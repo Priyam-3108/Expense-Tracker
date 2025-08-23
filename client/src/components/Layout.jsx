@@ -13,8 +13,19 @@ import {
 import { useState } from 'react'
 import { cn } from '../utils/cn'
 
+const currencySymbols = {
+  USD: '$',
+  EUR: '€',
+  INR: '₹',
+  GBP: '£',
+  JPY: '¥',
+  CNY: '¥',
+  CAD: 'C$',
+  AUD: 'A$'
+}
+
 const Layout = () => {
-  const { user, logout } = useAuth()
+  const { user, logout, currency } = useAuth()
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -51,7 +62,7 @@ const Layout = () => {
           <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
             <div className="flex items-center">
               <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">$</span>
+                <span className="text-white font-bold text-lg">{currencySymbols[currency] || '$'}</span>
               </div>
               <h1 className="ml-3 text-xl font-bold text-gray-900">Expense Tracker</h1>
             </div>
@@ -125,7 +136,7 @@ const Layout = () => {
             </button>
             <div className="flex items-center">
               <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">$</span>
+                <span className="text-white font-bold text-lg">{currencySymbols[currency] || '$'}</span>
               </div>
               <h1 className="ml-3 text-lg font-bold text-gray-900">Expense Tracker</h1>
             </div>

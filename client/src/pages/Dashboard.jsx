@@ -4,7 +4,7 @@ import { formatCurrency } from '../utils/helpers'
 import { TrendingUp, TrendingDown, DollarSign, CreditCard, Calendar, PieChart, Activity } from 'lucide-react'
 
 const Dashboard = () => {
-  const { user } = useAuth()
+  const { user, currency } = useAuth()
   const { stats, loading } = useExpense()
 
   const totalExpenses = stats?.totalStats?.expenses || 0
@@ -27,7 +27,7 @@ const Dashboard = () => {
             <div>
               <p className="text-sm font-medium text-gray-600">Total Expenses</p>
               <p className="text-3xl font-bold text-gray-900 mt-2">
-                {loading ? '...' : formatCurrency(totalExpenses)}
+                {loading ? '...' : formatCurrency(totalExpenses, currency)}
               </p>
             </div>
             <div className="p-3 bg-red-100 rounded-lg">
@@ -42,7 +42,7 @@ const Dashboard = () => {
             <div>
               <p className="text-sm font-medium text-gray-600">Total Income</p>
               <p className="text-3xl font-bold text-gray-900 mt-2">
-                {loading ? '...' : formatCurrency(totalIncome)}
+                {loading ? '...' : formatCurrency(totalIncome, currency)}
               </p>
             </div>
             <div className="p-3 bg-green-100 rounded-lg">
@@ -57,7 +57,7 @@ const Dashboard = () => {
             <div>
               <p className="text-sm font-medium text-gray-600">Net Amount</p>
               <p className={`text-3xl font-bold mt-2 ${netAmount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {loading ? '...' : formatCurrency(netAmount)}
+                {loading ? '...' : formatCurrency(netAmount, currency)}
               </p>
             </div>
             <div className="p-3 bg-blue-100 rounded-lg">
@@ -135,7 +135,7 @@ const Dashboard = () => {
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
               <div>
                 <p className="text-sm font-medium text-gray-600">This Month</p>
-                <p className="text-lg font-semibold text-gray-900">{formatCurrency(totalExpenses)}</p>
+                <p className="text-lg font-semibold text-gray-900">{formatCurrency(totalExpenses, currency)}</p>
               </div>
               <div className="text-right">
                 <p className="text-sm text-gray-600">vs Last Month</p>
@@ -145,7 +145,7 @@ const Dashboard = () => {
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
               <div>
                 <p className="text-sm font-medium text-gray-600">Average Daily</p>
-                <p className="text-lg font-semibold text-gray-900">{formatCurrency(totalExpenses / 30)}</p>
+                <p className="text-lg font-semibold text-gray-900">{formatCurrency(totalExpenses / 30, currency)}</p>
               </div>
               <div className="text-right">
                 <p className="text-sm text-gray-600">Spending</p>

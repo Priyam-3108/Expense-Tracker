@@ -29,6 +29,12 @@ const userSchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: true
+  },
+  currency: {
+    type: String,
+    enum: ['USD', 'EUR', 'INR', 'GBP', 'JPY', 'CNY', 'CAD', 'AUD'],
+    default: 'USD',
+    required: true
   }
 }, {
   timestamps: true

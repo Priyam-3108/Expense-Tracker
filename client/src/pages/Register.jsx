@@ -27,7 +27,7 @@ const Register = () => {
     setIsLoading(true)
     
     try {
-      const result = await registerUser(data.name, data.email, data.password)
+      const result = await registerUser(data.name, data.email, data.password, data.currency)
       if (result.success) {
         navigate('/dashboard')
       } else {
@@ -165,6 +165,34 @@ const Register = () => {
               </div>
               {errors.password && (
                 <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+              )}
+            </div>
+
+            {/* Confirm Password field */}
+            <div>
+              <label htmlFor="currency" className="block text-sm font-medium text-gray-700">
+                Preferred Currency
+              </label>
+              <select
+                id="currency"
+                {...register('currency', { required: 'Currency is required' })}
+                defaultValue="USD"
+                className={cn(
+                  "appearance-none relative block w-full pl-3 pr-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm",
+                  errors.currency && "border-red-300 focus:ring-red-500 focus:border-red-500"
+                )}
+              >
+                <option value="USD">US Dollar ($)</option>
+                <option value="EUR">Euro (€)</option>
+                <option value="INR">Indian Rupee (₹)</option>
+                <option value="GBP">British Pound (£)</option>
+                <option value="JPY">Japanese Yen (¥)</option>
+                <option value="CNY">Chinese Yuan (¥)</option>
+                <option value="CAD">Canadian Dollar (C$)</option>
+                <option value="AUD">Australian Dollar (A$)</option>
+              </select>
+              {errors.currency && (
+                <p className="mt-1 text-sm text-red-600">{errors.currency.message}</p>
               )}
             </div>
 

@@ -8,14 +8,14 @@ const Profile = () => {
   const [loading, setLoading] = useState(false)
   const [passwordLoading, setPasswordLoading] = useState(false)
 
-  const [profileForm, setProfileForm] = useState({ name: '', email: '' })
+  const [profileForm, setProfileForm] = useState({ name: '', email: '', currency: 'USD' })
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '', newPassword: '', confirmPassword: ''
   })
 
   useEffect(() => {
     if (user) {
-      setProfileForm({ name: user.name || '', email: user.email || '' })
+      setProfileForm({ name: user.name || '', email: user.email || '', currency: user.currency || 'USD' })
     }
   }, [user])
 
@@ -113,6 +113,29 @@ const Profile = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
+              </div>
+
+              <div>
+                <label htmlFor="currency" className="block text-sm font-medium text-gray-700 mb-1">
+                  Preferred Currency
+                </label>
+                <select
+                  id="currency"
+                  name="currency"
+                  value={profileForm.currency}
+                  onChange={e => setProfileForm(prev => ({ ...prev, currency: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                >
+                  <option value="USD">US Dollar ($)</option>
+                  <option value="EUR">Euro (€)</option>
+                  <option value="INR">Indian Rupee (₹)</option>
+                  <option value="GBP">British Pound (£)</option>
+                  <option value="JPY">Japanese Yen (¥)</option>
+                  <option value="CNY">Chinese Yuan (¥)</option>
+                  <option value="CAD">Canadian Dollar (C$)</option>
+                  <option value="AUD">Australian Dollar (A$)</option>
+                </select>
               </div>
 
               <div className="flex justify-end">

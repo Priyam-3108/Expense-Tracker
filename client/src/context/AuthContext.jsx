@@ -53,9 +53,9 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
-  const register = async (name, email, password) => {
+  const register = async (name, email, password, currency) => {
     try {
-      const response = await authService.register(name, email, password)
+      const response = await authService.register(name, email, password, currency)
       const { user: userData, token } = response.data
       
       localStorage.setItem('token', token)
@@ -79,7 +79,7 @@ export const AuthProvider = ({ children }) => {
   const updateProfile = async (updates) => {
     try {
       const response = await authService.updateProfile(updates)
-      const updatedUser = response.data.user
+      const updatedUser = response.data.data.user
       setUser(updatedUser)
       toast.success('Profile updated successfully')
       return { success: true }
@@ -110,7 +110,8 @@ export const AuthProvider = ({ children }) => {
     logout,
     updateProfile,
     changePassword,
-    isAuthenticated: !!user
+    isAuthenticated: !!user,
+    currency: user?.currency || 'USD'
   }
 
   return (

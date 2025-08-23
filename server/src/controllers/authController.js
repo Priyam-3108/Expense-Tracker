@@ -12,7 +12,7 @@ const generateToken = (userId) => {
 // Register user
 export const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, currency } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -27,7 +27,8 @@ export const register = async (req, res) => {
     const user = new User({
       name,
       email,
-      password
+      password,
+      currency: currency || 'USD'
     });
 
     await user.save();
@@ -137,11 +138,12 @@ export const getProfile = async (req, res) => {
 // Update user profile
 export const updateProfile = async (req, res) => {
   try {
-    const { name, email } = req.body;
+    const { name, email, currency } = req.body;
     const updates = {};
 
     if (name) updates.name = name;
     if (email) updates.email = email;
+    if (currency) updates.currency = currency;
 
     // Check if email is being changed and if it's already taken
     if (email && email !== req.user.email) {
