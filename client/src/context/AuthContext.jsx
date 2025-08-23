@@ -40,9 +40,6 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await authService.login(email, password)
       const { user: userData, token } = response.data.data
-      console.log(response.data.data)
-      console.log(userData)
-      console.log(token)
       
       localStorage.setItem('token', token)
       setUser(userData)
