@@ -21,20 +21,30 @@ export const ExpenseProvider = ({ children }) => {
   const [stats, setStats] = useState(null)
   const [trends, setTrends] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [categoriesLoading, setCategoriesLoading] = useState(false)
+  const [error, setError] = useState(null)
 
   // Load categories when user changes
   useEffect(() => {
     if (user) {
-      loadCategories()
+      loadCategories().catch(error => {
+        console.error('Error in loadCategories useEffect:', error)
+        setError(error.message)
+      })
     }
   }, [user])
 
   // Load initial data
   useEffect(() => {
     if (user) {
-      loadExpenses()
-      loadStats()
-      loadTrends()
+      Promise.all([
+        loadExpenses(),
+        loadStats(),
+        loadTrends()
+      ]).catch(error => {
+        console.error('Error in initial data useEffect:', error)
+        setError(error.message)
+      })
     }
   }, [user])
 
@@ -42,11 +52,17 @@ export const ExpenseProvider = ({ children }) => {
     try {
       setLoading(true)
       const response = await expenseService.getExpenses(filters)
-      setExpenses(response.data.expenses)
-      return response.data
+      if (response && response.data && Array.isArray(response.data.expenses)) {
+        setExpenses(response.data.expenses)
+        return response.data
+      } else {
+        console.error('Invalid expenses response:', response)
+        setExpenses([])
+      }
     } catch (error) {
       console.error('Error loading expenses:', error)
       toast.error('Failed to load expenses')
+      setExpenses([])
     } finally {
       setLoading(false)
     }
@@ -54,29 +70,50 @@ export const ExpenseProvider = ({ children }) => {
 
   const loadCategories = async () => {
     try {
+      setCategoriesLoading(true)
       const response = await categoryService.getCategories()
-      setCategories(response.data.categories)
+      if (response && response.data && Array.isArray(response.data.categories)) {
+        setCategories(response.data.categories)
+      } else {
+        console.error('Invalid categories response:', response)
+        setCategories([])
+      }
     } catch (error) {
       console.error('Error loading categories:', error)
       toast.error('Failed to load categories')
+      setCategories([])
+    } finally {
+      setCategoriesLoading(false)
     }
   }
 
   const loadStats = async (dateRange = {}) => {
     try {
       const response = await expenseService.getStats(dateRange)
-      setStats(response.data)
+      if (response && response.data) {
+        setStats(response.data)
+      } else {
+        console.error('Invalid stats response:', response)
+        setStats(null)
+      }
     } catch (error) {
       console.error('Error loading stats:', error)
+      setStats(null)
     }
   }
 
   const loadTrends = async (year = new Date().getFullYear()) => {
     try {
       const response = await expenseService.getTrends(year)
-      setTrends(response.data)
+      if (response && response.data) {
+        setTrends(response.data)
+      } else {
+        console.error('Invalid trends response:', response)
+        setTrends(null)
+      }
     } catch (error) {
       console.error('Error loading trends:', error)
+      setTrends(null)
     }
   }
 
@@ -145,6 +182,41 @@ export const ExpenseProvider = ({ children }) => {
     }
   }
 
+  const createDefaultCategories = async () => {
+    try {
+      const response = await categoryService.createDefaultCategories()
+      console.log('Response:', response)
+      console.log('Response data:', response.data)
+      
+      // Handle different response structures
+      let newCategories = []
+      if (response.data && response.data.data && response.data.data.categories) {
+        newCategories = response.data.data.categories
+      } else if (response.data && response.data.categories) {
+        newCategories = response.data.categories
+      } else {
+        console.error('Unexpected response structure:', response.data)
+        toast.error('Unexpected response format from server')
+        return { success: false, error: 'Unexpected response format' }
+      }
+      
+      if (Array.isArray(newCategories)) {
+        setCategories(prev => [...prev, ...newCategories])
+        toast.success(response.data.message || 'Default categories created successfully')
+        return { success: true, categories: newCategories }
+      } else {
+        console.error('Categories is not an array:', newCategories)
+        toast.error('Invalid categories data received')
+        return { success: false, error: 'Invalid categories data' }
+      }
+    } catch (error) {
+      console.error('Error in createDefaultCategories:', error)
+      const message = error.response?.data?.message || 'Failed to create default categories'
+      toast.error(message)
+      return { success: false, error: message }
+    }
+  }
+
   const updateCategory = async (id, updates) => {
     try {
       const response = await categoryService.updateCategory(id, updates)
@@ -177,13 +249,21 @@ export const ExpenseProvider = ({ children }) => {
   }
 
   const getCategoryById = (id) => {
-    return categories.find(category => category._id === id)
+    if (!id || !Array.isArray(categories)) {
+      return null
+    }
+    return categories.find(category => category._id === id) || null
   }
 
   const getCategoryStats = async (dateRange = {}) => {
     try {
       const response = await categoryService.getCategoryStats(dateRange)
-      return response.data.stats
+      if (response && response.data && Array.isArray(response.data.stats)) {
+        return response.data.stats
+      } else {
+        console.error('Invalid category stats response:', response)
+        return []
+      }
     } catch (error) {
       console.error('Error loading category stats:', error)
       return []
@@ -196,6 +276,8 @@ export const ExpenseProvider = ({ children }) => {
     stats,
     trends,
     loading,
+    categoriesLoading,
+    error,
     loadExpenses,
     loadCategories,
     loadStats,
@@ -204,10 +286,29 @@ export const ExpenseProvider = ({ children }) => {
     updateExpense,
     deleteExpense,
     addCategory,
+    createDefaultCategories,
     updateCategory,
     deleteCategory,
     getCategoryById,
     getCategoryStats
+  }
+
+  // If there's an error, show it instead of crashing
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-red-600 mb-2">Something went wrong</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button 
+            onClick={() => setError(null)}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (

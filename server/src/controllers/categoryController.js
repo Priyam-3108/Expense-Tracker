@@ -291,3 +291,67 @@ export const getCategoryStats = async (req, res) => {
     });
   }
 };
+
+// Create default categories for a user
+export const createDefaultCategories = async (req, res) => {
+  try {
+    const defaultCategories = [
+      { name: 'Meal', color: '#EF4444', icon: '🍽️', isDefault: true },
+      { name: 'House Rent', color: '#10B981', icon: '🏠', isDefault: true },
+      { name: 'Travel', color: '#3B82F6', icon: '✈️', isDefault: true },
+      { name: 'Loan', color: '#F59E0B', icon: '💳', isDefault: true },
+      { name: 'Shopping', color: '#8B5CF6', icon: '🛍️', isDefault: true },
+      { name: 'Transportation', color: '#06B6D4', icon: '🚗', isDefault: true },
+      { name: 'Healthcare', color: '#EC4899', icon: '🏥', isDefault: true },
+      { name: 'Entertainment', color: '#F97316', icon: '🎬', isDefault: true },
+      { name: 'Education', color: '#84CC16', icon: '📚', isDefault: true },
+      { name: 'Utilities', color: '#6366F1', icon: '⚡', isDefault: true }
+    ];
+
+    // Check which default categories don't exist for this user
+    const existingCategories = await Category.find({ user: req.user._id });
+    const existingNames = existingCategories.map(cat => cat.name.toLowerCase());
+    
+    const categoriesToCreate = defaultCategories.filter(
+      cat => !existingNames.includes(cat.name.toLowerCase())
+    );
+
+    if (categoriesToCreate.length === 0) {
+      return res.json({
+        success: true,
+        message: 'All default categories already exist',
+        data: {
+          created: 0,
+          categories: []
+        }
+      });
+    }
+
+    // Create the missing default categories
+    const createdCategories = [];
+    for (const categoryData of categoriesToCreate) {
+      const category = new Category({
+        ...categoryData,
+        user: req.user._id
+      });
+      await category.save();
+      createdCategories.push(category);
+    }
+
+    res.status(201).json({
+      success: true,
+      message: `Created ${createdCategories.length} default categories`,
+      data: {
+        created: createdCategories.length,
+        categories: createdCategories
+      }
+    });
+  } catch (error) {
+    console.error('Create default categories error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create default categories',
+      error: error.message
+    });
+  }
+};

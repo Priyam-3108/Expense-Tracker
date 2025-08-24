@@ -19,6 +19,14 @@ A comprehensive expense tracking application built with the MERN stack (MongoDB,
 - **Recurring expense support** (weekly, monthly, yearly)
 - **Tags and notes** for better organization
 
+### 📂 Category Management
+- **Default categories** automatically created for new users (Meal, House Rent, Travel, etc.)
+- **Custom category creation** with personalized colors and icons
+- **Category editing and deletion** with safety checks for associated expenses
+- **Category statistics** showing expense breakdown and usage
+- **Visual category selector** with search functionality
+- **Category badges** for easy identification in lists
+
 ### 📊 Analytics & Visualization
 - **Dashboard overview** with key metrics
 - **Monthly expense trends** with interactive charts
@@ -88,7 +96,9 @@ expense-tracker/
 └── client/                 # Frontend (React + Vite)
     ├── src/
     │   ├── components/     # Reusable UI components
-    │   │   └── Layout.jsx
+    │   │   ├── Layout.jsx
+    │   │   ├── CategorySelector.jsx
+    │   │   └── CategoryBadge.jsx
     │   ├── pages/          # Page components
     │   │   ├── Login.jsx
     │   │   ├── Register.jsx
@@ -224,6 +234,37 @@ Content-Type: application/json
   "color": "#FF6B6B",
   "icon": "🍕"
 }
+```
+
+#### Create Default Categories
+```http
+POST /api/categories/defaults
+Authorization: Bearer <token>
+```
+
+#### Update Category
+```http
+PUT /api/categories/:id
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "name": "Updated Food",
+  "color": "#FF8E8E",
+  "icon": "🍕"
+}
+```
+
+#### Delete Category
+```http
+DELETE /api/categories/:id
+Authorization: Bearer <token>
+```
+
+#### Get Category Statistics
+```http
+GET /api/categories/stats?startDate=2024-01-01&endDate=2024-12-31
+Authorization: Bearer <token>
 ```
 
 ### Expense Endpoints

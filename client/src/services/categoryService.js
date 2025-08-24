@@ -39,4 +39,9 @@ export const categoryService = {
     
     return api.get(`/categories/stats?${params.toString()}`)
   },
+
+  // Create default categories
+  createDefaultCategories: () => {
+    return api.post('/categories/defaults')
+  },
 }

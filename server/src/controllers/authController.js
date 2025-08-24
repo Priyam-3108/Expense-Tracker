@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { User } from '../config/models/index.js';
+import { User, Category } from '../config/models/index.js';
 import { env } from '../config/env.js';
 
 // Generate JWT token
@@ -32,6 +32,28 @@ export const register = async (req, res) => {
     });
 
     await user.save();
+
+    // Create default categories for the new user
+    const defaultCategories = [
+      { name: 'Meal', color: '#EF4444', icon: '🍽️', isDefault: true },
+      { name: 'House Rent', color: '#10B981', icon: '🏠', isDefault: true },
+      { name: 'Travel', color: '#3B82F6', icon: '✈️', isDefault: true },
+      { name: 'Loan', color: '#F59E0B', icon: '💳', isDefault: true },
+      { name: 'Shopping', color: '#8B5CF6', icon: '🛍️', isDefault: true },
+      { name: 'Transportation', color: '#06B6D4', icon: '🚗', isDefault: true },
+      { name: 'Healthcare', color: '#EC4899', icon: '🏥', isDefault: true },
+      { name: 'Entertainment', color: '#F97316', icon: '🎬', isDefault: true },
+      { name: 'Education', color: '#84CC16', icon: '📚', isDefault: true },
+      { name: 'Utilities', color: '#6366F1', icon: '⚡', isDefault: true }
+    ];
+
+    for (const categoryData of defaultCategories) {
+      const category = new Category({
+        ...categoryData,
+        user: user._id
+      });
+      await category.save();
+    }
 
     // Generate token
     const token = generateToken(user._id);

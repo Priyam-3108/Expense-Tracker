@@ -5,7 +5,8 @@ import {
   createCategory,
   updateCategory,
   deleteCategory,
-  getCategoryStats
+  getCategoryStats,
+  createDefaultCategories
 } from '../controllers/categoryController.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { validate, categorySchema } from '../middleware/validation.js';
@@ -20,6 +21,7 @@ router.get('/', getCategories);
 router.get('/stats', getCategoryStats);
 router.get('/:id', getCategory);
 router.post('/', validate(categorySchema), createCategory);
+router.post('/defaults', createDefaultCategories);
 router.put('/:id', validate(categorySchema), updateCategory);
 router.delete('/:id', deleteCategory);
 
