@@ -173,49 +173,13 @@ export const ExpenseProvider = ({ children }) => {
       const response = await categoryService.createCategory(categoryData)
       const newCategory = response.data.category
       setCategories(prev => [...prev, newCategory])
-      toast.success('Category added successfully')
       return { success: true, category: newCategory }
     } catch (error) {
       const message = error.response?.data?.message || 'Failed to add category'
-      toast.error(message)
       return { success: false, error: message }
     }
   }
 
-  const createDefaultCategories = async () => {
-    try {
-      const response = await categoryService.createDefaultCategories()
-      console.log('Response:', response)
-      console.log('Response data:', response.data)
-      
-      // Handle different response structures
-      let newCategories = []
-      if (response.data && response.data.data && response.data.data.categories) {
-        newCategories = response.data.data.categories
-      } else if (response.data && response.data.categories) {
-        newCategories = response.data.categories
-      } else {
-        console.error('Unexpected response structure:', response.data)
-        toast.error('Unexpected response format from server')
-        return { success: false, error: 'Unexpected response format' }
-      }
-      
-      if (Array.isArray(newCategories)) {
-        setCategories(prev => [...prev, ...newCategories])
-        toast.success(response.data.message || 'Default categories created successfully')
-        return { success: true, categories: newCategories }
-      } else {
-        console.error('Categories is not an array:', newCategories)
-        toast.error('Invalid categories data received')
-        return { success: false, error: 'Invalid categories data' }
-      }
-    } catch (error) {
-      console.error('Error in createDefaultCategories:', error)
-      const message = error.response?.data?.message || 'Failed to create default categories'
-      toast.error(message)
-      return { success: false, error: message }
-    }
-  }
 
   const updateCategory = async (id, updates) => {
     try {
@@ -226,11 +190,9 @@ export const ExpenseProvider = ({ children }) => {
           category._id === id ? updatedCategory : category
         )
       )
-      toast.success('Category updated successfully')
       return { success: true, category: updatedCategory }
     } catch (error) {
       const message = error.response?.data?.message || 'Failed to update category'
-      toast.error(message)
       return { success: false, error: message }
     }
   }
@@ -239,11 +201,9 @@ export const ExpenseProvider = ({ children }) => {
     try {
       await categoryService.deleteCategory(id)
       setCategories(prev => prev.filter(category => category._id !== id))
-      toast.success('Category deleted successfully')
       return { success: true }
     } catch (error) {
       const message = error.response?.data?.message || 'Failed to delete category'
-      toast.error(message)
       return { success: false, error: message }
     }
   }
@@ -286,7 +246,6 @@ export const ExpenseProvider = ({ children }) => {
     updateExpense,
     deleteExpense,
     addCategory,
-    createDefaultCategories,
     updateCategory,
     deleteCategory,
     getCategoryById,

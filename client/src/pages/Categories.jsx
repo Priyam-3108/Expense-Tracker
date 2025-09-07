@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useExpense } from '../context/ExpenseContext'
-import { Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-react'
+import { Plus, Edit, Trash2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const Categories = () => {
-  const { categories, addCategory, updateCategory, deleteCategory, createDefaultCategories, getCategoryStats, loading, categoriesLoading } = useExpense()
+  const { categories, addCategory, updateCategory, deleteCategory, getCategoryStats, loading, categoriesLoading } = useExpense()
   const [showForm, setShowForm] = useState(false)
   const [editingCategory, setEditingCategory] = useState(null)
   const [formData, setFormData] = useState({
@@ -12,23 +12,10 @@ const Categories = () => {
     color: '#3B82F6',
     icon: '💰'
   })
-  const [showDefaultCategories, setShowDefaultCategories] = useState(true)
   const [categoryStats, setCategoryStats] = useState([])
   const [statsLoading, setStatsLoading] = useState(false)
+  const [formLoading, setFormLoading] = useState(false)
 
-  // Default categories that will be created for new users
-  const defaultCategories = [
-    { name: 'Meal', color: '#EF4444', icon: '🍽️' },
-    { name: 'House Rent', color: '#10B981', icon: '🏠' },
-    { name: 'Travel', color: '#3B82F6', icon: '✈️' },
-    { name: 'Loan', color: '#F59E0B', icon: '💳' },
-    { name: 'Shopping', color: '#8B5CF6', icon: '🛍️' },
-    { name: 'Transportation', color: '#06B6D4', icon: '🚗' },
-    { name: 'Healthcare', color: '#EC4899', icon: '🏥' },
-    { name: 'Entertainment', color: '#F97316', icon: '🎬' },
-    { name: 'Education', color: '#84CC16', icon: '📚' },
-    { name: 'Utilities', color: '#6366F1', icon: '⚡' }
-  ]
 
   const iconOptions = [
     '💰', '🍽️', '🏠', '✈️', '💳', '🛍️', '🚗', '🏥', '🎬', '📚', '⚡',
@@ -65,18 +52,30 @@ const Categories = () => {
       return
     }
 
+    setFormLoading(true)
     try {
       if (editingCategory) {
-        await updateCategory(editingCategory._id, formData)
-        setEditingCategory(null)
+        const result = await updateCategory(editingCategory._id, formData)
+        if (result.success) {
+          toast.success('Category updated successfully')
+          setEditingCategory(null)
+          setShowForm(false)
+          setFormData({ name: '', color: '#3B82F6', icon: '💰' })
+        }
       } else {
-        await addCategory(formData)
+        const result = await addCategory(formData)
+        if (result.success) {
+          toast.success('Category created successfully')
+          setShowForm(false)
+          setFormData({ name: '', color: '#3B82F6', icon: '💰' })
+        }
       }
-      
-      setShowForm(false)
-      setFormData({ name: '', color: '#3B82F6', icon: '💰' })
     } catch (error) {
       console.error('Error saving category:', error)
+      const errorMessage = error.response?.data?.message || 'Failed to save category'
+      toast.error(errorMessage)
+    } finally {
+      setFormLoading(false)
     }
   }
 
@@ -85,23 +84,38 @@ const Categories = () => {
     setShowForm(true)
   }
 
+  const handleCancel = () => {
+    setShowForm(false)
+    setEditingCategory(null)
+    setFormData({ name: '', color: '#3B82F6', icon: '💰' })
+  }
+
+  const handleAddNew = () => {
+    setEditingCategory(null)
+    setFormData({ name: '', color: '#3B82F6', icon: '💰' })
+    setShowForm(true)
+  }
+
   const handleDelete = async (category) => {
-    if (window.confirm(`Are you sure you want to delete "${category.name}"?`)) {
+    const hasExpenses = category.expenseCount > 0
+    const confirmMessage = hasExpenses 
+      ? `Are you sure you want to delete "${category.name}"? This category has ${category.expenseCount} associated expense${category.expenseCount !== 1 ? 's' : ''}. You'll need to reassign or delete those expenses first.`
+      : `Are you sure you want to delete "${category.name}"? This action cannot be undone.`
+    
+    if (window.confirm(confirmMessage)) {
       try {
-        await deleteCategory(category._id)
+        const result = await deleteCategory(category._id)
+        if (result.success) {
+          toast.success('Category deleted successfully')
+        }
       } catch (error) {
         console.error('Error deleting category:', error)
+        const errorMessage = error.response?.data?.message || 'Failed to delete category'
+        toast.error(errorMessage)
       }
     }
   }
 
-  const handleCreateDefaultCategories = async () => {
-    try {
-      await createDefaultCategories()
-    } catch (error) {
-      console.error('Error creating default categories:', error)
-    }
-  }
 
   const userCategories = categories?.filter(cat => !cat.isDefault) || []
   const defaultUserCategories = categories?.filter(cat => cat.isDefault) || []
@@ -143,20 +157,7 @@ const Categories = () => {
         </div>
         <div className="flex gap-2">
           <button
-            onClick={() => setShowDefaultCategories(!showDefaultCategories)}
-            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            {showDefaultCategories ? <EyeOff size={16} /> : <Eye size={16} />}
-            {showDefaultCategories ? 'Hide' : 'Show'} Defaults
-          </button>
-          <button
-            onClick={handleCreateDefaultCategories}
-            className="px-3 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-          >
-            Create Defaults
-          </button>
-          <button
-            onClick={() => setShowForm(true)}
+            onClick={handleAddNew}
             className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             <Plus size={16} />
@@ -233,18 +234,23 @@ const Categories = () => {
             <div className="flex gap-3 pt-4">
               <button
                 type="submit"
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                disabled={formLoading}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {editingCategory ? 'Update Category' : 'Add Category'}
+                {formLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    {editingCategory ? 'Updating...' : 'Adding...'}
+                  </div>
+                ) : (
+                  editingCategory ? 'Update Category' : 'Add Category'
+                )}
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setShowForm(false)
-                  setEditingCategory(null)
-                  setFormData({ name: '', color: '#3B82F6', icon: '💰' })
-                }}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                onClick={handleCancel}
+                disabled={formLoading}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
@@ -253,15 +259,35 @@ const Categories = () => {
         </div>
       )}
 
-      {/* Default Categories */}
-      {showDefaultCategories && defaultUserCategories.length > 0 && (
-        <div className="bg-white rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900">Default Categories</h3>
-            <p className="text-sm text-gray-600">Pre-defined categories for common expenses</p>
-          </div>
-          <div className="p-6">
+      {/* All Categories */}
+      <div className="bg-white rounded-lg shadow">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h3 className="text-lg font-medium text-gray-900">All Categories</h3>
+          <p className="text-sm text-gray-600">
+            {defaultUserCategories.length} default categories • {userCategories.length} custom categories
+          </p>
+        </div>
+        <div className="p-6">
+          {categories.length === 0 ? (
+            <div className="text-center py-8">
+              <div className="text-gray-400 mb-4">
+                <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center">
+                  <Plus size={24} />
+                </div>
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No categories available</h3>
+              <p className="text-gray-600 mb-4">Create your first custom category to get started</p>
+              <button
+                onClick={handleAddNew}
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+              >
+                <Plus size={16} />
+                Add Category
+              </button>
+            </div>
+          ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Default Categories */}
               {defaultUserCategories.map((category) => (
                 <div
                   key={category._id}
@@ -276,51 +302,25 @@ const Categories = () => {
                     </div>
                     <div>
                       <h4 className="font-medium text-gray-900">{category.name}</h4>
-                      <p className="text-sm text-gray-500">Default category</p>
+                      <p className="text-sm text-gray-500">
+                        Default category
+                        {category.expenseCount > 0 && (
+                          <span className="ml-2 text-blue-600">
+                            • {category.expenseCount} expense{category.expenseCount !== 1 ? 's' : ''}
+                          </span>
+                        )}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleEdit(category)}
-                      className="p-1 text-gray-400 hover:text-blue-600"
-                      title="Edit category"
-                    >
-                      <Edit size={16} />
-                    </button>
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                      Read-only
+                    </span>
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* User Categories */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">Your Categories</h3>
-          <p className="text-sm text-gray-600">Custom categories you've created</p>
-        </div>
-        <div className="p-6">
-          {userCategories.length === 0 ? (
-            <div className="text-center py-8">
-              <div className="text-gray-400 mb-4">
-                <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center">
-                  <Plus size={24} />
-                </div>
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No custom categories yet</h3>
-              <p className="text-gray-600 mb-4">Create your first custom category to get started</p>
-              <button
-                onClick={() => setShowForm(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-              >
-                <Plus size={16} />
-                Add Category
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              
+              {/* User Categories */}
               {userCategories.map((category) => (
                 <div
                   key={category._id}
@@ -335,7 +335,14 @@ const Categories = () => {
                     </div>
                     <div>
                       <h4 className="font-medium text-gray-900">{category.name}</h4>
-                      <p className="text-sm text-gray-500">Custom category</p>
+                      <p className="text-sm text-gray-500">
+                        Custom category
+                        {category.expenseCount > 0 && (
+                          <span className="ml-2 text-blue-600">
+                            • {category.expenseCount} expense{category.expenseCount !== 1 ? 's' : ''}
+                          </span>
+                        )}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -348,8 +355,16 @@ const Categories = () => {
                     </button>
                     <button
                       onClick={() => handleDelete(category)}
-                      className="p-1 text-gray-400 hover:text-red-600"
-                      title="Delete category"
+                      className={`p-1 ${
+                        category.expenseCount > 0 
+                          ? 'text-orange-400 hover:text-orange-600' 
+                          : 'text-gray-400 hover:text-red-600'
+                      }`}
+                      title={
+                        category.expenseCount > 0 
+                          ? `Delete category (has ${category.expenseCount} expense${category.expenseCount !== 1 ? 's' : ''})`
+                          : 'Delete category'
+                      }
                     >
                       <Trash2 size={16} />
                     </button>
