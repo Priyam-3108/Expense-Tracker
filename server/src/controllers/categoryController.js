@@ -9,10 +9,11 @@ export const getCategories = async (req, res) => {
 
     // Get expense counts for each category using aggregation
     const { Expense } = await import('../config/models/index.js');
+    const mongoose = (await import('mongoose')).default;
     const expenseCounts = await Expense.aggregate([
       {
         $match: {
-          user: req.user._id
+          user: new mongoose.Types.ObjectId(req.user._id)
         }
       },
       {

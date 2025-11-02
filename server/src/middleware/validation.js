@@ -21,7 +21,7 @@ export const categorySchema = z.object({
 export const expenseSchema = z.object({
   description: z.string().min(1, 'Description is required').max(100, 'Description cannot exceed 100 characters'),
   amount: z.number().positive('Amount must be positive').max(999999.99, 'Amount cannot exceed 999,999.99'),
-  date: z.string().datetime().optional(),
+  date: z.string().optional(),
   category: z.string().min(1, 'Category is required'),
   type: z.enum(['expense', 'income']).default('expense'),
   tags: z.array(z.string().max(20)).optional(),

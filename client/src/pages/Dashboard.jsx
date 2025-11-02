@@ -3,6 +3,17 @@ import { useExpense } from '../context/ExpenseContext'
 import { formatCurrency } from '../utils/helpers'
 import { TrendingUp, TrendingDown, DollarSign, CreditCard, Calendar, PieChart, Activity } from 'lucide-react'
 
+const currencySymbols = {
+  USD: '$',
+  EUR: '€',
+  INR: '₹',
+  GBP: '£',
+  JPY: '¥',
+  CNY: '¥',
+  CAD: 'C$',
+  AUD: 'A$'
+}
+
 const Dashboard = () => {
   const { user, currency } = useAuth()
   const { stats, loading } = useExpense()
@@ -61,7 +72,7 @@ const Dashboard = () => {
               </p>
             </div>
             <div className="p-3 bg-blue-100 rounded-lg">
-              <DollarSign className="h-8 w-8 text-blue-600" />
+              <span className="text-blue-600 font-bold text-4xl">{currencySymbols[currency] || '$'}</span>
             </div>
           </div>
         </div>

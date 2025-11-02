@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { expenseService } from '../services/expenseService'
 import { categoryService } from '../services/categoryService'
 import { useAuth } from './AuthContext'
@@ -24,35 +24,7 @@ export const ExpenseProvider = ({ children }) => {
   const [categoriesLoading, setCategoriesLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  // Load categories when user changes
-  useEffect(() => {
-    if (user) {
-      loadCategories().catch(error => {
-        const errorMessage = error.response?.data?.message || error.message || 'Failed to load categories'
-        toast.error(errorMessage)
-        console.error('Error in loadCategories useEffect:', error)
-        setError(error.message)
-      })
-    }
-  }, [user])
-
-  // Load initial data
-  useEffect(() => {
-    if (user) {
-      Promise.all([
-        loadExpenses(),
-        loadStats(),
-        loadTrends()
-      ]).catch(error => {
-        const errorMessage = error.response?.data?.message || error.message || 'Failed to load initial data'
-        toast.error(errorMessage)
-        console.error('Error in initial data useEffect:', error)
-        setError(error.message)
-      })
-    }
-  }, [user])
-
-  const loadExpenses = async (filters = {}) => {
+  const loadExpenses = useCallback(async (filters = {}) => {
     try {
       setLoading(true)
       const response = await expenseService.getExpenses(filters)
@@ -76,9 +48,9 @@ export const ExpenseProvider = ({ children }) => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
-  const loadCategories = async () => {
+  const loadCategories = useCallback(async () => {
     try {
       setCategoriesLoading(true)
       const response = await categoryService.getCategories()
@@ -105,9 +77,9 @@ export const ExpenseProvider = ({ children }) => {
     } finally {
       setCategoriesLoading(false)
     }
-  }
+  }, [])
 
-  const loadStats = async (dateRange = {}) => {
+  const loadStats = useCallback(async (dateRange = {}) => {
     try {
       const response = await expenseService.getStats(dateRange)
       if (response && response.data && response.data.success && response.data.data) {
@@ -126,9 +98,9 @@ export const ExpenseProvider = ({ children }) => {
       console.error('Error loading stats:', error)
       setStats(null)
     }
-  }
+  }, [])
 
-  const loadTrends = async (year = new Date().getFullYear()) => {
+  const loadTrends = useCallback(async (year = new Date().getFullYear()) => {
     try {
       const response = await expenseService.getTrends(year)
       if (response && response.data && response.data.success && response.data.data) {
@@ -147,9 +119,9 @@ export const ExpenseProvider = ({ children }) => {
       console.error('Error loading trends:', error)
       setTrends(null)
     }
-  }
+  }, [])
 
-  const addExpense = async (expenseData) => {
+  const addExpense = useCallback(async (expenseData) => {
     try {
       const response = await expenseService.createExpense(expenseData)
       const newExpense = response.data?.data?.expense || response.data?.expense
@@ -168,9 +140,9 @@ export const ExpenseProvider = ({ children }) => {
       toast.error(message)
       return { success: false, error: message }
     }
-  }
+  }, [loadStats, loadTrends])
 
-  const updateExpense = async (id, updates) => {
+  const updateExpense = useCallback(async (id, updates) => {
     try {
       const response = await expenseService.updateExpense(id, updates)
       const updatedExpense = response.data?.data?.expense || response.data?.expense
@@ -193,9 +165,9 @@ export const ExpenseProvider = ({ children }) => {
       toast.error(message)
       return { success: false, error: message }
     }
-  }
+  }, [loadStats, loadTrends])
 
-  const deleteExpense = async (id) => {
+  const deleteExpense = useCallback(async (id) => {
     try {
       await expenseService.deleteExpense(id)
       setExpenses(prev => prev.filter(expense => expense._id !== id))
@@ -208,9 +180,9 @@ export const ExpenseProvider = ({ children }) => {
       toast.error(message)
       return { success: false, error: message }
     }
-  }
+  }, [loadStats, loadTrends])
 
-  const addCategory = async (categoryData) => {
+  const addCategory = useCallback(async (categoryData) => {
     try {
       const response = await categoryService.createCategory(categoryData)
       // Backend returns: { success: true, data: { category: {...} } }
@@ -228,10 +200,10 @@ export const ExpenseProvider = ({ children }) => {
       toast.error(message)
       return { success: false, error: message }
     }
-  }
+  }, [loadCategories])
 
 
-  const updateCategory = async (id, updates) => {
+  const updateCategory = useCallback(async (id, updates) => {
     try {
       const response = await categoryService.updateCategory(id, updates)
       // Backend returns: { success: true, data: { category: {...} } }
@@ -249,9 +221,9 @@ export const ExpenseProvider = ({ children }) => {
       toast.error(message)
       return { success: false, error: message }
     }
-  }
+  }, [loadCategories])
 
-  const deleteCategory = async (id) => {
+  const deleteCategory = useCallback(async (id) => {
     try {
       const response = await categoryService.deleteCategory(id)
       // Check if deletion was successful
@@ -268,7 +240,7 @@ export const ExpenseProvider = ({ children }) => {
       toast.error(message)
       return { success: false, error: message }
     }
-  }
+  }, [loadCategories])
 
   const getCategoryById = (id) => {
     if (!id || !Array.isArray(categories)) {
@@ -299,6 +271,34 @@ export const ExpenseProvider = ({ children }) => {
       return []
     }
   }
+
+  // Load categories when user changes
+  useEffect(() => {
+    if (user) {
+      loadCategories().catch(error => {
+        const errorMessage = error.response?.data?.message || error.message || 'Failed to load categories'
+        toast.error(errorMessage)
+        console.error('Error in loadCategories useEffect:', error)
+        setError(error.message)
+      })
+    }
+  }, [user, loadCategories])
+
+  // Load initial data
+  useEffect(() => {
+    if (user) {
+      Promise.all([
+        loadExpenses(),
+        loadStats(),
+        loadTrends()
+      ]).catch(error => {
+        const errorMessage = error.response?.data?.message || error.message || 'Failed to load initial data'
+        toast.error(errorMessage)
+        console.error('Error in initial data useEffect:', error)
+        setError(error.message)
+      })
+    }
+  }, [user, loadExpenses, loadStats, loadTrends])
 
   const value = {
     expenses,

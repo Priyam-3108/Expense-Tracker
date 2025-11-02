@@ -4,8 +4,8 @@ import { Expense, Category } from '../config/models/index.js';
 export const getExpenses = async (req, res) => {
   try {
     const {
-      page = 1,
-      limit = 10,
+      page,
+      limit,
       category,
       type,
       startDate,
@@ -18,8 +18,8 @@ export const getExpenses = async (req, res) => {
     // Build filter object
     const filter = { user: req.user._id };
     
-    if (category) filter.category = category;
-    if (type) filter.type = type;
+    if (category && category !== 'all') filter.category = category;
+    if (type && type !== 'all') filter.type = type;
     
     if (startDate && endDate) {
       filter.date = {
@@ -39,38 +39,53 @@ export const getExpenses = async (req, res) => {
     const sort = {};
     sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
 
-    // Calculate pagination
-    const skip = (parseInt(page) - 1) * parseInt(limit);
+    // Check if pagination is requested
+    if (page && limit) {
+      // Calculate pagination
+      const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    // Get expenses with category info
-    const expenses = await Expense.find(filter)
-      .populate('category', 'name color icon')
-      .sort(sort)
-      .skip(skip)
-      .limit(parseInt(limit));
+      // Get expenses with category info
+      const expenses = await Expense.find(filter)
+        .populate('category', 'name color icon')
+        .sort(sort)
+        .skip(skip)
+        .limit(parseInt(limit));
 
-    // Get total count for pagination
-    const total = await Expense.countDocuments(filter);
+      // Get total count for pagination
+      const total = await Expense.countDocuments(filter);
 
-    // Calculate pagination info
-    const totalPages = Math.ceil(total / parseInt(limit));
-    const hasNextPage = page < totalPages;
-    const hasPrevPage = page > 1;
+      // Calculate pagination info
+      const totalPages = Math.ceil(total / parseInt(limit));
+      const hasNextPage = page < totalPages;
+      const hasPrevPage = page > 1;
 
-    res.json({
-      success: true,
-      data: {
-        expenses,
-        pagination: {
-          currentPage: parseInt(page),
-          totalPages,
-          totalItems: total,
-          hasNextPage,
-          hasPrevPage,
-          limit: parseInt(limit)
+      res.json({
+        success: true,
+        data: {
+          expenses,
+          pagination: {
+            currentPage: parseInt(page),
+            totalPages,
+            totalItems: total,
+            hasNextPage,
+            hasPrevPage,
+            limit: parseInt(limit)
+          }
         }
-      }
-    });
+      });
+    } else {
+      // Return all expenses without pagination
+      const expenses = await Expense.find(filter)
+        .populate('category', 'name color icon')
+        .sort(sort);
+
+      res.json({
+        success: true,
+        data: {
+          expenses
+        }
+      });
+    }
   } catch (error) {
     console.error('Get expenses error:', error);
     res.status(500).json({
