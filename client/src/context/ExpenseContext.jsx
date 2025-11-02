@@ -28,6 +28,8 @@ export const ExpenseProvider = ({ children }) => {
   useEffect(() => {
     if (user) {
       loadCategories().catch(error => {
+        const errorMessage = error.response?.data?.message || error.message || 'Failed to load categories'
+        toast.error(errorMessage)
         console.error('Error in loadCategories useEffect:', error)
         setError(error.message)
       })
@@ -42,6 +44,8 @@ export const ExpenseProvider = ({ children }) => {
         loadStats(),
         loadTrends()
       ]).catch(error => {
+        const errorMessage = error.response?.data?.message || error.message || 'Failed to load initial data'
+        toast.error(errorMessage)
         console.error('Error in initial data useEffect:', error)
         setError(error.message)
       })
@@ -59,12 +63,15 @@ export const ExpenseProvider = ({ children }) => {
         setExpenses(response.data.expenses)
         return response.data
       } else {
+        const errorMsg = response?.data?.message || 'Invalid response format from server'
+        toast.error(errorMsg)
         console.error('Invalid expenses response:', response)
         setExpenses([])
       }
     } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to load expenses. Please try again.'
+      toast.error(errorMessage)
       console.error('Error loading expenses:', error)
-      toast.error('Failed to load expenses')
       setExpenses([])
     } finally {
       setLoading(false)
@@ -80,17 +87,20 @@ export const ExpenseProvider = ({ children }) => {
       if (response && response.data && response.data.success && response.data.data && Array.isArray(response.data.data.categories)) {
         setCategories(response.data.data.categories)
       } else {
-        console.error('Invalid categories response:', response)
         // Try alternative structure in case response is flattened
         if (response && response.data && Array.isArray(response.data.categories)) {
           setCategories(response.data.categories)
         } else {
+          const errorMsg = response?.data?.message || 'Invalid response format from server'
+          toast.error(errorMsg)
+          console.error('Invalid categories response:', response)
           setCategories([])
         }
       }
     } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to load categories. Please try again.'
+      toast.error(errorMessage)
       console.error('Error loading categories:', error)
-      toast.error('Failed to load categories')
       setCategories([])
     } finally {
       setCategoriesLoading(false)
@@ -105,10 +115,14 @@ export const ExpenseProvider = ({ children }) => {
       } else if (response && response.data) {
         setStats(response.data)
       } else {
+        const errorMsg = response?.data?.message || 'Invalid response format from server'
+        toast.error(errorMsg)
         console.error('Invalid stats response:', response)
         setStats(null)
       }
     } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to load statistics. Please try again.'
+      toast.error(errorMessage)
       console.error('Error loading stats:', error)
       setStats(null)
     }
@@ -122,10 +136,14 @@ export const ExpenseProvider = ({ children }) => {
       } else if (response && response.data) {
         setTrends(response.data)
       } else {
+        const errorMsg = response?.data?.message || 'Invalid response format from server'
+        toast.error(errorMsg)
         console.error('Invalid trends response:', response)
         setTrends(null)
       }
     } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to load trends. Please try again.'
+      toast.error(errorMessage)
       console.error('Error loading trends:', error)
       setTrends(null)
     }
@@ -135,13 +153,18 @@ export const ExpenseProvider = ({ children }) => {
     try {
       const response = await expenseService.createExpense(expenseData)
       const newExpense = response.data?.data?.expense || response.data?.expense
+      if (!newExpense) {
+        const errorMsg = response?.data?.message || 'Failed to create expense'
+        toast.error(errorMsg)
+        return { success: false, error: errorMsg }
+      }
       setExpenses(prev => [newExpense, ...prev])
       await loadStats()
       await loadTrends()
       toast.success('Expense added successfully')
       return { success: true, expense: newExpense }
     } catch (error) {
-      const message = error.response?.data?.message || 'Failed to add expense'
+      const message = error.response?.data?.message || error.message || 'Failed to add expense. Please try again.'
       toast.error(message)
       return { success: false, error: message }
     }
@@ -151,6 +174,11 @@ export const ExpenseProvider = ({ children }) => {
     try {
       const response = await expenseService.updateExpense(id, updates)
       const updatedExpense = response.data?.data?.expense || response.data?.expense
+      if (!updatedExpense) {
+        const errorMsg = response?.data?.message || 'Failed to update expense'
+        toast.error(errorMsg)
+        return { success: false, error: errorMsg }
+      }
       setExpenses(prev => 
         prev.map(expense => 
           expense._id === id ? updatedExpense : expense
@@ -161,7 +189,7 @@ export const ExpenseProvider = ({ children }) => {
       toast.success('Expense updated successfully')
       return { success: true, expense: updatedExpense }
     } catch (error) {
-      const message = error.response?.data?.message || 'Failed to update expense'
+      const message = error.response?.data?.message || error.message || 'Failed to update expense. Please try again.'
       toast.error(message)
       return { success: false, error: message }
     }
@@ -187,11 +215,17 @@ export const ExpenseProvider = ({ children }) => {
       const response = await categoryService.createCategory(categoryData)
       // Backend returns: { success: true, data: { category: {...} } }
       const newCategory = response.data?.data?.category || response.data?.category
+      if (!newCategory) {
+        const errorMsg = response?.data?.message || 'Failed to create category'
+        toast.error(errorMsg)
+        return { success: false, error: errorMsg }
+      }
       // Reload categories to get updated expense counts
       await loadCategories()
       return { success: true, category: newCategory }
     } catch (error) {
-      const message = error.response?.data?.message || 'Failed to add category'
+      const message = error.response?.data?.message || error.message || 'Failed to add category. Please try again.'
+      toast.error(message)
       return { success: false, error: message }
     }
   }
@@ -202,23 +236,36 @@ export const ExpenseProvider = ({ children }) => {
       const response = await categoryService.updateCategory(id, updates)
       // Backend returns: { success: true, data: { category: {...} } }
       const updatedCategory = response.data?.data?.category || response.data?.category
+      if (!updatedCategory) {
+        const errorMsg = response?.data?.message || 'Failed to update category'
+        toast.error(errorMsg)
+        return { success: false, error: errorMsg }
+      }
       // Reload categories to get updated expense counts
       await loadCategories()
       return { success: true, category: updatedCategory }
     } catch (error) {
-      const message = error.response?.data?.message || 'Failed to update category'
+      const message = error.response?.data?.message || error.message || 'Failed to update category. Please try again.'
+      toast.error(message)
       return { success: false, error: message }
     }
   }
 
   const deleteCategory = async (id) => {
     try {
-      await categoryService.deleteCategory(id)
+      const response = await categoryService.deleteCategory(id)
+      // Check if deletion was successful
+      if (response?.data?.success === false) {
+        const errorMsg = response?.data?.message || 'Failed to delete category'
+        toast.error(errorMsg)
+        return { success: false, error: errorMsg }
+      }
       // Reload categories to get updated expense counts
       await loadCategories()
       return { success: true }
     } catch (error) {
-      const message = error.response?.data?.message || 'Failed to delete category'
+      const message = error.response?.data?.message || error.message || 'Failed to delete category. Please try again.'
+      toast.error(message)
       return { success: false, error: message }
     }
   }
@@ -240,10 +287,14 @@ export const ExpenseProvider = ({ children }) => {
         // Try alternative structure
         return response.data.stats
       } else {
+        const errorMsg = response?.data?.message || 'Invalid response format from server'
+        toast.error(errorMsg)
         console.error('Invalid category stats response:', response)
         return []
       }
     } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to load category statistics. Please try again.'
+      toast.error(errorMessage)
       console.error('Error loading category stats:', error)
       return []
     }
