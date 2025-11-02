@@ -4,7 +4,7 @@ import { Plus, Edit, Trash2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const Categories = () => {
-  const { categories, addCategory, updateCategory, deleteCategory, getCategoryStats, loading, categoriesLoading } = useExpense()
+  const { categories, addCategory, updateCategory, deleteCategory, getCategoryStats, loadCategories, loading, categoriesLoading } = useExpense()
   const [showForm, setShowForm] = useState(false)
   const [editingCategory, setEditingCategory] = useState(null)
   const [formData, setFormData] = useState({
@@ -15,6 +15,12 @@ const Categories = () => {
   const [categoryStats, setCategoryStats] = useState([])
   const [statsLoading, setStatsLoading] = useState(false)
   const [formLoading, setFormLoading] = useState(false)
+
+  // Load categories when component mounts
+  useEffect(() => {
+    loadCategories()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
 
   const iconOptions = [
@@ -55,6 +61,12 @@ const Categories = () => {
     setFormLoading(true)
     try {
       if (editingCategory) {
+        // Prevent editing default categories
+        if (editingCategory.isDefault) {
+          toast.error('Cannot edit default categories')
+          setFormLoading(false)
+          return
+        }
         const result = await updateCategory(editingCategory._id, formData)
         if (result.success) {
           toast.success('Category updated successfully')
@@ -80,6 +92,11 @@ const Categories = () => {
   }
 
   const handleEdit = (category) => {
+    // Prevent editing default categories
+    if (category.isDefault) {
+      toast.error('Default categories cannot be edited')
+      return
+    }
     setEditingCategory(category)
     setShowForm(true)
   }
@@ -97,6 +114,12 @@ const Categories = () => {
   }
 
   const handleDelete = async (category) => {
+    // Prevent deleting default categories
+    if (category.isDefault) {
+      toast.error('Default categories cannot be deleted')
+      return
+    }
+    
     const hasExpenses = category.expenseCount > 0
     const confirmMessage = hasExpenses 
       ? `Are you sure you want to delete "${category.name}"? This category has ${category.expenseCount} associated expense${category.expenseCount !== 1 ? 's' : ''}. You'll need to reassign or delete those expenses first.`
@@ -286,92 +309,135 @@ const Categories = () => {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Default Categories */}
-              {defaultUserCategories.map((category) => (
-                <div
-                  key={category._id}
-                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center text-lg"
-                      style={{ backgroundColor: category.color + '20' }}
-                    >
-                      {category.icon}
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-gray-900">{category.name}</h4>
-                      <p className="text-sm text-gray-500">
-                        Default category
-                        {category.expenseCount > 0 && (
-                          <span className="ml-2 text-blue-600">
-                            • {category.expenseCount} expense{category.expenseCount !== 1 ? 's' : ''}
+            <>
+              {/* Default Categories Section */}
+              {defaultUserCategories.length > 0 && (
+                <div className="mb-6">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
+                    Default Categories
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {defaultUserCategories.map((category) => (
+                      <div
+                        key={category._id}
+                        className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                      >
+                        <div className="flex items-center gap-3 flex-1">
+                          <div
+                            className="w-12 h-12 rounded-full flex items-center justify-center text-xl flex-shrink-0"
+                            style={{ backgroundColor: category.color + '20' }}
+                          >
+                            {category.icon}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium text-gray-900 truncate">{category.name}</h4>
+                            <p className="text-sm text-gray-500">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 mr-2">
+                                Default
+                              </span>
+                              {category.expenseCount > 0 && (
+                                <span className="text-blue-600">
+                                  {category.expenseCount} expense{category.expenseCount !== 1 ? 's' : ''}
+                                </span>
+                              )}
+                              {category.expenseCount === 0 && (
+                                <span className="text-gray-400">No expenses</span>
+                              )}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 ml-3">
+                          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded font-medium">
+                            Read-only
                           </span>
-                        )}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                      Read-only
-                    </span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              ))}
+              )}
               
-              {/* User Categories */}
-              {userCategories.map((category) => (
-                <div
-                  key={category._id}
-                  className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center text-lg"
-                      style={{ backgroundColor: category.color + '20' }}
-                    >
-                      {category.icon}
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-gray-900">{category.name}</h4>
-                      <p className="text-sm text-gray-500">
-                        Custom category
-                        {category.expenseCount > 0 && (
-                          <span className="ml-2 text-blue-600">
-                            • {category.expenseCount} expense{category.expenseCount !== 1 ? 's' : ''}
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleEdit(category)}
-                      className="p-1 text-gray-400 hover:text-blue-600"
-                      title="Edit category"
-                    >
-                      <Edit size={16} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(category)}
-                      className={`p-1 ${
-                        category.expenseCount > 0 
-                          ? 'text-orange-400 hover:text-orange-600' 
-                          : 'text-gray-400 hover:text-red-600'
-                      }`}
-                      title={
-                        category.expenseCount > 0 
-                          ? `Delete category (has ${category.expenseCount} expense${category.expenseCount !== 1 ? 's' : ''})`
-                          : 'Delete category'
-                      }
-                    >
-                      <Trash2 size={16} />
-                    </button>
+              {/* User Categories Section */}
+              {userCategories.length > 0 && (
+                <div className={defaultUserCategories.length > 0 ? 'mt-6 pt-6 border-t border-gray-200' : ''}>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
+                    Your Custom Categories
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {userCategories.map((category) => (
+                      <div
+                        key={category._id}
+                        className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                      >
+                        <div className="flex items-center gap-3 flex-1">
+                          <div
+                            className="w-12 h-12 rounded-full flex items-center justify-center text-xl flex-shrink-0"
+                            style={{ backgroundColor: category.color + '20' }}
+                          >
+                            {category.icon}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium text-gray-900 truncate">{category.name}</h4>
+                            <p className="text-sm text-gray-500">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 mr-2">
+                                Custom
+                              </span>
+                              {category.expenseCount > 0 && (
+                                <span className="text-blue-600">
+                                  {category.expenseCount} expense{category.expenseCount !== 1 ? 's' : ''}
+                                </span>
+                              )}
+                              {category.expenseCount === 0 && (
+                                <span className="text-gray-400">No expenses</span>
+                              )}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 ml-3">
+                          <button
+                            onClick={() => handleEdit(category)}
+                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                            title="Edit category"
+                            aria-label="Edit category"
+                          >
+                            <Edit size={18} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(category)}
+                            className={`p-2 rounded transition-colors ${
+                              category.expenseCount > 0 
+                                ? 'text-orange-400 hover:text-orange-600 hover:bg-orange-50' 
+                                : 'text-gray-400 hover:text-red-600 hover:bg-red-50'
+                            }`}
+                            title={
+                              category.expenseCount > 0 
+                                ? `Delete category (has ${category.expenseCount} expense${category.expenseCount !== 1 ? 's' : ''})`
+                                : 'Delete category'
+                            }
+                            aria-label="Delete category"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              ))}
-            </div>
+              )}
+
+              {/* Show message if no categories at all */}
+              {defaultUserCategories.length === 0 && userCategories.length === 0 && (
+                <div className="text-center py-8">
+                  <div className="text-gray-400 mb-4">
+                    <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center">
+                      <Plus size={24} />
+                    </div>
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No categories available</h3>
+                  <p className="text-gray-600 mb-4">Categories should be created automatically. If you see this message, please refresh the page.</p>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

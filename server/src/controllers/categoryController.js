@@ -3,14 +3,43 @@ import { Category } from '../config/models/index.js';
 // Get all categories for a user
 export const getCategories = async (req, res) => {
   try {
+    // Get all categories for the user
     const categories = await Category.find({ user: req.user._id })
-      .populate('expenseCount')
-      .sort({ createdAt: -1 });
+      .sort({ isDefault: -1, createdAt: -1 });
+
+    // Get expense counts for each category using aggregation
+    const { Expense } = await import('../config/models/index.js');
+    const expenseCounts = await Expense.aggregate([
+      {
+        $match: {
+          user: req.user._id
+        }
+      },
+      {
+        $group: {
+          _id: '$category',
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    // Create a map of category ID to expense count
+    const expenseCountMap = {};
+    expenseCounts.forEach(item => {
+      expenseCountMap[item._id.toString()] = item.count;
+    });
+
+    // Add expense count to each category
+    const categoriesWithCounts = categories.map(category => {
+      const categoryObj = category.toObject();
+      categoryObj.expenseCount = expenseCountMap[category._id.toString()] || 0;
+      return categoryObj;
+    });
 
     res.json({
       success: true,
       data: {
-        categories
+        categories: categoriesWithCounts
       }
     });
   } catch (error) {
@@ -29,7 +58,7 @@ export const getCategory = async (req, res) => {
     const category = await Category.findOne({
       _id: req.params.id,
       user: req.user._id
-    }).populate('expenseCount');
+    });
 
     if (!category) {
       return res.status(404).json({
@@ -38,10 +67,20 @@ export const getCategory = async (req, res) => {
       });
     }
 
+    // Get expense count for this category
+    const { Expense } = await import('../config/models/index.js');
+    const expenseCount = await Expense.countDocuments({
+      category: category._id,
+      user: req.user._id
+    });
+
+    const categoryObj = category.toObject();
+    categoryObj.expenseCount = expenseCount;
+
     res.json({
       success: true,
       data: {
-        category
+        category: categoryObj
       }
     });
   } catch (error) {
@@ -76,7 +115,8 @@ export const createCategory = async (req, res) => {
       name: name.trim(),
       color: color || '#3B82F6',
       icon: icon || '💰',
-      user: req.user._id
+      user: req.user._id,
+      isDefault: false // Ensure user-created categories are not default
     });
 
     await category.save();

@@ -52,7 +52,10 @@ export const ExpenseProvider = ({ children }) => {
     try {
       setLoading(true)
       const response = await expenseService.getExpenses(filters)
-      if (response && response.data && Array.isArray(response.data.expenses)) {
+      if (response && response.data && response.data.success && response.data.data && Array.isArray(response.data.data.expenses)) {
+        setExpenses(response.data.data.expenses)
+        return response.data.data
+      } else if (response && response.data && Array.isArray(response.data.expenses)) {
         setExpenses(response.data.expenses)
         return response.data
       } else {
@@ -72,11 +75,18 @@ export const ExpenseProvider = ({ children }) => {
     try {
       setCategoriesLoading(true)
       const response = await categoryService.getCategories()
-      if (response && response.data && Array.isArray(response.data.categories)) {
-        setCategories(response.data.categories)
+      // Backend returns: { success: true, data: { categories: [...] } }
+      // Axios wraps it: response.data = { success: true, data: { categories: [...] } }
+      if (response && response.data && response.data.success && response.data.data && Array.isArray(response.data.data.categories)) {
+        setCategories(response.data.data.categories)
       } else {
         console.error('Invalid categories response:', response)
-        setCategories([])
+        // Try alternative structure in case response is flattened
+        if (response && response.data && Array.isArray(response.data.categories)) {
+          setCategories(response.data.categories)
+        } else {
+          setCategories([])
+        }
       }
     } catch (error) {
       console.error('Error loading categories:', error)
@@ -90,7 +100,9 @@ export const ExpenseProvider = ({ children }) => {
   const loadStats = async (dateRange = {}) => {
     try {
       const response = await expenseService.getStats(dateRange)
-      if (response && response.data) {
+      if (response && response.data && response.data.success && response.data.data) {
+        setStats(response.data.data)
+      } else if (response && response.data) {
         setStats(response.data)
       } else {
         console.error('Invalid stats response:', response)
@@ -105,7 +117,9 @@ export const ExpenseProvider = ({ children }) => {
   const loadTrends = async (year = new Date().getFullYear()) => {
     try {
       const response = await expenseService.getTrends(year)
-      if (response && response.data) {
+      if (response && response.data && response.data.success && response.data.data) {
+        setTrends(response.data.data)
+      } else if (response && response.data) {
         setTrends(response.data)
       } else {
         console.error('Invalid trends response:', response)
@@ -120,7 +134,7 @@ export const ExpenseProvider = ({ children }) => {
   const addExpense = async (expenseData) => {
     try {
       const response = await expenseService.createExpense(expenseData)
-      const newExpense = response.data.expense
+      const newExpense = response.data?.data?.expense || response.data?.expense
       setExpenses(prev => [newExpense, ...prev])
       await loadStats()
       await loadTrends()
@@ -136,7 +150,7 @@ export const ExpenseProvider = ({ children }) => {
   const updateExpense = async (id, updates) => {
     try {
       const response = await expenseService.updateExpense(id, updates)
-      const updatedExpense = response.data.expense
+      const updatedExpense = response.data?.data?.expense || response.data?.expense
       setExpenses(prev => 
         prev.map(expense => 
           expense._id === id ? updatedExpense : expense
@@ -171,8 +185,10 @@ export const ExpenseProvider = ({ children }) => {
   const addCategory = async (categoryData) => {
     try {
       const response = await categoryService.createCategory(categoryData)
-      const newCategory = response.data.category
-      setCategories(prev => [...prev, newCategory])
+      // Backend returns: { success: true, data: { category: {...} } }
+      const newCategory = response.data?.data?.category || response.data?.category
+      // Reload categories to get updated expense counts
+      await loadCategories()
       return { success: true, category: newCategory }
     } catch (error) {
       const message = error.response?.data?.message || 'Failed to add category'
@@ -184,12 +200,10 @@ export const ExpenseProvider = ({ children }) => {
   const updateCategory = async (id, updates) => {
     try {
       const response = await categoryService.updateCategory(id, updates)
-      const updatedCategory = response.data.category
-      setCategories(prev => 
-        prev.map(category => 
-          category._id === id ? updatedCategory : category
-        )
-      )
+      // Backend returns: { success: true, data: { category: {...} } }
+      const updatedCategory = response.data?.data?.category || response.data?.category
+      // Reload categories to get updated expense counts
+      await loadCategories()
       return { success: true, category: updatedCategory }
     } catch (error) {
       const message = error.response?.data?.message || 'Failed to update category'
@@ -200,7 +214,8 @@ export const ExpenseProvider = ({ children }) => {
   const deleteCategory = async (id) => {
     try {
       await categoryService.deleteCategory(id)
-      setCategories(prev => prev.filter(category => category._id !== id))
+      // Reload categories to get updated expense counts
+      await loadCategories()
       return { success: true }
     } catch (error) {
       const message = error.response?.data?.message || 'Failed to delete category'
@@ -218,7 +233,11 @@ export const ExpenseProvider = ({ children }) => {
   const getCategoryStats = async (dateRange = {}) => {
     try {
       const response = await categoryService.getCategoryStats(dateRange)
-      if (response && response.data && Array.isArray(response.data.stats)) {
+      // Backend returns: { success: true, data: { stats: [...] } }
+      if (response && response.data && response.data.success && response.data.data && Array.isArray(response.data.data.stats)) {
+        return response.data.data.stats
+      } else if (response && response.data && Array.isArray(response.data.stats)) {
+        // Try alternative structure
         return response.data.stats
       } else {
         console.error('Invalid category stats response:', response)
