@@ -2,11 +2,15 @@ import { useState, useEffect, useMemo } from 'react'
 import { useExpense } from '../context/ExpenseContext'
 import { useAuth } from '../context/AuthContext'
 import CategorySelector from '../components/CategorySelector'
+import DatePicker from '../components/DatePicker'
+import DateRangePicker from '../components/DateRangePicker'
 import { formatCurrency, formatDate, formatDateForInput } from '../utils/helpers'
 import {
   Plus, Edit, Trash2, Search, X,
-  ArrowUpCircle, ArrowDownCircle, Layers
+  ArrowUpCircle, ArrowDownCircle, Layers,
+  Calendar as CalendarIcon, List, Repeat
 } from 'lucide-react'
+import { startOfMonth, endOfMonth, eachDayOfInterval, format, isSameMonth, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns'
 import toast from 'react-hot-toast'
 
 const currencySymbols = {
@@ -40,7 +44,10 @@ const Expenses = () => {
     amount: '',
     date: formatDateForInput(new Date()),
     category: '',
-    type: 'expense'
+    type: 'expense',
+    isRecurring: false,
+    recurringPeriod: 'monthly',
+    recurringEndDate: ''
   })
   const [formLoading, setFormLoading] = useState(false)
 
@@ -55,6 +62,12 @@ const Expenses = () => {
   // Filter state
   const [searchTerm, setSearchTerm] = useState('')
   const [filterType, setFilterType] = useState('all')
+  const [dateRange, setDateRange] = useState({ startDate: '', endDate: '' })
+  
+  // View state
+  const [viewMode, setViewMode] = useState('list') // 'list' or 'calendar'
+  const [calendarDate, setCalendarDate] = useState(new Date())
+  const [selectedDate, setSelectedDate] = useState(null) // For calendar date selection
 
   const summary = useMemo(() => {
     let totalExpenseAmount = 0
@@ -91,7 +104,12 @@ const Expenses = () => {
         amount: editingExpense.amount?.toString() || '',
         date: expenseDate,
         category: editingExpense.category?._id || editingExpense.category || '',
-        type: editingExpense.type || 'expense'
+        type: editingExpense.type || 'expense',
+        isRecurring: editingExpense.isRecurring || false,
+        recurringPeriod: editingExpense.recurringPeriod || 'monthly',
+        recurringEndDate: editingExpense.recurringEndDate
+          ? formatDateForInput(new Date(editingExpense.recurringEndDate))
+          : ''
       })
       setShowForm(true)
     } else {
@@ -105,7 +123,10 @@ const Expenses = () => {
       amount: '',
       date: formatDateForInput(new Date()),
       category: '',
-      type: 'expense'
+      type: 'expense',
+      isRecurring: false,
+      recurringPeriod: 'monthly',
+      recurringEndDate: ''
     })
     setEditingExpense(null)
   }
@@ -128,6 +149,26 @@ const Expenses = () => {
       return
     }
 
+    if (formData.isRecurring) {
+      if (!formData.recurringEndDate) {
+        toast.error('Please select an end date for recurring expenses')
+        return
+      }
+
+      const start = new Date(formData.date)
+      const end = new Date(formData.recurringEndDate)
+
+      if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+        toast.error('Invalid start or end date')
+        return
+      }
+
+      if (end < start) {
+        toast.error('Recurring end date must be after the start date')
+        return
+      }
+    }
+
     setFormLoading(true)
     try {
       const expenseData = {
@@ -135,7 +176,10 @@ const Expenses = () => {
         amount: parseFloat(formData.amount),
         date: formData.date,
         category: formData.category,
-        type: formData.type
+        type: formData.type,
+        isRecurring: formData.isRecurring,
+        recurringPeriod: formData.isRecurring ? formData.recurringPeriod : undefined,
+        recurringEndDate: formData.isRecurring ? formData.recurringEndDate : undefined
       }
 
       if (editingExpense) {
@@ -179,14 +223,32 @@ const Expenses = () => {
         const matchesSearch = !searchTerm || 
           expense.description?.toLowerCase().includes(searchTerm.toLowerCase())
         const matchesType = filterType === 'all' || expense.type === filterType
-        return matchesSearch && matchesType
+        
+        // Date range filter
+        let matchesDateRange = true
+        if (dateRange.startDate || dateRange.endDate) {
+          const expenseDate = new Date(expense.date)
+          if (dateRange.startDate && expenseDate < new Date(dateRange.startDate)) {
+            matchesDateRange = false
+          }
+          if (dateRange.endDate) {
+            const endDate = new Date(dateRange.endDate)
+            endDate.setHours(23, 59, 59, 999)
+            if (expenseDate > endDate) {
+              matchesDateRange = false
+            }
+          }
+        }
+        
+        return matchesSearch && matchesType && matchesDateRange
       })
       .sort((a, b) => new Date(b.date) - new Date(a.date))
-  }, [expenses, searchTerm, filterType])
+  }, [expenses, searchTerm, filterType, dateRange])
 
   const clearFilters = () => {
     setSearchTerm('')
     setFilterType('all')
+    setDateRange({ startDate: '', endDate: '' })
   }
 
   const resetBulkForm = () => {
@@ -254,8 +316,37 @@ const Expenses = () => {
     }
   }
 
-  const hasActiveFilters = searchTerm || filterType !== 'all'
+  const hasActiveFilters = searchTerm || filterType !== 'all' || dateRange.startDate || dateRange.endDate
   const hasExpenses = filteredExpenses.length > 0
+
+  // Calendar helpers
+  const getExpensesForDate = (date) => {
+    return filteredExpenses.filter(expense => {
+      const expenseDate = new Date(expense.date)
+      return isSameDay(expenseDate, date)
+    })
+  }
+
+  const handleDateClick = (date) => {
+    setSelectedDate(date)
+    setFormData({
+      ...formData,
+      date: formatDateForInput(date)
+    })
+    setShowForm(true)
+  }
+
+  const handleExpenseClick = (expense, e) => {
+    e.stopPropagation()
+    handleEdit(expense)
+  }
+
+  // Calendar month view
+  const monthStart = startOfMonth(calendarDate)
+  const monthEnd = endOfMonth(calendarDate)
+  const calendarStart = startOfWeek(monthStart)
+  const calendarEnd = endOfWeek(monthEnd)
+  const calendarDays = eachDayOfInterval({ start: calendarStart, end: calendarEnd })
 
   return (
     <div className="">
@@ -287,6 +378,34 @@ const Expenses = () => {
           >
             <Plus size={16} className="mr-2" />
             Add Expense
+          </button>
+        </div>
+      </div>
+
+      {/* View Toggle */}
+      <div className="flex items-center justify-between">
+        <div className="flex gap-2 rounded-lg border border-gray-200 bg-white p-1">
+          <button
+            onClick={() => setViewMode('list')}
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition ${
+              viewMode === 'list'
+                ? 'bg-blue-50 text-blue-600'
+                : 'text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            <List size={16} />
+            List
+          </button>
+          <button
+            onClick={() => setViewMode('calendar')}
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition ${
+              viewMode === 'calendar'
+                ? 'bg-blue-50 text-blue-600'
+                : 'text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            <CalendarIcon size={16} />
+            Calendar
           </button>
         </div>
       </div>
@@ -333,8 +452,9 @@ const Expenses = () => {
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="rounded-lg border border-gray-200 bg-white p-4">
+      {/* Filters - Only show in list view */}
+      {viewMode === 'list' && (
+        <div className="rounded-lg border border-gray-200 bg-white p-4">
         <div className="flex flex-col gap-4 md:flex-row md:items-center">
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -379,8 +499,11 @@ const Expenses = () => {
           )}
         </div>
       </div>
-      {/* Expenses list */}
-      <div className="rounded-lg border border-gray-200 bg-white p-6">
+      )}
+
+      {/* Expenses list - Only show in list view */}
+      {viewMode === 'list' && (
+        <div className="rounded-lg border border-gray-200 bg-white p-6">
         {loading ? (
           <div className="flex justify-center py-16">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-100 border-t-blue-500" />
@@ -439,6 +562,12 @@ const Expenses = () => {
                           Income
                         </span>
                       )}
+                      {expense.isRecurring && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-purple-50 px-2 py-0.5 text-xs font-medium text-purple-600">
+                          <Repeat size={12} />
+                          Recurring
+                        </span>
+                      )}
                     </div>
                     <p className="text-sm text-gray-500">
                       {expense.description || 'No description'}
@@ -479,13 +608,188 @@ const Expenses = () => {
           </div>
         )}
       </div>
+      )}
+
+      {/* Calendar View */}
+      {viewMode === 'calendar' && (
+        <>
+          {/* Filters for Calendar View */}
+          <div className="rounded-lg border border-gray-200 bg-white p-4">
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-4 md:flex-row md:items-center">
+                <div className="relative flex-1">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search expenses..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 px-10 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+
+                <div className="flex gap-2">
+                  {[
+                    { label: 'All', value: 'all' },
+                    { label: 'Expenses', value: 'expense' },
+                    { label: 'Income', value: 'income' }
+                  ].map(option => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setFilterType(option.value)}
+                      className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
+                        filterType === option.value
+                          ? 'border-blue-500 bg-blue-50 text-blue-600'
+                          : 'border-gray-300 text-gray-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+
+                {hasActiveFilters && (
+                  <button
+                    onClick={clearFilters}
+                    className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+                  >
+                    <X size={16} />
+                    Clear
+                  </button>
+                )}
+              </div>
+              
+              {/* Date Range Picker */}
+              <div className="w-full md:w-auto">
+                <DateRangePicker
+                  startDate={dateRange.startDate}
+                  endDate={dateRange.endDate}
+                  onStartDateChange={(date) => setDateRange({ ...dateRange, startDate: date })}
+                  onEndDateChange={(date) => setDateRange({ ...dateRange, endDate: date })}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-gray-200 bg-white p-6">
+            {/* Calendar Header */}
+          <div className="flex items-center justify-between mb-6">
+            <button
+              onClick={() => setCalendarDate(subMonths(calendarDate, 1))}
+              className="p-2 hover:bg-gray-100 rounded-lg transition"
+              title="Previous month"
+            >
+              <ArrowDownCircle size={20} className="rotate-90 text-gray-600" />
+            </button>
+            <div className="flex items-center gap-3">
+              <h2 className="text-xl font-semibold text-gray-900">
+                {format(calendarDate, 'MMMM yyyy')}
+              </h2>
+              <div className="w-48">
+                <DatePicker
+                  value={formatDateForInput(calendarDate)}
+                  onChange={(date) => {
+                    if (date) {
+                      setCalendarDate(new Date(date))
+                    }
+                  }}
+                  placeholder="Go to date"
+                />
+              </div>
+              <button
+                onClick={() => setCalendarDate(new Date())}
+                className="px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition"
+              >
+                Today
+              </button>
+            </div>
+            <button
+              onClick={() => setCalendarDate(addMonths(calendarDate, 1))}
+              className="p-2 hover:bg-gray-100 rounded-lg transition"
+              title="Next month"
+            >
+              <ArrowDownCircle size={20} className="-rotate-90 text-gray-600" />
+            </button>
+          </div>
+
+          {/* Calendar Grid */}
+          <div className="grid grid-cols-7 gap-1">
+            {/* Day headers */}
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+              <div key={day} className="p-2 text-center text-sm font-medium text-gray-500">
+                {day}
+              </div>
+            ))}
+
+            {/* Calendar days */}
+            {calendarDays.map((day, idx) => {
+              const dayExpenses = getExpensesForDate(day)
+              const isCurrentMonth = isSameMonth(day, calendarDate)
+              const isToday = isSameDay(day, new Date())
+              const totalAmount = dayExpenses.reduce((sum, exp) => {
+                return exp.type === 'expense' ? sum + exp.amount : sum - exp.amount
+              }, 0)
+
+              return (
+                <div
+                  key={idx}
+                  onClick={() => handleDateClick(day)}
+                  className={`min-h-[100px] p-2 border border-gray-200 rounded-lg cursor-pointer transition hover:bg-gray-50 hover:border-blue-300 ${
+                    !isCurrentMonth ? 'bg-gray-50 opacity-50' : 'bg-white'
+                  } ${isToday ? 'ring-2 ring-blue-500' : ''}`}
+                >
+                  <div className={`text-sm font-medium mb-1 ${isToday ? 'text-blue-600' : isCurrentMonth ? 'text-gray-900' : 'text-gray-400'}`}>
+                    {format(day, 'd')}
+                  </div>
+                  <div className="space-y-1">
+                    {dayExpenses.slice(0, 3).map((expense) => {
+                      const category = expense.category || categories?.find(c => c._id === expense.category)
+                      const isIncome = expense.type === 'income'
+                      return (
+                        <div
+                          key={expense._id}
+                          onClick={(e) => handleExpenseClick(expense, e)}
+                          className={`text-xs p-1 rounded truncate font-medium ${
+                            isIncome 
+                              ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' 
+                              : 'bg-rose-100 text-rose-700 hover:bg-rose-200'
+                          }`}
+                          title={`${category?.name || 'Uncategorized'}: ${formatCurrency(expense.amount, currency)}`}
+                        >
+                          <span>{isIncome ? '+' : '-'}</span>
+                          {formatCurrency(expense.amount, currency)}
+                        </div>
+                      )
+                    })}
+                    {dayExpenses.length > 3 && (
+                      <div className="text-xs text-gray-500 font-medium">
+                        +{dayExpenses.length - 3} more
+                      </div>
+                    )}
+                  </div>
+                  {dayExpenses.length > 0 && (
+                    <div className={`text-xs font-semibold mt-1 ${
+                      totalAmount >= 0 ? 'text-emerald-600' : 'text-rose-600'
+                    }`}>
+                      {totalAmount >= 0 ? '+' : ''}{formatCurrency(Math.abs(totalAmount), currency)}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+        </>
+      )}
 
       {/* Add/Edit Form Modal */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="w-full max-w-md rounded-lg bg-white shadow-xl">
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              <div className="flex items-center justify-between border-b border-gray-200 pb-4">
+          <div className="w-full max-w-lg max-h-[90vh] rounded-lg bg-white shadow-xl overflow-hidden flex flex-col">
+            <form onSubmit={handleSubmit} className="flex flex-col h-full">
+              {/* Header - Fixed */}
+              <div className="flex items-center justify-between border-b border-gray-200 p-6 flex-shrink-0">
                 <h3 className="text-lg font-semibold text-gray-900">
                   {editingExpense ? 'Edit Expense' : 'Add Expense'}
                 </h3>
@@ -498,102 +802,157 @@ const Expenses = () => {
                 </button>
               </div>
 
-              {/* Type Toggle */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, type: 'expense' })}
-                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 border-2 rounded-lg transition ${
-                      formData.type === 'expense'
-                        ? 'border-red-500 bg-red-50 text-red-700'
-                        : 'border-gray-300 text-gray-700 hover:border-gray-400'
-                    }`}
-                  >
-                    <ArrowDownCircle size={18} />
-                    Expense
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, type: 'income' })}
-                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 border-2 rounded-lg transition ${
-                      formData.type === 'income'
-                        ? 'border-green-500 bg-green-50 text-green-700'
-                        : 'border-gray-300 text-gray-700 hover:border-gray-400'
-                    }`}
-                  >
-                    <ArrowUpCircle size={18} />
-                    Income
-                  </button>
+              {/* Scrollable Content */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-4 max-h-[400px]">
+                {/* Type Toggle */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, type: 'expense' })}
+                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 border-2 rounded-lg transition ${
+                        formData.type === 'expense'
+                          ? 'border-red-500 bg-red-50 text-red-700'
+                          : 'border-gray-300 text-gray-700 hover:border-gray-400'
+                      }`}
+                    >
+                      <ArrowDownCircle size={18} />
+                      Expense
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, type: 'income' })}
+                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 border-2 rounded-lg transition ${
+                        formData.type === 'income'
+                          ? 'border-green-500 bg-green-50 text-green-700'
+                          : 'border-gray-300 text-gray-700 hover:border-gray-400'
+                      }`}
+                    >
+                      <ArrowUpCircle size={18} />
+                      Income
+                    </button>
+                  </div>
                 </div>
-              </div>
 
-              {/* Date and Category */}
-              <div className="grid grid-cols-2 gap-4">
+                {/* Date and Category */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Date *
+                    </label>
+                    <DatePicker
+                      value={formData.date}
+                      onChange={(date) => setFormData({ ...formData, date })}
+                      placeholder="Select date"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Category *
+                    </label>
+                    <CategorySelector
+                      value={formData.category}
+                      onChange={(categoryId) => setFormData({ ...formData, category: categoryId })}
+                      placeholder="Select category"
+                    />
+                  </div>
+                </div>
+
+                {/* Description */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Date *
+                    Description
                   </label>
                   <input
-                    type="date"
-                    value={formData.date}
-                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                    type="text"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
+                    placeholder="e.g., Groceries, Salary..."
                   />
                 </div>
 
+                {/* Amount */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Category *
+                    Amount *
                   </label>
-                  <CategorySelector
-                    value={formData.category}
-                    onChange={(categoryId) => setFormData({ ...formData, category: categoryId })}
-                    placeholder="Select category"
-                  />
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+                      {currencySymbols[currency] || '$'}
+                    </span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0.01"
+                      value={formData.amount}
+                      onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                      className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="0.00"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Recurring Expense */}
+                <div>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.isRecurring}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          isRecurring: e.target.checked,
+                          recurringEndDate: e.target.checked ? formData.recurringEndDate : ''
+                        })
+                      }
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <div className="flex items-center gap-2">
+                      <Repeat size={16} className="text-gray-600" />
+                      <span className="text-sm font-medium text-gray-700">Recurring {formData.type}</span>
+                    </div>
+                  </label>
+                  {formData.isRecurring && (
+                    <div className="mt-3 ml-6 space-y-3 p-4 bg-gray-50 rounded-lg">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Frequency *
+                        </label>
+                        <select
+                          value={formData.recurringPeriod}
+                          onChange={(e) => setFormData({ ...formData, recurringPeriod: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="weekly">Weekly</option>
+                          <option value="monthly">Monthly</option>
+                          <option value="yearly">Yearly</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          End Date *
+                        </label>
+                        <DatePicker
+                          value={formData.recurringEndDate}
+                          onChange={(date) => setFormData({ ...formData, recurringEndDate: date })}
+                          placeholder="Select end date"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Recurring entries will be created from the start date through this end date.
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {/* Description */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description
-                </label>
-                <input
-                  type="text"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g., Groceries, Salary..."
-                />
-              </div>
-
-              {/* Amount */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Amount *
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
-                    {currencySymbols[currency] || '$'}
-                  </span>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0.01"
-                    value={formData.amount}
-                    onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="0.00"
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Form Actions */}
-              <div className="flex gap-3 pt-4 border-t border-gray-200">
+              {/* Form Actions - Fixed */}
+              <div className="flex gap-3 p-6 border-t border-gray-200 bg-gray-50 flex-shrink-0">
                 <button
                   type="submit"
                   disabled={formLoading}
@@ -624,10 +983,11 @@ const Expenses = () => {
 
       {/* Bulk Add Form Modal */}
       {showBulkForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="w-full max-w-2xl max-h-[90vh] rounded-lg bg-white shadow-xl overflow-hidden flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black bg-opacity-50 p-4 overflow-y-auto">
+          <div className="w-full max-w-2xl my-8 rounded-lg bg-white shadow-xl overflow-visible flex flex-col max-h-[90vh]">
             <form onSubmit={handleBulkSubmit} className="flex flex-col h-full">
-              <div className="flex items-center justify-between border-b border-gray-200 p-6">
+              {/* Header - Fixed */}
+              <div className="flex items-center justify-between border-b border-gray-200 p-6 flex-shrink-0">
                 <h3 className="text-lg font-semibold text-gray-900">Bulk Add Expenses</h3>
                 <button
                   type="button"
@@ -638,38 +998,45 @@ const Expenses = () => {
                 </button>
               </div>
 
-              <div className="flex-1 flex flex-col overflow-hidden p-6">
-                {/* Date Selection - Fixed at top */}
-                <div className="mb-4 flex-shrink-0">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Date for all expenses *
-                  </label>
-                  <input
-                    type="date"
-                    value={bulkDate}
-                    onChange={(e) => setBulkDate(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-
-                {/* Expense Rows - Scrollable */}
-                <div className="flex-1 flex flex-col overflow-hidden">
-                  <div className="flex items-center justify-between mb-3 flex-shrink-0">
-                    <label className="block text-sm font-medium text-gray-700">
-                      Expenses
+              {/* Content Area - Scrollable */}
+              <div className="flex-1 flex flex-col overflow-hidden">
+                <div className="flex flex-col p-6 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 200px)' }}>
+                  {/* Date Selection - Fixed at top */}
+                  <div className="mb-4 flex-shrink-0 relative z-[60]">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Date for all expenses *
                     </label>
-                    <button
-                      type="button"
-                      onClick={addBulkRow}
-                      className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-                    >
-                      + Add Row
-                    </button>
+                    <DatePicker
+                      value={bulkDate}
+                      onChange={(date) => setBulkDate(date)}
+                      placeholder="Select date"
+                    />
                   </div>
 
-                  <div className="flex-1 overflow-y-auto pr-2 space-y-3">
-                    {bulkExpenses.map((expense, index) => (
+                  {/* Expense Rows Section */}
+                  <div className="flex flex-col">
+                    <div className="flex items-center justify-between mb-3 flex-shrink-0">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Expenses
+                      </label>
+                      <button
+                        type="button"
+                        onClick={addBulkRow}
+                        className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                      >
+                        + Add Row
+                      </button>
+                    </div>
+
+                    <div 
+                      className="space-y-3 overflow-y-auto pr-2 bulk-expenses-scroll"
+                      style={{ 
+                        maxHeight: '400px',
+                        scrollbarWidth: 'thin',
+                        scrollbarColor: '#cbd5e1 #f1f5f9'
+                      }}
+                    >
+                      {bulkExpenses.map((expense, index) => (
                       <div key={index} className="grid grid-cols-12 gap-2 items-start p-3 border border-gray-200 rounded-lg flex-shrink-0">
                         <div className="col-span-4">
                           <input
@@ -711,13 +1078,14 @@ const Expenses = () => {
                           )}
                         </div>
                       </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Form Actions */}
-              <div className="flex gap-3 p-6 border-t border-gray-200 bg-gray-50">
+              {/* Form Actions - Fixed */}
+              <div className="flex gap-3 p-6 border-t border-gray-200 bg-gray-50 flex-shrink-0">
                 <button
                   type="submit"
                   disabled={bulkLoading}
