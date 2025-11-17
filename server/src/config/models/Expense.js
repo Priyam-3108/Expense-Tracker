@@ -3,9 +3,9 @@ import mongoose from 'mongoose';
 const expenseSchema = new mongoose.Schema({
   description: {
     type: String,
-    required: [true, 'Description is required'],
     trim: true,
-    maxlength: [100, 'Description cannot exceed 100 characters']
+    maxlength: [100, 'Description cannot exceed 100 characters'],
+    default: ''
   },
   amount: {
     type: Number,
@@ -50,7 +50,14 @@ const expenseSchema = new mongoose.Schema({
   recurringPeriod: {
     type: String,
     enum: ['weekly', 'monthly', 'yearly'],
-    default: 'monthly'
+    default: null
+  },
+  recurringEndDate: {
+    type: Date
+  },
+  recurringGroupId: {
+    type: mongoose.Schema.Types.ObjectId,
+    default: null
   }
 }, {
   timestamps: true

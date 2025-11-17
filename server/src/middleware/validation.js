@@ -19,7 +19,7 @@ export const categorySchema = z.object({
 });
 
 export const expenseSchema = z.object({
-  description: z.string().min(1, 'Description is required').max(100, 'Description cannot exceed 100 characters'),
+  description: z.string().max(100, 'Description cannot exceed 100 characters').optional(),
   amount: z.number().positive('Amount must be positive').max(999999.99, 'Amount cannot exceed 999,999.99'),
   date: z.string().optional(),
   category: z.string().min(1, 'Category is required'),
@@ -27,7 +27,8 @@ export const expenseSchema = z.object({
   tags: z.array(z.string().max(20)).optional(),
   notes: z.string().max(500, 'Notes cannot exceed 500 characters').optional(),
   isRecurring: z.boolean().optional(),
-  recurringPeriod: z.enum(['weekly', 'monthly', 'yearly']).optional()
+  recurringPeriod: z.enum(['weekly', 'monthly', 'yearly']).optional(),
+  recurringEndDate: z.string().optional()
 });
 
 // Validation middleware factory

@@ -1,4 +1,35 @@
+import mongoose from 'mongoose';
 import { Expense, Category } from '../config/models/index.js';
+
+const normalizeDate = (date) => {
+  const normalized = new Date(date);
+  normalized.setHours(0, 0, 0, 0);
+  return normalized;
+};
+
+const getNextRecurringDate = (currentDate, period) => {
+  const nextDate = new Date(currentDate);
+
+  switch (period) {
+    case 'weekly':
+      nextDate.setDate(nextDate.getDate() + 7);
+      break;
+    case 'yearly':
+      nextDate.setFullYear(nextDate.getFullYear() + 1);
+      break;
+    case 'monthly':
+    default: {
+      const originalDay = nextDate.getDate();
+      nextDate.setDate(1);
+      nextDate.setMonth(nextDate.getMonth() + 1);
+      const daysInMonth = new Date(nextDate.getFullYear(), nextDate.getMonth() + 1, 0).getDate();
+      nextDate.setDate(Math.min(originalDay, daysInMonth));
+      break;
+    }
+  }
+
+  return normalizeDate(nextDate);
+};
 
 // Get all expenses for a user with filtering and pagination
 export const getExpenses = async (req, res) => {
@@ -18,7 +49,16 @@ export const getExpenses = async (req, res) => {
     // Build filter object
     const filter = { user: req.user._id };
     
-    if (category && category !== 'all') filter.category = category;
+    if (category && category !== 'all') {
+      try {
+        filter.category = new mongoose.Types.ObjectId(category);
+      } catch (error) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid category identifier'
+        });
+      }
+    }
     if (type && type !== 'all') filter.type = type;
     
     if (startDate && endDate) {
@@ -127,6 +167,94 @@ export const getExpense = async (req, res) => {
   }
 };
 
+// Bulk create expenses
+export const bulkCreateExpenses = async (req, res) => {
+  try {
+    const { date, expenses } = req.body;
+
+    if (!date || !Array.isArray(expenses) || expenses.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Date and expenses array are required'
+      });
+    }
+
+    const baseDate = normalizeDate(new Date(date));
+    if (Number.isNaN(baseDate.getTime())) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid date provided'
+      });
+    }
+
+    // Validate all expenses
+    const validExpenses = [];
+    const errors = [];
+
+    for (let i = 0; i < expenses.length; i++) {
+      const expense = expenses[i];
+      
+      if (!expense.amount || parseFloat(expense.amount) <= 0) {
+        errors.push(`Expense ${i + 1}: Invalid amount`);
+        continue;
+      }
+
+      if (!expense.category) {
+        errors.push(`Expense ${i + 1}: Category is required`);
+        continue;
+      }
+
+      // Verify category exists and belongs to user
+      const categoryExists = await Category.findOne({
+        _id: expense.category,
+        user: req.user._id
+      });
+
+      if (!categoryExists) {
+        errors.push(`Expense ${i + 1}: Invalid category`);
+        continue;
+      }
+
+      validExpenses.push({
+        description: expense.description ? expense.description.trim() : '',
+        amount: parseFloat(expense.amount),
+        date: baseDate,
+        category: expense.category,
+        type: 'expense',
+        user: req.user._id
+      });
+    }
+
+    if (validExpenses.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No valid expenses to create',
+        errors
+      });
+    }
+
+    // Insert all valid expenses
+    const createdExpenses = await Expense.insertMany(validExpenses);
+    await Expense.populate(createdExpenses, { path: 'category', select: 'name color icon' });
+
+    res.status(201).json({
+      success: true,
+      message: `${createdExpenses.length} expense(s) created successfully`,
+      data: {
+        expenses: createdExpenses,
+        errors: errors.length > 0 ? errors : undefined
+      }
+    });
+  } catch (error) {
+    console.error('Bulk create expenses error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create expenses',
+      error: error.message
+    });
+  }
+};
+
 // Create new expense
 export const createExpense = async (req, res) => {
   try {
@@ -139,7 +267,8 @@ export const createExpense = async (req, res) => {
       tags,
       notes,
       isRecurring,
-      recurringPeriod
+      recurringPeriod,
+      recurringEndDate
     } = req.body;
 
     // Verify category exists and belongs to user
@@ -155,16 +284,89 @@ export const createExpense = async (req, res) => {
       });
     }
 
+    const baseDate = normalizeDate(date ? new Date(date) : new Date());
+    if (Number.isNaN(baseDate.getTime())) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid date provided'
+      });
+    }
+
+    const cleanedDescription = description ? description.trim() : '';
+
+    if (isRecurring) {
+      if (!recurringEndDate) {
+        return res.status(400).json({
+          success: false,
+          message: 'Recurring expenses require an end date'
+        });
+      }
+
+      const endDateObj = normalizeDate(new Date(recurringEndDate));
+      if (Number.isNaN(endDateObj.getTime())) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid recurring end date provided'
+        });
+      }
+
+      if (baseDate > endDateObj) {
+        return res.status(400).json({
+          success: false,
+          message: 'Recurring end date must be after the start date'
+        });
+      }
+
+      const period = recurringPeriod || 'monthly';
+      const occurrences = [];
+      let currentDate = new Date(baseDate);
+      const groupId = new mongoose.Types.ObjectId();
+      const maxOccurrences = 500;
+
+      while (currentDate <= endDateObj) {
+        occurrences.push({
+          description: cleanedDescription,
+          amount: parseFloat(amount),
+          date: normalizeDate(currentDate),
+          category,
+          type,
+          tags: tags || [],
+          notes: notes ? notes.trim() : '',
+          isRecurring: true,
+          recurringPeriod: period,
+          recurringEndDate: endDateObj,
+          recurringGroupId: groupId,
+          user: req.user._id
+        });
+
+        currentDate = getNextRecurringDate(currentDate, period);
+
+        if (occurrences.length >= maxOccurrences) {
+          break;
+        }
+      }
+
+      const createdExpenses = await Expense.insertMany(occurrences);
+      await Expense.populate(createdExpenses, { path: 'category', select: 'name color icon' });
+
+      return res.status(201).json({
+        success: true,
+        message: 'Recurring expenses created successfully',
+        data: {
+          expenses: createdExpenses
+        }
+      });
+    }
+
     const expense = new Expense({
-      description: description.trim(),
+      description: cleanedDescription,
       amount: parseFloat(amount),
-      date: date ? new Date(date) : new Date(),
+      date: baseDate,
       category,
       type,
       tags: tags || [],
       notes: notes ? notes.trim() : '',
-      isRecurring: isRecurring || false,
-      recurringPeriod: recurringPeriod || 'monthly',
+      isRecurring: false,
       user: req.user._id
     });
 
@@ -203,7 +405,8 @@ export const updateExpense = async (req, res) => {
       tags,
       notes,
       isRecurring,
-      recurringPeriod
+      recurringPeriod,
+      recurringEndDate
     } = req.body;
 
     // Find expense and ensure it belongs to the user
@@ -234,21 +437,66 @@ export const updateExpense = async (req, res) => {
       }
     }
 
-    // Update expense
     const updates = {};
-    if (description) updates.description = description.trim();
+    const unset = {};
+
+    if (description !== undefined) updates.description = description ? description.trim() : '';
     if (amount !== undefined) updates.amount = parseFloat(amount);
-    if (date) updates.date = new Date(date);
+    if (date) updates.date = normalizeDate(new Date(date));
     if (category) updates.category = category;
     if (type) updates.type = type;
     if (tags) updates.tags = tags;
-    if (notes !== undefined) updates.notes = notes.trim();
+    if (notes !== undefined) updates.notes = notes ? notes.trim() : '';
     if (isRecurring !== undefined) updates.isRecurring = isRecurring;
-    if (recurringPeriod) updates.recurringPeriod = recurringPeriod;
+    if (isRecurring !== undefined && !isRecurring) {
+      unset.recurringPeriod = '';
+      unset.recurringEndDate = '';
+      unset.recurringGroupId = '';
+    } else if (recurringPeriod) {
+      updates.recurringPeriod = recurringPeriod;
+    }
+
+    if (recurringEndDate !== undefined) {
+      if (recurringEndDate) {
+        const endDateObj = normalizeDate(new Date(recurringEndDate));
+        if (Number.isNaN(endDateObj.getTime())) {
+          return res.status(400).json({
+            success: false,
+            message: 'Invalid recurring end date provided'
+          });
+        }
+
+        const effectiveDate = updates.date ? normalizeDate(updates.date) : expense.date;
+        if (effectiveDate > endDateObj) {
+          return res.status(400).json({
+            success: false,
+            message: 'Recurring end date must be after the start date'
+          });
+        }
+
+        updates.recurringEndDate = endDateObj;
+      } else {
+        unset.recurringEndDate = '';
+      }
+    }
+
+    const updatePayload = Object.keys(updates).length ? { $set: updates } : {};
+    const unsetPayload = Object.keys(unset).length ? { $unset: unset } : {};
+
+    if (!Object.keys(updatePayload).length && !Object.keys(unsetPayload).length) {
+      const freshExpense = await Expense.findById(expenseId).populate('category', 'name color icon');
+      return res.json({
+        success: true,
+        message: 'Expense updated successfully',
+        data: {
+          expense: freshExpense
+        }
+      });
+    }
 
     const updatedExpense = await Expense.findByIdAndUpdate(
       expenseId,
-      updates,
+      { ...updatePayload, ...unsetPayload },
       { new: true, runValidators: true }
     ).populate('category', 'name color icon');
 

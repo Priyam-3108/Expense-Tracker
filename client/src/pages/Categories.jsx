@@ -16,11 +16,7 @@ const Categories = () => {
   const [statsLoading, setStatsLoading] = useState(false)
   const [formLoading, setFormLoading] = useState(false)
 
-  // Load categories when component mounts
-  useEffect(() => {
-    loadCategories()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  // Categories are already loaded by ExpenseContext, no need to load again
 
 
   const iconOptions = [
@@ -160,7 +156,8 @@ const Categories = () => {
     if (categories && categories.length > 0) {
       loadStats()
     }
-  }, [categories, getCategoryStats])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categories?.length]) // Only reload when categories count changes, not on every categories array reference change
 
   // Show loading state while categories are being loaded
   if (categoriesLoading) {

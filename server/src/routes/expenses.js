@@ -3,6 +3,7 @@ import {
   getExpenses,
   getExpense,
   createExpense,
+  bulkCreateExpenses,
   updateExpense,
   deleteExpense,
   getExpenseStats,
@@ -21,6 +22,7 @@ router.get('/', validateDateRange, getExpenses);
 router.get('/stats', validateDateRange, getExpenseStats);
 router.get('/trends', getExpenseTrends);
 router.get('/:id', getExpense);
+router.post('/bulk', bulkCreateExpenses);
 router.post('/', validate(expenseSchema), createExpense);
 router.put('/:id', validate(expenseSchema), updateExpense);
 router.delete('/:id', deleteExpense);

@@ -1,7 +1,8 @@
+import { useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useExpense } from '../context/ExpenseContext'
 import { formatCurrency } from '../utils/helpers'
-import { TrendingUp, TrendingDown, DollarSign, CreditCard, Calendar, PieChart, Activity } from 'lucide-react'
+import { TrendingUp, TrendingDown, CreditCard, Calendar, PieChart, Activity } from 'lucide-react'
 
 const currencySymbols = {
   USD: '$',
@@ -16,7 +17,12 @@ const currencySymbols = {
 
 const Dashboard = () => {
   const { user, currency } = useAuth()
-  const { stats, loading } = useExpense()
+  const { stats, loading, loadStats, loadTrends } = useExpense()
+
+  useEffect(() => {
+    loadStats()
+    loadTrends()
+  }, [loadStats, loadTrends])
 
   const totalExpenses = stats?.totalStats?.expenses || 0
   const totalIncome = stats?.totalStats?.income || 0

@@ -124,13 +124,23 @@ export const ExpenseProvider = ({ children }) => {
   const addExpense = useCallback(async (expenseData) => {
     try {
       const response = await expenseService.createExpense(expenseData)
+      const createdExpenses = response.data?.data?.expenses
       const newExpense = response.data?.data?.expense || response.data?.expense
+
+      if (Array.isArray(createdExpenses) && createdExpenses.length > 0) {
+        await loadExpenses()
+        await loadStats()
+        await loadTrends()
+        toast.success('Recurring expenses created successfully')
+        return { success: true, expenses: createdExpenses }
+      }
+
       if (!newExpense) {
         const errorMsg = response?.data?.message || 'Failed to create expense'
         toast.error(errorMsg)
         return { success: false, error: errorMsg }
       }
-      setExpenses(prev => [newExpense, ...prev])
+      await loadExpenses()
       await loadStats()
       await loadTrends()
       toast.success('Expense added successfully')
@@ -140,7 +150,7 @@ export const ExpenseProvider = ({ children }) => {
       toast.error(message)
       return { success: false, error: message }
     }
-  }, [loadStats, loadTrends])
+  }, [loadExpenses, loadStats, loadTrends])
 
   const updateExpense = useCallback(async (id, updates) => {
     try {
@@ -151,11 +161,7 @@ export const ExpenseProvider = ({ children }) => {
         toast.error(errorMsg)
         return { success: false, error: errorMsg }
       }
-      setExpenses(prev => 
-        prev.map(expense => 
-          expense._id === id ? updatedExpense : expense
-        )
-      )
+      await loadExpenses()
       await loadStats()
       await loadTrends()
       toast.success('Expense updated successfully')
@@ -165,12 +171,12 @@ export const ExpenseProvider = ({ children }) => {
       toast.error(message)
       return { success: false, error: message }
     }
-  }, [loadStats, loadTrends])
+  }, [loadExpenses, loadStats, loadTrends])
 
   const deleteExpense = useCallback(async (id) => {
     try {
       await expenseService.deleteExpense(id)
-      setExpenses(prev => prev.filter(expense => expense._id !== id))
+      await loadExpenses()
       await loadStats()
       await loadTrends()
       toast.success('Expense deleted successfully')
@@ -180,7 +186,7 @@ export const ExpenseProvider = ({ children }) => {
       toast.error(message)
       return { success: false, error: message }
     }
-  }, [loadStats, loadTrends])
+  }, [loadExpenses, loadStats, loadTrends])
 
   const addCategory = useCallback(async (categoryData) => {
     try {

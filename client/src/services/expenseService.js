@@ -24,6 +24,11 @@ export const expenseService = {
     return api.post('/expenses', expenseData)
   },
 
+  // Bulk create expenses
+  bulkCreateExpenses: (bulkData) => {
+    return api.post('/expenses/bulk', bulkData)
+  },
+
   // Update expense
   updateExpense: (id, updates) => {
     return api.put(`/expenses/${id}`, updates)
