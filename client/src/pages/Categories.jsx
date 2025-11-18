@@ -2,9 +2,22 @@ import { useState, useEffect } from 'react'
 import { useExpense } from '../context/ExpenseContext'
 import { Plus, Edit, Trash2 } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { useAuth } from '../context/AuthContext'
+
+const currencySymbols = {
+  USD: '$',
+  EUR: '€',
+  INR: '₹',
+  GBP: '£',
+  JPY: '¥',
+  CNY: '¥',
+  CAD: 'C$',
+  AUD: 'A$'
+}
 
 const Categories = () => {
   const { categories, addCategory, updateCategory, deleteCategory, getCategoryStats, loadCategories, loading, categoriesLoading } = useExpense()
+  const { user, currency } = useAuth()
   const [showForm, setShowForm] = useState(false)
   const [editingCategory, setEditingCategory] = useState(null)
   const [formData, setFormData] = useState({
@@ -469,7 +482,7 @@ const Categories = () => {
                     </div>
                     <div className="text-right">
                       <div className="text-lg font-semibold text-gray-900">
-                        ${stat.totalAmount.toFixed(2)}
+                      {currencySymbols[currency] || '$'} {stat.totalAmount.toFixed(2)}
                       </div>
                       <div className="text-sm text-gray-500">
                         {((stat.totalAmount / categoryStats.reduce((sum, s) => sum + s.totalAmount, 0)) * 100).toFixed(1)}%
