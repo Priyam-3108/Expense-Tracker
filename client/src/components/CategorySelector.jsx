@@ -76,7 +76,7 @@ const CategorySelector = ({
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute top-full left-0 w-full z-[100] mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-hidden">
+        <div className="absolute top-full left-0 w-full z-[9999] mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-hidden">
           {/* Search Input */}
           <div className="p-2 border-b border-gray-200">
             <input

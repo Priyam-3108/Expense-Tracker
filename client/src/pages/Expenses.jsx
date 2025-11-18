@@ -358,15 +358,15 @@ const Expenses = () => {
             Track your expenses and income
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={() => {
               resetBulkForm()
               setShowBulkForm(true)
             }}
-            className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors shadow-sm"
           >
-            <Layers size={16} className="mr-2" />
+            <Layers size={18} />
             Bulk Add
           </button>
           <button
@@ -374,22 +374,22 @@ const Expenses = () => {
               resetForm()
               setShowForm(true)
             }}
-            className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg"
           >
-            <Plus size={16} className="mr-2" />
+            <Plus size={18} />
             Add Expense
           </button>
         </div>
       </div>
 
       {/* View Toggle */}
-      <div className="flex items-center justify-between">
-        <div className="flex gap-2 rounded-lg border border-gray-200 bg-white p-1">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="inline-flex gap-1 rounded-lg border border-gray-200 bg-white p-1 shadow-sm">
           <button
             onClick={() => setViewMode('list')}
-            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition ${
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all ${
               viewMode === 'list'
-                ? 'bg-blue-50 text-blue-600'
+                ? 'bg-blue-600 text-white shadow-sm'
                 : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
@@ -398,9 +398,9 @@ const Expenses = () => {
           </button>
           <button
             onClick={() => setViewMode('calendar')}
-            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition ${
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all ${
               viewMode === 'calendar'
-                ? 'bg-blue-50 text-blue-600'
+                ? 'bg-blue-600 text-white shadow-sm'
                 : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
@@ -411,7 +411,7 @@ const Expenses = () => {
       </div>
 
       {/* Summary cards */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3 mt-2">
         <div className="rounded-lg border border-blue-100 bg-blue-50 p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -454,87 +454,87 @@ const Expenses = () => {
 
       {/* Filters - Only show in list view */}
       {viewMode === 'list' && (
-        <div className="rounded-lg border border-gray-200 bg-white p-4">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center">
-          <div className="relative flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search expenses..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-10 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-            />
-          </div>
+        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center">
+            <div className="relative flex-1">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search expenses..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 px-10 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors"
+              />
+            </div>
 
-          <div className="flex gap-2">
-            {[
-              { label: 'All', value: 'all' },
-              { label: 'Expenses', value: 'expense' },
-              { label: 'Income', value: 'income' }
-            ].map(option => (
+            <div className="flex gap-2">
+              {[
+                { label: 'All', value: 'all' },
+                { label: 'Expenses', value: 'expense' },
+                { label: 'Income', value: 'income' }
+              ].map(option => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setFilterType(option.value)}
+                  className={`rounded-lg border px-4 py-2.5 text-sm font-medium transition-all ${
+                    filterType === option.value
+                      ? 'border-blue-500 bg-blue-50 text-blue-600 shadow-sm'
+                      : 'border-gray-300 text-gray-600 hover:bg-gray-50 hover:border-gray-400'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+
+            {hasActiveFilters && (
               <button
-                key={option.value}
-                type="button"
-                onClick={() => setFilterType(option.value)}
-                className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
-                  filterType === option.value
-                    ? 'border-blue-500 bg-blue-50 text-blue-600'
-                    : 'border-gray-300 text-gray-600 hover:bg-gray-50'
-                }`}
+                onClick={clearFilters}
+                className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:border-gray-400 transition-colors"
               >
-                {option.label}
+                <X size={16} />
+                Clear
               </button>
-            ))}
+            )}
           </div>
-
-          {hasActiveFilters && (
-            <button
-              onClick={clearFilters}
-              className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
-            >
-              <X size={16} />
-              Clear
-            </button>
-          )}
         </div>
-      </div>
       )}
 
       {/* Expenses list - Only show in list view */}
       {viewMode === 'list' && (
-        <div className="rounded-lg border border-gray-200 bg-white p-6">
-        {loading ? (
-          <div className="flex justify-center py-16">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-100 border-t-blue-500" />
-          </div>
-        ) : !hasExpenses ? (
-          <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold text-gray-900">
-                {hasActiveFilters ? 'No expenses found' : 'No expenses yet'}
-              </h3>
-              <p className="text-sm text-gray-500">
-                {hasActiveFilters
-                  ? 'Try adjusting your filters.'
-                  : 'Add your first expense or income entry to get started.'}
-              </p>
+        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+          {loading ? (
+            <div className="flex justify-center py-16">
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-100 border-t-blue-500" />
             </div>
-            {!hasActiveFilters && (
-              <button
-                onClick={() => {
-                  resetForm()
-                  setShowForm(true)
-                }}
-                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-              >
-                <Plus size={16} />
-                Add Expense
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="space-y-3">
+          ) : !hasExpenses ? (
+            <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
+              <div className="space-y-2">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {hasActiveFilters ? 'No expenses found' : 'No expenses yet'}
+                </h3>
+                <p className="text-sm text-gray-500">
+                  {hasActiveFilters
+                    ? 'Try adjusting your filters.'
+                    : 'Add your first expense or income entry to get started.'}
+                </p>
+              </div>
+              {!hasActiveFilters && (
+                <button
+                  onClick={() => {
+                    resetForm()
+                    setShowForm(true)
+                  }}
+                  className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg"
+                >
+                  <Plus size={16} />
+                  Add Expense
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-3">
             {filteredExpenses.map((expense) => {
               const category = expense.category || categories?.find(c => c._id === expense.category)
               const isIncome = expense.type === 'income'
@@ -607,14 +607,14 @@ const Expenses = () => {
             })}
           </div>
         )}
-      </div>
+        </div>
       )}
 
       {/* Calendar View */}
       {viewMode === 'calendar' && (
         <>
           {/* Filters for Calendar View */}
-          <div className="rounded-lg border border-gray-200 bg-white p-4">
+          <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-4 md:flex-row md:items-center">
                 <div className="relative flex-1">
@@ -624,7 +624,7 @@ const Expenses = () => {
                     placeholder="Search expenses..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-10 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    className="w-full rounded-lg border border-gray-300 px-10 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors"
                   />
                 </div>
 
@@ -638,10 +638,10 @@ const Expenses = () => {
                       key={option.value}
                       type="button"
                       onClick={() => setFilterType(option.value)}
-                      className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
+                      className={`rounded-lg border px-4 py-2.5 text-sm font-medium transition-all ${
                         filterType === option.value
-                          ? 'border-blue-500 bg-blue-50 text-blue-600'
-                          : 'border-gray-300 text-gray-600 hover:bg-gray-50'
+                          ? 'border-blue-500 bg-blue-50 text-blue-600 shadow-sm'
+                          : 'border-gray-300 text-gray-600 hover:bg-gray-50 hover:border-gray-400'
                       }`}
                     >
                       {option.label}
@@ -652,7 +652,7 @@ const Expenses = () => {
                 {hasActiveFilters && (
                   <button
                     onClick={clearFilters}
-                    className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+                    className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:border-gray-400 transition-colors"
                   >
                     <X size={16} />
                     Clear
@@ -672,112 +672,112 @@ const Expenses = () => {
             </div>
           </div>
 
-          <div className="rounded-lg border border-gray-200 bg-white p-6">
+          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             {/* Calendar Header */}
-          <div className="flex items-center justify-between mb-6">
-            <button
-              onClick={() => setCalendarDate(subMonths(calendarDate, 1))}
-              className="p-2 hover:bg-gray-100 rounded-lg transition"
-              title="Previous month"
-            >
-              <ArrowDownCircle size={20} className="rotate-90 text-gray-600" />
-            </button>
-            <div className="flex items-center gap-3">
-              <h2 className="text-xl font-semibold text-gray-900">
-                {format(calendarDate, 'MMMM yyyy')}
-              </h2>
-              <div className="w-48">
-                <DatePicker
-                  value={formatDateForInput(calendarDate)}
-                  onChange={(date) => {
-                    if (date) {
-                      setCalendarDate(new Date(date))
-                    }
-                  }}
-                  placeholder="Go to date"
-                />
+            <div className="flex items-center justify-between mb-6">
+              <button
+                onClick={() => setCalendarDate(subMonths(calendarDate, 1))}
+                className="p-2 hover:bg-gray-100 rounded-lg transition"
+                title="Previous month"
+              >
+                <ArrowDownCircle size={20} className="rotate-90 text-gray-600" />
+              </button>
+              <div className="flex items-center gap-3">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  {format(calendarDate, 'MMMM yyyy')}
+                </h2>
+                <div className="w-48">
+                  <DatePicker
+                    value={formatDateForInput(calendarDate)}
+                    onChange={(date) => {
+                      if (date) {
+                        setCalendarDate(new Date(date))
+                      }
+                    }}
+                    placeholder="Go to date"
+                  />
+                </div>
+                <button
+                  onClick={() => setCalendarDate(new Date())}
+                  className="px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                >
+                  Today
+                </button>
               </div>
               <button
-                onClick={() => setCalendarDate(new Date())}
-                className="px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                onClick={() => setCalendarDate(addMonths(calendarDate, 1))}
+                className="p-2 hover:bg-gray-100 rounded-lg transition"
+                title="Next month"
               >
-                Today
+                <ArrowDownCircle size={20} className="-rotate-90 text-gray-600" />
               </button>
             </div>
-            <button
-              onClick={() => setCalendarDate(addMonths(calendarDate, 1))}
-              className="p-2 hover:bg-gray-100 rounded-lg transition"
-              title="Next month"
-            >
-              <ArrowDownCircle size={20} className="-rotate-90 text-gray-600" />
-            </button>
-          </div>
 
-          {/* Calendar Grid */}
-          <div className="grid grid-cols-7 gap-1">
-            {/* Day headers */}
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-              <div key={day} className="p-2 text-center text-sm font-medium text-gray-500">
-                {day}
-              </div>
-            ))}
+            {/* Calendar Grid */}
+            <div className="grid grid-cols-7 gap-1">
+              {/* Day headers */}
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                <div key={day} className="p-2 text-center text-sm font-medium text-gray-500">
+                  {day}
+                </div>
+              ))}
 
-            {/* Calendar days */}
-            {calendarDays.map((day, idx) => {
-              const dayExpenses = getExpensesForDate(day)
-              const isCurrentMonth = isSameMonth(day, calendarDate)
-              const isToday = isSameDay(day, new Date())
-              const totalAmount = dayExpenses.reduce((sum, exp) => {
-                return exp.type === 'expense' ? sum + exp.amount : sum - exp.amount
-              }, 0)
+              {/* Calendar days */}
+              {calendarDays.map((day, idx) => {
+                const dayExpenses = getExpensesForDate(day)
+                const isCurrentMonth = isSameMonth(day, calendarDate)
+                const isToday = isSameDay(day, new Date())
+                const totalAmount = dayExpenses.reduce((sum, exp) => {
+                  return exp.type === 'income' ? sum + exp.amount : sum - exp.amount
+                }, 0)
 
-              return (
-                <div
-                  key={idx}
-                  onClick={() => handleDateClick(day)}
-                  className={`min-h-[100px] p-2 border border-gray-200 rounded-lg cursor-pointer transition hover:bg-gray-50 hover:border-blue-300 ${
-                    !isCurrentMonth ? 'bg-gray-50 opacity-50' : 'bg-white'
-                  } ${isToday ? 'ring-2 ring-blue-500' : ''}`}
-                >
-                  <div className={`text-sm font-medium mb-1 ${isToday ? 'text-blue-600' : isCurrentMonth ? 'text-gray-900' : 'text-gray-400'}`}>
-                    {format(day, 'd')}
-                  </div>
-                  <div className="space-y-1">
-                    {dayExpenses.slice(0, 3).map((expense) => {
-                      const category = expense.category || categories?.find(c => c._id === expense.category)
-                      const isIncome = expense.type === 'income'
-                      return (
-                        <div
-                          key={expense._id}
-                          onClick={(e) => handleExpenseClick(expense, e)}
-                          className={`text-xs p-1 rounded truncate font-medium ${
-                            isIncome 
-                              ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' 
-                              : 'bg-rose-100 text-rose-700 hover:bg-rose-200'
-                          }`}
-                          title={`${category?.name || 'Uncategorized'}: ${formatCurrency(expense.amount, currency)}`}
-                        >
-                          <span>{isIncome ? '+' : '-'}</span>
-                          {formatCurrency(expense.amount, currency)}
+                return (
+                  <div
+                    key={idx}
+                    onClick={() => handleDateClick(day)}
+                    className={`min-h-[100px] p-2 border border-gray-200 rounded-lg cursor-pointer transition hover:bg-gray-50 hover:border-blue-300 ${
+                      !isCurrentMonth ? 'bg-gray-50 opacity-50' : 'bg-white'
+                    } ${isToday ? 'ring-2 ring-blue-500' : ''}`}
+                  >
+                    <div className={`text-sm font-medium mb-1 ${isToday ? 'text-blue-600' : isCurrentMonth ? 'text-gray-900' : 'text-gray-400'}`}>
+                      {format(day, 'd')}
+                    </div>
+                    <div className="space-y-1">
+                      {dayExpenses.slice(0, 3).map((expense) => {
+                        const category = expense.category || categories?.find(c => c._id === expense.category)
+                        const isIncome = expense.type === 'income'
+                        return (
+                          <div
+                            key={expense._id}
+                            onClick={(e) => handleExpenseClick(expense, e)}
+                            className={`text-xs p-1 rounded truncate font-medium ${
+                              isIncome 
+                                ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' 
+                                : 'bg-rose-100 text-rose-700 hover:bg-rose-200'
+                            }`}
+                            title={`${category?.name || 'Uncategorized'}: ${formatCurrency(expense.amount, currency)}`}
+                          >
+                            <span>{isIncome ? '+' : '-'}</span>
+                            {formatCurrency(expense.amount, currency)}
+                          </div>
+                        )
+                      })}
+                      {dayExpenses.length > 3 && (
+                        <div className="text-xs text-gray-500 font-medium">
+                          +{dayExpenses.length - 3} more
                         </div>
-                      )
-                    })}
-                    {dayExpenses.length > 3 && (
-                      <div className="text-xs text-gray-500 font-medium">
-                        +{dayExpenses.length - 3} more
+                      )}
+                    </div>
+                    {dayExpenses.length > 0 && (
+                      <div className={`text-xs font-semibold mt-1 ${
+                        totalAmount >= 0 ? 'text-emerald-600' : 'text-rose-600'
+                      }`}>
+                        {totalAmount >= 0 ? '+' : ''}{formatCurrency(Math.abs(totalAmount), currency)}
                       </div>
                     )}
                   </div>
-                  {dayExpenses.length > 0 && (
-                    <div className={`text-xs font-semibold mt-1 ${
-                      totalAmount >= 0 ? 'text-emerald-600' : 'text-rose-600'
-                    }`}>
-                      {totalAmount >= 0 ? '+' : ''}{formatCurrency(Math.abs(totalAmount), currency)}
-                    </div>
-                  )}
-                </div>
-              )
-            })}
+                )
+              })}
           </div>
         </div>
         </>
@@ -785,7 +785,7 @@ const Expenses = () => {
 
       {/* Add/Edit Form Modal */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+        <div className="fixed inset-0 z-50 flex items-baseline justify-center bg-black bg-opacity-50 p-4">
           <div className="w-full max-w-lg max-h-[90vh] rounded-lg bg-white shadow-xl overflow-hidden flex flex-col">
             <form onSubmit={handleSubmit} className="flex flex-col h-full">
               {/* Header - Fixed */}
@@ -917,7 +917,7 @@ const Expenses = () => {
                     </div>
                   </label>
                   {formData.isRecurring && (
-                    <div className="mt-3 ml-6 space-y-3 p-4 bg-gray-50 rounded-lg">
+                    <div className="mt-3 ml-6 space-y-3 p-4 bg-gray-50 rounded-lg" style={{ overflow: 'visible' }}>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           Frequency *
@@ -933,7 +933,7 @@ const Expenses = () => {
                         </select>
                       </div>
 
-                      <div>
+                      <div className="relative" style={{ zIndex: 1000 }}>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           End Date *
                         </label>
@@ -984,7 +984,7 @@ const Expenses = () => {
       {/* Bulk Add Form Modal */}
       {showBulkForm && (
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-black bg-opacity-50 p-4 overflow-y-auto">
-          <div className="w-full max-w-2xl my-8 rounded-lg bg-white shadow-xl overflow-visible flex flex-col max-h-[90vh]">
+          <div className="w-full max-w-2xl my-8 rounded-lg bg-white shadow-xl flex flex-col max-h-[90vh] relative">
             <form onSubmit={handleBulkSubmit} className="flex flex-col h-full">
               {/* Header - Fixed */}
               <div className="flex items-center justify-between border-b border-gray-200 p-6 flex-shrink-0">
@@ -999,10 +999,10 @@ const Expenses = () => {
               </div>
 
               {/* Content Area - Scrollable */}
-              <div className="flex-1 flex flex-col overflow-hidden">
-                <div className="flex flex-col p-6 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 200px)' }}>
+              <div className="flex-1 flex flex-col overflow-hidden min-h-0">
+                <div className="flex flex-col p-6 overflow-y-auto flex-1">
                   {/* Date Selection - Fixed at top */}
-                  <div className="mb-4 flex-shrink-0 relative z-[60]">
+                  <div className="mb-4 flex-shrink-0 relative">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Date for all expenses *
                     </label>
@@ -1029,7 +1029,7 @@ const Expenses = () => {
                     </div>
 
                     <div 
-                      className="space-y-3 overflow-y-auto pr-2 bulk-expenses-scroll"
+                      className="space-y-3 overflow-y-auto pr-2"
                       style={{ 
                         maxHeight: '400px',
                         scrollbarWidth: 'thin',
