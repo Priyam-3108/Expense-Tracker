@@ -29,15 +29,20 @@ export const categoryService = {
   // Get category statistics
   getCategoryStats: (dateRange = {}) => {
     const params = new URLSearchParams()
-    
+
     if (dateRange.startDate) {
       params.append('startDate', dateRange.startDate)
     }
     if (dateRange.endDate) {
       params.append('endDate', dateRange.endDate)
     }
-    
+
     return api.get(`/categories/stats?${params.toString()}`)
   },
+
+  // Update category order
+  updateCategoryOrder: (order) => {
+    return api.put('/categories/order', { order })
+  }
 
 }

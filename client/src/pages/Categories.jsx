@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useExpense } from '../context/ExpenseContext'
-import { Plus, Edit, Trash2 } from 'lucide-react'
+import { Plus, Edit, Trash2, GripVertical } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useAuth } from '../context/AuthContext'
 
@@ -16,10 +16,12 @@ const currencySymbols = {
 }
 
 const Categories = () => {
-  const { categories, addCategory, updateCategory, deleteCategory, getCategoryStats, loadCategories, loading, categoriesLoading } = useExpense()
+  const { categories, addCategory, updateCategory, deleteCategory, getCategoryStats, reorderCategories, loading, categoriesLoading } = useExpense()
   const { user, currency } = useAuth()
   const [showForm, setShowForm] = useState(false)
   const [editingCategory, setEditingCategory] = useState(null)
+  const [draggedItem, setDraggedItem] = useState(null)
+  const [dragOverItem, setDragOverItem] = useState(null)
   const [formData, setFormData] = useState({
     name: '',
     color: '#3B82F6',
@@ -61,7 +63,7 @@ const Categories = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
+
     if (!formData.name.trim()) {
       toast.error('Category name is required')
       return
@@ -128,12 +130,12 @@ const Categories = () => {
       toast.error('Default categories cannot be deleted')
       return
     }
-    
+
     const hasExpenses = category.expenseCount > 0
-    const confirmMessage = hasExpenses 
+    const confirmMessage = hasExpenses
       ? `Are you sure you want to delete "${category.name}"? This category has ${category.expenseCount} associated expense${category.expenseCount !== 1 ? 's' : ''}. You'll need to reassign or delete those expenses first.`
       : `Are you sure you want to delete "${category.name}"? This action cannot be undone.`
-    
+
     if (window.confirm(confirmMessage)) {
       try {
         const result = await deleteCategory(category._id)
@@ -146,6 +148,58 @@ const Categories = () => {
         toast.error(errorMessage)
       }
     }
+  }
+
+  // Drag and Drop Handlers
+  const handleDragStart = (e, category) => {
+    setDraggedItem(category)
+    e.dataTransfer.effectAllowed = 'move'
+    // Make the drag image transparent or custom if needed, but default is usually fine
+    // e.dataTransfer.setDragImage(e.target, 0, 0)
+  }
+
+  const handleDragOver = (e, category) => {
+    e.preventDefault()
+    if (draggedItem === category) return
+    setDragOverItem(category)
+  }
+
+  const handleDragLeave = (e) => {
+    // Optional: clear dragOverItem if leaving the list, but tricky with grid
+  }
+
+  const handleDrop = async (e, targetCategory) => {
+    e.preventDefault()
+
+    if (!draggedItem || draggedItem._id === targetCategory._id) {
+      setDragOverItem(null)
+      return
+    }
+
+    const newCategories = [...categories]
+    const draggedIndex = newCategories.findIndex(c => c._id === draggedItem._id)
+    const targetIndex = newCategories.findIndex(c => c._id === targetCategory._id)
+
+    if (draggedIndex === -1 || targetIndex === -1) return
+
+    // Remove dragged item
+    newCategories.splice(draggedIndex, 1)
+    // Insert at new position
+    newCategories.splice(targetIndex, 0, draggedItem)
+
+    setDragOverItem(null)
+    setDraggedItem(null)
+
+    // Call context to update state and backend
+    const result = await reorderCategories(newCategories.map(c => c._id))
+    if (result.success) {
+      toast.success('Category order updated')
+    }
+  }
+
+  const handleDragEnd = () => {
+    setDraggedItem(null)
+    setDragOverItem(null)
   }
 
 
@@ -184,9 +238,9 @@ const Categories = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-start">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Categories</h1>
-        <p className="text-gray-600">Manage your expense categories</p>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Categories</h1>
+          <p className="text-gray-600">Manage your expense categories</p>
         </div>
         <div className="flex gap-2">
           <button
@@ -198,14 +252,14 @@ const Categories = () => {
           </button>
         </div>
       </div>
-      
+
       {/* Add/Edit Category Form */}
       {showForm && (
-      <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">
             {editingCategory ? 'Edit Category' : 'Add New Category'}
           </h3>
-          
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -231,11 +285,10 @@ const Categories = () => {
                     key={icon}
                     type="button"
                     onClick={() => setFormData({ ...formData, icon })}
-                    className={`p-2 text-lg rounded border-2 ${
-                      formData.icon === icon
+                    className={`p-2 text-lg rounded border-2 ${formData.icon === icon
                         ? 'border-blue-500 bg-blue-50'
                         : 'border-gray-200 hover:border-gray-300'
-                    }`}
+                      }`}
                   >
                     {icon}
                   </button>
@@ -253,11 +306,10 @@ const Categories = () => {
                     key={color}
                     type="button"
                     onClick={() => setFormData({ ...formData, color })}
-                    className={`w-8 h-8 rounded-full border-2 ${
-                      formData.color === color
+                    className={`w-8 h-8 rounded-full border-2 ${formData.color === color
                         ? 'border-gray-800'
                         : 'border-gray-200 hover:border-gray-300'
-                    }`}
+                      }`}
                     style={{ backgroundColor: color }}
                   />
                 ))}
@@ -297,7 +349,7 @@ const Categories = () => {
         <div className="px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-medium text-gray-900">All Categories</h3>
           <p className="text-sm text-gray-600">
-            {defaultUserCategories.length} default categories • {userCategories.length} custom categories
+            Drag and drop to reorder categories
           </p>
         </div>
         <div className="p-6">
@@ -319,135 +371,84 @@ const Categories = () => {
               </button>
             </div>
           ) : (
-            <>
-              {/* Default Categories Section */}
-              {defaultUserCategories.length > 0 && (
-                <div className="mb-6">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
-                    Default Categories
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {defaultUserCategories.map((category) => (
-                      <div
-                        key={category._id}
-                        className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                      >
-                        <div className="flex items-center gap-3 flex-1">
-                          <div
-                            className="w-12 h-12 rounded-full flex items-center justify-center text-xl flex-shrink-0"
-                            style={{ backgroundColor: category.color + '20' }}
-                          >
-                            {category.icon}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-medium text-gray-900 truncate">{category.name}</h4>
-                            <p className="text-sm text-gray-500">
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 mr-2">
-                                Default
-                              </span>
-                              {category.expenseCount > 0 && (
-                                <span className="text-blue-600">
-                                  {category.expenseCount} expense{category.expenseCount !== 1 ? 's' : ''}
-                                </span>
-                              )}
-                              {category.expenseCount === 0 && (
-                                <span className="text-gray-400">No expenses</span>
-                              )}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 ml-3">
-                          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded font-medium">
-                            Read-only
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {categories.map((category) => (
+                <div
+                  key={category._id}
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, category)}
+                  onDragOver={(e) => handleDragOver(e, category)}
+                  onDrop={(e) => handleDrop(e, category)}
+                  onDragEnd={handleDragEnd}
+                  className={`flex items-center justify-between p-4 border rounded-lg transition-all cursor-move ${dragOverItem?._id === category._id
+                      ? 'border-blue-500 bg-blue-50 scale-105 shadow-md'
+                      : draggedItem?._id === category._id
+                        ? 'opacity-50 border-dashed border-gray-400'
+                        : 'border-gray-200 hover:bg-gray-50 hover:shadow-sm'
+                    }`}
+                >
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="text-gray-400 cursor-grab active:cursor-grabbing">
+                      <GripVertical size={20} />
+                    </div>
+                    <div
+                      className="w-12 h-12 rounded-full flex items-center justify-center text-xl flex-shrink-0"
+                      style={{ backgroundColor: category.color + '20' }}
+                    >
+                      {category.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medium text-gray-900 truncate">{category.name}</h4>
+                      <p className="text-sm text-gray-500 flex items-center gap-2">
+                        {category.isDefault ? (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                            Default
                           </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              
-              {/* User Categories Section */}
-              {userCategories.length > 0 && (
-                <div className={defaultUserCategories.length > 0 ? 'mt-6 pt-6 border-t border-gray-200' : ''}>
-                  <h4 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
-                    Your Custom Categories
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {userCategories.map((category) => (
-                      <div
-                        key={category._id}
-                        className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                      >
-                        <div className="flex items-center gap-3 flex-1">
-                          <div
-                            className="w-12 h-12 rounded-full flex items-center justify-center text-xl flex-shrink-0"
-                            style={{ backgroundColor: category.color + '20' }}
-                          >
-                            {category.icon}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-medium text-gray-900 truncate">{category.name}</h4>
-                            <p className="text-sm text-gray-500">
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 mr-2">
-                                Custom
-                              </span>
-                              {category.expenseCount > 0 && (
-                                <span className="text-blue-600">
-                                  {category.expenseCount} expense{category.expenseCount !== 1 ? 's' : ''}
-                                </span>
-                              )}
-                              {category.expenseCount === 0 && (
-                                <span className="text-gray-400">No expenses</span>
-                              )}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 ml-3">
-                          <button
-                            onClick={() => handleEdit(category)}
-                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                            title="Edit category"
-                            aria-label="Edit category"
-                          >
-                            <Edit size={18} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(category)}
-                            className={`p-2 rounded transition-colors ${
-                              category.expenseCount > 0 
-                                ? 'text-orange-400 hover:text-orange-600 hover:bg-orange-50' 
-                                : 'text-gray-400 hover:text-red-600 hover:bg-red-50'
-                            }`}
-                            title={
-                              category.expenseCount > 0 
-                                ? `Delete category (has ${category.expenseCount} expense${category.expenseCount !== 1 ? 's' : ''})`
-                                : 'Delete category'
-                            }
-                            aria-label="Delete category"
-                          >
-                            <Trash2 size={18} />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Show message if no categories at all */}
-              {defaultUserCategories.length === 0 && userCategories.length === 0 && (
-                <div className="text-center py-8">
-                  <div className="text-gray-400 mb-4">
-                    <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center">
-                      <Plus size={24} />
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                            Custom
+                          </span>
+                        )}
+                        {category.expenseCount > 0 && (
+                          <span className="text-blue-600 text-xs">
+                            {category.expenseCount} exp.
+                          </span>
+                        )}
+                      </p>
                     </div>
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No categories available</h3>
-                  <p className="text-gray-600 mb-4">Categories should be created automatically. If you see this message, please refresh the page.</p>
+
+                  <div className="flex items-center gap-1 ml-2">
+                    {!category.isDefault && (
+                      <>
+                        <button
+                          onClick={() => handleEdit(category)}
+                          className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                          title="Edit category"
+                        >
+                          <Edit size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(category)}
+                          className={`p-1.5 rounded transition-colors ${category.expenseCount > 0
+                              ? 'text-orange-400 hover:text-orange-600 hover:bg-orange-50'
+                              : 'text-gray-400 hover:text-red-600 hover:bg-red-50'
+                            }`}
+                          title="Delete category"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </>
+                    )}
+                    {category.isDefault && (
+                      <span className="text-xs text-gray-400 italic px-2">
+                        Read-only
+                      </span>
+                    )}
+                  </div>
                 </div>
-              )}
-            </>
+              ))}
+            </div>
           )}
         </div>
       </div>
@@ -482,7 +483,7 @@ const Categories = () => {
                     </div>
                     <div className="text-right">
                       <div className="text-lg font-semibold text-gray-900">
-                      {currencySymbols[currency] || '$'} {stat.totalAmount.toFixed(2)}
+                        {currencySymbols[currency] || '$'} {stat.totalAmount.toFixed(2)}
                       </div>
                       <div className="text-sm text-gray-500">
                         {((stat.totalAmount / categoryStats.reduce((sum, s) => sum + s.totalAmount, 0)) * 100).toFixed(1)}%
@@ -492,7 +493,7 @@ const Categories = () => {
                 ))}
               </div>
             )}
-      </div>
+          </div>
         </div>
       )}
 

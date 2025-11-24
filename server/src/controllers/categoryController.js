@@ -5,8 +5,37 @@ import { Category } from '../config/models/index.js';
 export const getCategories = async (req, res) => {
   try {
     // Get all categories for the user
-    const categories = await Category.find({ user: req.user._id })
-      .sort({ isDefault: -1, createdAt: -1 });
+    const categories = await Category.find({ user: req.user._id });
+
+    // Get user's category order
+    const { User } = await import('../config/models/index.js');
+    const user = await User.findById(req.user._id);
+    const categoryOrder = user.categoryOrder || [];
+
+    // Create a map for order index
+    const orderMap = {};
+    categoryOrder.forEach((id, index) => {
+      orderMap[id.toString()] = index;
+    });
+
+    // Sort categories based on order map
+    // Items not in the map will be placed at the end, sorted by isDefault and createdAt
+    categories.sort((a, b) => {
+      const indexA = orderMap[a._id.toString()];
+      const indexB = orderMap[b._id.toString()];
+
+      if (indexA !== undefined && indexB !== undefined) {
+        return indexA - indexB;
+      }
+      if (indexA !== undefined) return -1;
+      if (indexB !== undefined) return 1;
+
+      // Fallback to default sorting
+      if (a.isDefault !== b.isDefault) {
+        return b.isDefault - a.isDefault; // Defaults first
+      }
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
 
     // Get expense counts for each category using aggregation
     const { Expense } = await import('../config/models/index.js');
@@ -131,7 +160,7 @@ export const createCategory = async (req, res) => {
     });
   } catch (error) {
     console.error('Create category error:', error);
-    
+
     if (error.code === 11000) {
       return res.status(400).json({
         success: false,
@@ -211,7 +240,7 @@ export const updateCategory = async (req, res) => {
     });
   } catch (error) {
     console.error('Update category error:', error);
-    
+
     if (error.code === 11000) {
       return res.status(400).json({
         success: false,
@@ -287,7 +316,7 @@ export const deleteCategory = async (req, res) => {
 export const getCategoryStats = async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
-    
+
     let dateFilter = {};
     if (startDate && endDate) {
       dateFilter = {
@@ -299,7 +328,7 @@ export const getCategoryStats = async (req, res) => {
     }
 
     const { Expense } = await import('../config/models/index.js');
-    
+
     const stats = await Expense.aggregate([
       {
         $match: {
@@ -344,6 +373,39 @@ export const getCategoryStats = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to get category statistics',
+      error: error.message
+    });
+  }
+};
+
+// Update category order
+export const updateCategoryOrder = async (req, res) => {
+  try {
+    const { order } = req.body;
+
+    if (!Array.isArray(order)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Order must be an array of category IDs'
+      });
+    }
+
+    const { User } = await import('../config/models/index.js');
+
+    // Update user's category order
+    await User.findByIdAndUpdate(req.user._id, {
+      categoryOrder: order
+    });
+
+    res.json({
+      success: true,
+      message: 'Category order updated successfully'
+    });
+  } catch (error) {
+    console.error('Update category order error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update category order',
       error: error.message
     });
   }

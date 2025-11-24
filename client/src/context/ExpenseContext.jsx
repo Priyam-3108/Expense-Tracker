@@ -269,6 +269,34 @@ export const ExpenseProvider = ({ children }) => {
     }
   }, [loadCategories])
 
+  const reorderCategories = useCallback(async (newOrder) => {
+    try {
+      // Optimistically update local state
+      const orderMap = new Map(newOrder.map((id, index) => [id, index]))
+      setCategories(prev => {
+        const sorted = [...prev].sort((a, b) => {
+          const indexA = orderMap.get(a._id)
+          const indexB = orderMap.get(b._id)
+          if (indexA !== undefined && indexB !== undefined) return indexA - indexB
+          if (indexA !== undefined) return -1
+          if (indexB !== undefined) return 1
+          return 0
+        })
+        return sorted
+      })
+
+      // Send to backend
+      await categoryService.updateCategoryOrder(newOrder)
+      return { success: true }
+    } catch (error) {
+      console.error('Error reordering categories:', error)
+      toast.error('Failed to save category order')
+      // Revert on failure (reload from server)
+      await loadCategories()
+      return { success: false, error: error.message }
+    }
+  }, [loadCategories])
+
   const getCategoryById = (id) => {
     if (!id || !Array.isArray(categories)) {
       return null
@@ -347,7 +375,8 @@ export const ExpenseProvider = ({ children }) => {
     updateCategory,
     deleteCategory,
     getCategoryById,
-    getCategoryStats
+    getCategoryStats,
+    reorderCategories
   }
 
   // If there's an error, show it instead of crashing

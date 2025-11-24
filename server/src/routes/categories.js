@@ -5,7 +5,8 @@ import {
   createCategory,
   updateCategory,
   deleteCategory,
-  getCategoryStats
+  getCategoryStats,
+  updateCategoryOrder
 } from '../controllers/categoryController.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { validate, categorySchema } from '../middleware/validation.js';
@@ -18,6 +19,7 @@ router.use(authenticateToken);
 // CRUD operations
 router.get('/', getCategories);
 router.get('/stats', getCategoryStats);
+router.put('/order', updateCategoryOrder); // Add this before /:id to avoid conflict
 router.get('/:id', getCategory);
 router.post('/', validate(categorySchema), createCategory);
 router.put('/:id', validate(categorySchema), updateCategory);
