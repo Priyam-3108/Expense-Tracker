@@ -7,7 +7,8 @@ import {
   updateExpense,
   deleteExpense,
   getExpenseStats,
-  getExpenseTrends
+  getExpenseTrends,
+  getDetailedAnalytics
 } from '../controllers/expenseController.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { validate, expenseSchema, validateDateRange } from '../middleware/validation.js';
@@ -21,6 +22,7 @@ router.use(authenticateToken);
 router.get('/', validateDateRange, getExpenses);
 router.get('/stats', validateDateRange, getExpenseStats);
 router.get('/trends', getExpenseTrends);
+router.get('/analytics', validateDateRange, getDetailedAnalytics);
 router.get('/:id', getExpense);
 router.post('/bulk', bulkCreateExpenses);
 router.post('/', validate(expenseSchema), createExpense);

@@ -48,7 +48,7 @@ export const getExpenses = async (req, res) => {
 
     // Build filter object
     const filter = { user: req.user._id };
-    
+
     if (category && category !== 'all') {
       try {
         filter.category = new mongoose.Types.ObjectId(category);
@@ -60,7 +60,7 @@ export const getExpenses = async (req, res) => {
       }
     }
     if (type && type !== 'all') filter.type = type;
-    
+
     if (startDate && endDate) {
       filter.date = {
         $gte: new Date(startDate),
@@ -193,7 +193,7 @@ export const bulkCreateExpenses = async (req, res) => {
 
     for (let i = 0; i < expenses.length; i++) {
       const expense = expenses[i];
-      
+
       if (!expense.amount || parseFloat(expense.amount) <= 0) {
         errors.push(`Expense ${i + 1}: Invalid amount`);
         continue;
@@ -555,7 +555,7 @@ export const deleteExpense = async (req, res) => {
 export const getExpenseStats = async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
-    
+
     let dateFilter = {};
     if (startDate && endDate) {
       dateFilter = {
@@ -709,3 +709,263 @@ export const getExpenseTrends = async (req, res) => {
     });
   }
 };
+
+// Get detailed analytics with comprehensive insights
+export const getDetailedAnalytics = async (req, res) => {
+  try {
+    const { startDate, endDate, category, type } = req.query;
+
+    // Build base filter
+    const filter = { user: req.user._id };
+
+    // Add date range filter
+    if (startDate && endDate) {
+      filter.date = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate)
+      };
+    } else {
+      // Default to current month if no dates provided
+      const now = new Date();
+      filter.date = {
+        $gte: new Date(now.getFullYear(), now.getMonth(), 1),
+        $lte: new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
+      };
+    }
+
+    // Add category filter if provided
+    if (category && category !== 'all') {
+      filter.category = new mongoose.Types.ObjectId(category);
+    }
+
+    // Add type filter if provided
+    if (type && type !== 'all') {
+      filter.type = type;
+    }
+
+    // 1. Get category-wise breakdown with detailed stats
+    const categoryBreakdown = await Expense.aggregate([
+      { $match: { ...filter, type: 'expense' } },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'category',
+          foreignField: '_id',
+          as: 'categoryInfo'
+        }
+      },
+      { $unwind: '$categoryInfo' },
+      {
+        $group: {
+          _id: '$category',
+          category: { $first: '$categoryInfo' },
+          totalAmount: { $sum: '$amount' },
+          count: { $sum: 1 },
+          avgAmount: { $avg: '$amount' },
+          minAmount: { $min: '$amount' },
+          maxAmount: { $max: '$amount' }
+        }
+      },
+      { $sort: { totalAmount: -1 } }
+    ]);
+
+    // 2. Get overall summary stats
+    const summaryStats = await Expense.aggregate([
+      { $match: filter },
+      {
+        $group: {
+          _id: '$type',
+          total: { $sum: '$amount' },
+          count: { $sum: 1 },
+          avg: { $avg: '$amount' }
+        }
+      }
+    ]);
+
+    const expenseStats = summaryStats.find(s => s._id === 'expense') || { total: 0, count: 0, avg: 0 };
+    const incomeStats = summaryStats.find(s => s._id === 'income') || { total: 0, count: 0, avg: 0 };
+
+    // 3. Get daily spending pattern
+    const dailyPattern = await Expense.aggregate([
+      { $match: filter },
+      {
+        $group: {
+          _id: {
+            date: { $dateToString: { format: '%Y-%m-%d', date: '$date' } },
+            type: '$type'
+          },
+          total: { $sum: '$amount' },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $group: {
+          _id: '$_id.date',
+          expenses: {
+            $sum: {
+              $cond: [{ $eq: ['$_id.type', 'expense'] }, '$total', 0]
+            }
+          },
+          income: {
+            $sum: {
+              $cond: [{ $eq: ['$_id.type', 'income'] }, '$total', 0]
+            }
+          },
+          transactionCount: { $sum: '$count' }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+
+    // 4. Get top spending days
+    const topSpendingDays = await Expense.aggregate([
+      { $match: { ...filter, type: 'expense' } },
+      {
+        $group: {
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$date' } },
+          total: { $sum: '$amount' },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { total: -1 } },
+      { $limit: 5 }
+    ]);
+
+    // 5. Get weekly comparison (if date range spans multiple weeks)
+    const weeklyComparison = await Expense.aggregate([
+      { $match: filter },
+      {
+        $group: {
+          _id: {
+            week: { $week: '$date' },
+            year: { $year: '$date' },
+            type: '$type'
+          },
+          total: { $sum: '$amount' },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $group: {
+          _id: { week: '$_id.week', year: '$_id.year' },
+          expenses: {
+            $sum: {
+              $cond: [{ $eq: ['$_id.type', 'expense'] }, '$total', 0]
+            }
+          },
+          income: {
+            $sum: {
+              $cond: [{ $eq: ['$_id.type', 'income'] }, '$total', 0]
+            }
+          }
+        }
+      },
+      { $sort: { '_id.year': 1, '_id.week': 1 } }
+    ]);
+
+    // 6. Get monthly comparison
+    const monthlyComparison = await Expense.aggregate([
+      { $match: filter },
+      {
+        $group: {
+          _id: {
+            month: { $month: '$date' },
+            year: { $year: '$date' },
+            type: '$type'
+          },
+          total: { $sum: '$amount' },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $group: {
+          _id: { month: '$_id.month', year: '$_id.year' },
+          expenses: {
+            $sum: {
+              $cond: [{ $eq: ['$_id.type', 'expense'] }, '$total', 0]
+            }
+          },
+          income: {
+            $sum: {
+              $cond: [{ $eq: ['$_id.type', 'income'] }, '$total', 0]
+            }
+          }
+        }
+      },
+      { $sort: { '_id.year': 1, '_id.month': 1 } }
+    ]);
+
+    // 7. Calculate insights
+    const totalDays = dailyPattern.length || 1;
+    const avgDailyExpense = expenseStats.total / totalDays;
+    const avgDailyIncome = incomeStats.total / totalDays;
+    const netAmount = incomeStats.total - expenseStats.total;
+    const savingsRate = incomeStats.total > 0 ? ((netAmount / incomeStats.total) * 100) : 0;
+
+    // 8. Get recurring expenses info
+    const recurringExpenses = await Expense.aggregate([
+      {
+        $match: {
+          user: req.user._id,
+          isRecurring: true,
+          type: 'expense'
+        }
+      },
+      {
+        $group: {
+          _id: '$recurringGroupId',
+          amount: { $first: '$amount' },
+          description: { $first: '$description' },
+          period: { $first: '$recurringPeriod' },
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    const totalRecurringExpenses = recurringExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+
+    // Prepare response
+    res.json({
+      success: true,
+      data: {
+        summary: {
+          totalExpenses: expenseStats.total,
+          totalIncome: incomeStats.total,
+          netAmount,
+          expenseCount: expenseStats.count,
+          incomeCount: incomeStats.count,
+          avgExpenseAmount: expenseStats.avg,
+          avgIncomeAmount: incomeStats.avg,
+          avgDailyExpense,
+          avgDailyIncome,
+          savingsRate,
+          totalDays
+        },
+        categoryBreakdown,
+        dailyPattern,
+        topSpendingDays,
+        weeklyComparison,
+        monthlyComparison,
+        recurringExpenses: {
+          total: totalRecurringExpenses,
+          count: recurringExpenses.length,
+          details: recurringExpenses
+        },
+        insights: {
+          highestSpendingCategory: categoryBreakdown[0] || null,
+          lowestSpendingCategory: categoryBreakdown[categoryBreakdown.length - 1] || null,
+          averageTransactionSize: expenseStats.count > 0 ? expenseStats.total / expenseStats.count : 0,
+          totalTransactions: expenseStats.count + incomeStats.count
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Get detailed analytics error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get detailed analytics',
+      error: error.message
+    });
+  }
+};
+

@@ -121,6 +121,27 @@ export const ExpenseProvider = ({ children }) => {
     }
   }, [])
 
+  const loadDetailedAnalytics = useCallback(async (filters = {}) => {
+    try {
+      const response = await expenseService.getDetailedAnalytics(filters)
+      if (response && response.data && response.data.success && response.data.data) {
+        return response.data.data
+      } else if (response && response.data) {
+        return response.data
+      } else {
+        const errorMsg = response?.data?.message || 'Invalid response format from server'
+        toast.error(errorMsg)
+        console.error('Invalid analytics response:', response)
+        return null
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to load analytics. Please try again.'
+      toast.error(errorMessage)
+      console.error('Error loading analytics:', error)
+      return null
+    }
+  }, [])
+
   const addExpense = useCallback(async (expenseData) => {
     try {
       const response = await expenseService.createExpense(expenseData)
@@ -318,6 +339,7 @@ export const ExpenseProvider = ({ children }) => {
     loadCategories,
     loadStats,
     loadTrends,
+    loadDetailedAnalytics,
     addExpense,
     updateExpense,
     deleteExpense,
@@ -335,7 +357,7 @@ export const ExpenseProvider = ({ children }) => {
         <div className="text-center">
           <h2 className="text-xl font-semibold text-red-600 mb-2">Something went wrong</h2>
           <p className="text-gray-600 mb-4">{error}</p>
-          <button 
+          <button
             onClick={() => setError(null)}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >

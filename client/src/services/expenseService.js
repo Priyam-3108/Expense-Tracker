@@ -4,13 +4,13 @@ export const expenseService = {
   // Get all expenses with optional filters
   getExpenses: (filters = {}) => {
     const params = new URLSearchParams()
-    
+
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
         params.append(key, value)
       }
     })
-    
+
     return api.get(`/expenses?${params.toString()}`)
   },
 
@@ -42,14 +42,14 @@ export const expenseService = {
   // Get expense statistics
   getStats: (dateRange = {}) => {
     const params = new URLSearchParams()
-    
+
     if (dateRange.startDate) {
       params.append('startDate', dateRange.startDate)
     }
     if (dateRange.endDate) {
       params.append('endDate', dateRange.endDate)
     }
-    
+
     return api.get(`/expenses/stats?${params.toString()}`)
   },
 
@@ -59,7 +59,20 @@ export const expenseService = {
     if (year) {
       params.append('year', year)
     }
-    
+
     return api.get(`/expenses/trends?${params.toString()}`)
+  },
+
+  // Get detailed analytics
+  getDetailedAnalytics: (filters = {}) => {
+    const params = new URLSearchParams()
+
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        params.append(key, value)
+      }
+    })
+
+    return api.get(`/expenses/analytics?${params.toString()}`)
   },
 }
