@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { ExpenseProvider } from './context/ExpenseContext'
+import { ThemeProvider } from './context/ThemeContext'
 import Layout from './components/Layout'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -13,7 +14,7 @@ import Profile from './pages/Profile'
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth()
-  
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -21,14 +22,14 @@ const ProtectedRoute = ({ children }) => {
       </div>
     )
   }
-  
+
   return user ? children : <Navigate to="/login" replace />
 }
 
 // Public Route Component (redirects to dashboard if already logged in)
 const PublicRoute = ({ children }) => {
   const { user, loading } = useAuth()
-  
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -36,7 +37,7 @@ const PublicRoute = ({ children }) => {
       </div>
     )
   }
-  
+
   return user ? <Navigate to="/dashboard" replace /> : children
 }
 
@@ -54,7 +55,7 @@ function AppRoutes() {
           <Register />
         </PublicRoute>
       } />
-      
+
       {/* Protected Routes */}
       <Route path="/" element={
         <ProtectedRoute>
@@ -68,7 +69,7 @@ function AppRoutes() {
         <Route path="analytics" element={<Analytics />} />
         <Route path="profile" element={<Profile />} />
       </Route>
-      
+
       {/* Catch all route */}
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
@@ -78,9 +79,11 @@ function AppRoutes() {
 function App() {
   return (
     <AuthProvider>
-      <ExpenseProvider>
-        <AppRoutes />
-      </ExpenseProvider>
+      <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+        <ExpenseProvider>
+          <AppRoutes />
+        </ExpenseProvider>
+      </ThemeProvider>
     </AuthProvider>
   )
 }

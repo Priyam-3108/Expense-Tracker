@@ -35,7 +35,7 @@ const DatePicker = ({ value, onChange, placeholder = "Select date", className = 
   const handleToggle = (e) => {
     e.preventDefault()
     e.stopPropagation()
-    
+
     if (!isOpen && buttonRef.current) {
       // Calculate position synchronously BEFORE opening to prevent flicker
       const rect = buttonRef.current.getBoundingClientRect()
@@ -43,30 +43,30 @@ const DatePicker = ({ value, onChange, placeholder = "Select date", className = 
       const viewportWidth = window.innerWidth
       const dropdownHeight = 400 // Approximate height of calendar dropdown
       const dropdownWidth = 320 // w-80 = 320px
-      
+
       // Check if there's enough space below, if not, position above
       const spaceBelow = viewportHeight - rect.bottom
       const spaceAbove = rect.top
       const shouldPositionAbove = spaceBelow < dropdownHeight && spaceAbove > spaceBelow
-      
+
       // Calculate top position
-      let top = shouldPositionAbove 
+      let top = shouldPositionAbove
         ? rect.top - dropdownHeight - 8
         : rect.bottom + 8
-      
+
       // Ensure dropdown doesn't go off screen
       if (top < 8) top = 8
       if (top + dropdownHeight > viewportHeight - 8) {
         top = viewportHeight - dropdownHeight - 8
       }
-      
+
       // Calculate left position (ensure it doesn't go off screen)
       let left = rect.left
       if (left + dropdownWidth > viewportWidth - 8) {
         left = viewportWidth - dropdownWidth - 8
       }
       if (left < 8) left = 8
-      
+
       const position = {
         top: top,
         left: left,
@@ -105,11 +105,11 @@ const DatePicker = ({ value, onChange, placeholder = "Select date", className = 
           ref={buttonRef}
           type="button"
           onClick={handleToggle}
-          className={`w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg bg-white text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 transition ${value ? 'pr-10' : ''}`}
+          className={`w-full flex items-center justify-between px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-left focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-600 transition ${value ? 'pr-10' : ''}`}
         >
           <div className="flex items-center gap-2">
             <CalendarIcon size={18} className="text-gray-400" />
-            <span className={value ? 'text-gray-900' : 'text-gray-500'}>
+            <span className={value ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}>
               {displayValue || placeholder}
             </span>
           </div>
@@ -122,7 +122,7 @@ const DatePicker = ({ value, onChange, placeholder = "Select date", className = 
               e.stopPropagation()
               onChange('')
             }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 z-10 p-1"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 z-10 p-1"
           >
             <X size={16} />
           </button>
@@ -130,10 +130,10 @@ const DatePicker = ({ value, onChange, placeholder = "Select date", className = 
       </div>
 
       {isOpen && dropdownPosition.ready && (
-        <div 
-          className="fixed z-[9999] bg-white border border-gray-200 rounded-lg shadow-xl p-4 w-80" 
-          style={{ 
-            top: `${dropdownPosition.top}px`, 
+        <div
+          className="fixed z-[9999] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl p-4 w-80"
+          style={{
+            top: `${dropdownPosition.top}px`,
             left: `${dropdownPosition.left}px`,
             maxHeight: 'calc(100vh - 16px)',
             maxWidth: 'calc(100vw - 16px)',
@@ -147,17 +147,17 @@ const DatePicker = ({ value, onChange, placeholder = "Select date", className = 
             <button
               type="button"
               onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-              className="p-1 hover:bg-gray-100 rounded transition"
+              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition"
             >
               <ChevronLeft size={20} className="text-gray-600" />
             </button>
-            <h3 className="text-sm font-semibold text-gray-900">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
               {format(currentMonth, 'MMMM yyyy')}
             </h3>
             <button
               type="button"
               onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-              className="p-1 hover:bg-gray-100 rounded transition"
+              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition"
             >
               <ChevronRight size={20} className="text-gray-600" />
             </button>
@@ -168,7 +168,7 @@ const DatePicker = ({ value, onChange, placeholder = "Select date", className = 
             <div className="grid grid-cols-7 gap-1">
               {/* Day headers */}
               {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
-                <div key={day} className="p-2 text-center text-xs font-medium text-gray-500">
+                <div key={day} className="p-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400">
                   {day}
                 </div>
               ))}
@@ -184,15 +184,14 @@ const DatePicker = ({ value, onChange, placeholder = "Select date", className = 
                     key={idx}
                     type="button"
                     onClick={() => handleDateSelect(day)}
-                    className={`p-2 text-sm rounded transition ${
-                      !isCurrentMonthDay
-                        ? 'text-gray-300 cursor-not-allowed'
-                        : isSelected
+                    className={`p-2 text-sm rounded transition ${!isCurrentMonthDay
+                      ? 'text-gray-300 dark:text-gray-500 cursor-not-allowed'
+                      : isSelected
                         ? 'bg-blue-600 text-white font-semibold'
                         : isToday
-                        ? 'bg-blue-50 text-blue-600 font-semibold'
-                        : 'text-gray-700 hover:bg-gray-100'
-                    }`}
+                          ? 'bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-300 font-semibold'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      }`}
                     disabled={!isCurrentMonthDay}
                   >
                     {format(day, 'd')}
@@ -203,18 +202,18 @@ const DatePicker = ({ value, onChange, placeholder = "Select date", className = 
           </div>
 
           {/* Quick actions - Fixed */}
-          <div className="mt-4 pt-4 border-t border-gray-200 flex gap-2 flex-shrink-0">
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex gap-2 flex-shrink-0">
             <button
               type="button"
               onClick={() => handleDateSelect(new Date())}
-              className="flex-1 px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition"
+              className="flex-1 px-3 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition"
             >
               Today
             </button>
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="flex-1 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition"
+              className="flex-1 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/20 rounded-lg transition"
             >
               Cancel
             </button>

@@ -239,8 +239,8 @@ const Categories = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Categories</h1>
-          <p className="text-gray-600">Manage your expense categories</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Categories</h1>
+          <p className="text-gray-600 dark:text-gray-400">Manage your expense categories</p>
         </div>
         <div className="flex gap-2">
           <button
@@ -255,28 +255,28 @@ const Categories = () => {
 
       {/* Add/Edit Category Form */}
       {showForm && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
             {editingCategory ? 'Edit Category' : 'Add New Category'}
           </h3>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Category Name
               </label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                 placeholder="Enter category name"
                 maxLength={30}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Icon
               </label>
               <div className="grid grid-cols-12 gap-2">
@@ -286,8 +286,8 @@ const Categories = () => {
                     type="button"
                     onClick={() => setFormData({ ...formData, icon })}
                     className={`p-2 text-lg rounded border-2 ${formData.icon === icon
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500'
                       }`}
                   >
                     {icon}
@@ -297,7 +297,7 @@ const Categories = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Color
               </label>
               <div className="grid grid-cols-8 gap-2">
@@ -307,8 +307,8 @@ const Categories = () => {
                     type="button"
                     onClick={() => setFormData({ ...formData, color })}
                     className={`w-8 h-8 rounded-full border-2 ${formData.color === color
-                        ? 'border-gray-800'
-                        : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-gray-800 dark:border-white'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500'
                       }`}
                     style={{ backgroundColor: color }}
                   />
@@ -335,7 +335,7 @@ const Categories = () => {
                 type="button"
                 onClick={handleCancel}
                 disabled={formLoading}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
@@ -345,10 +345,10 @@ const Categories = () => {
       )}
 
       {/* All Categories */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">All Categories</h3>
-          <p className="text-sm text-gray-600">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">All Categories</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             Drag and drop to reorder categories
           </p>
         </div>
@@ -356,12 +356,12 @@ const Categories = () => {
           {categories.length === 0 ? (
             <div className="text-center py-8">
               <div className="text-gray-400 mb-4">
-                <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center">
+                <div className="w-16 h-16 mx-auto bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
                   <Plus size={24} />
                 </div>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No categories available</h3>
-              <p className="text-gray-600 mb-4">Create your first custom category to get started</p>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No categories available</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">Create your first custom category to get started</p>
               <button
                 onClick={handleAddNew}
                 className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
@@ -381,10 +381,10 @@ const Categories = () => {
                   onDrop={(e) => handleDrop(e, category)}
                   onDragEnd={handleDragEnd}
                   className={`flex items-center justify-between p-4 border rounded-lg transition-all cursor-move ${dragOverItem?._id === category._id
-                      ? 'border-blue-500 bg-blue-50 scale-105 shadow-md'
-                      : draggedItem?._id === category._id
-                        ? 'opacity-50 border-dashed border-gray-400'
-                        : 'border-gray-200 hover:bg-gray-50 hover:shadow-sm'
+                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 scale-105 shadow-md'
+                    : draggedItem?._id === category._id
+                      ? 'opacity-50 border-dashed border-gray-400 dark:border-gray-500'
+                      : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-sm'
                     }`}
                 >
                   <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -398,19 +398,19 @@ const Categories = () => {
                       {category.icon}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-900 truncate">{category.name}</h4>
-                      <p className="text-sm text-gray-500 flex items-center gap-2">
+                      <h4 className="font-medium text-gray-900 dark:text-white truncate">{category.name}</h4>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
                         {category.isDefault ? (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
                             Default
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
                             Custom
                           </span>
                         )}
                         {category.expenseCount > 0 && (
-                          <span className="text-blue-600 text-xs">
+                          <span className="text-blue-600 dark:text-blue-400 text-xs">
                             {category.expenseCount} exp.
                           </span>
                         )}
@@ -423,7 +423,7 @@ const Categories = () => {
                       <>
                         <button
                           onClick={() => handleEdit(category)}
-                          className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                          className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
                           title="Edit category"
                         >
                           <Edit size={16} />
@@ -431,8 +431,8 @@ const Categories = () => {
                         <button
                           onClick={() => handleDelete(category)}
                           className={`p-1.5 rounded transition-colors ${category.expenseCount > 0
-                              ? 'text-orange-400 hover:text-orange-600 hover:bg-orange-50'
-                              : 'text-gray-400 hover:text-red-600 hover:bg-red-50'
+                            ? 'text-orange-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20'
+                            : 'text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'
                             }`}
                           title="Delete category"
                         >
@@ -455,10 +455,10 @@ const Categories = () => {
 
       {/* Category Statistics */}
       {categoryStats.length > 0 && (
-        <div className="bg-white rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900">Category Statistics</h3>
-            <p className="text-sm text-gray-600">Expense breakdown by category</p>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white">Category Statistics</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Expense breakdown by category</p>
           </div>
           <div className="p-6">
             {statsLoading ? (
@@ -468,7 +468,7 @@ const Categories = () => {
             ) : (
               <div className="space-y-4">
                 {categoryStats.map((stat, index) => (
-                  <div key={stat._id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div key={stat._id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
                     <div className="flex items-center gap-3">
                       <div
                         className="w-10 h-10 rounded-full flex items-center justify-center text-lg"
@@ -477,15 +477,15 @@ const Categories = () => {
                         {categories?.find(cat => cat._id === stat._id)?.icon || '💰'}
                       </div>
                       <div>
-                        <h4 className="font-medium text-gray-900">{stat.categoryName}</h4>
-                        <p className="text-sm text-gray-500">{stat.count} expense(s)</p>
+                        <h4 className="font-medium text-gray-900 dark:text-white">{stat.categoryName}</h4>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{stat.count} expense(s)</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-lg font-semibold text-gray-900">
+                      <div className="text-lg font-semibold text-gray-900 dark:text-white">
                         {currencySymbols[currency] || '$'} {stat.totalAmount.toFixed(2)}
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
                         {((stat.totalAmount / categoryStats.reduce((sum, s) => sum + s.totalAmount, 0)) * 100).toFixed(1)}%
                       </div>
                     </div>

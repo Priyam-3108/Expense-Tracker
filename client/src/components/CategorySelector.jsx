@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react'
 import { ChevronDown, Plus } from 'lucide-react'
 import { useExpense } from '../context/ExpenseContext'
 
-const CategorySelector = ({ 
-  value, 
-  onChange, 
+const CategorySelector = ({
+  value,
+  onChange,
   placeholder = "Select a category",
   showCreateButton = false,
   onCreateClick = null,
@@ -53,7 +53,7 @@ const CategorySelector = ({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md bg-white text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
       >
         {selectedCategory ? (
           <div className="flex items-center gap-2">
@@ -63,28 +63,28 @@ const CategorySelector = ({
             >
               {selectedCategory.icon}
             </div>
-            <span className="text-gray-900">{selectedCategory.name}</span>
+            <span className="text-gray-900 dark:text-white">{selectedCategory.name}</span>
           </div>
         ) : (
-          <span className="text-gray-500">{placeholder}</span>
+          <span className="text-gray-500 dark:text-gray-400">{placeholder}</span>
         )}
-        <ChevronDown 
-          size={16} 
+        <ChevronDown
+          size={16}
           className={`text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute top-full left-0 w-full z-[9999] mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-hidden">
+        <div className="absolute top-full left-0 w-full z-[9999] mt-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-hidden">
           {/* Search Input */}
-          <div className="p-2 border-b border-gray-200">
+          <div className="p-2 border-b border-gray-200 dark:border-gray-600">
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search categories..."
-              className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-500 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
               autoFocus
             />
           </div>
@@ -92,7 +92,7 @@ const CategorySelector = ({
           {/* Categories List */}
           <div className="max-h-48 overflow-y-auto">
             {filteredCategories.length === 0 ? (
-              <div className="px-3 py-2 text-sm text-gray-500">
+              <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
                 {searchTerm ? 'No categories found' : 'No categories available'}
               </div>
             ) : (
@@ -101,7 +101,7 @@ const CategorySelector = ({
                   key={category._id}
                   type="button"
                   onClick={() => handleSelect(category)}
-                  className="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                  className="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-600 focus:bg-gray-50 dark:focus:bg-gray-600 focus:outline-none"
                 >
                   <div
                     className="w-6 h-6 rounded-full flex items-center justify-center text-sm"
@@ -110,11 +110,11 @@ const CategorySelector = ({
                     {category.icon}
                   </div>
                   <div className="flex-1">
-                    <div className="text-sm font-medium text-gray-900">
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">
                       {category.name}
                     </div>
                     {category.isDefault && (
-                      <div className="text-xs text-gray-500">Default category</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">Default category</div>
                     )}
                   </div>
                 </button>
@@ -124,11 +124,11 @@ const CategorySelector = ({
 
           {/* Create New Category Button */}
           {showCreateButton && onCreateClick && (
-            <div className="border-t border-gray-200">
+            <div className="border-t border-gray-200 dark:border-gray-600">
               <button
                 type="button"
                 onClick={handleCreateClick}
-                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 focus:bg-blue-50 focus:outline-none"
+                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 focus:bg-blue-50 dark:focus:bg-blue-900/20 focus:outline-none"
               >
                 <Plus size={16} />
                 Create new category
