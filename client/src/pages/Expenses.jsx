@@ -409,7 +409,7 @@ const Expenses = () => {
   </div>
 
   {/* Summary cards */ }
-  <div className="grid grid-cols-1 gap-4 md:grid-cols-3 mt-2 mb-2">
+  <div className="grid grid-cols-1 gap-4 md:grid-cols-3 mt-4 mb-4">
     <div className="rounded-lg border border-blue-100 dark:border-blue-900/30 bg-blue-50 dark:bg-blue-900/10 p-6">
       <div className="flex items-center justify-between">
         <div>
@@ -452,7 +452,7 @@ const Expenses = () => {
   {/* Filters - Only show in list view */ }
   {
     viewMode === 'list' && (
-      <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm mb-2">
+      <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm mb-4">
         <div className="flex flex-col gap-4 md:flex-row md:items-center">
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -614,7 +614,7 @@ const Expenses = () => {
     viewMode === 'calendar' && (
       <>
         {/* Filters for Calendar View */}
-        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm mb-2">
+        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm mb-4">
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-4 md:flex-row md:items-center">
               <div className="relative flex-1">
