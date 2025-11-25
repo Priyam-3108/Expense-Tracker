@@ -33,7 +33,7 @@ export const ThemeProvider = ({ children, defaultTheme = 'system', storageKey = 
     }
 
     return (
-        <ThemeContext.Provider value={value} {...children}>
+        <ThemeContext.Provider value={value}>
             {children}
         </ThemeContext.Provider>
     )
