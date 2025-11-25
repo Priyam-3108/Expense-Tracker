@@ -55,9 +55,9 @@ const Profile = () => {
   };
 
   const tabs = [
-    { id: 'profile', label: 'Profile Information', icon: '👤' },
-    { id: 'password', label: 'Change Password', icon: '🔒' },
-    { id: 'account', label: 'Account Info', icon: 'ℹ️' },
+    { id: 'profile', label: 'Profile Information' },
+    { id: 'password', label: 'Change Password'},
+    { id: 'account', label: 'Account Info'},
   ];
 
   return (
@@ -78,7 +78,6 @@ const Profile = () => {
                 : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                 }`}
             >
-              <span className="mr-2">{tab.icon}</span>
               {tab.label}
             </button>
           ))}
