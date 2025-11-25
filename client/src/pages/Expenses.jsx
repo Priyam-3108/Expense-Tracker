@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import CategorySelector from '../components/CategorySelector'
 import DatePicker from '../components/DatePicker'
 import DateRangePicker from '../components/DateRangePicker'
-import { formatCurrency, formatDate, formatDateForInput } from '../utils/helpers'
+import { formatCurrency, formatDate, formatDateForInput, parseDateLocal, getTodayDate } from '../utils/helpers'
 import {
   Plus, Edit, Trash2, Search, X,
   ArrowUpCircle, ArrowDownCircle, Layers,
@@ -36,13 +36,16 @@ const Expenses = () => {
     loadExpenses
   } = useExpense()
 
+  // Get today's date
+  const todayDate = useMemo(() => getTodayDate(), [])
+
   // Form state
   const [showForm, setShowForm] = useState(false)
   const [editingExpense, setEditingExpense] = useState(null)
   const [formData, setFormData] = useState({
     description: '',
     amount: '',
-    date: formatDateForInput(new Date()),
+    date: todayDate,
     category: '',
     type: 'expense',
     isRecurring: false,
@@ -53,7 +56,7 @@ const Expenses = () => {
 
   // Bulk form state
   const [showBulkForm, setShowBulkForm] = useState(false)
-  const [bulkDate, setBulkDate] = useState(formatDateForInput(new Date()))
+  const [bulkDate, setBulkDate] = useState(todayDate)
   const [bulkExpenses, setBulkExpenses] = useState([
     { amount: '', category: '', description: '' }
   ])
@@ -93,11 +96,26 @@ const Expenses = () => {
   // Reset form when editing changes
   useEffect(() => {
     if (editingExpense) {
-      const expenseDate = editingExpense.date
-        ? (typeof editingExpense.date === 'string'
-          ? editingExpense.date.split('T')[0]
-          : formatDateForInput(new Date(editingExpense.date)))
-        : formatDateForInput(new Date())
+      // Parse the date correctly without timezone shift
+      let expenseDate = formatDateForInput(new Date())
+      if (editingExpense.date) {
+        if (typeof editingExpense.date === 'string') {
+          // If it's an ISO string, extract just the date part (YYYY-MM-DD)
+          expenseDate = editingExpense.date.split('T')[0]
+        } else {
+          expenseDate = formatDateForInput(editingExpense.date)
+        }
+      }
+
+      // Parse recurring end date correctly
+      let recurringEndDate = ''
+      if (editingExpense.recurringEndDate) {
+        if (typeof editingExpense.recurringEndDate === 'string') {
+          recurringEndDate = editingExpense.recurringEndDate.split('T')[0]
+        } else {
+          recurringEndDate = formatDateForInput(editingExpense.recurringEndDate)
+        }
+      }
 
       setFormData({
         description: editingExpense.description || '',
@@ -107,9 +125,7 @@ const Expenses = () => {
         type: editingExpense.type || 'expense',
         isRecurring: editingExpense.isRecurring || false,
         recurringPeriod: editingExpense.recurringPeriod || 'monthly',
-        recurringEndDate: editingExpense.recurringEndDate
-          ? formatDateForInput(new Date(editingExpense.recurringEndDate))
-          : ''
+        recurringEndDate: recurringEndDate
       })
       setShowForm(true)
     } else {
@@ -121,7 +137,7 @@ const Expenses = () => {
     setFormData({
       description: '',
       amount: '',
-      date: formatDateForInput(new Date()),
+      date: getTodayDate(),
       category: '',
       type: 'expense',
       isRecurring: false,
@@ -171,6 +187,7 @@ const Expenses = () => {
 
     setFormLoading(true)
     try {
+      // Send date as simple YYYY-MM-DD string
       const expenseData = {
         description: formData.description ? formData.description.trim() : '',
         amount: parseFloat(formData.amount),
@@ -252,7 +269,7 @@ const Expenses = () => {
   }
 
   const resetBulkForm = () => {
-    setBulkDate(formatDateForInput(new Date()))
+    setBulkDate(todayDate)
     setBulkExpenses([{ amount: '', category: '', description: '' }])
   }
 
@@ -322,7 +339,7 @@ const Expenses = () => {
   // Calendar helpers
   const getExpensesForDate = (date) => {
     return filteredExpenses.filter(expense => {
-      const expenseDate = new Date(expense.date)
+      const expenseDate = parseDateLocal(expense.date)
       return isSameDay(expenseDate, date)
     })
   }

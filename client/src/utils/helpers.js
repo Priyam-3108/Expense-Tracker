@@ -8,12 +8,26 @@ export const formatCurrency = (amount, currency = 'USD') => {
   }).format(amount)
 }
 
+// Parse date string without timezone shift
+export const parseDateLocal = (date) => {
+  if (!date) return null
+  
+  if (typeof date === 'string') {
+    // Extract just the date part (YYYY-MM-DD) to avoid timezone issues
+    const datePart = date.split('T')[0]
+    const [year, month, day] = datePart.split('-').map(Number)
+    return new Date(year, month - 1, day)
+  }
+  
+  return date
+}
+
 // Format date
 export const formatDate = (date, formatStr = 'MMM dd, yyyy') => {
   if (!date) return ''
   
   try {
-    const dateObj = typeof date === 'string' ? parseISO(date) : date
+    const dateObj = parseDateLocal(date)
     return format(dateObj, formatStr)
   } catch (error) {
     console.error('Date formatting error:', error)
@@ -26,12 +40,24 @@ export const formatDateForInput = (date) => {
   if (!date) return ''
   
   try {
-    const dateObj = typeof date === 'string' ? parseISO(date) : date
-    return format(dateObj, 'yyyy-MM-dd')
+    // For strings, just extract the date part directly
+    if (typeof date === 'string') {
+      return date.split('T')[0]
+    }
+    return format(date, 'yyyy-MM-dd')
   } catch (error) {
     console.error('Date formatting error:', error)
     return ''
   }
+}
+
+// Get today's date as YYYY-MM-DD (local date)
+export const getTodayDate = () => {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
 }
 
 // Get month name

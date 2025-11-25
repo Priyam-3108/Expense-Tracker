@@ -1,34 +1,60 @@
 import mongoose from 'mongoose';
 import { Expense, Category } from '../config/models/index.js';
 
-const normalizeDate = (date) => {
-  const normalized = new Date(date);
-  normalized.setHours(0, 0, 0, 0);
-  return normalized;
+// Validate and return date string in YYYY-MM-DD format
+const validateDateString = (dateStr) => {
+  if (!dateStr) return null;
+  
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    return dateStr;
+  }
+  
+  // If it's an ISO string or other format, extract the date part
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return null;
+  
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 };
 
-const getNextRecurringDate = (currentDate, period) => {
-  const nextDate = new Date(currentDate);
+// Get today's date as YYYY-MM-DD
+const getTodayString = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+// Get next recurring date as YYYY-MM-DD string
+const getNextRecurringDate = (currentDateStr, period) => {
+  const [year, month, day] = currentDateStr.split('-').map(Number);
+  const currentDate = new Date(year, month - 1, day);
 
   switch (period) {
     case 'weekly':
-      nextDate.setDate(nextDate.getDate() + 7);
+      currentDate.setDate(currentDate.getDate() + 7);
       break;
     case 'yearly':
-      nextDate.setFullYear(nextDate.getFullYear() + 1);
+      currentDate.setFullYear(currentDate.getFullYear() + 1);
       break;
     case 'monthly':
     default: {
-      const originalDay = nextDate.getDate();
-      nextDate.setDate(1);
-      nextDate.setMonth(nextDate.getMonth() + 1);
-      const daysInMonth = new Date(nextDate.getFullYear(), nextDate.getMonth() + 1, 0).getDate();
-      nextDate.setDate(Math.min(originalDay, daysInMonth));
+      const originalDay = currentDate.getDate();
+      currentDate.setDate(1);
+      currentDate.setMonth(currentDate.getMonth() + 1);
+      const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+      currentDate.setDate(Math.min(originalDay, daysInMonth));
       break;
     }
   }
 
-  return normalizeDate(nextDate);
+  const newYear = currentDate.getFullYear();
+  const newMonth = String(currentDate.getMonth() + 1).padStart(2, '0');
+  const newDay = String(currentDate.getDate()).padStart(2, '0');
+  return `${newYear}-${newMonth}-${newDay}`;
 };
 
 // Get all expenses for a user with filtering and pagination
@@ -63,8 +89,8 @@ export const getExpenses = async (req, res) => {
 
     if (startDate && endDate) {
       filter.date = {
-        $gte: new Date(startDate),
-        $lte: new Date(endDate)
+        $gte: validateDateString(startDate),
+        $lte: validateDateString(endDate)
       };
     }
 
@@ -179,11 +205,11 @@ export const bulkCreateExpenses = async (req, res) => {
       });
     }
 
-    const baseDate = normalizeDate(new Date(date));
-    if (Number.isNaN(baseDate.getTime())) {
+    const baseDate = validateDateString(date);
+    if (!baseDate) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid date provided'
+        message: 'Invalid date provided. Use YYYY-MM-DD format.'
       });
     }
 
@@ -284,11 +310,11 @@ export const createExpense = async (req, res) => {
       });
     }
 
-    const baseDate = normalizeDate(date ? new Date(date) : new Date());
-    if (Number.isNaN(baseDate.getTime())) {
+    const baseDate = validateDateString(date) || getTodayString();
+    if (!baseDate) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid date provided'
+        message: 'Invalid date provided. Use YYYY-MM-DD format.'
       });
     }
 
@@ -302,15 +328,15 @@ export const createExpense = async (req, res) => {
         });
       }
 
-      const endDateObj = normalizeDate(new Date(recurringEndDate));
-      if (Number.isNaN(endDateObj.getTime())) {
+      const endDateStr = validateDateString(recurringEndDate);
+      if (!endDateStr) {
         return res.status(400).json({
           success: false,
-          message: 'Invalid recurring end date provided'
+          message: 'Invalid recurring end date provided. Use YYYY-MM-DD format.'
         });
       }
 
-      if (baseDate > endDateObj) {
+      if (baseDate > endDateStr) {
         return res.status(400).json({
           success: false,
           message: 'Recurring end date must be after the start date'
@@ -319,27 +345,27 @@ export const createExpense = async (req, res) => {
 
       const period = recurringPeriod || 'monthly';
       const occurrences = [];
-      let currentDate = new Date(baseDate);
+      let currentDateStr = baseDate;
       const groupId = new mongoose.Types.ObjectId();
       const maxOccurrences = 500;
 
-      while (currentDate <= endDateObj) {
+      while (currentDateStr <= endDateStr) {
         occurrences.push({
           description: cleanedDescription,
           amount: parseFloat(amount),
-          date: normalizeDate(currentDate),
+          date: currentDateStr,
           category,
           type,
           tags: tags || [],
           notes: notes ? notes.trim() : '',
           isRecurring: true,
           recurringPeriod: period,
-          recurringEndDate: endDateObj,
+          recurringEndDate: endDateStr,
           recurringGroupId: groupId,
           user: req.user._id
         });
 
-        currentDate = getNextRecurringDate(currentDate, period);
+        currentDateStr = getNextRecurringDate(currentDateStr, period);
 
         if (occurrences.length >= maxOccurrences) {
           break;
@@ -361,7 +387,7 @@ export const createExpense = async (req, res) => {
     const expense = new Expense({
       description: cleanedDescription,
       amount: parseFloat(amount),
-      date: baseDate,
+      date: baseDate, // YYYY-MM-DD string
       category,
       type,
       tags: tags || [],
@@ -442,7 +468,16 @@ export const updateExpense = async (req, res) => {
 
     if (description !== undefined) updates.description = description ? description.trim() : '';
     if (amount !== undefined) updates.amount = parseFloat(amount);
-    if (date) updates.date = normalizeDate(new Date(date));
+    if (date) {
+      const dateStr = validateDateString(date);
+      if (!dateStr) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid date provided. Use YYYY-MM-DD format.'
+        });
+      }
+      updates.date = dateStr;
+    }
     if (category) updates.category = category;
     if (type) updates.type = type;
     if (tags) updates.tags = tags;
@@ -458,23 +493,23 @@ export const updateExpense = async (req, res) => {
 
     if (recurringEndDate !== undefined) {
       if (recurringEndDate) {
-        const endDateObj = normalizeDate(new Date(recurringEndDate));
-        if (Number.isNaN(endDateObj.getTime())) {
+        const endDateStr = validateDateString(recurringEndDate);
+        if (!endDateStr) {
           return res.status(400).json({
             success: false,
-            message: 'Invalid recurring end date provided'
+            message: 'Invalid recurring end date provided. Use YYYY-MM-DD format.'
           });
         }
 
-        const effectiveDate = updates.date ? normalizeDate(updates.date) : expense.date;
-        if (effectiveDate > endDateObj) {
+        const effectiveDate = updates.date || expense.date;
+        if (effectiveDate > endDateStr) {
           return res.status(400).json({
             success: false,
             message: 'Recurring end date must be after the start date'
           });
         }
 
-        updates.recurringEndDate = endDateObj;
+        updates.recurringEndDate = endDateStr;
       } else {
         unset.recurringEndDate = '';
       }
@@ -560,24 +595,27 @@ export const getExpenseStats = async (req, res) => {
     if (startDate && endDate) {
       dateFilter = {
         date: {
-          $gte: new Date(startDate),
-          $lte: new Date(endDate)
+          $gte: validateDateString(startDate),
+          $lte: validateDateString(endDate)
         }
       };
     }
 
     // Get monthly summary
+    const now = new Date();
     const monthlySummary = await Expense.getMonthlySummary(
       req.user._id,
-      new Date().getFullYear(),
-      new Date().getMonth() + 1
+      now.getFullYear(),
+      now.getMonth() + 1
     );
 
-    // Get category summary
+    // Get category summary - use string dates
+    const startDateStr = startDate ? validateDateString(startDate) : `${now.getFullYear()}-01-01`;
+    const endDateStr = endDate ? validateDateString(endDate) : getTodayString();
     const categorySummary = await Expense.getCategorySummary(
       req.user._id,
-      startDate ? new Date(startDate) : new Date(new Date().getFullYear(), 0, 1),
-      endDate ? new Date(endDate) : new Date()
+      startDateStr,
+      endDateStr
     );
 
     // Get total expenses and income
@@ -629,20 +667,30 @@ export const getExpenseTrends = async (req, res) => {
   try {
     const { year = new Date().getFullYear() } = req.query;
 
+    // Use string date comparison for YYYY-MM-DD format
+    const startDateStr = `${year}-01-01`;
+    const endDateStr = `${year}-12-31`;
+
     const trends = await Expense.aggregate([
       {
         $match: {
           user: req.user._id,
           date: {
-            $gte: new Date(year, 0, 1),
-            $lte: new Date(year, 11, 31, 23, 59, 59)
+            $gte: startDateStr,
+            $lte: endDateStr
           }
+        }
+      },
+      {
+        // Extract month from YYYY-MM-DD string
+        $addFields: {
+          monthNum: { $toInt: { $substr: ['$date', 5, 2] } }
         }
       },
       {
         $group: {
           _id: {
-            month: { $month: '$date' },
+            month: '$monthNum',
             type: '$type'
           },
           total: { $sum: '$amount' },
@@ -718,18 +766,21 @@ export const getDetailedAnalytics = async (req, res) => {
     // Build base filter
     const filter = { user: req.user._id };
 
-    // Add date range filter
+    // Add date range filter using string comparison
     if (startDate && endDate) {
       filter.date = {
-        $gte: new Date(startDate),
-        $lte: new Date(endDate)
+        $gte: validateDateString(startDate),
+        $lte: validateDateString(endDate)
       };
     } else {
       // Default to current month if no dates provided
       const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const lastDay = new Date(year, now.getMonth() + 1, 0).getDate();
       filter.date = {
-        $gte: new Date(now.getFullYear(), now.getMonth(), 1),
-        $lte: new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
+        $gte: `${year}-${month}-01`,
+        $lte: `${year}-${month}-${String(lastDay).padStart(2, '0')}`
       };
     }
 
@@ -785,13 +836,13 @@ export const getDetailedAnalytics = async (req, res) => {
     const expenseStats = summaryStats.find(s => s._id === 'expense') || { total: 0, count: 0, avg: 0 };
     const incomeStats = summaryStats.find(s => s._id === 'income') || { total: 0, count: 0, avg: 0 };
 
-    // 3. Get daily spending pattern
+    // 3. Get daily spending pattern (date is already YYYY-MM-DD string)
     const dailyPattern = await Expense.aggregate([
       { $match: filter },
       {
         $group: {
           _id: {
-            date: { $dateToString: { format: '%Y-%m-%d', date: '$date' } },
+            date: '$date',
             type: '$type'
           },
           total: { $sum: '$amount' },
@@ -822,7 +873,7 @@ export const getDetailedAnalytics = async (req, res) => {
       { $match: { ...filter, type: 'expense' } },
       {
         $group: {
-          _id: { $dateToString: { format: '%Y-%m-%d', date: '$date' } },
+          _id: '$date',
           total: { $sum: '$amount' },
           count: { $sum: 1 }
         }
@@ -831,14 +882,27 @@ export const getDetailedAnalytics = async (req, res) => {
       { $limit: 5 }
     ]);
 
-    // 5. Get weekly comparison (if date range spans multiple weeks)
+    // 5. Get weekly comparison - extract year and calculate week from string date
     const weeklyComparison = await Expense.aggregate([
       { $match: filter },
       {
+        $addFields: {
+          yearNum: { $toInt: { $substr: ['$date', 0, 4] } },
+          monthNum: { $toInt: { $substr: ['$date', 5, 2] } },
+          dayNum: { $toInt: { $substr: ['$date', 8, 2] } }
+        }
+      },
+      {
+        $addFields: {
+          // Simple week calculation (approximate)
+          weekNum: { $ceil: { $divide: [{ $add: [{ $multiply: [{ $subtract: ['$monthNum', 1] }, 4] }, '$dayNum'] }, 7] } }
+        }
+      },
+      {
         $group: {
           _id: {
-            week: { $week: '$date' },
-            year: { $year: '$date' },
+            week: '$weekNum',
+            year: '$yearNum',
             type: '$type'
           },
           total: { $sum: '$amount' },
@@ -863,14 +927,20 @@ export const getDetailedAnalytics = async (req, res) => {
       { $sort: { '_id.year': 1, '_id.week': 1 } }
     ]);
 
-    // 6. Get monthly comparison
+    // 6. Get monthly comparison - extract month and year from string date
     const monthlyComparison = await Expense.aggregate([
       { $match: filter },
       {
+        $addFields: {
+          yearNum: { $toInt: { $substr: ['$date', 0, 4] } },
+          monthNum: { $toInt: { $substr: ['$date', 5, 2] } }
+        }
+      },
+      {
         $group: {
           _id: {
-            month: { $month: '$date' },
-            year: { $year: '$date' },
+            month: '$monthNum',
+            year: '$yearNum',
             type: '$type'
           },
           total: { $sum: '$amount' },
