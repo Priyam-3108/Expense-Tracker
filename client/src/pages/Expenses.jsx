@@ -382,72 +382,72 @@ const Expenses = () => {
         </div>
       </div>
 
-  {/* View Toggle */ }
-  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-    <div className="inline-flex gap-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-1 shadow-sm">
-      <button
-        onClick={() => setViewMode('list')}
-        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all ${viewMode === 'list'
-            ? 'bg-blue-600 text-white shadow-sm'
-            : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-          }`}
-      >
-        <List size={16} />
-        List
-      </button>
-      <button
-        onClick={() => setViewMode('calendar')}
-        className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all ${viewMode === 'calendar'
-            ? 'bg-blue-600 text-white shadow-sm'
-            : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-          }`}
-      >
-        <CalendarIcon size={16} />
-        Calendar
-      </button>
-    </div>
-  </div>
-
-  {/* Summary cards */ }
-  <div className="grid grid-cols-1 gap-4 md:grid-cols-3 mt-4 mb-4">
-    <div className="rounded-lg border border-blue-100 dark:border-blue-900/30 bg-blue-50 dark:bg-blue-900/10 p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-blue-700 dark:text-blue-300">Total Expenses</p>
-          <p className="mt-1 text-2xl font-semibold text-blue-900 dark:text-blue-100">
-            {formatCurrency(totalExpenseAmount, currency)}
-          </p>
-        </div>
-        <ArrowDownCircle size={24} className="text-blue-600" />
-      </div>
-    </div>
-
-    <div className="rounded-lg border border-emerald-100 dark:border-emerald-900/30 bg-emerald-50 dark:bg-emerald-900/10 p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Total Income</p>
-          <p className="mt-1 text-2xl font-semibold text-emerald-900 dark:text-emerald-100">
-            {formatCurrency(totalIncomeAmount, currency)}
-          </p>
-        </div>
-        <ArrowUpCircle size={24} className="text-emerald-600" />
-      </div>
-    </div>
-
-    <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Net Balance</p>
-          <p
-            className={`mt-1 text-2xl font-semibold ${netAmount >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+      {/* View Toggle */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="inline-flex gap-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-1 shadow-sm">
+          <button
+            onClick={() => setViewMode('list')}
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all ${viewMode === 'list'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
               }`}
           >
-            {formatCurrency(Math.abs(netAmount), currency)}
-          </p>
+            <List size={16} />
+            List
+          </button>
+          <button
+            onClick={() => setViewMode('calendar')}
+            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all ${viewMode === 'calendar'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+              }`}
+          >
+            <CalendarIcon size={16} />
+            Calendar
+          </button>
         </div>
       </div>
-    </div>
-  </div>
+
+      {/* Summary cards */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3 mt-4 mb-4">
+        <div className="rounded-lg border border-blue-100 dark:border-blue-900/30 bg-blue-50 dark:bg-blue-900/10 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-blue-700 dark:text-blue-300">Total Expenses</p>
+              <p className="mt-1 text-2xl font-semibold text-blue-900 dark:text-blue-100">
+                {formatCurrency(totalExpenseAmount, currency)}
+              </p>
+            </div>
+            <ArrowDownCircle size={24} className="text-blue-600" />
+          </div>
+        </div>
+
+        <div className="rounded-lg border border-emerald-100 dark:border-emerald-900/30 bg-emerald-50 dark:bg-emerald-900/10 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Total Income</p>
+              <p className="mt-1 text-2xl font-semibold text-emerald-900 dark:text-emerald-100">
+                {formatCurrency(totalIncomeAmount, currency)}
+              </p>
+            </div>
+            <ArrowUpCircle size={24} className="text-emerald-600" />
+          </div>
+        </div>
+
+        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Net Balance</p>
+              <p
+                className={`mt-1 text-2xl font-semibold ${netAmount >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+                  }`}
+              >
+                {formatCurrency(Math.abs(netAmount), currency)}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
 
   {/* Filters - Only show in list view */ }
   {
@@ -606,12 +606,10 @@ const Expenses = () => {
           </div>
         )}
       </div>
-    )
-  }
+      )}
 
-  {/* Calendar View */ }
-  {
-    viewMode === 'calendar' && (
+      {/* Calendar View */}
+      {viewMode === 'calendar' && (
       <>
         {/* Filters for Calendar View */}
         <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm mb-4">
@@ -779,9 +777,206 @@ const Expenses = () => {
       </>
     )
   }
-  {/* Bulk Add Form Modal */ }
-  {
-    showBulkForm && (
+      {/* Add/Edit Form Modal */}
+      {showForm && (
+        <div className="fixed inset-0 z-50 flex items-baseline justify-center bg-black bg-opacity-50 p-4">
+          <div className="w-full max-w-lg max-h-[90vh] rounded-lg bg-white dark:bg-gray-800 shadow-xl overflow-hidden flex flex-col">
+            <form onSubmit={handleSubmit} className="flex flex-col h-full">
+              {/* Header - Fixed */}
+              <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 p-6 flex-shrink-0">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {editingExpense ? 'Edit Expense' : 'Add Expense'}
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => { setShowForm(false); resetForm() }}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              {/* Scrollable Content */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-4 max-h-[400px]">
+                {/* Type Toggle */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Type</label>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, type: 'expense' })}
+                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 border-2 rounded-lg transition ${
+                        formData.type === 'expense'
+                          ? 'border-red-500 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'
+                          : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500'
+                      }`}
+                    >
+                      <ArrowDownCircle size={18} />
+                      Expense
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, type: 'income' })}
+                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 border-2 rounded-lg transition ${
+                        formData.type === 'income'
+                          ? 'border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
+                          : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500'
+                      }`}
+                    >
+                      <ArrowUpCircle size={18} />
+                      Income
+                    </button>
+                  </div>
+                </div>
+
+                {/* Date and Category */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Date *
+                    </label>
+                    <DatePicker
+                      value={formData.date}
+                      onChange={(date) => setFormData({ ...formData, date })}
+                      placeholder="Select date"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Category *
+                    </label>
+                    <CategorySelector
+                      value={formData.category}
+                      onChange={(categoryId) => setFormData({ ...formData, category: categoryId })}
+                      placeholder="Select category"
+                    />
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Description
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                    placeholder="e.g., Groceries, Salary..."
+                  />
+                </div>
+
+                {/* Amount */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Amount *
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 font-medium">
+                      {currencySymbols[currency] || '$'}
+                    </span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0.01"
+                      value={formData.amount}
+                      onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                      className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                      placeholder="0.00"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Recurring Expense */}
+                <div>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.isRecurring}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          isRecurring: e.target.checked,
+                          recurringEndDate: e.target.checked ? formData.recurringEndDate : ''
+                        })
+                      }
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <div className="flex items-center gap-2">
+                      <Repeat size={16} className="text-gray-600 dark:text-gray-400" />
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Recurring {formData.type}</span>
+                    </div>
+                  </label>
+                  {formData.isRecurring && (
+                    <div className="mt-3 ml-6 space-y-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg" style={{ overflow: 'visible' }}>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Frequency *
+                        </label>
+                        <select
+                          value={formData.recurringPeriod}
+                          onChange={(e) => setFormData({ ...formData, recurringPeriod: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        >
+                          <option value="weekly">Weekly</option>
+                          <option value="monthly">Monthly</option>
+                          <option value="yearly">Yearly</option>
+                        </select>
+                      </div>
+
+                      <div className="relative" style={{ zIndex: 1000 }}>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          End Date *
+                        </label>
+                        <DatePicker
+                          value={formData.recurringEndDate}
+                          onChange={(date) => setFormData({ ...formData, recurringEndDate: date })}
+                          placeholder="Select end date"
+                        />
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          Recurring entries will be created from the start date through this end date.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Form Actions - Fixed */}
+              <div className="flex gap-3 p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex-shrink-0">
+                <button
+                  type="submit"
+                  disabled={formLoading}
+                  className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {formLoading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                      {editingExpense ? 'Updating...' : 'Adding...'}
+                    </span>
+                  ) : (
+                    editingExpense ? 'Update' : 'Add'
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setShowForm(false); resetForm() }}
+                  disabled={formLoading}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Add Form Modal */}
+      {showBulkForm && (
       <div className="fixed inset-0 z-50 flex items-start justify-center bg-black bg-opacity-50 p-4 overflow-y-auto">
         <div className="w-full max-w-2xl my-8 rounded-lg bg-white dark:bg-gray-800 shadow-xl flex flex-col max-h-[90vh] relative">
           <form onSubmit={handleBulkSubmit} className="flex flex-col h-full">
@@ -911,9 +1106,8 @@ const Expenses = () => {
           </form>
         </div>
       </div>
-    )
-  }
-    </div >
+      )}
+    </div>
   )
 }
 
