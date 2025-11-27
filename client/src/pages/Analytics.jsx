@@ -693,31 +693,33 @@ const Analytics = () => {
             <BarChart3 size={20} className="text-gray-400 dark:text-gray-500" />
           </div>
           {monthlyData.length > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={monthlyData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" className="dark:stroke-gray-700" />
+            <ResponsiveContainer width="100%" height={300} className="bg-transparent">
+              <BarChart data={monthlyData} style={{ backgroundColor: 'transparent' }}>
+                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#374151' : '#D1D5DB'} fill="transparent" vertical={false} />
                 <XAxis
                   dataKey="month"
-                  stroke="#6B7280"
-                  tick={{ fontSize: 12 }}
+                  stroke={isDark ? '#9CA3AF' : '#4B5563'} 
+                  tick={{ fontSize: 12, fill: isDark ? '#9CA3AF' : '#4B5563' }}
                 />
                 <YAxis
-                  stroke="#6B7280"
-                  tick={{ fontSize: 12 }}
+                  stroke={isDark ? '#9CA3AF' : '#4B5563'}
+                  tick={{ fontSize: 12, fill: isDark ? '#9CA3AF' : '#4B5563' }}
                   tickFormatter={(value) => formatCurrency(value, currency).replace(/[^\d.-]/g, '')}
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: isDark ? '#1F2937' : '#fff',
-                    border: `1px solid ${isDark ? '#374151' : '#E5E7EB'}`,
+                    backgroundColor: isDark ? '#1F2937' : '#FFFFFF',
+                    borderColor: isDark ? '#374151' : '#E5E7EB',
                     borderRadius: '8px',
                     padding: '8px',
-                    color: isDark ? '#F3F4F6' : '#374151'
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                    color: isDark ? '#F3F4F6' : '#1F2937'
                   }}
-                  itemStyle={{ color: isDark ? '#F3F4F6' : '#374151' }}
+                  itemStyle={{ color: isDark ? '#F3F4F6' : '#1F2937' }}
                   formatter={(value) => formatCurrency(value, currency)}
+                  cursor={{ fill: isDark ? '#374151' : '#F3F4F6', opacity: 0.4 }}
                 />
-                <Legend />
+                <Legend wrapperStyle={{ color: isDark ? '#F3F4F6' : '#374151', paddingTop: '10px' }} />
                 <Bar dataKey="expenses" fill="#EF4444" name="Expenses" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="income" fill="#10B981" name="Income" radius={[4, 4, 0, 0]} />
               </BarChart>
