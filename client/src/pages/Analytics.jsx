@@ -322,6 +322,21 @@ const Analytics = () => {
     dateRange.startDate !== formatDateForInput(startOfMonth(new Date())) ||
     dateRange.endDate !== formatDateForInput(endOfMonth(new Date()))
 
+  // Chart visibility state
+  const [visibleSeries, setVisibleSeries] = useState({
+    expenses: true,
+    income: true
+  })
+
+  const handleLegendClick = (e) => {
+    const { value } = e
+    const key = value.toLowerCase()
+    setVisibleSeries(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }))
+  }
+
   if (loading && !stats) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -611,7 +626,10 @@ const Analytics = () => {
                     name === 'expenses' ? 'Expenses' : name === 'income' ? 'Income' : 'Net'
                   ]}
                 />
-                <Legend />
+                <Legend
+                  onClick={handleLegendClick}
+                  wrapperStyle={{ cursor: 'pointer' }}
+                />
                 <Area
                   type="monotone"
                   dataKey="expenses"
@@ -619,6 +637,7 @@ const Analytics = () => {
                   fillOpacity={1}
                   fill="url(#colorExpenses)"
                   name="Expenses"
+                  hide={!visibleSeries.expenses}
                 />
                 <Area
                   type="monotone"
@@ -627,6 +646,7 @@ const Analytics = () => {
                   fillOpacity={1}
                   fill="url(#colorIncome)"
                   name="Income"
+                  hide={!visibleSeries.income}
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -698,7 +718,7 @@ const Analytics = () => {
                 <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#374151' : '#D1D5DB'} fill="transparent" vertical={false} />
                 <XAxis
                   dataKey="month"
-                  stroke={isDark ? '#9CA3AF' : '#4B5563'} 
+                  stroke={isDark ? '#9CA3AF' : '#4B5563'}
                   tick={{ fontSize: 12, fill: isDark ? '#9CA3AF' : '#4B5563' }}
                 />
                 <YAxis
@@ -719,9 +739,24 @@ const Analytics = () => {
                   formatter={(value) => formatCurrency(value, currency)}
                   cursor={{ fill: isDark ? '#374151' : '#F3F4F6', opacity: 0.4 }}
                 />
-                <Legend wrapperStyle={{ color: isDark ? '#F3F4F6' : '#374151', paddingTop: '10px' }} />
-                <Bar dataKey="expenses" fill="#EF4444" name="Expenses" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="income" fill="#10B981" name="Income" radius={[4, 4, 0, 0]} />
+                <Legend
+                  wrapperStyle={{ color: isDark ? '#F3F4F6' : '#374151', paddingTop: '10px', cursor: 'pointer' }}
+                  onClick={handleLegendClick}
+                />
+                <Bar
+                  dataKey="expenses"
+                  fill="#EF4444"
+                  name="Expenses"
+                  radius={[4, 4, 0, 0]}
+                  hide={!visibleSeries.expenses}
+                />
+                <Bar
+                  dataKey="income"
+                  fill="#10B981"
+                  name="Income"
+                  radius={[4, 4, 0, 0]}
+                  hide={!visibleSeries.income}
+                />
               </BarChart>
             </ResponsiveContainer>
           ) : (
