@@ -6,11 +6,12 @@ import DatePicker from '../components/DatePicker'
 import DateRangePicker from '../components/DateRangePicker'
 import DataTable from '../components/DataTable'
 import BulkEditList from '../components/BulkEditList'
+import ExportModal from '../components/ExportModal'
 import { formatCurrency, formatDate, formatDateForInput, parseDateLocal, getTodayDate } from '../utils/helpers'
 import {
   Plus, Edit, Trash2, Search, X,
   ArrowUpCircle, ArrowDownCircle, Layers,
-  Calendar as CalendarIcon, List, Repeat
+  Calendar as CalendarIcon, List, Repeat, Download
 } from 'lucide-react'
 import { startOfMonth, endOfMonth, eachDayOfInterval, format, isSameMonth, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns'
 import toast from 'react-hot-toast'
@@ -62,6 +63,10 @@ const Expenses = () => {
     bulkUpdateList,
     loadExpenses
   } = useExpense()
+
+  // Export state
+  const [showExportModal, setShowExportModal] = useState(false)
+  const [exportLoading, setExportLoading] = useState(false)
 
   // Get today's date
   const todayDate = useMemo(() => getTodayDate(), [])
@@ -438,6 +443,46 @@ const Expenses = () => {
     }
   }
 
+  const handleExport = async (format, dateRange) => {
+    setExportLoading(true)
+    try {
+      const { expenseService } = await import('../services/expenseService')
+      const response = await expenseService.exportExpenses(format, {
+        startDate: dateRange.startDate,
+        endDate: dateRange.endDate,
+        search: searchTerm,
+        category: filterType === 'all' ? undefined : filterType, // Assuming filterType can be category ID too, but logic in filteredExpenses suggests filterType is 'all' | 'expense' | 'income'. If category filter exists, it should be passed.
+        // Wait, filterType in Expenses.jsx is only 'all', 'expense', 'income'. 
+        // But getExpenses supports category. 
+        // Let's check if there is a category filter state.
+        // Looking at the code, there is no category filter state in Expenses.jsx, only type filter.
+        // So we only pass type.
+        type: filterType
+      })
+
+      // Create blob link to download
+      const url = window.URL.createObjectURL(new Blob([response.data]))
+      const link = document.createElement('a')
+      link.href = url
+
+      const extension = format === 'excel' ? 'xlsx' : format
+      const filename = `expenses-${new Date().toISOString().split('T')[0]}.${extension}`
+
+      link.setAttribute('download', filename)
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+
+      setShowExportModal(false)
+      toast.success('Export successful')
+    } catch (error) {
+      console.error('Export error:', error)
+      toast.error('Failed to export expenses')
+    } finally {
+      setExportLoading(false)
+    }
+  }
+
   const columns = useMemo(() => [
     {
       id: 'select',
@@ -585,6 +630,13 @@ const Expenses = () => {
           >
             <Layers size={18} />
             Bulk Add
+          </button>
+          <button
+            onClick={() => setShowExportModal(true)}
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition-all shadow-sm hover:shadow"
+          >
+            <Download size={18} />
+            Export
           </button>
           <button
             onClick={() => {
@@ -1250,6 +1302,13 @@ const Expenses = () => {
           </div>
         </div>
       )}
+      {/* Export Modal */}
+      <ExportModal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        onExport={handleExport}
+        loading={exportLoading}
+      />
     </div>
   )
 }

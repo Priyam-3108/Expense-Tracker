@@ -87,4 +87,20 @@ export const expenseService = {
 
     return api.get(`/expenses/analytics?${params.toString()}`)
   },
+
+  // Export expenses
+  exportExpenses: (format, filters = {}) => {
+    const params = new URLSearchParams()
+    params.append('format', format)
+
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        params.append(key, value)
+      }
+    })
+
+    return api.get(`/expenses/export?${params.toString()}`, {
+      responseType: 'blob'
+    })
+  },
 }

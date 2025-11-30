@@ -13,6 +13,7 @@ import {
   getDetailedAnalytics,
   bulkUpdateList
 } from '../controllers/expenseController.js';
+import { exportExpenses } from '../controllers/exportController.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { validate, expenseSchema, validateDateRange } from '../middleware/validation.js';
 
@@ -22,6 +23,7 @@ const router = express.Router();
 router.use(authenticateToken);
 
 // CRUD operations
+router.get('/export', exportExpenses);
 router.get('/', validateDateRange, getExpenses);
 router.get('/stats', validateDateRange, getExpenseStats);
 router.get('/trends', getExpenseTrends);
