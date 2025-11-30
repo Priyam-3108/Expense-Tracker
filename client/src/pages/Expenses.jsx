@@ -540,7 +540,7 @@ const Expenses = () => {
   return (
     <div className="">
       {/* Header */}
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Expenses</h1>
           <p className="mt-2 text-gray-600 dark:text-gray-400">
@@ -548,12 +548,40 @@ const Expenses = () => {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
+          {/* View Toggle */}
+          <div className="inline-flex gap-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-1 shadow-sm">
+            <button
+              onClick={() => setViewMode('list')}
+              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-all ${viewMode === 'list'
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800'
+                }`}
+            >
+              <List size={16} />
+              List
+            </button>
+            <button
+              onClick={() => setViewMode('calendar')}
+              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-all ${viewMode === 'calendar'
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800'
+                }`}
+            >
+              <CalendarIcon size={16} />
+              Calendar
+            </button>
+          </div>
+
+          {/* Divider */}
+          <div className="hidden sm:block h-8 w-px bg-gray-300 dark:bg-gray-600"></div>
+
+          {/* Action Buttons */}
           <button
             onClick={() => {
               resetBulkForm()
               setShowBulkForm(true)
             }}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition-colors shadow-sm"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition-all shadow-sm hover:shadow"
           >
             <Layers size={18} />
             Bulk Add
@@ -563,36 +591,10 @@ const Expenses = () => {
               resetForm()
               setShowForm(true)
             }}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition-all shadow-md hover:shadow-lg active:scale-95"
           >
             <Plus size={18} />
             Add Expense
-          </button>
-        </div>
-      </div>
-
-      {/* View Toggle */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="inline-flex gap-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-1 shadow-sm">
-          <button
-            onClick={() => setViewMode('list')}
-            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all ${viewMode === 'list'
-              ? 'bg-blue-600 text-white shadow-sm'
-              : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-              }`}
-          >
-            <List size={16} />
-            List
-          </button>
-          <button
-            onClick={() => setViewMode('calendar')}
-            className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all ${viewMode === 'calendar'
-              ? 'bg-blue-600 text-white shadow-sm'
-              : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-              }`}
-          >
-            <CalendarIcon size={16} />
-            Calendar
           </button>
         </div>
       </div>
