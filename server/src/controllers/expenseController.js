@@ -4,15 +4,15 @@ import { Expense, Category } from '../config/models/index.js';
 // Validate and return date string in YYYY-MM-DD format
 const validateDateString = (dateStr) => {
   if (!dateStr) return null;
-  
+
   if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
     return dateStr;
   }
-  
+
   // If it's an ISO string or other format, extract the date part
   const date = new Date(dateStr);
   if (isNaN(date.getTime())) return null;
-  
+
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
@@ -276,6 +276,227 @@ export const bulkCreateExpenses = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to create expenses',
+      error: error.message
+    });
+  }
+};
+
+// Bulk delete expenses
+export const bulkDeleteExpenses = async (req, res) => {
+  try {
+    const { ids } = req.body;
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Array of expense IDs is required'
+      });
+    }
+
+    const result = await Expense.deleteMany({
+      _id: { $in: ids },
+      user: req.user._id
+    });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No expenses found to delete'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: `${result.deletedCount} expense(s) deleted successfully`
+    });
+  } catch (error) {
+    console.error('Bulk delete expenses error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete expenses',
+      error: error.message
+    });
+  }
+};
+
+// Bulk update expenses
+export const bulkUpdateExpenses = async (req, res) => {
+  try {
+    const { ids, updates } = req.body;
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Array of expense IDs is required'
+      });
+    }
+
+    if (!updates || Object.keys(updates).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Update data is required'
+      });
+    }
+
+    // Validate updates
+    const allowedUpdates = {};
+    if (updates.category) {
+      // Verify category exists and belongs to user
+      const categoryExists = await Category.findOne({
+        _id: updates.category,
+        user: req.user._id
+      });
+
+      if (!categoryExists) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid category'
+        });
+      }
+      allowedUpdates.category = updates.category;
+    }
+
+    if (updates.date) {
+      const dateStr = validateDateString(updates.date);
+      if (!dateStr) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid date provided. Use YYYY-MM-DD format.'
+        });
+      }
+      allowedUpdates.date = dateStr;
+    }
+
+    if (updates.type) allowedUpdates.type = updates.type;
+    if (updates.description !== undefined) allowedUpdates.description = updates.description.trim();
+    if (updates.amount !== undefined) allowedUpdates.amount = parseFloat(updates.amount);
+
+    if (Object.keys(allowedUpdates).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No valid fields to update'
+      });
+    }
+
+    const result = await Expense.updateMany(
+      {
+        _id: { $in: ids },
+        user: req.user._id
+      },
+      { $set: allowedUpdates }
+    );
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No expenses found to update'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: `${result.modifiedCount} expense(s) updated successfully`
+    });
+  } catch (error) {
+    console.error('Bulk update expenses error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update expenses',
+      error: error.message
+    });
+  }
+};
+// Bulk update expenses with individual values
+export const bulkUpdateList = async (req, res) => {
+  try {
+    const { expenses } = req.body;
+
+    if (!Array.isArray(expenses) || expenses.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Array of expenses is required'
+      });
+    }
+
+    const updates = [];
+    const errors = [];
+
+    for (let i = 0; i < expenses.length; i++) {
+      const item = expenses[i];
+
+      if (!item._id) {
+        errors.push(`Item ${i + 1}: Missing ID`);
+        continue;
+      }
+
+      const updateData = {};
+
+      if (item.category) {
+        // Verify category exists
+        const categoryExists = await Category.findOne({
+          _id: item.category,
+          user: req.user._id
+        });
+        if (!categoryExists) {
+          errors.push(`Item ${i + 1}: Invalid category`);
+          continue;
+        }
+        updateData.category = item.category;
+      }
+
+      if (item.date) {
+        const dateStr = validateDateString(item.date);
+        if (!dateStr) {
+          errors.push(`Item ${i + 1}: Invalid date`);
+          continue;
+        }
+        updateData.date = dateStr;
+      }
+
+      if (item.type) updateData.type = item.type;
+      if (item.description !== undefined) updateData.description = item.description.trim();
+      if (item.amount !== undefined) {
+        const amount = parseFloat(item.amount);
+        if (isNaN(amount) || amount <= 0) {
+          errors.push(`Item ${i + 1}: Invalid amount`);
+          continue;
+        }
+        updateData.amount = amount;
+      }
+
+      if (Object.keys(updateData).length > 0) {
+        updates.push({
+          updateOne: {
+            filter: { _id: item._id, user: req.user._id },
+            update: { $set: updateData }
+          }
+        });
+      }
+    }
+
+    if (updates.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No valid updates found',
+        errors
+      });
+    }
+
+    const result = await Expense.bulkWrite(updates);
+
+    res.json({
+      success: true,
+      message: `${result.modifiedCount} expense(s) updated successfully`,
+      data: {
+        errors: errors.length > 0 ? errors : undefined
+      }
+    });
+
+  } catch (error) {
+    console.error('Bulk list update error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update expenses',
       error: error.message
     });
   }

@@ -209,6 +209,27 @@ export const ExpenseProvider = ({ children }) => {
     }
   }, [loadExpenses, loadStats, loadTrends])
 
+  const bulkUpdateList = useCallback(async (expenses) => {
+    try {
+      const response = await expenseService.bulkUpdateList(expenses)
+      if (response && response.data && response.data.success) {
+        await loadExpenses()
+        await loadStats()
+        await loadTrends()
+        toast.success(response.data.message || 'Expenses updated successfully')
+        return { success: true }
+      } else {
+        const errorMsg = response?.data?.message || 'Failed to update expenses'
+        toast.error(errorMsg)
+        return { success: false, error: errorMsg }
+      }
+    } catch (error) {
+      const message = error.response?.data?.message || error.message || 'Failed to update expenses'
+      toast.error(message)
+      return { success: false, error: message }
+    }
+  }, [loadExpenses, loadStats, loadTrends])
+
   const addCategory = useCallback(async (categoryData) => {
     try {
       const response = await categoryService.createCategory(categoryData)
@@ -371,6 +392,7 @@ export const ExpenseProvider = ({ children }) => {
     addExpense,
     updateExpense,
     deleteExpense,
+    bulkUpdateList,
     addCategory,
     updateCategory,
     deleteCategory,

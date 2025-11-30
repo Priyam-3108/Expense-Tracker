@@ -39,6 +39,18 @@ export const expenseService = {
     return api.delete(`/expenses/${id}`)
   },
 
+  // Bulk delete expenses
+  bulkDeleteExpenses: (ids) => {
+    return api.post('/expenses/bulk-delete', { ids })
+  },
+
+
+
+  // Bulk update expenses with individual values
+  bulkUpdateList: (expenses) => {
+    return api.put('/expenses/bulk-list-update', { expenses })
+  },
+
   // Get expense statistics
   getStats: (dateRange = {}) => {
     const params = new URLSearchParams()
