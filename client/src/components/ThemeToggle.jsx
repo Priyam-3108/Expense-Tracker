@@ -38,7 +38,7 @@ const ThemeToggle = () => {
             </button>
 
             {isOpen && (
-                <div className="absolute bottom-full left-0 mb-2 w-36 rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-gray-950 z-50">
+                <div className="absolute top-full right-0 mt-2 w-36 rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800 z-50">
                     <div className="p-1">
                         {themes.map((t) => {
                             const Icon = t.icon
