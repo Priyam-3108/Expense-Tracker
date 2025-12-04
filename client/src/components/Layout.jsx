@@ -41,6 +41,7 @@ const Layout = () => {
   const navigation = [
     { name: 'Dashboard', href: '/app/dashboard', icon: Home },
     { name: 'Expenses', href: '/app/expenses', icon: CreditCard },
+    { name: 'Debts', href: '/app/debts', icon: CreditCard },
     { name: 'Categories', href: '/app/categories', icon: Tag },
     { name: 'Analytics', href: '/app/analytics', icon: BarChart3 },
     { name: 'Profile', href: '/app/profile', icon: User },

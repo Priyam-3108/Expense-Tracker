@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { ExpenseProvider } from './context/ExpenseContext'
 import { ThemeProvider } from './context/ThemeContext'
+import { DebtProvider } from './context/DebtContext'
 import Layout from './components/Layout'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
@@ -11,6 +12,7 @@ import Expenses from './pages/Expenses'
 import Categories from './pages/Categories'
 import Analytics from './pages/Analytics'
 import Profile from './pages/Profile'
+import Debts from './pages/Debts'
 import TermsOfService from './pages/TermsOfService'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import FAQ from './pages/FAQ'
@@ -62,6 +64,7 @@ function AppRoutes() {
         <Route path="expenses" element={<Expenses />} />
         <Route path="categories" element={<Categories />} />
         <Route path="analytics" element={<Analytics />} />
+        <Route path="debts" element={<Debts />} />
         <Route path="profile" element={<Profile />} />
       </Route>
 
@@ -76,7 +79,9 @@ function App() {
     <AuthProvider>
       <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
         <ExpenseProvider>
-          <AppRoutes />
+          <DebtProvider>
+            <AppRoutes />
+          </DebtProvider>
         </ExpenseProvider>
       </ThemeProvider>
     </AuthProvider>

@@ -11,21 +11,21 @@ export const formatCurrency = (amount, currency = 'USD') => {
 // Parse date string without timezone shift
 export const parseDateLocal = (date) => {
   if (!date) return null
-  
+
   if (typeof date === 'string') {
     // Extract just the date part (YYYY-MM-DD) to avoid timezone issues
     const datePart = date.split('T')[0]
     const [year, month, day] = datePart.split('-').map(Number)
     return new Date(year, month - 1, day)
   }
-  
+
   return date
 }
 
 // Format date
 export const formatDate = (date, formatStr = 'MMM dd, yyyy') => {
   if (!date) return ''
-  
+
   try {
     const dateObj = parseDateLocal(date)
     return format(dateObj, formatStr)
@@ -38,7 +38,7 @@ export const formatDate = (date, formatStr = 'MMM dd, yyyy') => {
 // Format date for input fields
 export const formatDateForInput = (date) => {
   if (!date) return ''
-  
+
   try {
     // For strings, just extract the date part directly
     if (typeof date === 'string') {
@@ -122,7 +122,7 @@ export const debounce = (func, wait) => {
 // Group expenses by date
 export const groupExpensesByDate = (expenses) => {
   const groups = {}
-  
+
   expenses.forEach(expense => {
     const date = formatDate(expense.date, 'yyyy-MM-dd')
     if (!groups[date]) {
@@ -130,7 +130,7 @@ export const groupExpensesByDate = (expenses) => {
     }
     groups[date].push(expense)
   })
-  
+
   return Object.entries(groups)
     .map(([date, expenses]) => ({
       date,
@@ -150,12 +150,12 @@ export const calculateTotalExpenses = (expenses) => {
 // Filter expenses by date range
 export const filterExpensesByDateRange = (expenses, startDate, endDate) => {
   if (!startDate || !endDate) return expenses
-  
+
   return expenses.filter(expense => {
     const expenseDate = new Date(expense.date)
     const start = new Date(startDate)
     const end = new Date(endDate)
-    
+
     return expenseDate >= start && expenseDate <= end
   })
 }
@@ -165,7 +165,7 @@ export const getCurrentMonthRange = () => {
   const now = new Date()
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
   const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0)
-  
+
   return {
     startDate: formatDateForInput(startOfMonth),
     endDate: formatDateForInput(endOfMonth)
@@ -176,7 +176,7 @@ export const getCurrentMonthRange = () => {
 export const getLast30DaysRange = () => {
   const now = new Date()
   const thirtyDaysAgo = new Date(now.getTime() - (29 * 24 * 60 * 60 * 1000))
-  
+
   return {
     startDate: formatDateForInput(thirtyDaysAgo),
     endDate: formatDateForInput(now)

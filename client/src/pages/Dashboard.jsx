@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useExpense } from '../context/ExpenseContext'
+import { useDebt } from '../context/DebtContext'
 import { expenseService } from '../services/expenseService'
 import { formatCurrency } from '../utils/helpers'
 import { format } from 'date-fns'
@@ -15,6 +16,11 @@ import {
   Wallet
 } from 'lucide-react'
 import {
+  BanknotesIcon,
+  ArrowDownTrayIcon,
+  ArrowUpTrayIcon
+} from '@heroicons/react/24/outline'
+import {
   AreaChart,
   Area,
   XAxis,
@@ -27,6 +33,7 @@ import {
 const Dashboard = () => {
   const { user, currency } = useAuth()
   const { stats, trends, loading, loadStats, loadTrends } = useExpense()
+  const { debts, loadDebts } = useDebt()
   const [recentTransactions, setRecentTransactions] = useState([])
   const [loadingRecent, setLoadingRecent] = useState(true)
   const navigate = useNavigate()
@@ -34,8 +41,9 @@ const Dashboard = () => {
   useEffect(() => {
     loadStats()
     loadTrends()
+    loadDebts()
     fetchRecentTransactions()
-  }, [loadStats, loadTrends])
+  }, [loadStats, loadTrends, loadDebts])
 
   const fetchRecentTransactions = async () => {
     try {
@@ -53,6 +61,9 @@ const Dashboard = () => {
   const totalExpenses = stats?.totalStats?.expenses || 0
   const totalIncome = stats?.totalStats?.income || 0
   const netAmount = stats?.totalStats?.net || 0
+
+  const totalPayable = debts.filter(d => d.type === 'borrowed').reduce((sum, d) => sum + d.currentAmount, 0)
+  const totalReceivable = debts.filter(d => d.type === 'lent').reduce((sum, d) => sum + d.currentAmount, 0)
 
   // Prepare chart data
   const chartData = trends?.trends?.map(item => ({
@@ -87,7 +98,7 @@ const Dashboard = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {/* Total Expenses */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
@@ -133,17 +144,31 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Total Transactions */}
+        {/* Debt Summary */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Transactions</p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
-                {loading ? '...' : (stats?.totalStats?.expenses || 0) + (stats?.totalStats?.income || 0)}
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Outstanding Payable</p>
+              <p className="text-3xl font-bold text-red-600 dark:text-red-400 mt-2">
+                {formatCurrency(totalPayable, currency)}
               </p>
             </div>
-            <div className="p-3 bg-purple-100 rounded-lg">
-              <CreditCard className="h-8 w-8 text-purple-600" />
+            <div className="p-3 bg-orange-100 rounded-lg">
+              <ArrowDownTrayIcon className="h-8 w-8 text-orange-600" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Outstanding Receivable</p>
+              <p className="text-3xl font-bold text-green-600 dark:text-green-400 mt-2">
+                {formatCurrency(totalReceivable, currency)}
+              </p>
+            </div>
+            <div className="p-3 bg-teal-100 rounded-lg">
+              <ArrowUpTrayIcon className="h-8 w-8 text-teal-600" />
             </div>
           </div>
         </div>
@@ -234,6 +259,12 @@ const Dashboard = () => {
                 className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-purple-600 hover:bg-purple-700 transition-colors"
               >
                 Manage Categories
+              </button>
+              <button
+                onClick={() => navigate('/app/debts')}
+                className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-orange-600 hover:bg-orange-700 transition-colors"
+              >
+                Manage Debts
               </button>
             </div>
           </div>
