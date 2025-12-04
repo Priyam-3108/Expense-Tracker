@@ -7,6 +7,7 @@ import { Eye, EyeOff, Mail, Lock, User, DollarSign } from 'lucide-react'
 import { validateEmail, validatePassword } from '../utils/helpers'
 import { cn } from '../utils/cn'
 import ThemeToggle from '../components/ThemeToggle'
+import Logo from '../components/Logo'
 
 const Register = () => {
   const { register: registerUser } = useAuth()
@@ -49,7 +50,7 @@ const Register = () => {
     try {
       const result = await registerUser(data.name, data.email, data.password, data.currency)
       if (result.success) {
-        navigate('/dashboard')
+        navigate('/app/dashboard')
       } else {
         setError('root', { message: result.error })
       }
@@ -96,14 +97,9 @@ const Register = () => {
         )}>
           {/* Card Content */}
           <div className="p-8 sm:p-10">
-            {/* Logo with Gradient */}
+            {/* Logo */}
             <div className="flex justify-center mb-5">
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary-600 to-blue-600 rounded-2xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity"></div>
-                <div className="relative h-14 w-14 bg-gradient-to-br from-primary-500 via-primary-600 to-blue-600 rounded-2xl flex items-center justify-center shadow-xl transform group-hover:scale-105 transition-transform duration-300">
-                  <span className="text-white font-bold text-2xl">$</span>
-                </div>
-              </div>
+              <Logo size="default" />
             </div>
 
             {/* Title */}
@@ -112,14 +108,8 @@ const Register = () => {
                 "text-2xl font-bold mb-2 transition-colors",
                 isDark ? "text-white" : "text-gray-900"
               )}>
-                Get started free
+                Get started for free
               </h2>
-              <p className={cn(
-                "text-xs transition-colors",
-                isDark ? "text-gray-400" : "text-gray-600"
-              )}>
-                Create your account to start tracking expenses
-              </p>
             </div>
 
             <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>

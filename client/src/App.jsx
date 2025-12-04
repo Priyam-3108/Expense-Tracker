@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import { ExpenseProvider } from './context/ExpenseContext'
 import { ThemeProvider } from './context/ThemeContext'
 import Layout from './components/Layout'
+import Landing from './pages/Landing'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
@@ -10,6 +11,11 @@ import Expenses from './pages/Expenses'
 import Categories from './pages/Categories'
 import Analytics from './pages/Analytics'
 import Profile from './pages/Profile'
+import TermsOfService from './pages/TermsOfService'
+import PrivacyPolicy from './pages/PrivacyPolicy'
+import FAQ from './pages/FAQ'
+import Support from './pages/Support'
+import Documentation from './pages/Documentation'
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -26,43 +32,32 @@ const ProtectedRoute = ({ children }) => {
   return user ? children : <Navigate to="/login" replace />
 }
 
-// Public Route Component (redirects to dashboard if already logged in)
-const PublicRoute = ({ children }) => {
-  const { user, loading } = useAuth()
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="loading-spinner"></div>
-      </div>
-    )
-  }
-
-  return user ? <Navigate to="/dashboard" replace /> : children
-}
-
 function AppRoutes() {
+  const { user } = useAuth()
+
   return (
     <Routes>
+      {/* Landing Page - Root Route */}
+      <Route path="/" element={<Landing />} />
+
       {/* Public Routes */}
-      <Route path="/login" element={
-        <PublicRoute>
-          <Login />
-        </PublicRoute>
-      } />
-      <Route path="/register" element={
-        <PublicRoute>
-          <Register />
-        </PublicRoute>
-      } />
+      <Route path="/login" element={user ? <Navigate to="/app/dashboard" replace /> : <Login />} />
+      <Route path="/register" element={user ? <Navigate to="/app/dashboard" replace /> : <Register />} />
+
+      {/* Static Pages - Public Routes */}
+      <Route path="/terms" element={<TermsOfService />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/faq" element={<FAQ />} />
+      <Route path="/support" element={<Support />} />
+      <Route path="/docs" element={<Documentation />} />
 
       {/* Protected Routes */}
-      <Route path="/" element={
+      <Route path="/app" element={
         <ProtectedRoute>
           <Layout />
         </ProtectedRoute>
       }>
-        <Route index element={<Navigate to="/dashboard" replace />} />
+        <Route index element={<Navigate to="/app/dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="expenses" element={<Expenses />} />
         <Route path="categories" element={<Categories />} />
@@ -71,7 +66,7 @@ function AppRoutes() {
       </Route>
 
       {/* Catch all route */}
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }

@@ -7,6 +7,7 @@ import { Eye, EyeOff, Mail, Lock } from 'lucide-react'
 import { validateEmail } from '../utils/helpers'
 import { cn } from '../utils/cn'
 import ThemeToggle from '../components/ThemeToggle'
+import Logo from '../components/Logo'
 
 const Login = () => {
   const { login } = useAuth()
@@ -28,7 +29,7 @@ const Login = () => {
     try {
       const result = await login(data.email, data.password)
       if (result.success) {
-        navigate('/dashboard')
+        navigate('/app/dashboard')
       } else {
         setError('root', { message: result.error })
       }
@@ -75,14 +76,9 @@ const Login = () => {
         )}>
           {/* Card Content */}
           <div className="p-8 sm:p-10">
-            {/* Logo with Gradient */}
+            {/* Logo */}
             <div className="flex justify-center mb-8">
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary-600 to-blue-600 rounded-2xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity"></div>
-                <div className="relative h-16 w-16 bg-gradient-to-br from-primary-500 via-primary-600 to-blue-600 rounded-2xl flex items-center justify-center shadow-xl transform group-hover:scale-105 transition-transform duration-300">
-                  <span className="text-white font-bold text-3xl">$</span>
-                </div>
-              </div>
+              <Logo size="large" />
             </div>
 
             {/* Title */}
@@ -91,14 +87,8 @@ const Login = () => {
                 "text-3xl font-bold mb-3 transition-colors",
                 isDark ? "text-white" : "text-gray-900"
               )}>
-                Welcome back
+                Welcome
               </h2>
-              <p className={cn(
-                "text-sm transition-colors",
-                isDark ? "text-gray-400" : "text-gray-600"
-              )}>
-                Sign in to continue to your account
-              </p>
             </div>
 
             <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>

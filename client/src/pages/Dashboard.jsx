@@ -218,19 +218,19 @@ const Dashboard = () => {
             </h2>
             <div className="space-y-4">
               <button
-                onClick={() => navigate('/expenses', { state: { action: 'add_expense' } })}
+                onClick={() => navigate('/app/expenses', { state: { action: 'add_expense' } })}
                 className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 transition-colors"
               >
                 Add Expense
               </button>
               <button
-                onClick={() => navigate('/expenses', { state: { action: 'add_income' } })}
+                onClick={() => navigate('/app/expenses', { state: { action: 'add_income' } })}
                 className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-success-600 hover:bg-success-700 transition-colors"
               >
                 Add Income
               </button>
               <button
-                onClick={() => navigate('/categories')}
+                onClick={() => navigate('/app/categories')}
                 className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-purple-600 hover:bg-purple-700 transition-colors"
               >
                 Manage Categories
@@ -246,7 +246,7 @@ const Dashboard = () => {
                 Recent Activity
               </h2>
               <button
-                onClick={() => navigate('/expenses')}
+                onClick={() => navigate('/app/expenses')}
                 className="text-sm text-primary-600 hover:text-primary-700 font-medium"
               >
                 View All
@@ -261,7 +261,7 @@ const Dashboard = () => {
                   <div
                     key={transaction._id}
                     className="flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors cursor-pointer border border-transparent hover:border-gray-100 dark:hover:border-gray-600"
-                    onClick={() => navigate('/expenses')}
+                    onClick={() => navigate('/app/expenses')}
                   >
                     <div className="flex items-center space-x-3">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center ${transaction.type === 'income' ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'

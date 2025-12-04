@@ -39,11 +39,11 @@ const Layout = () => {
   }
 
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'Expenses', href: '/expenses', icon: CreditCard },
-    { name: 'Categories', href: '/categories', icon: Tag },
-    { name: 'Analytics', href: '/analytics', icon: BarChart3 },
-    { name: 'Profile', href: '/profile', icon: User },
+    { name: 'Dashboard', href: '/app/dashboard', icon: Home },
+    { name: 'Expenses', href: '/app/expenses', icon: CreditCard },
+    { name: 'Categories', href: '/app/categories', icon: Tag },
+    { name: 'Analytics', href: '/app/analytics', icon: BarChart3 },
+    { name: 'Profile', href: '/app/profile', icon: User },
   ]
 
   // Close dropdown when clicking outside
