@@ -209,6 +209,24 @@ export const ExpenseProvider = ({ children }) => {
     }
   }, [loadExpenses, loadStats, loadTrends])
 
+  const bulkDeleteExpenses = useCallback(async (ids) => {
+    try {
+      const response = await expenseService.bulkDeleteExpenses(ids)
+      if (response && response.data && response.data.success) {
+        await loadExpenses()
+        await loadStats()
+        await loadTrends()
+        return { success: true }
+      } else {
+        const errorMsg = response?.data?.message || 'Failed to delete expenses'
+        return { success: false, error: errorMsg }
+      }
+    } catch (error) {
+      const message = error.response?.data?.message || error.message || 'Failed to delete expenses'
+      return { success: false, error: message }
+    }
+  }, [loadExpenses, loadStats, loadTrends])
+
   const bulkUpdateList = useCallback(async (expenses) => {
     try {
       const response = await expenseService.bulkUpdateList(expenses)
@@ -392,6 +410,7 @@ export const ExpenseProvider = ({ children }) => {
     addExpense,
     updateExpense,
     deleteExpense,
+    bulkDeleteExpenses,
     bulkUpdateList,
     addCategory,
     updateCategory,
