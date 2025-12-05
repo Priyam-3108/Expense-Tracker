@@ -110,6 +110,7 @@ const Categories = () => {
     }
     setEditingCategory(category)
     setShowForm(true)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleCancel = () => {
