@@ -4,6 +4,7 @@ import { XMarkIcon, BanknotesIcon, CalendarIcon, DocumentTextIcon, CheckCircleIc
 import { useDebt } from '../context/DebtContext';
 import { useAuth } from '../context/AuthContext';
 import { formatCurrency } from '../utils/helpers';
+import DatePicker from './DatePicker';
 
 export default function RepaymentModal({ isOpen, onClose, debt }) {
     const { addRepayment } = useDebt();
@@ -160,12 +161,10 @@ export default function RepaymentModal({ isOpen, onClose, debt }) {
                                             <CalendarIcon className="h-4 w-4 inline mr-1.5" />
                                             Payment Date
                                         </label>
-                                        <input
-                                            type="date"
-                                            required
+                                        <DatePicker
                                             value={date}
-                                            onChange={(e) => setDate(e.target.value)}
-                                            className="block w-full rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-gray-900 dark:text-white focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all sm:text-sm"
+                                            onChange={(newDate) => setDate(newDate)}
+                                            placeholder="Select payment date"
                                         />
                                     </div>
 

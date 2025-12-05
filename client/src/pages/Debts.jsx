@@ -51,7 +51,7 @@ export default function Debts() {
                                     'focus:outline-none',
                                     selected
                                         ? 'bg-white dark:bg-gray-700 text-blue-700 dark:text-blue-100 shadow'
-                                        : 'text-blue-100 hover:bg-white/[0.12] hover:text-white'
+                                        : 'text-gray-600 dark:text-gray-400 hover:bg-white/[0.12] hover:text-gray-800 dark:hover:text-white'
                                 )
                             }
                         >
@@ -64,7 +64,7 @@ export default function Debts() {
                                     'focus:outline-none',
                                     selected
                                         ? 'bg-white dark:bg-gray-700 text-blue-700 dark:text-blue-100 shadow'
-                                        : 'text-blue-100 hover:bg-white/[0.12] hover:text-white'
+                                        : 'text-gray-600 dark:text-gray-400 hover:bg-white/[0.12] hover:text-gray-800 dark:hover:text-white'
                                 )
                             }
                         >
