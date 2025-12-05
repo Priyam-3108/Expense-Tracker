@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns'
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, X } from 'lucide-react'
 
@@ -8,6 +9,7 @@ const DatePicker = ({ value, onChange, placeholder = "Select date", className = 
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, ready: false })
   const wrapperRef = useRef(null)
   const buttonRef = useRef(null)
+  const dropdownRef = useRef(null)
 
   useEffect(() => {
     if (value) {
@@ -17,7 +19,10 @@ const DatePicker = ({ value, onChange, placeholder = "Select date", className = 
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+      const isOutsideWrapper = wrapperRef.current && !wrapperRef.current.contains(event.target)
+      const isOutsideDropdown = dropdownRef.current && !dropdownRef.current.contains(event.target)
+
+      if (isOutsideWrapper && isOutsideDropdown) {
         setIsOpen(false)
         setDropdownPosition({ top: 0, left: 0, ready: false })
       }
@@ -25,10 +30,16 @@ const DatePicker = ({ value, onChange, placeholder = "Select date", className = 
 
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside)
+      // Handle window resize
+      window.addEventListener('resize', () => setIsOpen(false))
+      // Handle scroll
+      window.addEventListener('scroll', () => setIsOpen(false), true)
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
+      window.removeEventListener('resize', () => setIsOpen(false))
+      window.removeEventListener('scroll', () => setIsOpen(false), true)
     }
   }, [isOpen])
 
@@ -99,7 +110,7 @@ const DatePicker = ({ value, onChange, placeholder = "Select date", className = 
   const displayValue = value ? format(new Date(value), 'MMM dd, yyyy') : ''
 
   return (
-    <div ref={wrapperRef} className={`relative ${className}`} style={{ zIndex: isOpen ? 9999 : 'auto' }}>
+    <div ref={wrapperRef} className={`relative ${className}`}>
       <div className="relative">
         <button
           ref={buttonRef}
@@ -129,8 +140,9 @@ const DatePicker = ({ value, onChange, placeholder = "Select date", className = 
         )}
       </div>
 
-      {isOpen && dropdownPosition.ready && (
+      {isOpen && dropdownPosition.ready && createPortal(
         <div
+          ref={dropdownRef}
           className="fixed z-[9999] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl p-4 w-80"
           style={{
             top: `${dropdownPosition.top}px`,
@@ -218,7 +230,8 @@ const DatePicker = ({ value, onChange, placeholder = "Select date", className = 
               Cancel
             </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )

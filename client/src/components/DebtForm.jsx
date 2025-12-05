@@ -4,6 +4,7 @@ import { XMarkIcon, UserIcon, CurrencyDollarIcon, CalendarIcon, DocumentTextIcon
 import { useDebt } from '../context/DebtContext';
 import { Fragment } from 'react';
 import { useAuth } from '../context/AuthContext'
+import DatePicker from './DatePicker'
 
 
 export default function DebtForm({ isOpen, onClose, editDebt = null, type = 'borrowed' }) {
@@ -148,12 +149,10 @@ export default function DebtForm({ isOpen, onClose, editDebt = null, type = 'bor
                                             <input
                                                 type="number"
                                                 required
-                                                step="0.01"
-                                                min="0.01"
                                                 value={formData.amount}
                                                 onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                                                 className="block w-full rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 pl-10 pr-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all sm:text-sm disabled:opacity-60 disabled:cursor-not-allowed"
-                                                placeholder="0.00"
+                                                placeholder="0"
                                                 disabled={!!editDebt}
                                             />
                                         </div>
@@ -174,12 +173,10 @@ export default function DebtForm({ isOpen, onClose, editDebt = null, type = 'bor
                                                 <CalendarIcon className="h-4 w-4 inline mr-1.5" />
                                                 Date
                                             </label>
-                                            <input
-                                                type="date"
-                                                required
+                                            <DatePicker
                                                 value={formData.date}
-                                                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                                className="block w-full rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all sm:text-sm"
+                                                onChange={(date) => setFormData({ ...formData, date })}
+                                                placeholder="Select date"
                                             />
                                         </div>
                                         <div>
@@ -187,11 +184,10 @@ export default function DebtForm({ isOpen, onClose, editDebt = null, type = 'bor
                                                 Due Date
                                                 <span className="text-xs font-normal text-gray-500 ml-1">(Optional)</span>
                                             </label>
-                                            <input
-                                                type="date"
+                                            <DatePicker
                                                 value={formData.dueDate}
-                                                onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                                                className="block w-full rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all sm:text-sm"
+                                                onChange={(date) => setFormData({ ...formData, dueDate: date })}
+                                                placeholder="Select due date"
                                             />
                                         </div>
                                     </div>
