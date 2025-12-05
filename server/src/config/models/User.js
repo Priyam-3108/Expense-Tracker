@@ -39,7 +39,13 @@ const userSchema = new mongoose.Schema({
   categoryOrder: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Category'
-  }]
+  }],
+  analyticsShareToken: {
+    type: String,
+    unique: true,
+    sparse: true,
+    select: false
+  }
 }, {
   timestamps: true
 });

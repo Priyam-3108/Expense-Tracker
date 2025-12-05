@@ -8,9 +8,12 @@ const CategorySelector = ({
   placeholder = "Select a category",
   showCreateButton = false,
   onCreateClick = null,
-  className = ""
+  className = "",
+  categories: propCategories,
+  disabled = false
 }) => {
-  const { categories } = useExpense()
+  const { categories: contextCategories } = useExpense()
+  const categories = propCategories || contextCategories
   const [isOpen, setIsOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -52,8 +55,9 @@ const CategorySelector = ({
       {/* Selected Category Display */}
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        onClick={() => !disabled && setIsOpen(!isOpen)}
+        disabled={disabled}
+        className={`w-full flex items-center justify-between px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
         {selectedCategory ? (
           <div className="flex items-center gap-2">

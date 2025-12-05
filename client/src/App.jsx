@@ -18,6 +18,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy'
 import FAQ from './pages/FAQ'
 import Support from './pages/Support'
 import Documentation from './pages/Documentation'
+import SharedAnalytics from './pages/SharedAnalytics'
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -52,6 +53,9 @@ function AppRoutes() {
       <Route path="/faq" element={<FAQ />} />
       <Route path="/support" element={<Support />} />
       <Route path="/docs" element={<Documentation />} />
+
+      {/* Shared Analytics - Public Route */}
+      <Route path="/analytics/shared/:token" element={<SharedAnalytics />} />
 
       {/* Protected Routes */}
       <Route path="/app" element={
