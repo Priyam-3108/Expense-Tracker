@@ -65,6 +65,11 @@ const Expenses = () => {
     loadExpenses
   } = useExpense()
 
+  // Load expenses on mount to ensure data is fresh
+  useEffect(() => {
+    loadExpenses()
+  }, [loadExpenses])
+
   // Export state
   const [showExportModal, setShowExportModal] = useState(false)
   const [exportLoading, setExportLoading] = useState(false)
