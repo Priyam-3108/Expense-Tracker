@@ -282,10 +282,12 @@ const Analytics = () => {
               name: categoryName,
               value: 0,
               color: category?.color || '#3B82F6',
-              icon: category?.icon || '💰'
+              icon: category?.icon || '💰',
+              count: 0
             }
           }
           categoryMap[categoryName].value += expense.amount || 0
+          categoryMap[categoryName].count += 1
         }
       })
 
