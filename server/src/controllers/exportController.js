@@ -56,7 +56,14 @@ export const exportExpenses = async (req, res) => {
         const filename = `expenses-${new Date().toISOString().split('T')[0]}`;
 
         if (format === 'csv') {
-            const fields = ['date', 'category.name', 'description', 'amount', 'type', 'notes'];
+            const fields = [
+                { label: 'date', value: 'date' },
+                { label: 'category', value: 'category.name' },
+                { label: 'description', value: 'description' },
+                { label: 'amount', value: 'amount' },
+                { label: 'type', value: 'type' },
+                { label: 'notes', value: 'notes' }
+            ];
             const opts = { fields };
             const parser = new Parser(opts);
             const csv = parser.parse(expenses);

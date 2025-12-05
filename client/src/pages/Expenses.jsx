@@ -7,11 +7,12 @@ import DateRangePicker from '../components/DateRangePicker'
 import DataTable from '../components/DataTable'
 import BulkEditList from '../components/BulkEditList'
 import ExportModal from '../components/ExportModal'
+import ImportModal from '../components/ImportModal'
 import { formatCurrency, formatDate, formatDateForInput, parseDateLocal, getTodayDate } from '../utils/helpers'
 import {
   Plus, Edit, Trash2, Search, X,
   ArrowUpCircle, ArrowDownCircle, Layers,
-  Calendar as CalendarIcon, List, Repeat, Download
+  Calendar as CalendarIcon, List, Repeat, Download, Upload
 } from 'lucide-react'
 import { startOfMonth, endOfMonth, eachDayOfInterval, format, isSameMonth, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns'
 import toast from 'react-hot-toast'
@@ -67,6 +68,9 @@ const Expenses = () => {
   // Export state
   const [showExportModal, setShowExportModal] = useState(false)
   const [exportLoading, setExportLoading] = useState(false)
+
+  // Import state
+  const [showImportModal, setShowImportModal] = useState(false)
 
   // Get today's date
   const todayDate = useMemo(() => getTodayDate(), [])
@@ -630,6 +634,13 @@ const Expenses = () => {
           >
             <Layers size={18} />
             Bulk Add
+          </button>
+          <button
+            onClick={() => setShowImportModal(true)}
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition-all shadow-sm hover:shadow"
+          >
+            <Upload size={18} />
+            Import
           </button>
           <button
             onClick={() => setShowExportModal(true)}
@@ -1308,6 +1319,16 @@ const Expenses = () => {
         onClose={() => setShowExportModal(false)}
         onExport={handleExport}
         loading={exportLoading}
+      />
+
+      {/* Import Modal */}
+      <ImportModal
+        isOpen={showImportModal}
+        onClose={() => setShowImportModal(false)}
+        onImportSuccess={() => {
+          loadExpenses()
+          // Optionally refresh categories if new ones were added
+        }}
       />
     </div>
   )

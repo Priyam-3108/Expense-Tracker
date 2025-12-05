@@ -241,12 +241,24 @@ export const bulkCreateExpenses = async (req, res) => {
         continue;
       }
 
+      // Use individual date if provided, otherwise use base date
+      let expenseDate = baseDate;
+      if (expense.date) {
+        const validDate = validateDateString(expense.date);
+        if (validDate) {
+          expenseDate = validDate;
+        } else {
+          errors.push(`Expense ${i + 1}: Invalid date format`);
+          continue;
+        }
+      }
+
       validExpenses.push({
         description: expense.description ? expense.description.trim() : '',
         amount: parseFloat(expense.amount),
-        date: baseDate,
+        date: expenseDate,
         category: expense.category,
-        type: 'expense',
+        type: expense.type || 'expense', // Allow type override too
         user: req.user._id
       });
     }
