@@ -64,17 +64,19 @@ const DateRangePicker = ({ startDate, endDate, onStartDateChange, onEndDateChang
 
   return (
     <div ref={wrapperRef} className={`relative ${className}`}>
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg bg-white dark:bg-gray-800 text-left focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-600 transition"
-      >
-        <div className="flex items-center gap-2">
-          <CalendarIcon size={18} className="text-gray-400" />
-          <span className={startDate ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}>
-            {displayValue()}
-          </span>
-        </div>
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          className={`w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg bg-white dark:bg-gray-800 text-left focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-600 transition ${startDate || endDate ? 'pr-10' : ''}`}
+        >
+          <div className="flex items-center gap-2">
+            <CalendarIcon size={18} className="text-gray-400" />
+            <span className={startDate ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}>
+              {displayValue()}
+            </span>
+          </div>
+        </button>
         {(startDate || endDate) && (
           <button
             type="button"
@@ -83,12 +85,12 @@ const DateRangePicker = ({ startDate, endDate, onStartDateChange, onEndDateChang
               onStartDateChange('');
               onEndDateChange('');
             }}
-            className="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 p-1"
           >
             <X size={16} />
           </button>
         )}
-      </button>
+      </div>
 
       {isOpen && (
         <div className="absolute z-[100] mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl p-4 w-80">
