@@ -4,6 +4,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { AuthContext } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { expenseService } from '../services/expenseService';
+import CustomAlert from '../components/CustomAlert';
+import ActionSheet from '../components/ActionSheet';
 
 export default function DashboardScreen({ navigation }) {
   const { signOut, user } = useContext(AuthContext);
@@ -12,6 +14,12 @@ export default function DashboardScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [summary, setSummary] = useState({ income: 0, expense: 0, balance: 0 });
+
+  // Action Sheet & Alert States
+  const [showActionSheet, setShowActionSheet] = useState(false);
+  const [selectedExpense, setSelectedExpense] = useState(null);
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+  const [deleteExpenseId, setDeleteExpenseId] = useState(null);
 
   const currencySymbols = {
     'USD': '$', 'EUR': '€', 'INR': '₹', 'GBP': '£', 'JPY': '¥', 'CNY': '¥', 'CAD': 'C$', 'AUD': 'A$'
@@ -123,12 +131,35 @@ export default function DashboardScreen({ navigation }) {
     return colorsList[Math.abs(hash) % colorsList.length];
   };
 
+  const confirmDelete = async () => {
+    try {
+      setLoading(true);
+      await expenseService.deleteExpense(deleteExpenseId);
+      setShowDeleteAlert(false);
+      setDeleteExpenseId(null);
+      // Refresh data
+      fetchData();
+    } catch (error) {
+      setLoading(false);
+      // Could show error alert here
+      console.error('Failed to delete transaction:', error);
+    }
+  };
+
+  const handleExpensePress = (item) => {
+    setSelectedExpense(item);
+    setShowActionSheet(true);
+  };
+
   const renderExpense = ({ item }) => {
     const categoryName = item.category?.name || 'Uncategorized';
     const catColor = getCategoryColor(categoryName);
 
     return (
-      <View style={[styles.card, { backgroundColor: colors.card }]}>
+      <TouchableOpacity
+        style={[styles.card, { backgroundColor: colors.card }]}
+        onPress={() => handleExpensePress(item)}
+      >
         <View style={[styles.iconContainer, { backgroundColor: `${catColor}20` }]}>
           <Text style={[styles.iconText, { color: catColor }]}>{categoryName.charAt(0).toUpperCase()}</Text>
         </View>
@@ -145,7 +176,7 @@ export default function DashboardScreen({ navigation }) {
             {item.type === 'income' ? '+' : '-'}{currencySymbol}{formatAmount(item.amount)}
           </Text>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -244,6 +275,60 @@ export default function DashboardScreen({ navigation }) {
           />
         )}
       </View>
+
+      {/* Action Sheet for Transaction Options */}
+      <ActionSheet
+        visible={showActionSheet}
+        onClose={() => setShowActionSheet(false)}
+        title="Transaction Options"
+        subtitle={selectedExpense ? `${selectedExpense.category?.name || 'Uncategorized'} - ${currencySymbol}${formatAmount(selectedExpense.amount)}` : ''}
+        options={[
+          {
+            text: 'Edit Transaction',
+            icon: 'edit',
+            style: 'secondary',
+            onPress: () => {
+              navigation.navigate('AddExpense', { expense: selectedExpense });
+            }
+          },
+          {
+            text: 'Delete Transaction',
+            icon: 'delete',
+            style: 'destructive',
+            onPress: () => {
+              setDeleteExpenseId(selectedExpense._id);
+              setShowDeleteAlert(true);
+            }
+          }
+        ]}
+      />
+
+      {/* Delete Confirmation Alert */}
+      <CustomAlert
+        visible={showDeleteAlert}
+        type="danger"
+        title="Delete Transaction"
+        message="Are you sure you want to delete this transaction? This action cannot be undone."
+        buttons={[
+          {
+            text: 'Cancel',
+            style: 'cancel',
+            onPress: () => {
+              setShowDeleteAlert(false);
+              setDeleteExpenseId(null);
+            }
+          },
+          {
+            text: 'Delete',
+            style: 'destructive',
+            onPress: confirmDelete
+          }
+        ]}
+        onClose={() => {
+          setShowDeleteAlert(false);
+          setDeleteExpenseId(null);
+        }}
+      />
     </View>
   );
 }

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView, Modal, StatusBar, Switch } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Modal, StatusBar, Switch } from 'react-native';
 import ModernDatePicker from '../components/ModernDatePicker';
+import CustomAlert from '../components/CustomAlert';
 import { expenseService } from '../services/expenseService';
 import { categoryService } from '../services/categoryService';
 import { useTheme } from '../context/ThemeContext';
 
-export default function AddExpenseScreen({ navigation }) {
+export default function AddExpenseScreen({ navigation, route }) {
     const { colors, isDark } = useTheme();
     const [description, setDescription] = useState('');
     const [amount, setAmount] = useState('');
@@ -14,6 +15,10 @@ export default function AddExpenseScreen({ navigation }) {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
     const [pickerVisible, setPickerVisible] = useState(false);
+
+    // Editing State
+    const [isEditing, setIsEditing] = useState(false);
+    const [editId, setEditId] = useState(null);
 
     // Date State
     const [date, setDate] = useState(new Date());
@@ -25,9 +30,26 @@ export default function AddExpenseScreen({ navigation }) {
     const [recurringEndDate, setRecurringEndDate] = useState(new Date());
     const [showEndDatePicker, setShowEndDatePicker] = useState(false);
 
+    // Alert States
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertConfig, setAlertConfig] = useState({ type: 'default', title: '', message: '', buttons: [] });
+
     useEffect(() => {
         fetchCategories();
-    }, []);
+        if (route.params?.expense) {
+            const exp = route.params.expense;
+            setIsEditing(true);
+            setEditId(exp._id);
+            setDescription(exp.description || '');
+            setAmount(exp.amount ? exp.amount.toString() : '');
+            setType(exp.type || 'expense');
+            setCategory(exp.category?._id || exp.category || '');
+            setDate(new Date(exp.date));
+            setIsRecurring(exp.isRecurring || false);
+            if (exp.recurringPeriod) setRecurringPeriod(exp.recurringPeriod);
+            if (exp.recurringEndDate) setRecurringEndDate(new Date(exp.recurringEndDate));
+        }
+    }, [route.params]);
 
     const fetchCategories = async () => {
         try {
@@ -45,18 +67,36 @@ export default function AddExpenseScreen({ navigation }) {
             }
         } catch (error) {
             console.error('Failed to load categories', error);
-            Alert.alert('Error', 'Failed to load categories');
+            setAlertConfig({
+                type: 'danger',
+                title: 'Error',
+                message: 'Failed to load categories',
+                buttons: [{ text: 'OK', style: 'primary' }]
+            });
+            setShowAlert(true);
         }
     };
 
     const handleSubmit = async () => {
         if (!amount || !category) {
-            Alert.alert('Error', 'Please fill amount and category fields');
+            setAlertConfig({
+                type: 'warning',
+                title: 'Missing Information',
+                message: 'Please fill amount and category fields',
+                buttons: [{ text: 'OK', style: 'primary' }]
+            });
+            setShowAlert(true);
             return;
         }
 
         if (isRecurring && recurringEndDate < date) {
-            Alert.alert('Error', 'Recurring end date must be after the start date');
+            setAlertConfig({
+                type: 'warning',
+                title: 'Invalid Date',
+                message: 'Recurring end date must be after the start date',
+                buttons: [{ text: 'OK', style: 'primary' }]
+            });
+            setShowAlert(true);
             return;
         }
 
@@ -75,12 +115,41 @@ export default function AddExpenseScreen({ navigation }) {
                 })
             };
 
-            await expenseService.createExpense(payload);
-            Alert.alert('Success', 'Transaction added!');
-            navigation.goBack();
+            if (isEditing) {
+                await expenseService.updateExpense(editId, payload);
+                setAlertConfig({
+                    type: 'success',
+                    title: 'Success',
+                    message: 'Transaction updated successfully!',
+                    buttons: [{
+                        text: 'OK',
+                        style: 'primary',
+                        onPress: () => navigation.goBack()
+                    }]
+                });
+            } else {
+                await expenseService.createExpense(payload);
+                setAlertConfig({
+                    type: 'success',
+                    title: 'Success',
+                    message: 'Transaction added successfully!',
+                    buttons: [{
+                        text: 'OK',
+                        style: 'primary',
+                        onPress: () => navigation.goBack()
+                    }]
+                });
+            }
+            setShowAlert(true);
         } catch (error) {
-            const msg = error.response?.data?.message || 'Failed to add transaction';
-            Alert.alert('Error', msg);
+            const msg = error.response?.data?.message || (isEditing ? 'Failed to update transaction' : 'Failed to add transaction');
+            setAlertConfig({
+                type: 'danger',
+                title: 'Error',
+                message: msg,
+                buttons: [{ text: 'OK', style: 'primary' }]
+            });
+            setShowAlert(true);
         } finally {
             setLoading(false);
         }
@@ -98,7 +167,7 @@ export default function AddExpenseScreen({ navigation }) {
             <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor={colors.background} />
 
             <View style={styles.header}>
-                <Text style={[styles.headerTitle, { color: colors.text }]}>Add Transaction</Text>
+                <Text style={[styles.headerTitle, { color: colors.text }]}>{isEditing ? 'Edit Transaction' : 'Add Transaction'}</Text>
             </View>
 
             <View style={[styles.typeContainer, { borderColor: colors.primary }]}>
@@ -215,7 +284,7 @@ export default function AddExpenseScreen({ navigation }) {
                 onPress={handleSubmit}
                 disabled={loading}
             >
-                <Text style={styles.submitButtonText}>{loading ? 'Saving...' : 'Save Transaction'}</Text>
+                <Text style={styles.submitButtonText}>{loading ? 'Saving...' : (isEditing ? 'Update Transaction' : 'Save Transaction')}</Text>
             </TouchableOpacity>
 
             <Modal transparent={true} visible={pickerVisible} animationType="slide">
@@ -252,6 +321,16 @@ export default function AddExpenseScreen({ navigation }) {
                     </View>
                 </View>
             </Modal>
+
+            {/* Custom Alert */}
+            <CustomAlert
+                visible={showAlert}
+                type={alertConfig.type}
+                title={alertConfig.title}
+                message={alertConfig.message}
+                buttons={alertConfig.buttons}
+                onClose={() => setShowAlert(false)}
+            />
 
         </ScrollView>
     );
