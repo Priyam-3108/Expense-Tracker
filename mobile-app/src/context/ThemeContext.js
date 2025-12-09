@@ -36,6 +36,7 @@ export const ThemeProvider = ({ children }) => {
         primary: '#4F46E5',
         danger: '#ef4444',
         success: '#10B981',
+        secondary: '#6366F1',
     };
 
     return (
