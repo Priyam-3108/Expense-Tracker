@@ -1,16 +1,24 @@
 import React, { useEffect, useState, useContext, useCallback } from 'react';
-import { View, Text, SectionList, TouchableOpacity, StyleSheet, ActivityIndicator, RefreshControl, StatusBar } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, RefreshControl, StatusBar, ScrollView } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { expenseService } from '../services/expenseService';
 import CustomAlert from '../components/CustomAlert';
 import ActionSheet from '../components/ActionSheet';
+import BalanceCard from '../components/BalanceCard';
+import SummaryCard from '../components/SummaryCard';
+import FloatingActionButton from '../components/FloatingActionButton';
+import EmptyState from '../components/EmptyState';
+import TransactionItem from '../components/TransactionItem';
+import { SkeletonCard, SkeletonTransactionItem } from '../components/SkeletonLoader';
+import hapticFeedback from '../utils/haptics';
 
 export default function DashboardScreen({ navigation }) {
   const { signOut, user } = useContext(AuthContext);
-  const { theme, toggleTheme, isDark, colors } = useTheme();
-  const [sections, setSections] = useState([]);
+  const { theme, toggleTheme, isDark, colors, spacing, borderRadius, shadows } = useTheme();
+  const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [summary, setSummary] = useState({ income: 0, expense: 0, balance: 0 });
@@ -21,14 +29,8 @@ export default function DashboardScreen({ navigation }) {
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const [deleteExpenseId, setDeleteExpenseId] = useState(null);
 
-  const currencySymbols = {
-    'USD': '$', 'EUR': '€', 'INR': '₹', 'GBP': '£', 'JPY': '¥', 'CNY': '¥', 'CAD': 'C$', 'AUD': 'A$'
-  };
-  const currencySymbol = currencySymbols[user?.currency] || '$';
-
   const fetchData = async () => {
     try {
-      // Fetch more transactions to ensure local stats are reasonably accurate if fallback is needed
       const [expensesRes, statsRes] = await Promise.all([
         expenseService.getExpenses({ limit: 50, sort: '-date' }),
         expenseService.getStats()
@@ -38,8 +40,7 @@ export default function DashboardScreen({ navigation }) {
       const fetchedExpenses = expensesRes.data.success ? expensesRes.data.data.expenses : [];
 
       if (expensesRes.data.success) {
-        const grouped = groupExpensesByDate(fetchedExpenses);
-        setSections(grouped);
+        setTransactions(fetchedExpenses);
       }
 
       if (statsRes.data.success) {
@@ -55,7 +56,7 @@ export default function DashboardScreen({ navigation }) {
         }
       }
 
-      // Fallback: If backend stats are 0, calculate from fetched expenses (up to limit)
+      // Fallback: If backend stats are 0, calculate from fetched expenses
       if (backendStats.income === 0 && backendStats.expense === 0 && fetchedExpenses.length > 0) {
         fetchedExpenses.forEach(exp => {
           if (exp.type === 'income') backendStats.income += exp.amount;
@@ -77,40 +78,6 @@ export default function DashboardScreen({ navigation }) {
     }
   };
 
-  const groupExpensesByDate = (expenses) => {
-    const groups = expenses.reduce((acc, expense) => {
-      const dateObj = new Date(expense.date);
-      const dateStr = dateObj.toLocaleDateString(undefined, {
-        weekday: 'long', month: 'short', day: 'numeric'
-      });
-
-      if (!acc[dateStr]) {
-        acc[dateStr] = [];
-      }
-      acc[dateStr].push(expense);
-      return acc;
-    }, {});
-
-    return Object.keys(groups).map(date => ({
-      title: date,
-      data: groups[date]
-    }));
-  };
-
-  const formatAmount = (amount) => {
-    const locale = user?.currency === 'INR' ? 'en-IN' : 'en-US';
-    // Handle potential undefined/null
-    const val = amount || 0;
-    try {
-      return val.toLocaleString(locale, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      });
-    } catch (e) {
-      return val.toFixed(2);
-    }
-  };
-
   useFocusEffect(
     useCallback(() => {
       fetchData();
@@ -122,26 +89,15 @@ export default function DashboardScreen({ navigation }) {
     fetchData();
   }, []);
 
-  const getCategoryColor = (name) => {
-    const colorsList = ['#F59E0B', '#10B981', '#3B82F6', '#EF4444', '#8B5CF6', '#EC4899', '#6366F1'];
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) {
-      hash = name.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return colorsList[Math.abs(hash) % colorsList.length];
-  };
-
   const confirmDelete = async () => {
     try {
       setLoading(true);
       await expenseService.deleteExpense(deleteExpenseId);
       setShowDeleteAlert(false);
       setDeleteExpenseId(null);
-      // Refresh data
       fetchData();
     } catch (error) {
       setLoading(false);
-      // Could show error alert here
       console.error('Failed to delete transaction:', error);
     }
   };
@@ -151,137 +107,197 @@ export default function DashboardScreen({ navigation }) {
     setShowActionSheet(true);
   };
 
-  const renderExpense = ({ item }) => {
-    const categoryName = item.category?.name || 'Uncategorized';
-    const catColor = getCategoryColor(categoryName);
-
-    return (
-      <TouchableOpacity
-        style={[styles.card, { backgroundColor: colors.card }]}
-        onPress={() => handleExpensePress(item)}
-      >
-        <View style={[styles.iconContainer, { backgroundColor: `${catColor}20` }]}>
-          <Text style={[styles.iconText, { color: catColor }]}>{categoryName.charAt(0).toUpperCase()}</Text>
-        </View>
-
-        <View style={styles.cardInfo}>
-          <Text style={[styles.category, { color: colors.text }]}>{categoryName}</Text>
-          {item.description ? (
-            <Text style={[styles.desc, { color: colors.subText }]} numberOfLines={1}>{item.description}</Text>
-          ) : null}
-        </View>
-
-        <View style={styles.amountContainer}>
-          <Text style={[styles.amount, { color: item.type === 'income' ? colors.success : colors.danger }]}>
-            {item.type === 'income' ? '+' : '-'}{currencySymbol}{formatAmount(item.amount)}
-          </Text>
-        </View>
-      </TouchableOpacity>
-    );
+  const handleEdit = (item) => {
+    hapticFeedback.light();
+    navigation.navigate('AddExpense', { expense: item });
   };
 
-  const renderSectionHeader = ({ section: { title } }) => (
-    <Text style={[styles.sectionHeader, { color: colors.subText, backgroundColor: colors.background }]}>{title}</Text>
+  const handleDelete = (item) => {
+    hapticFeedback.light();
+    setDeleteExpenseId(item._id);
+    setShowDeleteAlert(true);
+  };
+
+  const renderHeader = () => (
+    <View>
+      {/* Top Header */}
+      <View style={styles.topHeader}>
+        <View>
+          <Text style={[styles.greeting, { color: colors.textSecondary }]}>
+            Welcome back,
+          </Text>
+          <Text style={[styles.userName, { color: colors.text }]}>
+            {user?.name || 'User'}
+          </Text>
+        </View>
+        <View style={styles.headerActions}>
+          <TouchableOpacity
+            onPress={() => {
+              hapticFeedback.light();
+              toggleTheme(isDark ? 'light' : 'dark');
+            }}
+            style={[styles.iconButton, { backgroundColor: colors.card }]}
+          >
+            <Ionicons
+              name={isDark ? 'sunny' : 'moon'}
+              size={20}
+              color={colors.text}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              hapticFeedback.medium();
+              signOut();
+            }}
+            style={[styles.iconButton, { backgroundColor: colors.card }]}
+          >
+            <Ionicons name="log-out-outline" size={20} color={colors.danger} />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Balance Card */}
+      <BalanceCard
+        balance={summary.balance}
+        onPress={() => {
+          hapticFeedback.light();
+        }}
+      />
+
+      {/* Summary Cards */}
+      <View style={styles.summaryRow}>
+        <SummaryCard
+          title="Income"
+          amount={summary.income}
+          type="income"
+          icon="trending-up"
+        />
+        <View style={{ width: spacing.md }} />
+        <SummaryCard
+          title="Expense"
+          amount={summary.expense}
+          type="expense"
+          icon="trending-down"
+        />
+      </View>
+
+      {/* Recent Transactions Header */}
+      <View style={styles.sectionHeader}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          Recent Transactions
+        </Text>
+        <TouchableOpacity
+          onPress={() => {
+            hapticFeedback.light();
+            // Navigate to search/filter screen
+          }}
+        >
+          <Ionicons name="search" size={22} color={colors.primary} />
+        </TouchableOpacity>
+      </View>
+    </View>
   );
+
+  const renderTransaction = ({ item }) => (
+    <TransactionItem
+      item={item}
+      onPress={handleExpensePress}
+      onEdit={handleEdit}
+      onDelete={handleDelete}
+    />
+  );
+
+  const renderEmpty = () => (
+    <EmptyState
+      icon="receipt-outline"
+      title="No Transactions Yet"
+      subtitle="Start tracking your expenses by adding your first transaction"
+      action={
+        <TouchableOpacity
+          style={[styles.emptyButton, { backgroundColor: colors.primary }]}
+          onPress={() => {
+            hapticFeedback.medium();
+            navigation.navigate('AddExpense');
+          }}
+        >
+          <Text style={styles.emptyButtonText}>Add Transaction</Text>
+        </TouchableOpacity>
+      }
+    />
+  );
+
+  const renderLoading = () => (
+    <ScrollView style={styles.container}>
+      <View style={styles.topHeader}>
+        <View>
+          <Text style={[styles.greeting, { color: colors.textSecondary }]}>
+            Welcome back,
+          </Text>
+          <Text style={[styles.userName, { color: colors.text }]}>
+            {user?.name || 'User'}
+          </Text>
+        </View>
+      </View>
+      <SkeletonCard />
+      <View style={styles.summaryRow}>
+        <SkeletonCard />
+        <View style={{ width: spacing.md }} />
+        <SkeletonCard />
+      </View>
+      <View style={{ marginTop: spacing.lg }}>
+        <SkeletonTransactionItem />
+        <SkeletonTransactionItem />
+        <SkeletonTransactionItem />
+        <SkeletonTransactionItem />
+      </View>
+    </ScrollView>
+  );
+
+  if (loading) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
+        {renderLoading()}
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor={colors.primary} />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
 
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: colors.primary }]}>
-        <View>
-          <Text style={styles.headerTitle}>Dashboard</Text>
-          <Text style={styles.subHeader}>Welcome, {user?.name || 'User'}</Text>
-        </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <TouchableOpacity onPress={() => toggleTheme(isDark ? 'light' : 'dark')} style={{ marginRight: 15 }}>
-            <Text style={{ fontSize: 20 }}>{isDark ? '☀️' : '🌙'}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={signOut}>
-            <Text style={{ color: 'white', fontWeight: 'bold' }}>Logout</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Summary Cards */}
-      <View style={styles.summaryContainer}>
-        <View style={[styles.summaryBox, {
-          backgroundColor: isDark ? '#065f46' : '#d1fae5',
-          borderColor: isDark ? '#10b981' : '#6ee7b7',
-          borderWidth: 1
-        }]}>
-          <Text style={[styles.summaryLabel, { color: isDark ? '#d1fae5' : '#065f46' }]}>Income</Text>
-          <Text style={[styles.summaryValue, { color: isDark ? '#6ee7b7' : '#047857' }]}>
-            +{currencySymbol}{formatAmount(summary.income)}
-          </Text>
-        </View>
-        <View style={[styles.summaryBox, {
-          backgroundColor: isDark ? '#991b1b' : '#fee2e2',
-          borderColor: isDark ? '#ef4444' : '#fca5a5',
-          borderWidth: 1
-        }]}>
-          <Text style={[styles.summaryLabel, { color: isDark ? '#fecaca' : '#991b1b' }]}>Expense</Text>
-          <Text style={[styles.summaryValue, { color: isDark ? '#fca5a5' : '#b91c1c' }]}>
-            -{currencySymbol}{formatAmount(summary.expense)}
-          </Text>
-        </View>
-      </View>
-
-      {/* Balance */}
-      <View style={[styles.balanceCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-        <Text style={[styles.balanceLabel, { color: colors.subText }]}>Total Balance</Text>
-        <Text style={[styles.balanceValue, { color: summary.balance >= 0 ? colors.success : colors.danger }]}>
-          {currencySymbol}{formatAmount(summary.balance)}
-        </Text>
-      </View>
-
-      <View style={styles.actionContainer}>
-        <TouchableOpacity
-          style={[styles.addButton, { backgroundColor: colors.primary }]}
-          onPress={() => navigation.navigate('AddExpense')}
-        >
-          <Text style={styles.addButtonText}>+ Add Transaction</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={{ flex: 1 }}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Recent Transactions</Text>
-
-        {loading ? (
-          <ActivityIndicator size="large" color={colors.primary} />
-        ) : (
-          <SectionList
-            sections={sections}
-            renderItem={renderExpense}
-            renderSectionHeader={renderSectionHeader}
-            keyExtractor={item => item._id}
-            contentContainerStyle={{ paddingBottom: 20 }}
-            stickySectionHeadersEnabled={false}
-            showsVerticalScrollIndicator={false}
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={onRefresh}
-                tintColor={colors.primary}
-                colors={[colors.primary]}
-              />
-            }
-            ListEmptyComponent={
-              <Text style={{ textAlign: 'center', marginTop: 20, color: colors.subText }}>
-                No transactions found.
-              </Text>
-            }
+      <FlatList
+        data={transactions}
+        renderItem={renderTransaction}
+        keyExtractor={item => item._id}
+        ListHeaderComponent={renderHeader}
+        ListEmptyComponent={renderEmpty}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
           />
-        )}
-      </View>
+        }
+      />
+
+      {/* Floating Action Button */}
+      <FloatingActionButton
+        onPress={() => {
+          navigation.navigate('AddExpense');
+        }}
+        icon="add"
+      />
 
       {/* Action Sheet for Transaction Options */}
       <ActionSheet
         visible={showActionSheet}
         onClose={() => setShowActionSheet(false)}
         title="Transaction Options"
-        subtitle={selectedExpense ? `${selectedExpense.category?.name || 'Uncategorized'} - ${currencySymbol}${formatAmount(selectedExpense.amount)}` : ''}
+        subtitle={selectedExpense ? `${selectedExpense.category?.name || 'Uncategorized'} - ₹${selectedExpense.amount}` : ''}
         options={[
           {
             text: 'Edit Transaction',
@@ -334,76 +350,62 @@ export default function DashboardScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 15, paddingTop: 10 },
-  header: {
+  container: {
+    flex: 1,
+  },
+  listContent: {
+    padding: 20,
+    paddingTop: 50,
+    paddingBottom: 100,
+  },
+  topHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 15,
-    padding: 15,
-    borderRadius: 16,
-    marginTop: 35,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
+    marginBottom: 24,
   },
-  headerTitle: { fontSize: 22, fontWeight: '800', color: 'white' },
-  subHeader: { color: '#e0e7ff', fontSize: 13, marginTop: 2 },
-  summaryContainer: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 },
-  summaryBox: { flex: 0.48, padding: 12, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
-  summaryLabel: { fontSize: 12, fontWeight: '600', marginBottom: 4 },
-  summaryValue: { fontSize: 16, fontWeight: '800' },
-  balanceCard: {
-    padding: 12,
-    borderRadius: 16,
-    alignItems: 'center',
-    marginBottom: 15,
-    borderWidth: 1,
+  greeting: {
+    fontSize: 14,
+    fontWeight: '500',
+    marginBottom: 4,
   },
-  balanceLabel: { fontSize: 13, fontWeight: '500' },
-  balanceValue: { fontSize: 22, fontWeight: '800', marginTop: 2 },
-  sectionTitle: { fontSize: 18, fontWeight: '700', marginBottom: 10 },
-  card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 14,
-    borderRadius: 16,
-    marginBottom: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  iconContainer: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  iconText: {
-    fontSize: 18,
+  userName: {
+    fontSize: 24,
     fontWeight: 'bold',
   },
-  cardInfo: { flex: 1 },
-  category: { fontSize: 15, fontWeight: '600', marginBottom: 2 },
-  desc: { fontSize: 12 },
-  amountContainer: { alignItems: 'flex-end' },
-  amount: { fontSize: 15, fontWeight: '700' },
-  sectionHeader: {
-    fontSize: 13,
-    fontWeight: '600',
-    marginBottom: 8,
-    marginTop: 8,
-    paddingVertical: 4,
-    opacity: 0.7,
-    textTransform: 'uppercase'
+  headerActions: {
+    flexDirection: 'row',
+    gap: 12,
   },
-  actionContainer: { marginBottom: 15 },
-  addButton: { padding: 14, borderRadius: 14, alignItems: 'center', shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 8, elevation: 4 },
-  addButtonText: { color: 'white', fontWeight: 'bold', fontSize: 15 }
+  iconButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    marginBottom: 24,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  emptyButton: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 12,
+  },
+  emptyButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });

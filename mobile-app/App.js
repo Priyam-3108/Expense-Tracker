@@ -1,57 +1,53 @@
 import React, { useContext } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
 import { AuthProvider, AuthContext } from './src/context/AuthContext';
+import { ThemeProvider } from './src/context/ThemeContext';
+import { SecurityProvider, SecurityContext } from './src/context/SecurityContext';
 import { ActivityIndicator, View } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import LockScreen from './src/screens/LockScreen';
 
-// Import Screens
-import LoginScreen from './src/screens/LoginScreen';
-import RegisterScreen from './src/screens/RegisterScreen';
-import DashboardScreen from './src/screens/DashboardScreen';
-import AddExpenseScreen from './src/screens/AddExpenseScreen';
+// Import Navigators
+import AppNavigator from './src/navigation/AppNavigator';
+import AuthNavigator from './src/navigation/AuthNavigator';
 
-const Stack = createStackNavigator();
-
-function AppNavigator() {
+function RootNavigator() {
   const { userToken, isLoading } = useContext(AuthContext);
+  const { isLocked, isLoading: isSecurityLoading } = useContext(SecurityContext);
 
-  if (isLoading) {
+  if (isLoading || isSecurityLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color="#6366f1" />
       </View>
     );
   }
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {userToken == null ? (
-          // No token found, user is not signed in
-          <>
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Register" component={RegisterScreen} />
-          </>
-        ) : (
-          // User is signed in
-          <>
-            <Stack.Screen name="Dashboard" component={DashboardScreen} />
-            <Stack.Screen name="AddExpense" component={AddExpenseScreen} />
-          </>
-        )}
-      </Stack.Navigator>
+      {userToken == null ? <AuthNavigator /> : (
+        <>
+          <AppNavigator />
+          {/* Overlay LockScreen if locked */}
+          {isLocked && <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999 }}>
+            <LockScreen />
+          </View>}
+        </>
+      )}
     </NavigationContainer>
   );
 }
 
-import { ThemeProvider } from './src/context/ThemeContext';
-
 export default function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <AppNavigator />
-      </AuthProvider>
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <SecurityProvider>
+            <RootNavigator />
+          </SecurityProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }
