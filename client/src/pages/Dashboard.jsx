@@ -6,6 +6,7 @@ import { useDebt } from '../context/DebtContext'
 import { expenseService } from '../services/expenseService'
 import { formatCurrency } from '../utils/helpers'
 import { format } from 'date-fns'
+import AnimatedNumberOdometer from '../components/AnimatedNumberOdometer'
 import {
   TrendingUp,
   TrendingDown,
@@ -105,7 +106,12 @@ const Dashboard = () => {
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Expenses</p>
               <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
-                {loading ? '...' : formatCurrency(totalExpenses, currency)}
+                <AnimatedNumberOdometer
+                  value={totalExpenses}
+                  currency={currency}
+                  isLoading={loading}
+                  duration={4500}
+                />
               </p>
             </div>
             <div className="p-3 bg-red-100 rounded-lg">
@@ -120,7 +126,12 @@ const Dashboard = () => {
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Income</p>
               <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
-                {loading ? '...' : formatCurrency(totalIncome, currency)}
+                <AnimatedNumberOdometer
+                  value={totalIncome}
+                  currency={currency}
+                  isLoading={loading}
+                  duration={4500}
+                />
               </p>
             </div>
             <div className="p-3 bg-green-100 rounded-lg">
@@ -135,7 +146,12 @@ const Dashboard = () => {
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Net Amount</p>
               <p className={`text-3xl font-bold mt-2 ${netAmount >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                {loading ? '...' : formatCurrency(netAmount, currency)}
+                <AnimatedNumberOdometer
+                  value={netAmount}
+                  currency={currency}
+                  isLoading={loading}
+                  duration={4500}
+                />
               </p>
             </div>
             <div className="p-3 bg-blue-100 rounded-lg">
@@ -145,33 +161,43 @@ const Dashboard = () => {
         </div>
 
         {/* Debt Summary */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+        { totalPayable > 0 && <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Outstanding Payable</p>
               <p className="text-3xl font-bold text-red-600 dark:text-red-400 mt-2">
-                {formatCurrency(totalPayable, currency)}
+                <AnimatedNumberOdometer
+                  value={totalPayable}
+                  currency={currency}
+                  isLoading={false}
+                  duration={4500}
+                />
               </p>
             </div>
             <div className="p-3 bg-orange-100 rounded-lg">
               <ArrowDownTrayIcon className="h-8 w-8 text-orange-600" />
             </div>
           </div>
-        </div>
+        </div>}
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+        { totalReceivable > 0 && <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Outstanding Receivable</p>
               <p className="text-3xl font-bold text-green-600 dark:text-green-400 mt-2">
-                {formatCurrency(totalReceivable, currency)}
+                <AnimatedNumberOdometer
+                  value={totalReceivable}
+                  currency={currency}
+                  isLoading={false}
+                  duration={4500}
+                />
               </p>
             </div>
             <div className="p-3 bg-teal-100 rounded-lg">
               <ArrowUpTrayIcon className="h-8 w-8 text-teal-600" />
             </div>
           </div>
-        </div>
+        </div>}
       </div>
 
       {/* Main Content Grid */}
