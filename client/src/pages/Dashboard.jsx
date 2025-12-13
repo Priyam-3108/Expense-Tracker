@@ -36,14 +36,15 @@ const Dashboard = () => {
   const { debts, loadDebts } = useDebt()
   const [recentTransactions, setRecentTransactions] = useState([])
   const [loadingRecent, setLoadingRecent] = useState(true)
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
   const navigate = useNavigate()
 
   useEffect(() => {
     loadStats()
-    loadTrends()
+    loadTrends(selectedYear)
     loadDebts()
     fetchRecentTransactions()
-  }, [loadStats, loadTrends, loadDebts])
+  }, [loadStats, loadTrends, loadDebts, selectedYear])
 
   const fetchRecentTransactions = async () => {
     try {
@@ -72,6 +73,10 @@ const Dashboard = () => {
     Expense: item.expenses,
     Net: item.net
   })) || []
+
+  // Generate available years (from 2020 to current year)
+  const currentYear = new Date().getFullYear()
+  const availableYears = Array.from({ length: currentYear - 2019 }, (_, i) => currentYear - i)
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -179,10 +184,22 @@ const Dashboard = () => {
         {/* Financial Overview Chart */}
         <div className="xl:col-span-2">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
-              <PieChart className="h-5 w-5 mr-2" />
-              Financial Overview
-            </h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
+                <PieChart className="h-5 w-5 mr-2" />
+                Financial Overview
+              </h2>
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(Number(e.target.value))}
+                className="pl-3 pr-8 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors appearance-none bg-no-repeat bg-right"
+                style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 20 20\'%3E%3Cpath stroke=\'%236B7280\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M6 8l4 4 4-4\'/%3E%3C/svg%3E")', backgroundPosition: 'right 0.5rem center', backgroundSize: '1.5em 1.5em' }}
+              >
+                {availableYears.map(year => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+            </div>
             <div className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
