@@ -117,9 +117,6 @@ const CategorySelector = ({
                     <div className="text-sm font-medium text-gray-900 dark:text-white">
                       {category.name}
                     </div>
-                    {category.isDefault && (
-                      <div className="text-xs text-gray-500 dark:text-gray-400">Default category</div>
-                    )}
                   </div>
                 </button>
               ))
