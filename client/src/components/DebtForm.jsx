@@ -87,18 +87,18 @@ export default function DebtForm({ isOpen, onClose, editDebt = null, type = 'bor
                     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
                 </Transition.Child>
 
-                <div className="fixed inset-0 overflow-y-auto">
-                    <div className="flex min-h-full items-center justify-center p-4">
+                <div className="fixed inset-0 flex flex-col justify-end md:justify-center md:items-center md:p-4">
+                    <div className="w-full md:max-w-lg">
                         <Transition.Child
                             as={Fragment}
                             enter="ease-out duration-300"
-                            enterFrom="opacity-0 scale-95"
-                            enterTo="opacity-100 scale-100"
+                            enterFrom="opacity-0 translate-y-full md:translate-y-4"
+                            enterTo="opacity-100 translate-y-0"
                             leave="ease-in duration-200"
-                            leaveFrom="opacity-100 scale-100"
-                            leaveTo="opacity-0 scale-95"
+                            leaveFrom="opacity-100 translate-y-0"
+                            leaveTo="opacity-0 translate-y-full md:translate-y-4"
                         >
-                            <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-2xl transition-all">
+                            <Dialog.Panel className="w-full transform overflow-y-auto rounded-t-2xl md:rounded-2xl bg-white dark:bg-gray-800 shadow-2xl transition-all" style={{ maxHeight: '95vh' }}>
                                 {/* Header */}
                                 <div className={`px-6 py-5 ${type === 'borrowed' ? 'bg-gradient-to-r from-red-500 to-orange-500' : 'bg-gradient-to-r from-green-500 to-teal-500'}`}>
                                     <div className="flex items-center justify-between">
@@ -108,9 +108,10 @@ export default function DebtForm({ isOpen, onClose, editDebt = null, type = 'bor
                                         </Dialog.Title>
                                         <button
                                             onClick={onClose}
-                                            className="rounded-lg p-1 text-white/80 hover:bg-white/20 hover:text-white transition-colors"
+                                            aria-label="Close"
+                                            className="rounded-lg p-2 text-white/80 hover:bg-white/20 hover:text-white transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center"
                                         >
-                                            <XMarkIcon className="h-6 w-6" />
+                                            <XMarkIcon className="h-5 w-5" />
                                         </button>
                                     </div>
                                     <p className="mt-1 text-sm text-white/90">
@@ -167,7 +168,7 @@ export default function DebtForm({ isOpen, onClose, editDebt = null, type = 'bor
                                     </div>
 
                                     {/* Dates */}
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div>
                                             <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
                                                 <CalendarIcon className="h-4 w-4 inline mr-1.5" />

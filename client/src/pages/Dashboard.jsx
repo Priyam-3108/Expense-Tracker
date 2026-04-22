@@ -97,54 +97,56 @@ const Dashboard = () => {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">Welcome back, {user?.name}! Here's your financial overview.</p>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 md:p-6">
+        <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-1 text-sm md:text-base">
+          Welcome back, {user?.name}! Here’s your financial overview.
+        </p>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {/* Total Expenses */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 md:p-6 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Expenses</p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+              <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mt-1 md:mt-2">
                 {loading ? '...' : formatCurrency(totalExpenses, currency)}
               </p>
             </div>
-            <div className="p-3 bg-red-100 rounded-lg">
-              <TrendingDown className="h-8 w-8 text-red-600" />
+            <div className="p-2.5 md:p-3 bg-red-100 rounded-lg">
+              <TrendingDown className="h-6 w-6 md:h-8 md:w-8 text-red-600" />
             </div>
           </div>
         </div>
 
         {/* Total Income */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 md:p-6 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Income</p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+              <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mt-1 md:mt-2">
                 {loading ? '...' : formatCurrency(totalIncome, currency)}
               </p>
             </div>
-            <div className="p-3 bg-green-100 rounded-lg">
-              <TrendingUp className="h-8 w-8 text-green-600" />
+            <div className="p-2.5 md:p-3 bg-green-100 rounded-lg">
+              <TrendingUp className="h-6 w-6 md:h-8 md:w-8 text-green-600" />
             </div>
           </div>
         </div>
 
         {/* Net Amount */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 md:p-6 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Net Amount</p>
-              <p className={`text-3xl font-bold mt-2 ${netAmount >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+              <p className={`text-2xl md:text-3xl font-bold mt-1 md:mt-2 ${netAmount >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                 {loading ? '...' : formatCurrency(netAmount, currency)}
               </p>
             </div>
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <Wallet className="h-8 w-8 text-blue-600" />
+            <div className="p-2.5 md:p-3 bg-blue-100 rounded-lg">
+              <Wallet className="h-6 w-6 md:h-8 md:w-8 text-blue-600" />
             </div>
           </div>
         </div>
@@ -183,9 +185,9 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         {/* Financial Overview Chart */}
         <div className="xl:col-span-2">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 md:p-6">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-4 md:mb-6">
+              <h2 className="text-base md:text-xl font-semibold text-gray-900 dark:text-white flex items-center">
                 <PieChart className="h-5 w-5 mr-2" />
                 Financial Overview
               </h2>
@@ -200,7 +202,7 @@ const Dashboard = () => {
                 ))}
               </select>
             </div>
-            <div className="h-[300px] w-full">
+            <div className="h-[220px] md:h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <defs>
@@ -253,12 +255,12 @@ const Dashboard = () => {
         {/* Quick Actions & Recent Activity */}
         <div className="xl:col-span-1 space-y-8">
           {/* Quick Actions */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 md:p-6">
+            <h2 className="text-base md:text-xl font-semibold text-gray-900 dark:text-white mb-4 md:mb-6 flex items-center">
               <Activity className="h-5 w-5 mr-2" />
               Quick Actions
             </h2>
-            <div className="space-y-4">
+            <div className="grid grid-cols-2 md:grid-cols-1 gap-3">
               <button
                 onClick={() => navigate('/app/expenses', { state: { action: 'add_expense' } })}
                 className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 transition-colors"
@@ -287,9 +289,9 @@ const Dashboard = () => {
           </div>
 
           {/* Recent Activity */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 md:p-6">
+            <div className="flex items-center justify-between mb-4 md:mb-6">
+              <h2 className="text-base md:text-xl font-semibold text-gray-900 dark:text-white flex items-center">
                 <Calendar className="h-5 w-5 mr-2" />
                 Recent Activity
               </h2>
@@ -321,7 +323,7 @@ const Dashboard = () => {
                         )}
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[120px]">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[140px] md:max-w-[120px]">
                           {transaction.description || transaction.category?.name}
                         </p>
                         <p className="text-xs text-gray-500">

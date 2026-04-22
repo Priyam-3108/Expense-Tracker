@@ -14,6 +14,7 @@ import {
 import { useState, useRef, useEffect } from 'react'
 import { cn } from '../utils/cn'
 import ThemeToggle from './ThemeToggle'
+import BottomNav from './BottomNav'
 
 const currencySymbols = {
   USD: '$',
@@ -47,6 +48,16 @@ const Layout = () => {
     { name: 'Profile', href: '/app/profile', icon: User },
   ]
 
+  // Lock body scroll when mobile sidebar is open
+  useEffect(() => {
+    if (sidebarOpen) {
+      document.body.classList.add('modal-open')
+    } else {
+      document.body.classList.remove('modal-open')
+    }
+    return () => document.body.classList.remove('modal-open')
+  }, [sidebarOpen])
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -61,13 +72,12 @@ const Layout = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Mobile sidebar overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-gray-600 bg-opacity-75 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+      {/* Mobile sidebar overlay — always rendered, toggled by opacity for smooth fade */}
+      <div
+        className={`fixed inset-0 z-40 bg-gray-600 bg-opacity-75 lg:hidden transition-opacity duration-300 ${sidebarOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        onClick={() => setSidebarOpen(false)}
+        aria-hidden="true"
+      />
 
       {/* Sidebar */}
       <div className={cn(
@@ -85,7 +95,8 @@ const Layout = () => {
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              aria-label="Close sidebar"
+              className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               <X size={20} />
             </button>
@@ -102,7 +113,7 @@ const Layout = () => {
                   onClick={() => setSidebarOpen(false)}
                   className={({ isActive }) =>
                     cn(
-                      "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                      "flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors min-h-[44px]",
                       isActive
                         ? "bg-primary-100 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400"
                         : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
@@ -127,9 +138,10 @@ const Layout = () => {
             <div className="flex items-center lg:hidden">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="p-2 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                aria-label="Open navigation menu"
+                className="p-2.5 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
-                <Menu size={20} />
+                <Menu size={22} />
               </button>
             </div>
 
@@ -188,13 +200,16 @@ const Layout = () => {
           </div>
         </nav>
 
-        {/* Page content */}
-        <main className="min-h-screen p-4 sm:p-6 lg:p-8 xl:p-10">
+        {/* Page content — extra bottom padding on mobile for bottom nav */}
+        <main className="min-h-screen p-4 sm:p-6 lg:p-8 xl:p-10 pb-20 lg:pb-8 xl:pb-10">
           <div className="w-full max-w-none">
             <Outlet />
           </div>
         </main>
       </div>
+
+      {/* Sticky bottom navigation — mobile only */}
+      <BottomNav />
     </div>
   )
 }

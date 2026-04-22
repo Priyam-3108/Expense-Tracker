@@ -2,6 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  html {
+    /* Prevents iOS font scaling on orientation change */
+    -webkit-text-size-adjust: 100%;
+    /* Removes 300ms tap delay on mobile */
+    touch-action: manipulation;
+  }
+}
+
+/* Bottom-sheet slide-up animation */
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Safe-area bottom padding for bottom nav (iPhone notch/home bar) */
+.pb-safe {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+.mb-safe {
+  margin-bottom: max(4rem, calc(4rem + env(safe-area-inset-bottom)));
+}
+
 /* Custom scrollbar for bulk expenses */
 .bulk-expenses-scroll::-webkit-scrollbar {
   width: 8px;
@@ -179,4 +213,16 @@
 .fade-exit-active {
   opacity: 0;
   transition: opacity 200ms ease-in;
+}
+
+/* Prevent body scroll when a modal is open */
+body.modal-open {
+  overflow: hidden;
+}
+
+/* Responsive table helpers */
+@layer utilities {
+  .table-responsive {
+    @apply w-full overflow-x-auto -webkit-overflow-scrolling-touch;
+  }
 }

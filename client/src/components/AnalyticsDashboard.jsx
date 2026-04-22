@@ -275,25 +275,27 @@ const AnalyticsDashboard = ({
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-row items-start justify-between gap-3">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                    <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white">
                         {isSharedView ? 'Shared Analytics' : 'Analytics'}
                     </h1>
-                    <p className="mt-2 text-gray-600 dark:text-gray-400">
+                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                         {isSharedView ? 'Viewing shared expense analytics' : 'View your expense analytics and insights'}
                     </p>
                 </div>
                 {!isSharedView && onShare && (
                     <button
                         onClick={onShare}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${shareEnabled
-                                ? 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400'
-                                : 'bg-blue-600 text-white hover:bg-blue-700'
-                            }`}
+                        className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors text-sm font-medium min-h-[40px] flex-shrink-0 ${
+                            shareEnabled
+                                ? 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800'
+                                : 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm'
+                        }`}
                     >
-                        <Share2 size={18} />
-                        {shareEnabled ? 'Sharing Enabled' : 'Share Analytics'}
+                        <Share2 size={16} />
+                        <span className="hidden sm:inline">{shareEnabled ? 'Sharing Enabled' : 'Share Analytics'}</span>
+                        <span className="sm:hidden">{shareEnabled ? 'Shared' : 'Share'}</span>
                     </button>
                 )}
             </div>
@@ -301,7 +303,7 @@ const AnalyticsDashboard = ({
             {/* Filters */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700">
                 {/* Filter Header */}
-                <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+                <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
                             <Filter size={20} className="text-gray-700 dark:text-gray-300" />
@@ -314,8 +316,8 @@ const AnalyticsDashboard = ({
                 </div>
 
                 {/* Filter Content */}
-                <div className="p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="p-4 sm:p-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         {/* Date Range */}
                         <div className="space-y-2">
                             <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
@@ -405,7 +407,7 @@ const AnalyticsDashboard = ({
                                         key={preset.value}
                                         type="button"
                                         onClick={() => applyQuickFilter(preset.value)}
-                                        className="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-gray-400 dark:hover:border-gray-500 hover:shadow-sm transition-all duration-200"
+                                        className="px-3 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-gray-400 dark:hover:border-gray-500 hover:shadow-sm transition-all duration-200 min-h-[36px]"
                                     >
                                         {preset.label}
                                     </button>
@@ -430,52 +432,52 @@ const AnalyticsDashboard = ({
             </div>
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-lg border border-blue-200 dark:border-blue-800 p-6 shadow-sm">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl border border-blue-200 dark:border-blue-800 p-4 sm:p-5 shadow-sm">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-blue-700 dark:text-blue-300">Total Expenses</p>
-                            <p className="mt-2 text-2xl font-bold text-blue-900 dark:text-blue-100">
+                            <p className="text-xs sm:text-sm font-medium text-blue-700 dark:text-blue-300">Total Expenses</p>
+                            <p className="mt-1 text-lg sm:text-2xl font-bold text-blue-900 dark:text-blue-100 leading-tight">
                                 {formatCurrency(summary.totalExpenses, currency)}
                             </p>
                             <p className="mt-1 text-xs text-blue-600 dark:text-blue-400">
                                 {summary.expenseCount} transaction{summary.expenseCount !== 1 ? 's' : ''}
                             </p>
                         </div>
-                        <div className="p-3 bg-blue-200 dark:bg-blue-800/40 rounded-lg">
-                            <ArrowDownCircle size={24} className="text-blue-700 dark:text-blue-300" />
+                        <div className="p-2 sm:p-3 bg-blue-200 dark:bg-blue-800/40 rounded-lg flex-shrink-0">
+                            <ArrowDownCircle size={20} className="text-blue-700 dark:text-blue-300" />
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-800/20 rounded-lg border border-emerald-200 dark:border-emerald-800 p-6 shadow-sm">
+                <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-800/20 rounded-xl border border-emerald-200 dark:border-emerald-800 p-4 sm:p-5 shadow-sm">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Total Income</p>
-                            <p className="mt-2 text-2xl font-bold text-emerald-900 dark:text-emerald-100">
+                            <p className="text-xs sm:text-sm font-medium text-emerald-700 dark:text-emerald-300">Total Income</p>
+                            <p className="mt-1 text-lg sm:text-2xl font-bold text-emerald-900 dark:text-emerald-100 leading-tight">
                                 {formatCurrency(summary.totalIncome, currency)}
                             </p>
                             <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-400">
                                 {summary.incomeCount} transaction{summary.incomeCount !== 1 ? 's' : ''}
                             </p>
                         </div>
-                        <div className="p-3 bg-emerald-200 dark:bg-emerald-800/40 rounded-lg">
-                            <ArrowUpCircle size={24} className="text-emerald-700 dark:text-emerald-300" />
+                        <div className="p-2 sm:p-3 bg-emerald-200 dark:bg-emerald-800/40 rounded-lg flex-shrink-0">
+                            <ArrowUpCircle size={20} className="text-emerald-700 dark:text-emerald-300" />
                         </div>
                     </div>
                 </div>
 
-                <div className={`bg-gradient-to-br rounded-lg border p-6 shadow-sm ${summary.netAmount >= 0
+                <div className={`bg-gradient-to-br rounded-xl border p-4 sm:p-5 shadow-sm ${summary.netAmount >= 0
                     ? 'from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-800/20 border-emerald-200 dark:border-emerald-800'
                     : 'from-rose-50 to-rose-100 dark:from-rose-900/20 dark:to-rose-800/20 border-rose-200 dark:border-rose-800'
                     }`}>
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className={`text-sm font-medium ${summary.netAmount >= 0 ? 'text-emerald-700 dark:text-emerald-300' : 'text-rose-700 dark:text-rose-300'
+                            <p className={`text-xs sm:text-sm font-medium ${summary.netAmount >= 0 ? 'text-emerald-700 dark:text-emerald-300' : 'text-rose-700 dark:text-rose-300'
                                 }`}>
                                 Net Balance
                             </p>
-                            <p className={`mt-2 text-2xl font-bold ${summary.netAmount >= 0 ? 'text-emerald-900 dark:text-emerald-100' : 'text-rose-900 dark:text-rose-100'
+                            <p className={`mt-1 text-lg sm:text-2xl font-bold leading-tight ${summary.netAmount >= 0 ? 'text-emerald-900 dark:text-emerald-100' : 'text-rose-900 dark:text-rose-100'
                                 }`}>
                                 {formatCurrency(Math.abs(summary.netAmount), currency)}
                             </p>
@@ -498,19 +500,19 @@ const AnalyticsDashboard = ({
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-5 shadow-sm">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Avg Daily Spending</p>
-                            <p className="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
+                            <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Avg Daily Spending</p>
+                            <p className="mt-1 text-lg sm:text-2xl font-bold text-gray-900 dark:text-white leading-tight">
                                 {formatCurrency(summary.avgDailyExpense, currency)}
                             </p>
                             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                                 Over {summary.daysDiff} day{summary.daysDiff !== 1 ? 's' : ''}
                             </p>
                         </div>
-                        <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                            <Activity size={24} className="text-gray-600 dark:text-gray-300" />
+                        <div className="p-2 sm:p-3 bg-gray-100 dark:bg-gray-700 rounded-lg flex-shrink-0">
+                            <Activity size={20} className="text-gray-600 dark:text-gray-300" />
                         </div>
                     </div>
                 </div>
@@ -519,16 +521,17 @@ const AnalyticsDashboard = ({
             {/* Charts Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Spending Trends Line Chart */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
-                    <div className="flex items-center justify-between mb-4">
+                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6 shadow-sm">
+                    <div className="flex items-center justify-between mb-3 sm:mb-4">
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Spending Trends</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Daily expenses and income over time</p>
+                            <h3 className="text-sm sm:text-lg font-semibold text-gray-900 dark:text-white">Spending Trends</h3>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">Daily expenses and income over time</p>
                         </div>
-                        <Activity size={20} className="text-gray-400 dark:text-gray-500" />
+                        <Activity size={18} className="text-gray-400 dark:text-gray-500" />
                     </div>
                     {trendData.length > 0 ? (
-                        <ResponsiveContainer width="100%" height={300}>
+                        <div className="h-[200px] sm:h-[300px]">
+                        <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={trendData}>
                                 <defs>
                                     <linearGradient id="colorExpenses" x1="0" y1="0" x2="0" y2="1">
@@ -544,7 +547,7 @@ const AnalyticsDashboard = ({
                                 <XAxis
                                     dataKey="date"
                                     stroke="#6B7280"
-                                    tick={{ fontSize: 12 }}
+                                    tick={{ fontSize: 10 }}
                                     angle={-45}
                                     textAnchor="end"
                                     height={60}
@@ -592,24 +595,26 @@ const AnalyticsDashboard = ({
                                 />
                             </AreaChart>
                         </ResponsiveContainer>
+                        </div>
                     ) : (
-                        <div className="flex items-center justify-center h-[300px] text-gray-400 dark:text-gray-500">
+                        <div className="flex items-center justify-center h-[200px] sm:h-[300px] text-gray-400 dark:text-gray-500">
                             <p>No data available for the selected period</p>
                         </div>
                     )}
                 </div>
 
                 {/* Category Breakdown Pie Chart */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
-                    <div className="flex items-center justify-between mb-4">
+                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6 shadow-sm">
+                    <div className="flex items-center justify-between mb-3 sm:mb-4">
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Category Breakdown</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Expense distribution by category</p>
+                            <h3 className="text-sm sm:text-lg font-semibold text-gray-900 dark:text-white">Category Breakdown</h3>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">Expense distribution by category</p>
                         </div>
-                        <PieChartIcon size={20} className="text-gray-400 dark:text-gray-500" />
+                        <PieChartIcon size={18} className="text-gray-400 dark:text-gray-500" />
                     </div>
                     {categoryChartData.length > 0 ? (
-                        <ResponsiveContainer width="100%" height={300}>
+                        <div className="h-[200px] sm:h-[300px]">
+                        <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
                                 <Pie
                                     data={categoryChartData}
@@ -638,24 +643,26 @@ const AnalyticsDashboard = ({
                                 />
                             </PieChart>
                         </ResponsiveContainer>
+                        </div>
                     ) : (
-                        <div className="flex items-center justify-center h-[300px] text-gray-400 dark:text-gray-500">
+                        <div className="flex items-center justify-center h-[200px] sm:h-[300px] text-gray-400 dark:text-gray-500">
                             <p>No category data available</p>
                         </div>
                     )}
                 </div>
 
                 {/* Monthly Comparison Bar Chart */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm lg:col-span-2">
-                    <div className="flex items-center justify-between mb-4">
+                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6 shadow-sm lg:col-span-2">
+                    <div className="flex items-center justify-between mb-3 sm:mb-4">
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Monthly Comparison</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Expenses and income by month</p>
+                            <h3 className="text-sm sm:text-lg font-semibold text-gray-900 dark:text-white">Monthly Comparison</h3>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">Expenses and income by month</p>
                         </div>
-                        <BarChart3 size={20} className="text-gray-400 dark:text-gray-500" />
+                        <BarChart3 size={18} className="text-gray-400 dark:text-gray-500" />
                     </div>
                     {monthlyData.length > 0 ? (
-                        <ResponsiveContainer width="100%" height={300} className="bg-transparent">
+                        <div className="h-[200px] sm:h-[300px]">
+                        <ResponsiveContainer width="100%" height="100%" className="bg-transparent">
                             <BarChart data={monthlyData} style={{ backgroundColor: 'transparent' }}>
                                 <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#374151' : '#D1D5DB'} fill="transparent" vertical={false} />
                                 <XAxis
@@ -701,8 +708,9 @@ const AnalyticsDashboard = ({
                                 />
                             </BarChart>
                         </ResponsiveContainer>
+                        </div>
                     ) : (
-                        <div className="flex items-center justify-center h-[300px] text-gray-400 dark:text-gray-500">
+                        <div className="flex items-center justify-center h-[200px] sm:h-[300px] text-gray-400 dark:text-gray-500">
                             <p>No monthly data available</p>
                         </div>
                     )}
@@ -710,10 +718,10 @@ const AnalyticsDashboard = ({
             </div>
 
             {/* Top Categories & Insights */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 {/* Top Categories */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Top Spending Categories</h3>
+                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6 shadow-sm">
+                    <h3 className="text-sm sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">Top Spending Categories</h3>
                     {topCategories.length > 0 ? (
                         <div className="space-y-4">
                             {topCategories.map((category, index) => {
@@ -759,92 +767,82 @@ const AnalyticsDashboard = ({
                 </div>
 
                 {/* Insights */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Insights</h3>
-                    <div className="space-y-4">
+                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6 shadow-sm">
+                    <h3 className="text-sm sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">Insights</h3>
+                    <div className="space-y-2.5 sm:space-y-3">
                         {summary.totalExpenses > 0 && (
-                            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800/40">
-                                <div className="flex items-start gap-3">
-                                    <div className="p-2 bg-blue-200 dark:bg-blue-800/40 rounded-lg">
-                                        <TrendingUp size={18} className="text-blue-700 dark:text-blue-300" />
-                                    </div>
-                                    <div>
-                                        <p className="font-medium text-blue-900 dark:text-blue-100">Total Transactions</p>
-                                        <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
-                                            You have {summary.transactionCount} transaction{summary.transactionCount !== 1 ? 's' : ''} in the selected period
-                                        </p>
-                                    </div>
+                            <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800/40">
+                                <div className="p-1.5 sm:p-2 bg-blue-200 dark:bg-blue-800/40 rounded-lg flex-shrink-0">
+                                    <TrendingUp size={16} className="text-blue-700 dark:text-blue-300" />
+                                </div>
+                                <div className="min-w-0">
+                                    <p className="text-xs sm:text-sm font-semibold text-blue-900 dark:text-blue-100">Total Transactions</p>
+                                    <p className="text-xs text-blue-700 dark:text-blue-300 mt-0.5 leading-snug">
+                                        {summary.transactionCount} transaction{summary.transactionCount !== 1 ? 's' : ''} in this period
+                                    </p>
                                 </div>
                             </div>
                         )}
 
                         {summary.avgDailyExpense > 0 && (
-                            <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-100 dark:border-emerald-800/40">
-                                <div className="flex items-start gap-3">
-                                    <div className="p-2 bg-emerald-200 dark:bg-emerald-800/40 rounded-lg">
-                                        <Calendar size={18} className="text-emerald-700 dark:text-emerald-300" />
-                                    </div>
-                                    <div>
-                                        <p className="font-medium text-emerald-900 dark:text-emerald-100">Average Daily Spending</p>
-                                        <p className="text-sm text-emerald-700 dark:text-emerald-300 mt-1">
-                                            You spend an average of {formatCurrency(summary.avgDailyExpense, currency)} per day
-                                        </p>
-                                    </div>
+                            <div className="flex items-center gap-3 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-100 dark:border-emerald-800/40">
+                                <div className="p-1.5 sm:p-2 bg-emerald-200 dark:bg-emerald-800/40 rounded-lg flex-shrink-0">
+                                    <Calendar size={16} className="text-emerald-700 dark:text-emerald-300" />
+                                </div>
+                                <div className="min-w-0">
+                                    <p className="text-xs sm:text-sm font-semibold text-emerald-900 dark:text-emerald-100">Avg Daily Spending</p>
+                                    <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-0.5 leading-snug">
+                                        {formatCurrency(summary.avgDailyExpense, currency)} per day
+                                    </p>
                                 </div>
                             </div>
                         )}
 
                         {topCategories.length > 0 && (
-                            <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-100 dark:border-purple-800/40">
-                                <div className="flex items-start gap-3">
-                                    <div className="p-2 bg-purple-200 dark:bg-purple-800/40 rounded-lg">
-                                        <PieChartIcon size={18} className="text-purple-700 dark:text-purple-300" />
-                                    </div>
-                                    <div>
-                                        <p className="font-medium text-purple-900 dark:text-purple-100">Top Category</p>
-                                        <p className="text-sm text-purple-700 dark:text-purple-300 mt-1">
-                                            {topCategories[0]?.name} is your highest spending category at {formatCurrency(topCategories[0]?.value || 0, currency)}
-                                        </p>
-                                    </div>
+                            <div className="flex items-center gap-3 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-100 dark:border-purple-800/40">
+                                <div className="p-1.5 sm:p-2 bg-purple-200 dark:bg-purple-800/40 rounded-lg flex-shrink-0">
+                                    <PieChartIcon size={16} className="text-purple-700 dark:text-purple-300" />
+                                </div>
+                                <div className="min-w-0">
+                                    <p className="text-xs sm:text-sm font-semibold text-purple-900 dark:text-purple-100">Top Category</p>
+                                    <p className="text-xs text-purple-700 dark:text-purple-300 mt-0.5 leading-snug">
+                                        <span className="font-medium">{topCategories[0]?.name}</span> — {formatCurrency(topCategories[0]?.value || 0, currency)}
+                                    </p>
                                 </div>
                             </div>
                         )}
 
                         {summary.netAmount < 0 && (
-                            <div className="p-4 bg-rose-50 dark:bg-rose-900/20 rounded-lg border border-rose-100 dark:border-rose-800/40">
-                                <div className="flex items-start gap-3">
-                                    <div className="p-2 bg-rose-200 dark:bg-rose-800/40 rounded-lg">
-                                        <TrendingDown size={18} className="text-rose-700 dark:text-rose-300" />
-                                    </div>
-                                    <div>
-                                        <p className="font-medium text-rose-900 dark:text-rose-100">Spending Alert</p>
-                                        <p className="text-sm text-rose-700 dark:text-rose-300 mt-1">
-                                            Your expenses exceed income by {formatCurrency(Math.abs(summary.netAmount), currency)}
-                                        </p>
-                                    </div>
+                            <div className="flex items-center gap-3 p-3 bg-rose-50 dark:bg-rose-900/20 rounded-xl border border-rose-100 dark:border-rose-800/40">
+                                <div className="p-1.5 sm:p-2 bg-rose-200 dark:bg-rose-800/40 rounded-lg flex-shrink-0">
+                                    <TrendingDown size={16} className="text-rose-700 dark:text-rose-300" />
+                                </div>
+                                <div className="min-w-0">
+                                    <p className="text-xs sm:text-sm font-semibold text-rose-900 dark:text-rose-100">Spending Alert</p>
+                                    <p className="text-xs text-rose-700 dark:text-rose-300 mt-0.5 leading-snug">
+                                        Expenses exceed income by {formatCurrency(Math.abs(summary.netAmount), currency)}
+                                    </p>
                                 </div>
                             </div>
                         )}
 
                         {summary.netAmount >= 0 && summary.totalIncome > 0 && (
-                            <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg border border-emerald-100 dark:border-emerald-800/40">
-                                <div className="flex items-start gap-3">
-                                    <div className="p-2 bg-emerald-200 dark:bg-emerald-800/40 rounded-lg">
-                                        <TrendingUp size={18} className="text-emerald-700 dark:text-emerald-300" />
-                                    </div>
-                                    <div>
-                                        <p className="font-medium text-emerald-900 dark:text-emerald-100">Positive Balance</p>
-                                        <p className="text-sm text-emerald-700 dark:text-emerald-300 mt-1">
-                                            Great! You have a positive net balance of {formatCurrency(summary.netAmount, currency)}
-                                        </p>
-                                    </div>
+                            <div className="flex items-center gap-3 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-100 dark:border-emerald-800/40">
+                                <div className="p-1.5 sm:p-2 bg-emerald-200 dark:bg-emerald-800/40 rounded-lg flex-shrink-0">
+                                    <TrendingUp size={16} className="text-emerald-700 dark:text-emerald-300" />
+                                </div>
+                                <div className="min-w-0">
+                                    <p className="text-xs sm:text-sm font-semibold text-emerald-900 dark:text-emerald-100">Positive Balance</p>
+                                    <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-0.5 leading-snug">
+                                        Net balance of {formatCurrency(summary.netAmount, currency)} 🎉
+                                    </p>
                                 </div>
                             </div>
                         )}
 
                         {filteredExpenses.length === 0 && (
-                            <div className="text-center py-8 text-gray-400 dark:text-gray-500">
-                                <p>No data available for the selected filters</p>
+                            <div className="text-center py-6 text-gray-400 dark:text-gray-500">
+                                <p className="text-sm">No data available for the selected filters</p>
                             </div>
                         )}
                     </div>

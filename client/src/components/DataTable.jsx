@@ -75,7 +75,7 @@ const DataTable = ({
                         placeholder="Search expenses..."
                         value={searchValue || ''}
                         onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
-                        className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-10 py-2.5 text-sm focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 transition-colors"
+                        className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-10 py-3 text-sm focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 transition-colors"
                     />
                 </div>
                 {totalResults !== undefined && (
@@ -192,9 +192,9 @@ const DataTable = ({
                 </div>
 
                 {/* Pagination */}
-                <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
                     <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                        <span>Page</span>
+                        <span className="hidden sm:inline">Page</span>
                         <span className="font-medium">
                             {table.getState().pagination.pageIndex + 1} of{' '}
                             {table.getPageCount()}
@@ -202,42 +202,46 @@ const DataTable = ({
                     </div>
                     <div className="flex items-center gap-2">
                         <button
-                            className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="p-2.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed min-h-[40px] min-w-[40px] flex items-center justify-center"
                             onClick={() => {
                                 if (manualPagination && onPageChange) onPageChange(0)
                                 else table.setPageIndex(0)
                             }}
                             disabled={manualPagination ? pageIndex === 0 : !table.getCanPreviousPage()}
+                            aria-label="First page"
                         >
                             <ChevronsLeft size={18} />
                         </button>
                         <button
-                            className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="p-2.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed min-h-[40px] min-w-[40px] flex items-center justify-center"
                             onClick={() => {
                                 if (manualPagination && onPageChange) onPageChange(pageIndex - 1)
                                 else table.previousPage()
                             }}
                             disabled={manualPagination ? pageIndex === 0 : !table.getCanPreviousPage()}
+                            aria-label="Previous page"
                         >
                             <ChevronLeft size={18} />
                         </button>
                         <button
-                            className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="p-2.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed min-h-[40px] min-w-[40px] flex items-center justify-center"
                             onClick={() => {
                                 if (manualPagination && onPageChange) onPageChange(pageIndex + 1)
                                 else table.nextPage()
                             }}
                             disabled={manualPagination ? pageIndex >= pageCount - 1 : !table.getCanNextPage()}
+                            aria-label="Next page"
                         >
                             <ChevronRight size={18} />
                         </button>
                         <button
-                            className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="p-2.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed min-h-[40px] min-w-[40px] flex items-center justify-center"
                             onClick={() => {
                                 if (manualPagination && onPageChange) onPageChange(pageCount - 1)
                                 else table.setPageIndex(table.getPageCount() - 1)
                             }}
                             disabled={manualPagination ? pageIndex >= pageCount - 1 : !table.getCanNextPage()}
+                            aria-label="Last page"
                         >
                             <ChevronsRight size={18} />
                         </button>
@@ -248,7 +252,7 @@ const DataTable = ({
                                 if (manualPagination && onPageSizeChange) onPageSizeChange(newSize)
                                 else table.setPageSize(newSize)
                             }}
-                            className="ml-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="ml-1 sm:ml-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             {[5, 10, 20, 30, 40, 50].map(size => (
                                 <option key={size} value={size}>

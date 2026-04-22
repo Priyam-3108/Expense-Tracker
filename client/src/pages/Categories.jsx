@@ -238,18 +238,18 @@ const Categories = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-start">
+      <div className="flex flex-wrap gap-3 items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Categories</h1>
-          <p className="text-gray-600 dark:text-gray-400">Manage your expense categories</p>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">Categories</h1>
+          <p className="text-sm text-gray-600 dark:text-gray-400">Manage your expense categories</p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={handleAddNew}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 min-h-[44px] shadow-sm"
           >
             <Plus size={16} />
-            Add Category
+            <span>Add Category</span>
           </button>
         </div>
       </div>
@@ -270,7 +270,7 @@ const Categories = () => {
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                className="w-full px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 text-sm"
                 placeholder="Enter category name"
                 maxLength={30}
               />
@@ -280,16 +280,17 @@ const Categories = () => {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Icon
               </label>
-              <div className="grid grid-cols-12 gap-2">
+              <div className="grid grid-cols-6 sm:grid-cols-11 gap-2">
                 {iconOptions.map((icon) => (
                   <button
                     key={icon}
                     type="button"
                     onClick={() => setFormData({ ...formData, icon })}
-                    className={`p-2 text-lg rounded border-2 ${formData.icon === icon
-                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500'
-                      }`}
+                    className={`flex items-center justify-center text-xl rounded-lg border-2 min-h-[44px] transition-all ${
+                      formData.icon === icon
+                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500'
+                    }`}
                   >
                     {icon}
                   </button>
@@ -301,33 +302,35 @@ const Categories = () => {
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Color
               </label>
-              <div className="grid grid-cols-8 gap-2">
+              <div className="grid grid-cols-8 sm:grid-cols-8 gap-2">
                 {colorOptions.map((color) => (
                   <button
                     key={color}
                     type="button"
                     onClick={() => setFormData({ ...formData, color })}
-                    className={`w-8 h-8 rounded-full border-2 ${formData.color === color
-                      ? 'border-gray-800 dark:border-white'
-                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500'
-                      }`}
+                    className={`w-10 h-10 rounded-full border-2 transition-all ${
+                      formData.color === color
+                        ? 'border-gray-800 dark:border-white scale-110 shadow-md'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500'
+                    }`}
                     style={{ backgroundColor: color }}
+                    aria-label={`Select color ${color}`}
                   />
                 ))}
               </div>
             </div>
 
-            <div className="flex gap-3 pt-4">
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
               <button
                 type="submit"
                 disabled={formLoading}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
               >
                 {formLoading ? (
-                  <div className="flex items-center gap-2">
+                  <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                     {editingCategory ? 'Updating...' : 'Adding...'}
-                  </div>
+                  </>
                 ) : (
                   editingCategory ? 'Update Category' : 'Add Category'
                 )}
@@ -336,7 +339,7 @@ const Categories = () => {
                 type="button"
                 onClick={handleCancel}
                 disabled={formLoading}
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
               >
                 Cancel
               </button>
@@ -346,14 +349,14 @@ const Categories = () => {
       )}
 
       {/* All Categories */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white">All Categories</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Drag and drop to reorder categories
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 className="text-base font-semibold text-gray-900 dark:text-white">All Categories</h3>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+            Drag and drop to reorder · {categories.length} total
           </p>
         </div>
-        <div className="p-6">
+        <div className="p-3 sm:p-6">
           {categories.length === 0 ? (
             <div className="text-center py-8">
               <div className="text-gray-400 mb-4">
@@ -372,7 +375,7 @@ const Categories = () => {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {categories.map((category) => (
                 <div
                   key={category._id}
@@ -424,18 +427,20 @@ const Categories = () => {
                       <>
                         <button
                           onClick={() => handleEdit(category)}
-                          className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                          className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center"
                           title="Edit category"
+                          aria-label={`Edit ${category.name}`}
                         >
                           <Edit size={16} />
                         </button>
                         <button
                           onClick={() => handleDelete(category)}
-                          className={`p-1.5 rounded transition-colors ${category.expenseCount > 0
+                          className={`p-2 rounded-lg transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center ${category.expenseCount > 0
                             ? 'text-orange-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20'
                             : 'text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'
                             }`}
                           title="Delete category"
+                          aria-label={`Delete ${category.name}`}
                         >
                           <Trash2 size={16} />
                         </button>
@@ -456,12 +461,12 @@ const Categories = () => {
 
       {/* Category Statistics */}
       {categoryStats.length > 0 && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">Category Statistics</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Expense breakdown by category</p>
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+          <div className="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white">Category Statistics</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Expense breakdown by category</p>
           </div>
-          <div className="p-6">
+          <div className="p-3 sm:p-6">
             {statsLoading ? (
               <div className="flex justify-center py-8">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
@@ -469,24 +474,24 @@ const Categories = () => {
             ) : (
               <div className="space-y-4">
                 {categoryStats.map((stat, index) => (
-                  <div key={stat._id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-                    <div className="flex items-center gap-3">
+                <div key={stat._id} className="flex items-center justify-between p-3 sm:p-4 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
                       <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center text-lg"
+                        className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
                         style={{ backgroundColor: stat.categoryColor + '20' }}
                       >
                         {categories?.find(cat => cat._id === stat._id)?.icon || '💰'}
                       </div>
-                      <div>
-                        <h4 className="font-medium text-gray-900 dark:text-white">{stat.categoryName}</h4>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{stat.count} expense(s)</p>
+                      <div className="min-w-0">
+                        <h4 className="font-medium text-gray-900 dark:text-white truncate text-sm">{stat.categoryName}</h4>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{stat.count} expense(s)</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-lg font-semibold text-gray-900 dark:text-white">
+                    <div className="text-right ml-2 flex-shrink-0">
+                      <div className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
                         {currencySymbols[currency] || '$'} {stat.totalAmount.toFixed(2)}
                       </div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
                         {((stat.totalAmount / categoryStats.reduce((sum, s) => sum + s.totalAmount, 0)) * 100).toFixed(1)}%
                       </div>
                     </div>

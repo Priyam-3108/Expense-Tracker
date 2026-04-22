@@ -253,8 +253,8 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-            <div className="w-full max-w-2xl rounded-lg bg-white dark:bg-gray-800 shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 z-50 flex flex-col justify-end md:items-center md:justify-center bg-black/50 backdrop-blur-sm md:p-4">
+            <div className="w-full md:max-w-4xl rounded-t-2xl md:rounded-2xl bg-white dark:bg-gray-800 shadow-2xl border border-gray-200 dark:border-gray-700 animate-slide-up md:[animation:none] flex flex-col" style={{ maxHeight: '95vh' }}>
                 {/* Header */}
                 <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 p-6">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -272,7 +272,7 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
                 <div className="p-6 overflow-y-auto flex-1">
                     {step === 1 && (
                         <div
-                            className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-12 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                            className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 sm:p-12 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                             onClick={() => fileInputRef.current?.click()}
                             onDragOver={(e) => e.preventDefault()}
                             onDrop={(e) => {

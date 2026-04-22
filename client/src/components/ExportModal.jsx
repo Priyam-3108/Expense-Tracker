@@ -17,8 +17,8 @@ const ExportModal = ({ isOpen, onClose, onExport, loading }) => {
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-            <div className="w-full max-w-md rounded-2xl bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700">
+        <div className="fixed inset-0 z-50 flex flex-col justify-end md:items-center md:justify-center bg-black/50 backdrop-blur-sm md:p-4">
+            <div className="w-full md:max-w-md rounded-t-2xl md:rounded-2xl bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700 animate-slide-up md:[animation:none] max-h-[95vh] md:max-h-[90vh] overflow-y-auto">
                 <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 p-4">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                         Export Expenses
@@ -85,17 +85,17 @@ const ExportModal = ({ isOpen, onClose, onExport, loading }) => {
                     </div>
                 </div>
 
-                <div className="flex items-center justify-end gap-3 border-t border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-b-2xl">
+                <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 border-t border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-b-2xl">
                     <button
                         onClick={onClose}
-                        className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                        className="w-full sm:w-auto rounded-lg px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                     >
                         Cancel
                     </button>
                     <button
                         onClick={handleExport}
                         disabled={loading}
-                        className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow"
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow"
                     >
                         {loading ? (
                             <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />

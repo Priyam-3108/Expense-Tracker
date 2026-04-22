@@ -8,6 +8,7 @@ import DataTable from '../components/DataTable'
 import BulkEditList from '../components/BulkEditList'
 import ExportModal from '../components/ExportModal'
 import ImportModal from '../components/ImportModal'
+import MobileExpenseCard from '../components/MobileExpenseCard'
 import { formatCurrency, formatDate, formatDateForInput, parseDateLocal, getTodayDate } from '../utils/helpers'
 import {
   Plus, Edit, Trash2, Search, X,
@@ -54,22 +55,22 @@ function IndeterminateCheckbox({
 const Expenses = () => {
   const { user, currency } = useAuth()
   const {
-     expenses,
-     categories,
-     stats,
-     loading,
-     pagination,
-     addExpense,
-     updateExpense,
-     deleteExpense,
-     bulkDeleteExpenses,
-     bulkUpdateList,
-     loadExpenses,
-     loadStats
-   } = useExpense()
- 
-   const [page, setPage] = useState(1)
-   const [limit, setLimit] = useState(10)
+    expenses,
+    categories,
+    stats,
+    loading,
+    pagination,
+    addExpense,
+    updateExpense,
+    deleteExpense,
+    bulkDeleteExpenses,
+    bulkUpdateList,
+    loadExpenses,
+    loadStats
+  } = useExpense()
+
+  const [page, setPage] = useState(1)
+  const [limit, setLimit] = useState(10)
 
 
   // Export state
@@ -81,7 +82,7 @@ const Expenses = () => {
 
   // Get today's date
   const todayDate = useMemo(() => getTodayDate(), [])
- 
+
   // Form state
   const [showForm, setShowForm] = useState(false)
   const [editingExpense, setEditingExpense] = useState(null)
@@ -111,19 +112,19 @@ const Expenses = () => {
   const [editableExpenses, setEditableExpenses] = useState([])
   const [showBulkDelete, setShowBulkDelete] = useState(false)
 
-   // Filter state
-   const [searchTerm, setSearchTerm] = useState('')
-   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
-   const [filterType, setFilterType] = useState('all')
-   const [dateRange, setDateRange] = useState({ startDate: '', endDate: '' })
- 
-   // View state
-   const [viewMode, setViewMode] = useState('list') // 'list' or 'calendar'
-   const [calendarDate, setCalendarDate] = useState(new Date())
-   const [calendarExpenses, setCalendarExpenses] = useState([])
-   const [calendarLoading, setCalendarLoading] = useState(false)
-   const [selectedDate, setSelectedDate] = useState(null) // For calendar date selection
- 
+  // Filter state
+  const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
+  const [filterType, setFilterType] = useState('all')
+  const [dateRange, setDateRange] = useState({ startDate: '', endDate: '' })
+
+  // View state
+  const [viewMode, setViewMode] = useState('list') // 'list' or 'calendar'
+  const [calendarDate, setCalendarDate] = useState(new Date())
+  const [calendarExpenses, setCalendarExpenses] = useState([])
+  const [calendarLoading, setCalendarLoading] = useState(false)
+  const [selectedDate, setSelectedDate] = useState(null) // For calendar date selection
+
   // Load expenses on mount to ensure data is fresh
   // Debounce search term
   useEffect(() => {
@@ -144,7 +145,7 @@ const Expenses = () => {
       startDate: dateRange.startDate,
       endDate: dateRange.endDate
     })
-    
+
     // Also load stats for the current filter/date range
     loadStats({
       startDate: dateRange.startDate,
@@ -184,7 +185,7 @@ const Expenses = () => {
     // Current filter or overall stats
     const expenseTotal = stats?.totalStats?.expenses || 0
     const incomeTotal = stats?.totalStats?.income || 0
-    
+
     return {
       totalExpenseAmount: expenseTotal,
       totalIncomeAmount: incomeTotal,
@@ -625,14 +626,14 @@ const Expenses = () => {
   return (
     <div className="">
       {/* Header */}
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between mb-6">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Expenses</h1>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
+          <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white">Expenses</h1>
+          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
             Track your expenses and income
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           {/* View Toggle */}
           <div className="inline-flex gap-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-1 shadow-sm">
             <button
@@ -739,30 +740,97 @@ const Expenses = () => {
         </div>
       </div>
 
-      {/* Expenses list - Only show in list view */}
+      {/* Expenses list - desktop table (hidden on mobile) */}
       {viewMode === 'list' && (
-        <DataTable
-          data={expenses}
-          columns={columns}
-          onBulkDelete={handleBulkDelete}
-          onBulkEdit={handleBulkEditClick}
-          isLoading={loading}
-          searchValue={searchTerm}
-          onSearchChange={(val) => {
-            setSearchTerm(val)
-            setPage(1)
-          }}
-          totalResults={pagination.totalItems}
-          manualPagination={true}
-          pageCount={pagination.totalPages}
-          pageIndex={pagination.currentPage - 1}
-          pageSize={pagination.limit}
-          onPageChange={(idx) => setPage(idx + 1)}
-          onPageSizeChange={(size) => {
-            setLimit(size)
-            setPage(1)
-          }}
-        />
+        <>
+          {/* Desktop table */}
+          <div className="hidden md:block">
+            <DataTable
+              data={expenses}
+              columns={columns}
+              onBulkDelete={handleBulkDelete}
+              onBulkEdit={handleBulkEditClick}
+              isLoading={loading}
+              searchValue={searchTerm}
+              onSearchChange={(val) => {
+                setSearchTerm(val)
+                setPage(1)
+              }}
+              totalResults={pagination.totalItems}
+              manualPagination={true}
+              pageCount={pagination.totalPages}
+              pageIndex={pagination.currentPage - 1}
+              pageSize={pagination.limit}
+              onPageChange={(idx) => setPage(idx + 1)}
+              onPageSizeChange={(size) => {
+                setLimit(size)
+                setPage(1)
+              }}
+            />
+          </div>
+
+          {/* Mobile card list */}
+          <div className="md:hidden space-y-3">
+            {/* Mobile search bar */}
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search expenses..."
+                value={searchTerm}
+                onChange={(e) => { setSearchTerm(e.target.value); setPage(1) }}
+                className="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 pl-10 pr-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors"
+              />
+            </div>
+
+            {/* Cards */}
+            {loading ? (
+              <div className="flex justify-center py-12">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-100 border-t-blue-500" />
+              </div>
+            ) : expenses.length === 0 ? (
+              <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                <p className="text-lg font-medium">No expenses found</p>
+                <p className="text-sm mt-1">Tap the + button to add your first one</p>
+              </div>
+            ) : (
+              expenses.map((expense) => (
+                <MobileExpenseCard
+                  key={expense._id}
+                  expense={expense}
+                  currency={currency}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                />
+              ))
+            )}
+
+            {/* Mobile pagination */}
+            {pagination.totalPages > 1 && (
+              <div className="flex items-center justify-between pt-2">
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  Page {pagination.currentPage} of {pagination.totalPages}
+                </span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    disabled={pagination.currentPage <= 1}
+                    className="px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 dark:border-gray-600 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors min-h-[40px]"
+                  >
+                    Prev
+                  </button>
+                  <button
+                    onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))}
+                    disabled={pagination.currentPage >= pagination.totalPages}
+                    className="px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 dark:border-gray-600 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors min-h-[40px]"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </>
       )}
       {/* Calendar View */}
       {viewMode === 'calendar' && (
@@ -825,21 +893,25 @@ const Expenses = () => {
             </div>
           </div>
 
-          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm">
+          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 sm:p-6 shadow-sm">
             {/* Calendar Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between gap-2 mb-4 sm:mb-6">
               <button
                 onClick={() => setCalendarDate(subMonths(calendarDate, 1))}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition text-gray-600 dark:text-gray-400"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition text-gray-600 dark:text-gray-400 min-h-[40px] min-w-[40px] flex items-center justify-center"
                 title="Previous month"
+                aria-label="Previous month"
               >
                 <ArrowDownCircle size={20} className="rotate-90" />
               </button>
-              <div className="flex items-center gap-3">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  {format(calendarDate, 'MMMM yyyy')}
+
+              {/* Mobile: just Month Year + Today */}
+              <div className="flex items-center gap-2 sm:gap-3 flex-1 justify-center">
+                <h2 className="text-base sm:text-xl font-semibold text-gray-900 dark:text-white">
+                  {format(calendarDate, 'MMM yyyy')}
                 </h2>
-                <div className="w-48">
+                {/* Go-to date picker — desktop only */}
+                <div className="hidden sm:block w-40">
                   <DatePicker
                     value={formatDateForInput(calendarDate)}
                     onChange={(date) => {
@@ -852,26 +924,29 @@ const Expenses = () => {
                 </div>
                 <button
                   onClick={() => setCalendarDate(new Date())}
-                  className="px-3 py-1 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition"
+                  className="px-2.5 py-1 text-xs sm:text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition border border-blue-200 dark:border-blue-800/50"
                 >
                   Today
                 </button>
               </div>
+
               <button
                 onClick={() => setCalendarDate(addMonths(calendarDate, 1))}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition text-gray-600 dark:text-gray-400"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition text-gray-600 dark:text-gray-400 min-h-[40px] min-w-[40px] flex items-center justify-center"
                 title="Next month"
+                aria-label="Next month"
               >
                 <ArrowDownCircle size={20} className="-rotate-90" />
               </button>
             </div>
 
             {/* Calendar Grid */}
-            <div className="grid grid-cols-7 gap-1">
+            <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
               {/* Day headers */}
-              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                <div key={day} className="p-2 text-center text-sm font-medium text-gray-500 dark:text-gray-400">
-                  {day}
+              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
+                <div key={i} className="p-1 sm:p-2 text-center text-xs font-semibold text-gray-500 dark:text-gray-400">
+                  <span className="sm:hidden">{day}</span>
+                  <span className="hidden sm:inline">{['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][i]}</span>
                 </div>
               ))}
 
@@ -883,18 +958,39 @@ const Expenses = () => {
                 const totalAmount = dayExpenses.reduce((sum, exp) => {
                   return exp.type === 'income' ? sum + exp.amount : sum - exp.amount
                 }, 0)
+                const incomeCount = dayExpenses.filter(e => e.type === 'income').length
+                const expenseCount = dayExpenses.filter(e => e.type === 'expense').length
 
                 return (
                   <div
                     key={idx}
                     onClick={() => handleDateClick(day)}
-                    className={`min-h-[100px] p-2 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer transition hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-300 dark:hover:border-blue-500 ${!isCurrentMonth ? 'bg-gray-50 dark:bg-gray-900/50 opacity-50' : 'bg-white dark:bg-gray-800'
+                    className={`min-h-[52px] sm:min-h-[100px] p-1 sm:p-2 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer transition hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-300 dark:hover:border-blue-500 ${!isCurrentMonth ? 'bg-gray-50 dark:bg-gray-900/50 opacity-40' : 'bg-white dark:bg-gray-800'
                       } ${isToday ? 'ring-2 ring-blue-500' : ''}`}
                   >
-                    <div className={`text-sm font-medium mb-1 ${isToday ? 'text-blue-600 dark:text-blue-400' : isCurrentMonth ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-600'}`}>
+                    <div className={`text-xs sm:text-sm font-medium mb-1 ${isToday ? 'text-blue-600 dark:text-blue-400' : isCurrentMonth ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-600'}`}>
                       {format(day, 'd')}
                     </div>
-                    <div className="space-y-1">
+
+                    {/* Mobile: coloured dots only */}
+                    {dayExpenses.length > 0 && (
+                      <div className="flex flex-wrap gap-0.5 sm:hidden">
+                        {incomeCount > 0 && (
+                          <span className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />
+                        )}
+                        {expenseCount > 0 && (
+                          <span className="w-2 h-2 rounded-full bg-rose-500 flex-shrink-0" />
+                        )}
+                        {dayExpenses.length > 1 && (
+                          <span className="text-gray-400 dark:text-gray-500" style={{ fontSize: '8px', lineHeight: '8px', marginTop: '2px' }}>
+                            ×{dayExpenses.length}
+                          </span>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Desktop: full text chips */}
+                    <div className="hidden sm:block space-y-1">
                       {dayExpenses.slice(0, 3).map((expense) => {
                         const category = expense.category || categories?.find(c => c._id === expense.category)
                         const isIncome = expense.type === 'income'
@@ -903,8 +999,8 @@ const Expenses = () => {
                             key={expense._id}
                             onClick={(e) => handleExpenseClick(expense, e)}
                             className={`text-xs p-1 rounded truncate font-medium ${isIncome
-                              ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900/50'
-                              : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300 hover:bg-rose-200 dark:hover:bg-rose-900/50'
+                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900/50'
+                                : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300 hover:bg-rose-200 dark:hover:bg-rose-900/50'
                               }`}
                             title={`${category?.name || 'Uncategorized'}: ${formatCurrency(expense.amount, currency)}`}
                           >
@@ -919,8 +1015,10 @@ const Expenses = () => {
                         </div>
                       )}
                     </div>
+
+                    {/* Desktop total */}
                     {dayExpenses.length > 0 && (
-                      <div className={`text-xs font-semibold mt-1 ${totalAmount >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+                      <div className={`hidden sm:block text-xs font-semibold mt-1 ${totalAmount >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
                         }`}>
                         {totalAmount >= 0 ? '+' : ''}{formatCurrency(Math.abs(totalAmount), currency)}
                       </div>
@@ -933,10 +1031,11 @@ const Expenses = () => {
         </>
       )}
 
-      {/* Add/Edit Form Modal */}
+      {/* Add/Edit Form Modal — bottom sheet on mobile, centered on md+ */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-baseline justify-center bg-black bg-opacity-50 p-4">
-          <div className="w-full max-w-lg max-h-[90vh] rounded-lg bg-white dark:bg-gray-800 shadow-xl overflow-hidden flex flex-col">
+        <div className="fixed inset-0 z-50 flex flex-col justify-end md:items-center md:justify-center bg-black bg-opacity-50 md:p-4">
+          {/* Bottom sheet inner panel */}
+          <div className="w-full md:max-w-lg max-h-[95vh] md:max-h-[90vh] rounded-t-2xl md:rounded-lg bg-white dark:bg-gray-800 shadow-xl overflow-hidden flex flex-col animate-slide-up md:[animation:none]">
             <form onSubmit={handleSubmit} className="flex flex-col h-full">
               {/* Header */}
               <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 p-6 flex-shrink-0">
@@ -1285,8 +1384,8 @@ const Expenses = () => {
                       }}
                     >
                       {bulkExpenses.map((expense, index) => (
-                        <div key={index} className="grid grid-cols-12 gap-2 items-start p-3 border border-gray-200 dark:border-gray-700 rounded-lg flex-shrink-0">
-                          <div className="col-span-4">
+                        <div key={index} className="flex flex-col sm:grid sm:grid-cols-12 gap-2 items-start p-3 border border-gray-200 dark:border-gray-700 rounded-lg flex-shrink-0">
+                          <div className="col-span-12 sm:col-span-4">
                             <input
                               type="number"
                               step="1"
@@ -1297,14 +1396,14 @@ const Expenses = () => {
                               placeholder="Amount"
                             />
                           </div>
-                          <div className="col-span-5 relative">
+                          <div className="col-span-12 sm:col-span-5 relative">
                             <CategorySelector
                               value={expense.category}
                               onChange={(categoryId) => updateBulkRow(index, 'category', categoryId)}
                               placeholder="Category"
                             />
                           </div>
-                          <div className="col-span-2">
+                          <div className="col-span-12 sm:col-span-2">
                             <input
                               type="text"
                               value={expense.description}
@@ -1313,7 +1412,7 @@ const Expenses = () => {
                               placeholder="Description"
                             />
                           </div>
-                          <div className="col-span-1">
+                          <div className="col-span-12 sm:col-span-1 flex sm:block justify-end">
                             {bulkExpenses.length > 1 && (
                               <button
                                 type="button"
