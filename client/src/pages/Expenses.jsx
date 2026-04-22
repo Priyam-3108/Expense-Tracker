@@ -54,21 +54,23 @@ function IndeterminateCheckbox({
 const Expenses = () => {
   const { user, currency } = useAuth()
   const {
-    expenses,
-    categories,
-    loading,
-    addExpense,
-    updateExpense,
-    deleteExpense,
-    bulkDeleteExpenses,
-    bulkUpdateList,
-    loadExpenses
-  } = useExpense()
+     expenses,
+     categories,
+     stats,
+     loading,
+     pagination,
+     addExpense,
+     updateExpense,
+     deleteExpense,
+     bulkDeleteExpenses,
+     bulkUpdateList,
+     loadExpenses,
+     loadStats
+   } = useExpense()
+ 
+   const [page, setPage] = useState(1)
+   const [limit, setLimit] = useState(10)
 
-  // Load expenses on mount to ensure data is fresh
-  useEffect(() => {
-    loadExpenses()
-  }, [loadExpenses])
 
   // Export state
   const [showExportModal, setShowExportModal] = useState(false)
@@ -79,7 +81,7 @@ const Expenses = () => {
 
   // Get today's date
   const todayDate = useMemo(() => getTodayDate(), [])
-
+ 
   // Form state
   const [showForm, setShowForm] = useState(false)
   const [editingExpense, setEditingExpense] = useState(null)
@@ -109,34 +111,86 @@ const Expenses = () => {
   const [editableExpenses, setEditableExpenses] = useState([])
   const [showBulkDelete, setShowBulkDelete] = useState(false)
 
-  // Filter state
-  const [searchTerm, setSearchTerm] = useState('')
-  const [filterType, setFilterType] = useState('all')
-  const [dateRange, setDateRange] = useState({ startDate: '', endDate: '' })
+   // Filter state
+   const [searchTerm, setSearchTerm] = useState('')
+   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
+   const [filterType, setFilterType] = useState('all')
+   const [dateRange, setDateRange] = useState({ startDate: '', endDate: '' })
+ 
+   // View state
+   const [viewMode, setViewMode] = useState('list') // 'list' or 'calendar'
+   const [calendarDate, setCalendarDate] = useState(new Date())
+   const [calendarExpenses, setCalendarExpenses] = useState([])
+   const [calendarLoading, setCalendarLoading] = useState(false)
+   const [selectedDate, setSelectedDate] = useState(null) // For calendar date selection
+ 
+  // Load expenses on mount to ensure data is fresh
+  // Debounce search term
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm)
+      setPage(1)
+    }, 500)
+    return () => clearTimeout(handler)
+  }, [searchTerm])
 
-  // View state
-  const [viewMode, setViewMode] = useState('list') // 'list' or 'calendar'
-  const [calendarDate, setCalendarDate] = useState(new Date())
-  const [selectedDate, setSelectedDate] = useState(null) // For calendar date selection
+  // Load expenses and stats when page, limit or filters change
+  useEffect(() => {
+    loadExpenses({
+      page,
+      limit,
+      search: debouncedSearchTerm,
+      type: filterType,
+      startDate: dateRange.startDate,
+      endDate: dateRange.endDate
+    })
+    
+    // Also load stats for the current filter/date range
+    loadStats({
+      startDate: dateRange.startDate,
+      endDate: dateRange.endDate
+    })
+  }, [loadExpenses, loadStats, page, limit, filterType, dateRange, debouncedSearchTerm])
+
+  // Load calendar expenses when calendar date changes
+  useEffect(() => {
+    if (viewMode === 'calendar') {
+      const fetchCalendarData = async () => {
+        setCalendarLoading(true)
+        try {
+          const { expenseService } = await import('../services/expenseService')
+          const start = format(startOfMonth(calendarDate), 'yyyy-MM-dd')
+          const end = format(endOfMonth(calendarDate), 'yyyy-MM-dd')
+          const response = await expenseService.getExpenses({
+            startDate: start,
+            endDate: end,
+            type: filterType,
+            search: debouncedSearchTerm
+          })
+          if (response.data?.success) {
+            setCalendarExpenses(response.data.data.expenses)
+          }
+        } catch (error) {
+          console.error('Failed to fetch calendar expenses:', error)
+        } finally {
+          setCalendarLoading(false)
+        }
+      }
+      fetchCalendarData()
+    }
+  }, [viewMode, calendarDate, filterType, debouncedSearchTerm])
 
   const summary = useMemo(() => {
-    let totalExpenseAmount = 0
-    let totalIncomeAmount = 0
-
-    expenses.forEach((expense) => {
-      if (expense.type === 'income') {
-        totalIncomeAmount += expense.amount || 0
-      } else {
-        totalExpenseAmount += expense.amount || 0
-      }
-    })
-
+    // Current filter or overall stats
+    const expenseTotal = stats?.totalStats?.expenses || 0
+    const incomeTotal = stats?.totalStats?.income || 0
+    
     return {
-      totalExpenseAmount,
-      totalIncomeAmount,
-      netAmount: totalIncomeAmount - totalExpenseAmount
+      totalExpenseAmount: expenseTotal,
+      totalIncomeAmount: incomeTotal,
+      netAmount: incomeTotal - expenseTotal
     }
-  }, [expenses])
+  }, [stats])
 
   const { totalExpenseAmount, totalIncomeAmount, netAmount } = summary
 
@@ -280,39 +334,16 @@ const Expenses = () => {
     }
   }
 
-  // Filter expenses
+  // Filter expenses (now handled by server, but we might want local filtering for search-as-you-type)
   const filteredExpenses = useMemo(() => {
     return expenses
-      .filter(expense => {
-        const matchesSearch = !searchTerm ||
-          expense.description?.toLowerCase().includes(searchTerm.toLowerCase())
-        const matchesType = filterType === 'all' || expense.type === filterType
-
-        // Date range filter
-        let matchesDateRange = true
-        if (dateRange.startDate || dateRange.endDate) {
-          const expenseDate = new Date(expense.date)
-          if (dateRange.startDate && expenseDate < new Date(dateRange.startDate)) {
-            matchesDateRange = false
-          }
-          if (dateRange.endDate) {
-            const endDate = new Date(dateRange.endDate)
-            endDate.setHours(23, 59, 59, 999)
-            if (expenseDate > endDate) {
-              matchesDateRange = false
-            }
-          }
-        }
-
-        return matchesSearch && matchesType && matchesDateRange
-      })
-      .sort((a, b) => new Date(b.date) - new Date(a.date))
-  }, [expenses, searchTerm, filterType, dateRange])
+  }, [expenses])
 
   const clearFilters = () => {
     setSearchTerm('')
     setFilterType('all')
     setDateRange({ startDate: '', endDate: '' })
+    setPage(1)
   }
 
   const resetBulkForm = () => {
@@ -385,7 +416,7 @@ const Expenses = () => {
 
   // Calendar helpers
   const getExpensesForDate = (date) => {
-    return filteredExpenses.filter(expense => {
+    return calendarExpenses.filter(expense => {
       const expenseDate = parseDateLocal(expense.date)
       return isSameDay(expenseDate, date)
     })
@@ -711,14 +742,26 @@ const Expenses = () => {
       {/* Expenses list - Only show in list view */}
       {viewMode === 'list' && (
         <DataTable
-          data={filteredExpenses}
+          data={expenses}
           columns={columns}
           onBulkDelete={handleBulkDelete}
           onBulkEdit={handleBulkEditClick}
           isLoading={loading}
           searchValue={searchTerm}
-          onSearchChange={setSearchTerm}
-          totalResults={filteredExpenses.length}
+          onSearchChange={(val) => {
+            setSearchTerm(val)
+            setPage(1)
+          }}
+          totalResults={pagination.totalItems}
+          manualPagination={true}
+          pageCount={pagination.totalPages}
+          pageIndex={pagination.currentPage - 1}
+          pageSize={pagination.limit}
+          onPageChange={(idx) => setPage(idx + 1)}
+          onPageSizeChange={(size) => {
+            setLimit(size)
+            setPage(1)
+          }}
         />
       )}
       {/* Calendar View */}

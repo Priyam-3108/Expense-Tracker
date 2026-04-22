@@ -26,7 +26,13 @@ const DataTable = ({
     isLoading,
     searchValue,
     onSearchChange,
-    totalResults
+    totalResults,
+    pageCount,
+    pageIndex = 0,
+    pageSize = 10,
+    onPageChange,
+    onPageSizeChange,
+    manualPagination = false
 }) => {
     const [sorting, setSorting] = useState([])
     const [rowSelection, setRowSelection] = useState({})
@@ -37,14 +43,22 @@ const DataTable = ({
         state: {
             sorting,
             rowSelection,
+            ...(manualPagination && {
+                pagination: {
+                    pageIndex,
+                    pageSize,
+                },
+            }),
         },
         enableRowSelection: true,
         onSortingChange: setSorting,
         onRowSelectionChange: setRowSelection,
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
+        ...(!manualPagination && { getPaginationRowModel: getPaginationRowModel() }),
         getSortedRowModel: getSortedRowModel(),
+        manualPagination,
+        ...(manualPagination && { pageCount }),
     })
 
     const selectedRows = table.getFilteredSelectedRowModel().rows
@@ -189,42 +203,56 @@ const DataTable = ({
                     <div className="flex items-center gap-2">
                         <button
                             className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                            onClick={() => table.setPageIndex(0)}
-                            disabled={!table.getCanPreviousPage()}
+                            onClick={() => {
+                                if (manualPagination && onPageChange) onPageChange(0)
+                                else table.setPageIndex(0)
+                            }}
+                            disabled={manualPagination ? pageIndex === 0 : !table.getCanPreviousPage()}
                         >
                             <ChevronsLeft size={18} />
                         </button>
                         <button
                             className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                            onClick={() => table.previousPage()}
-                            disabled={!table.getCanPreviousPage()}
+                            onClick={() => {
+                                if (manualPagination && onPageChange) onPageChange(pageIndex - 1)
+                                else table.previousPage()
+                            }}
+                            disabled={manualPagination ? pageIndex === 0 : !table.getCanPreviousPage()}
                         >
                             <ChevronLeft size={18} />
                         </button>
                         <button
                             className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                            onClick={() => table.nextPage()}
-                            disabled={!table.getCanNextPage()}
+                            onClick={() => {
+                                if (manualPagination && onPageChange) onPageChange(pageIndex + 1)
+                                else table.nextPage()
+                            }}
+                            disabled={manualPagination ? pageIndex >= pageCount - 1 : !table.getCanNextPage()}
                         >
                             <ChevronRight size={18} />
                         </button>
                         <button
                             className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                            disabled={!table.getCanNextPage()}
+                            onClick={() => {
+                                if (manualPagination && onPageChange) onPageChange(pageCount - 1)
+                                else table.setPageIndex(table.getPageCount() - 1)
+                            }}
+                            disabled={manualPagination ? pageIndex >= pageCount - 1 : !table.getCanNextPage()}
                         >
                             <ChevronsRight size={18} />
                         </button>
                         <select
-                            value={table.getState().pagination.pageSize}
+                            value={manualPagination ? pageSize : table.getState().pagination.pageSize}
                             onChange={e => {
-                                table.setPageSize(Number(e.target.value))
+                                const newSize = Number(e.target.value)
+                                if (manualPagination && onPageSizeChange) onPageSizeChange(newSize)
+                                else table.setPageSize(newSize)
                             }}
                             className="ml-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
-                            {[10, 20, 30, 40, 50].map(pageSize => (
-                                <option key={pageSize} value={pageSize}>
-                                    Show {pageSize}
+                            {[5, 10, 20, 30, 40, 50].map(size => (
+                                <option key={size} value={size}>
+                                    Show {size}
                                 </option>
                             ))}
                         </select>

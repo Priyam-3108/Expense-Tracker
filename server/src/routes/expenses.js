@@ -14,6 +14,7 @@ import {
   bulkUpdateList
 } from '../controllers/expenseController.js';
 import { exportExpenses } from '../controllers/exportController.js';
+import { syncExpenses } from '../controllers/syncController.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { validate, expenseSchema, validateDateRange } from '../middleware/validation.js';
 
@@ -36,5 +37,8 @@ router.put('/bulk-list-update', bulkUpdateList);
 router.post('/', validate(expenseSchema), createExpense);
 router.put('/:id', validate(expenseSchema), updateExpense);
 router.delete('/:id', deleteExpense);
+
+// Sync route
+router.post('/sync', syncExpenses);
 
 export default router;

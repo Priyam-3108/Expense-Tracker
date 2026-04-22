@@ -59,6 +59,12 @@ const expenseSchema = new mongoose.Schema({
   recurringGroupId: {
     type: mongoose.Schema.Types.ObjectId,
     default: null
+  },
+  client_uuid: {
+    type: String,
+    unique: true,
+    sparse: true, // Allows null/undefined for existing records
+    index: true
   }
 }, {
   timestamps: true
@@ -70,7 +76,7 @@ expenseSchema.index({ user: 1, category: 1 });
 expenseSchema.index({ user: 1, type: 1 });
 
 // Virtual for formatted amount
-expenseSchema.virtual('formattedAmount').get(function() {
+expenseSchema.virtual('formattedAmount').get(function () {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD'
@@ -78,7 +84,7 @@ expenseSchema.virtual('formattedAmount').get(function() {
 });
 
 // Virtual for formatted date
-expenseSchema.virtual('formattedDate').get(function() {
+expenseSchema.virtual('formattedDate').get(function () {
   if (!this.date) return '';
   const [year, month, day] = this.date.split('-');
   const date = new Date(year, month - 1, day);
@@ -94,11 +100,11 @@ expenseSchema.set('toJSON', { virtuals: true });
 expenseSchema.set('toObject', { virtuals: true });
 
 // Static method to get monthly summary
-expenseSchema.statics.getMonthlySummary = async function(userId, year, month) {
+expenseSchema.statics.getMonthlySummary = async function (userId, year, month) {
   const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
   const lastDay = new Date(year, month, 0).getDate();
   const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
-  
+
   return await this.aggregate([
     {
       $match: {
@@ -117,7 +123,7 @@ expenseSchema.statics.getMonthlySummary = async function(userId, year, month) {
 };
 
 // Static method to get category-wise summary (startDate and endDate should be YYYY-MM-DD strings)
-expenseSchema.statics.getCategorySummary = async function(userId, startDate, endDate) {
+expenseSchema.statics.getCategorySummary = async function (userId, startDate, endDate) {
   return await this.aggregate([
     {
       $match: {
