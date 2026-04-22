@@ -22,6 +22,14 @@ export const ExpenseProvider = ({ children }) => {
   const [trends, setTrends] = useState(null)
   const [loading, setLoading] = useState(false)
   const [categoriesLoading, setCategoriesLoading] = useState(false)
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    hasNextPage: false,
+    hasPrevPage: false,
+    limit: 10
+  })
   const [error, setError] = useState(null)
 
   const loadExpenses = useCallback(async (filters = {}) => {
@@ -30,6 +38,9 @@ export const ExpenseProvider = ({ children }) => {
       const response = await expenseService.getExpenses(filters)
       if (response && response.data && response.data.success && response.data.data && Array.isArray(response.data.data.expenses)) {
         setExpenses(response.data.data.expenses)
+        if (response.data.data.pagination) {
+          setPagination(response.data.data.pagination)
+        }
         return response.data.data
       } else if (response && response.data && Array.isArray(response.data.expenses)) {
         setExpenses(response.data.expenses)
@@ -366,23 +377,13 @@ export const ExpenseProvider = ({ children }) => {
     }
   }
 
-  // Load categories when user changes
-  useEffect(() => {
-    if (user) {
-      loadCategories().catch(error => {
-        const errorMessage = error.response?.data?.message || error.message || 'Failed to load categories'
-        toast.error(errorMessage)
-        console.error('Error in loadCategories useEffect:', error)
-        setError(error.message)
-      })
-    }
-  }, [user, loadCategories])
-
   // Load initial data
   useEffect(() => {
     if (user) {
+      const filters = { page: 1, limit: 10 }
       Promise.all([
-        loadExpenses(),
+        loadCategories(),
+        loadExpenses(filters),
         loadStats(),
         loadTrends()
       ]).catch(error => {
@@ -392,7 +393,7 @@ export const ExpenseProvider = ({ children }) => {
         setError(error.message)
       })
     }
-  }, [user, loadExpenses, loadStats, loadTrends])
+  }, [user, loadCategories, loadExpenses, loadStats, loadTrends])
 
   const value = {
     expenses,
@@ -401,6 +402,7 @@ export const ExpenseProvider = ({ children }) => {
     trends,
     loading,
     categoriesLoading,
+    pagination,
     error,
     loadExpenses,
     loadCategories,
