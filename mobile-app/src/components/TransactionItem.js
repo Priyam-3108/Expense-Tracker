@@ -140,7 +140,14 @@ function TransactionItem({
                 <Text style={styles.amount}>
                     {isIncome ? '+' : '-'} {formatAmount(Math.abs(item.amount))}
                 </Text>
-                <View style={styles.actions}>
+                <View style={[styles.actions, { alignItems: 'center' }]}>
+                    {item.syncStatus === 'PENDING' && (
+                        <Ionicons name="time-outline" size={16} color={colors.warning} style={{ marginRight: 4 }} />
+                    )}
+                    {item.syncStatus === 'FAILED' && (
+                        <Ionicons name="alert-circle-outline" size={16} color={colors.danger} style={{ marginRight: 4 }} />
+                    )}
+
                     {onEdit && (
                         <TouchableOpacity
                             style={styles.actionButton}

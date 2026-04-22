@@ -5,6 +5,9 @@ import CustomAlert from '../components/CustomAlert';
 import { expenseService } from '../services/expenseService';
 import { categoryService } from '../services/categoryService';
 import { useTheme } from '../context/ThemeContext';
+import { offlineService } from '../services/offlineService';
+import { syncEngine } from '../services/syncEngine';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function AddExpenseScreen({ navigation, route }) {
     const { colors, isDark } = useTheme();
@@ -55,25 +58,37 @@ export default function AddExpenseScreen({ navigation, route }) {
         try {
             const res = await categoryService.getCategories();
             // Check for nested structure commonly used in this project's backend
+            let cats = [];
             if (res.data.success) {
                 if (res.data.data && Array.isArray(res.data.data.categories)) {
-                    setCategories(res.data.data.categories);
+                    cats = res.data.data.categories;
                 } else if (Array.isArray(res.data.data)) {
-                    setCategories(res.data.data);
-                } else {
-                    console.warn('Unexpected category response structure:', res.data);
-                    setCategories([]);
+                    cats = res.data.data;
                 }
             }
+            if (cats.length > 0) {
+                setCategories(cats);
+                await AsyncStorage.setItem('categories_cache', JSON.stringify(cats));
+            }
         } catch (error) {
-            console.error('Failed to load categories', error);
-            setAlertConfig({
-                type: 'danger',
-                title: 'Error',
-                message: 'Failed to load categories',
-                buttons: [{ text: 'OK', style: 'primary' }]
-            });
-            setShowAlert(true);
+            console.log('Failed to load categories from API, checking cache', error);
+            // Try cache
+            try {
+                const cached = await AsyncStorage.getItem('categories_cache');
+                if (cached) {
+                    setCategories(JSON.parse(cached));
+                } else {
+                    setAlertConfig({
+                        type: 'danger',
+                        title: 'Offline',
+                        message: 'No Internet and no cached categories.',
+                        buttons: [{ text: 'OK', style: 'primary' }]
+                    });
+                    setShowAlert(true);
+                }
+            } catch (cacheErr) {
+                console.error('Cache load failed', cacheErr);
+            }
         }
     };
 
@@ -115,34 +130,25 @@ export default function AddExpenseScreen({ navigation, route }) {
                 })
             };
 
-            if (isEditing) {
-                await expenseService.updateExpense(editId, payload);
-                setAlertConfig({
-                    type: 'success',
-                    title: 'Success',
-                    message: 'Transaction updated successfully!',
-                    buttons: [{
-                        text: 'OK',
-                        style: 'primary',
-                        onPress: () => navigation.goBack()
-                    }]
-                });
-            } else {
-                await expenseService.createExpense(payload);
-                setAlertConfig({
-                    type: 'success',
-                    title: 'Success',
-                    message: 'Transaction added successfully!',
-                    buttons: [{
-                        text: 'OK',
-                        style: 'primary',
-                        onPress: () => navigation.goBack()
-                    }]
-                });
-            }
+            // OFFLINE-FIRST: Save locally
+            await offlineService.saveExpenseLocally(payload);
+
+            // Trigger background sync
+            syncEngine.syncNow();
+
+            setAlertConfig({
+                type: 'success',
+                title: 'Saved',
+                message: 'Transaction saved successfully!',
+                buttons: [{
+                    text: 'OK',
+                    style: 'primary',
+                    onPress: () => navigation.goBack()
+                }]
+            });
             setShowAlert(true);
         } catch (error) {
-            const msg = error.response?.data?.message || (isEditing ? 'Failed to update transaction' : 'Failed to add transaction');
+            const msg = error.message || 'Failed to save transaction';
             setAlertConfig({
                 type: 'danger',
                 title: 'Error',

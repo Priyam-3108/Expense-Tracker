@@ -14,6 +14,8 @@ import EmptyState from '../components/EmptyState';
 import TransactionItem from '../components/TransactionItem';
 import { SkeletonCard, SkeletonTransactionItem } from '../components/SkeletonLoader';
 import hapticFeedback from '../utils/haptics';
+import { offlineService } from '../services/offlineService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function DashboardScreen({ navigation }) {
   const { signOut, user } = useContext(AuthContext);
@@ -31,44 +33,110 @@ export default function DashboardScreen({ navigation }) {
 
   const fetchData = async () => {
     try {
-      const [expensesRes, statsRes] = await Promise.all([
-        expenseService.getExpenses({ limit: 50, sort: '-date' }),
-        expenseService.getStats()
-      ]);
+      setLoading(true);
+      // 1. Get Pending from Local DB (SQLite)
+      const localPending = await offlineService.getPendingExpenses();
 
-      let backendStats = { income: 0, expense: 0 };
-      const fetchedExpenses = expensesRes.data.success ? expensesRes.data.data.expenses : [];
-
-      if (expensesRes.data.success) {
-        setTransactions(fetchedExpenses);
+      // Try to load cached categories to hydrate the local expenses
+      let categoryMap = {};
+      try {
+        const cachedCats = await AsyncStorage.getItem('categories_cache');
+        if (cachedCats) {
+          const cats = JSON.parse(cachedCats);
+          cats.forEach(c => categoryMap[c._id] = c);
+        }
+      } catch (e) {
+        console.log('Error loading category cache', e);
       }
 
-      if (statsRes.data.success) {
-        const stats = statsRes.data.data;
-        if (Array.isArray(stats)) {
-          stats.forEach(s => {
-            if (s._id === 'income') backendStats.income += parseFloat(s.total) || 0;
-            if (s._id === 'expense') backendStats.expense += parseFloat(s.total) || 0;
-          });
-        } else {
-          backendStats.income = parseFloat(stats.totalIncome) || 0;
-          backendStats.expense = parseFloat(stats.totalExpense) || 0;
+      // Flatten payload and ensure ID and Category Object
+      const formattedPending = localPending.map(p => {
+        const data = p.payload;
+        // Hydrate category if it's just an ID
+        let categoryData = data.category;
+        if (typeof data.category === 'string' && categoryMap[data.category]) {
+          categoryData = categoryMap[data.category];
+        }
+
+        return {
+          ...p, // has uuid, server_id, sync_status
+          ...data, // spread payload
+          category: categoryData, // Override category with hydrated object if possible
+          _id: p.uuid, // Use uuid as key
+          isLocal: true
+        };
+      });
+
+      let fetchedExpenses = [];
+      let backendStats = { income: 0, expense: 0 };
+
+      try {
+        // 2. Fetch from Server
+        const [expensesRes, statsRes] = await Promise.all([
+          expenseService.getExpenses({ limit: 50, sort: '-date' }),
+          expenseService.getStats()
+        ]);
+
+        if (expensesRes.data.success) {
+          fetchedExpenses = expensesRes.data.data.expenses;
+        }
+
+        if (statsRes.data.success) {
+          const stats = statsRes.data.data;
+          if (Array.isArray(stats)) {
+            stats.forEach(s => {
+              if (s._id === 'income') backendStats.income += parseFloat(s.total) || 0;
+              if (s._id === 'expense') backendStats.expense += parseFloat(s.total) || 0;
+            });
+          } else {
+            backendStats.income = parseFloat(stats.totalIncome) || 0;
+            backendStats.expense = parseFloat(stats.totalExpense) || 0;
+          }
+        }
+      } catch (serverError) {
+        console.log('Server fetch failed, using cache if available', serverError);
+        // Try to load server expenses cache
+        const cache = await AsyncStorage.getItem('dashboard_server_cache');
+        if (cache) {
+          fetchedExpenses = JSON.parse(cache);
         }
       }
 
-      // Fallback: If backend stats are 0, calculate from fetched expenses
-      if (backendStats.income === 0 && backendStats.expense === 0 && fetchedExpenses.length > 0) {
-        fetchedExpenses.forEach(exp => {
-          if (exp.type === 'income') backendStats.income += exp.amount;
-          if (exp.type === 'expense') backendStats.expense += exp.amount;
-        });
-      }
+      // 3. Merge: Pending first, then Server (Server ones shouldn't overlap with Pending usually, but we filter by ID just in case?)
+      // Pending have UUIDs, Server have _id. They are distinct until synced.
+      // Once synced, they are in server list.
+      // If we have a PENDING item that was actually synced but we didn't get ACK?
+      // It remains PENDING locally.
+
+      const merged = [...formattedPending, ...fetchedExpenses];
+
+      // Remove duplicates if any (by client_uuid if server returns it)
+      // But server expense doesn't have client_uuid in the list usually unless we asked for it. 
+      // For now, simple merge is fine.
+
+      setTransactions(merged);
+
+      // Calculate stats including local pending
+      let totalIncome = backendStats.income;
+      let totalExpense = backendStats.expense;
+
+      // Add pending to stats locally for immediate feedback
+      formattedPending.forEach(exp => {
+        // Avoid double counting if we are unsure, but user wants "Visible immediately"
+        if (exp.type === 'income') totalIncome += exp.amount;
+        if (exp.type === 'expense') totalExpense += exp.amount;
+      });
 
       setSummary({
-        income: backendStats.income,
-        expense: backendStats.expense,
-        balance: backendStats.income - backendStats.expense
+        income: totalIncome,
+        expense: totalExpense,
+        balance: totalIncome - totalExpense
       });
+
+      // Cache the server part for offline use
+      if (fetchedExpenses.length > 0) {
+        AsyncStorage.setItem('dashboard_server_cache', JSON.stringify(fetchedExpenses));
+      }
 
     } catch (error) {
       console.error(error);
