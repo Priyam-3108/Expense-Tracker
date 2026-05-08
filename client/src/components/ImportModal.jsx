@@ -1,9 +1,10 @@
 import { useState, useRef, useMemo, useEffect } from 'react'
-import { X, Upload, FileSpreadsheet, AlertCircle, Check, ArrowRight, Loader2 } from 'lucide-react'
+import { Upload, FileSpreadsheet, AlertCircle, Check, ArrowRight, Loader2 } from 'lucide-react'
 import Papa from 'papaparse'
 import * as XLSX from 'xlsx'
 import { useExpense } from '../context/ExpenseContext'
 import toast from 'react-hot-toast'
+import Modal from './Modal'
 
 const REQUIRED_FIELDS = ['amount', 'date', 'category']
 const OPTIONAL_FIELDS = ['description', 'type', 'notes']
@@ -253,21 +254,8 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex flex-col justify-end md:items-center md:justify-center bg-black/50 backdrop-blur-sm md:p-4">
-            <div className="w-full md:max-w-4xl rounded-t-2xl md:rounded-2xl bg-white dark:bg-gray-800 shadow-2xl border border-gray-200 dark:border-gray-700 animate-slide-up md:[animation:none] flex flex-col" style={{ maxHeight: '95vh' }}>
-                {/* Header */}
-                <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                        Import Expenses
-                    </h3>
-                    <button
-                        onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                    >
-                        <X size={20} />
-                    </button>
-                </div>
-
+        <Modal isOpen={isOpen} onClose={onClose} title="Import Expenses" maxWidth="max-w-4xl">
+            <div className="flex flex-col h-full">
                 {/* Content */}
                 <div className="p-6 overflow-y-auto flex-1">
                     {step === 1 && (
@@ -327,7 +315,7 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
                                         <select
                                             value={mapping[field] || ''}
                                             onChange={(e) => handleMappingChange(field, e.target.value)}
-                                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${!mapping[field] && REQUIRED_FIELDS.includes(field)
+                                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white min-h-[44px] ${!mapping[field] && REQUIRED_FIELDS.includes(field)
                                                 ? 'border-red-300 focus:ring-red-500'
                                                 : 'border-gray-300 dark:border-gray-600 focus:ring-blue-500'
                                                 }`}
@@ -371,18 +359,18 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
                 </div>
 
                 {/* Footer */}
-                <div className="p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex justify-between items-center">
+                <div className="p-4 sm:p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex flex-col-reverse sm:flex-row justify-between items-center gap-3">
                     {step === 1 ? (
                         <button
                             onClick={onClose}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900"
+                            className="w-full sm:w-auto px-4 py-2 text-base sm:text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 transition-colors min-h-[44px] rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700"
                         >
                             Cancel
                         </button>
                     ) : (
                         <button
                             onClick={reset}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900"
+                            className="w-full sm:w-auto px-4 py-2 text-base sm:text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 transition-colors min-h-[44px] rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700"
                             disabled={processing}
                         >
                             Back
@@ -393,24 +381,24 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
                         <button
                             onClick={handleImport}
                             disabled={processing}
-                            className="flex items-center gap-2 px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2 text-base sm:text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
                         >
                             {processing ? (
                                 <>
-                                    <Loader2 size={16} className="animate-spin" />
-                                    Importing...
+                                    <Loader2 size={18} className="animate-spin" />
+                                    <span>Importing...</span>
                                 </>
                             ) : (
                                 <>
-                                    Import Expenses
-                                    <ArrowRight size={16} />
+                                    <span>Import Expenses</span>
+                                    <ArrowRight size={18} />
                                 </>
                             )}
                         </button>
                     )}
                 </div>
             </div>
-        </div>
+        </Modal>
     )
 }
 

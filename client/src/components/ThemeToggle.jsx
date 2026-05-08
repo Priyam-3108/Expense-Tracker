@@ -31,7 +31,7 @@ const ThemeToggle = () => {
         <div className="relative" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors"
+                className="p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
                 aria-label="Toggle theme"
             >
                 <CurrentIcon size={20} />
@@ -50,13 +50,13 @@ const ThemeToggle = () => {
                                         setIsOpen(false)
                                     }}
                                     className={cn(
-                                        "flex w-full items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors",
+                                        "flex w-full items-center rounded-sm px-3 py-2 text-sm outline-none transition-colors min-h-[44px]",
                                         theme === t.name
                                             ? "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-50"
                                             : "text-gray-700 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-50"
                                     )}
                                 >
-                                    <Icon className="mr-2 h-4 w-4" />
+                                    <Icon className="mr-3 h-4 w-4" />
                                     <span>{t.label}</span>
                                 </button>
                             )

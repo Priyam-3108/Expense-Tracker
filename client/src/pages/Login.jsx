@@ -119,7 +119,7 @@ const Login = () => {
                       validate: (value) => validateEmail(value) || 'Please enter a valid email'
                     })}
                     className={cn(
-                      "block w-full pl-11 pr-4 py-3 rounded-xl transition-all duration-300 text-sm font-medium",
+                      "block w-full pl-11 pr-4 py-3 rounded-xl transition-all duration-300 text-sm font-medium min-h-[44px]",
                       "focus:outline-none focus:ring-2 focus:ring-offset-0",
                       isDark
                         ? "bg-gray-800/50 border-2 border-gray-700 placeholder-gray-500 text-white hover:bg-gray-800/70 focus:bg-gray-800 focus:border-primary-500 focus:ring-primary-500/20"
@@ -177,7 +177,7 @@ const Login = () => {
                       }
                     })}
                     className={cn(
-                      "block w-full pl-11 pr-12 py-3 rounded-xl transition-all duration-300 text-sm font-medium",
+                      "block w-full pl-11 pr-12 py-3 rounded-xl transition-all duration-300 text-sm font-medium min-h-[44px]",
                       "focus:outline-none focus:ring-2 focus:ring-offset-0",
                       isDark
                         ? "bg-gray-800/50 border-2 border-gray-700 placeholder-gray-500 text-white hover:bg-gray-800/70 focus:bg-gray-800 focus:border-primary-500 focus:ring-primary-500/20"

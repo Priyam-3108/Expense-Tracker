@@ -73,15 +73,15 @@ const MobileExpenseCard = ({ expense, currency, onEdit, onDelete }) => {
           <button
             onClick={() => onEdit(expense)}
             aria-label="Edit expense"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 rounded-lg transition-colors min-h-[36px]"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 rounded-lg transition-colors min-h-[44px]"
           >
-            <Edit size={13} />
+            <Edit size={16} />
             Edit
           </button>
           <button
             onClick={() => onDelete(expense)}
             aria-label="Delete expense"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/20 hover:bg-rose-100 dark:hover:bg-rose-900/40 rounded-lg transition-colors min-h-[36px]"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/20 hover:bg-rose-100 dark:hover:bg-rose-900/40 rounded-lg transition-colors min-h-[44px]"
           >
             <Trash2 size={13} />
             Delete
