@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isAfter, isBefore } from 'date-fns';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, X } from 'lucide-react';
 
@@ -6,21 +7,75 @@ const DateRangePicker = ({ startDate, endDate, onStartDateChange, onEndDateChang
   const [isOpen, setIsOpen] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(startDate ? new Date(startDate) : new Date());
   const [hoverDate, setHoverDate] = useState(null);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, ready: false });
   const wrapperRef = useRef(null);
+  const buttonRef = useRef(null);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+      const isOutsideWrapper = wrapperRef.current && !wrapperRef.current.contains(event.target);
+      const isOutsideDropdown = dropdownRef.current && !dropdownRef.current.contains(event.target);
+
+      if (isOutsideWrapper && isOutsideDropdown) {
         setIsOpen(false);
+        setDropdownPosition({ top: 0, left: 0, ready: false })
       }
     };
     if (isOpen) {
+      const handleScroll = (event) => {
+        if (dropdownRef.current && dropdownRef.current.contains(event.target)) {
+          return
+        }
+        setIsOpen(false)
+      }
+
       document.addEventListener('mousedown', handleClickOutside);
+      window.addEventListener('resize', () => setIsOpen(false));
+      window.addEventListener('scroll', handleScroll, true);
+
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+        window.removeEventListener('resize', () => setIsOpen(false));
+        window.removeEventListener('scroll', handleScroll, true);
+      };
     }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
   }, [isOpen]);
+
+  const handleToggle = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const viewportWidth = window.innerWidth;
+      const dropdownHeight = 400;
+      const dropdownWidth = 320;
+
+      const spaceBelow = viewportHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      const shouldPositionAbove = spaceBelow < dropdownHeight && spaceAbove > spaceBelow;
+
+      let top = shouldPositionAbove ? rect.top - dropdownHeight - 8 : rect.bottom + 8;
+      if (top < 8) top = 8;
+      if (top + dropdownHeight > viewportHeight - 8) {
+        top = viewportHeight - dropdownHeight - 8;
+      }
+
+      let left = rect.left;
+      if (left + dropdownWidth > viewportWidth - 8) {
+        left = viewportWidth - dropdownWidth - 8;
+      }
+      if (left < 8) left = 8;
+
+      setDropdownPosition({ top, left, ready: true });
+      setTimeout(() => setIsOpen(true), 0);
+    } else {
+      setIsOpen(false);
+      setDropdownPosition({ top: 0, left: 0, ready: false });
+    }
+  };
 
   const handleDateSelect = (date) => {
     if (!startDate || (startDate && endDate)) {
@@ -66,9 +121,10 @@ const DateRangePicker = ({ startDate, endDate, onStartDateChange, onEndDateChang
     <div ref={wrapperRef} className={`relative ${className}`}>
       <div className="relative">
         <button
+          ref={buttonRef}
           type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className={`w-full flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg bg-white dark:bg-gray-800 text-left focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-600 transition ${startDate || endDate ? 'pr-10' : ''}`}
+          onClick={handleToggle}
+          className={`w-full flex items-center justify-between px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-left focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-600 transition min-h-[44px] ${startDate || endDate ? 'pr-10' : ''}`}
         >
           <div className="flex items-center gap-2">
             <CalendarIcon size={18} className="text-gray-400" />
@@ -85,99 +141,128 @@ const DateRangePicker = ({ startDate, endDate, onStartDateChange, onEndDateChang
               onStartDateChange('');
               onEndDateChange('');
             }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 p-1"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 p-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
             <X size={16} />
           </button>
         )}
       </div>
 
-      {isOpen && (
-        <div className="absolute z-[100] mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl p-4 w-80">
-          {/* Calendar Header */}
-          <div className="flex items-center justify-between mb-4">
-            <button
-              type="button"
-              onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition"
-            >
-              <ChevronLeft size={20} className="text-gray-600" />
-            </button>
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-              {format(currentMonth, 'MMMM yyyy')}
-            </h3>
-            <button
-              type="button"
-              onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition"
-            >
-              <ChevronRight size={20} className="text-gray-600" />
-            </button>
+      {isOpen && dropdownPosition.ready && createPortal(
+        <>
+          {/* Mobile backdrop */}
+          <div
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9998] md:hidden transition-opacity"
+            onClick={() => setIsOpen(false)}
+          />
+          <div
+            ref={dropdownRef}
+            className="fixed z-[9999] bg-white dark:bg-gray-800 border md:border-gray-200 dark:border-gray-700 rounded-t-2xl md:rounded-lg shadow-[0_-8px_30px_rgba(0,0,0,0.1)] md:shadow-xl p-4 w-full md:w-80 bottom-0 left-0 md:bottom-auto animate-slide-up md:animate-none"
+            style={{
+              ...(window.innerWidth >= 768 ? {
+                top: `${dropdownPosition.top}px`,
+                left: `${dropdownPosition.left}px`,
+                maxHeight: 'calc(100vh - 16px)',
+                maxWidth: 'calc(100vw - 16px)'
+              } : {
+                maxHeight: '85vh',
+                top: 'auto',
+                left: 0
+              }),
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden'
+            }}
+          >
+            {/* Mobile Drag Indicator */}
+            <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full mx-auto mb-4 md:hidden" />
+
+            {/* Calendar Header */}
+            <div className="flex items-center justify-between mb-4 flex-shrink-0">
+              <button
+                type="button"
+                onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition"
+              >
+                <ChevronLeft size={20} className="text-gray-600" />
+              </button>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                {format(currentMonth, 'MMMM yyyy')}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition"
+              >
+                <ChevronRight size={20} className="text-gray-600" />
+              </button>
+            </div>
+
+            {/* Calendar Grid */}
+            <div className="grid grid-cols-7 gap-1">
+              {/* Day headers */}
+              {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => (
+                <div key={day} className="p-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400">
+                  {day}
+                </div>
+              ))}
+
+              {/* Calendar days */}
+              {calendarDays.map((day, idx) => {
+                const isCurrentMonthDay = isSameMonth(day, currentMonth);
+                const isToday = isSameDay(day, new Date());
+                const isStart = startDate && isSameDay(day, new Date(startDate));
+                const isEnd = endDate && isSameDay(day, new Date(endDate));
+                const inRange = isInRange(day);
+
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleDateSelect(day)}
+                    onMouseEnter={() => setHoverDate(day)}
+                    className={`p-2 text-sm rounded transition relative ${!isCurrentMonthDay
+                      ? 'text-gray-300 dark:text-gray-500 cursor-not-allowed'
+                      : isStart || isEnd
+                        ? 'bg-blue-600 text-white font-semibold'
+                        : inRange
+                          ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
+                          : isToday
+                            ? 'bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-300 font-semibold'
+                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      }`}
+                    disabled={!isCurrentMonthDay}
+                  >
+                    {format(day, 'd')}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Quick actions */}
+            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const today = new Date();
+                  onStartDateChange(format(today, 'yyyy-MM-dd'));
+                  onEndDateChange('');
+                }}
+                className="flex-1 px-3 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition"
+              >
+                Today
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="flex-1 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/20 rounded-lg transition min-h-[40px]"
+              >
+                Close
+              </button>
+            </div>
           </div>
-
-          {/* Calendar Grid */}
-          <div className="grid grid-cols-7 gap-1">
-            {/* Day headers */}
-            {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => (
-              <div key={day} className="p-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400">
-                {day}
-              </div>
-            ))}
-
-            {/* Calendar days */}
-            {calendarDays.map((day, idx) => {
-              const isCurrentMonthDay = isSameMonth(day, currentMonth);
-              const isToday = isSameDay(day, new Date());
-              const isStart = startDate && isSameDay(day, new Date(startDate));
-              const isEnd = endDate && isSameDay(day, new Date(endDate));
-              const inRange = isInRange(day);
-
-              return (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => handleDateSelect(day)}
-                  onMouseEnter={() => setHoverDate(day)}
-                  className={`p-2 text-sm rounded transition relative ${!isCurrentMonthDay
-                    ? 'text-gray-300 dark:text-gray-500 cursor-not-allowed'
-                    : isStart || isEnd
-                      ? 'bg-blue-600 text-white font-semibold'
-                      : inRange
-                        ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
-                        : isToday
-                          ? 'bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-300 font-semibold'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                    }`}
-                  disabled={!isCurrentMonthDay}
-                >
-                  {format(day, 'd')}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Quick actions */}
-          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                const today = new Date();
-                onStartDateChange(format(today, 'yyyy-MM-dd'));
-                onEndDateChange('');
-              }}
-              className="flex-1 px-3 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition"
-            >
-              Today
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsOpen(false)}
-              className="flex-1 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/20 rounded-lg transition"
-            >
-              Close
-            </button>
-          </div>
-        </div>
+        </>,
+        document.body
       )}
     </div>
   );

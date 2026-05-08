@@ -9,6 +9,7 @@ import BulkEditList from '../components/BulkEditList'
 import ExportModal from '../components/ExportModal'
 import ImportModal from '../components/ImportModal'
 import MobileExpenseCard from '../components/MobileExpenseCard'
+import Modal from '../components/Modal'
 import { formatCurrency, formatDate, formatDateForInput, parseDateLocal, getTodayDate } from '../utils/helpers'
 import {
   Plus, Edit, Trash2, Search, X,
@@ -179,7 +180,7 @@ const Expenses = () => {
       }
       fetchCalendarData()
     }
-  }, [viewMode, calendarDate, filterType, debouncedSearchTerm])
+  }, [viewMode, calendarDate, filterType, debouncedSearchTerm, expenses])
 
   const summary = useMemo(() => {
     // Current filter or overall stats
@@ -911,7 +912,7 @@ const Expenses = () => {
                   {format(calendarDate, 'MMM yyyy')}
                 </h2>
                 {/* Go-to date picker — desktop only */}
-                <div className="hidden sm:block w-40">
+                <div className="hidden sm:block w-48">
                   <DatePicker
                     value={formatDateForInput(calendarDate)}
                     onChange={(date) => {
@@ -999,8 +1000,8 @@ const Expenses = () => {
                             key={expense._id}
                             onClick={(e) => handleExpenseClick(expense, e)}
                             className={`text-xs p-1 rounded truncate font-medium ${isIncome
-                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900/50'
-                                : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300 hover:bg-rose-200 dark:hover:bg-rose-900/50'
+                              ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900/50'
+                              : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300 hover:bg-rose-200 dark:hover:bg-rose-900/50'
                               }`}
                             title={`${category?.name || 'Uncategorized'}: ${formatCurrency(expense.amount, currency)}`}
                           >
@@ -1031,435 +1032,387 @@ const Expenses = () => {
         </>
       )}
 
-      {/* Add/Edit Form Modal — bottom sheet on mobile, centered on md+ */}
-      {showForm && (
-        <div className="fixed inset-0 z-50 flex flex-col justify-end md:items-center md:justify-center bg-black bg-opacity-50 md:p-4">
-          {/* Bottom sheet inner panel */}
-          <div className="w-full md:max-w-lg max-h-[95vh] md:max-h-[90vh] rounded-t-2xl md:rounded-lg bg-white dark:bg-gray-800 shadow-xl overflow-hidden flex flex-col animate-slide-up md:[animation:none]">
-            <form onSubmit={handleSubmit} className="flex flex-col h-full">
-              {/* Header */}
-              <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 p-6 flex-shrink-0">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {editingExpense ? 'Edit Expense' : 'Add Expense'}
-                </h3>
+      {/* Add/Edit Form Modal */}
+      <Modal
+        isOpen={showForm}
+        onClose={() => { setShowForm(false); resetForm() }}
+        title={editingExpense ? 'Edit Expense' : 'Add Expense'}
+        maxWidth="max-w-lg"
+      >
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 h-[600px] max-h-full">
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto p-6 space-y-4">
+            {/* Type Toggle */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Type</label>
+              <div className="flex gap-2">
                 <button
                   type="button"
-                  onClick={() => { setShowForm(false); resetForm() }}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  onClick={() => setFormData({ ...formData, type: 'expense' })}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 border-2 rounded-lg transition min-h-[44px] ${formData.type === 'expense'
+                    ? 'border-red-500 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'
+                    : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500'
+                    }`}
                 >
-                  <X size={20} />
-                </button>
-              </div>
-
-              {/* Scrollable Content */}
-              <div className="flex-1 overflow-y-auto p-6 space-y-4 max-h-[400px]">
-                {/* Type Toggle */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Type</label>
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setFormData({ ...formData, type: 'expense' })}
-                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 border-2 rounded-lg transition ${formData.type === 'expense'
-                        ? 'border-red-500 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'
-                        : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500'
-                        }`}
-                    >
-                      <ArrowDownCircle size={18} />
-                      Expense
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setFormData({ ...formData, type: 'income' })}
-                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 border-2 rounded-lg transition ${formData.type === 'income'
-                        ? 'border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
-                        : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500'
-                        }`}
-                    >
-                      <ArrowUpCircle size={18} />
-                      Income
-                    </button>
-                  </div>
-                </div>
-
-                {/* Date and Category */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Date *
-                    </label>
-                    <DatePicker
-                      value={formData.date}
-                      onChange={(date) => setFormData({ ...formData, date })}
-                      placeholder="Select date"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Category *
-                    </label>
-                    <CategorySelector
-                      value={formData.category}
-                      onChange={(categoryId) => setFormData({ ...formData, category: categoryId })}
-                      placeholder="Select category"
-                    />
-                  </div>
-                </div>
-
-                {/* Description */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Description
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-                    placeholder="e.g., Groceries, Salary..."
-                  />
-                </div>
-
-                {/* Amount */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Amount *
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 font-medium">
-                      {currencySymbols[currency] || '$'}
-                    </span>
-                    <input
-                      type="number"
-                      step="1"
-                      min="1"
-                      value={formData.amount}
-                      onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                      className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-                      placeholder="0.00"
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Recurring Expense */}
-                <div>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.isRecurring}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          isRecurring: e.target.checked,
-                          recurringEndDate: e.target.checked ? formData.recurringEndDate : ''
-                        })
-                      }
-                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    />
-                    <div className="flex items-center gap-2">
-                      <Repeat size={16} className="text-gray-600 dark:text-gray-400" />
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Recurring {formData.type}</span>
-                    </div>
-                  </label>
-                  {formData.isRecurring && (
-                    <div className="mt-3 ml-6 space-y-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg" style={{ overflow: 'visible' }}>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Frequency *
-                        </label>
-                        <select
-                          value={formData.recurringPeriod}
-                          onChange={(e) => setFormData({ ...formData, recurringPeriod: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                        >
-                          <option value="weekly">Weekly</option>
-                          <option value="monthly">Monthly</option>
-                          <option value="yearly">Yearly</option>
-                        </select>
-                      </div>
-
-                      <div className="relative" style={{ zIndex: 1000 }}>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          End Date *
-                        </label>
-                        <DatePicker
-                          value={formData.recurringEndDate}
-                          onChange={(date) => setFormData({ ...formData, recurringEndDate: date })}
-                          placeholder="Select end date"
-                        />
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          Recurring entries will be created from the start date through this end date.
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Form Actions */}
-              <div className="flex gap-3 p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex-shrink-0">
-                <button
-                  type="submit"
-                  disabled={formLoading}
-                  className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {formLoading ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                      {editingExpense ? 'Updating...' : 'Adding...'}
-                    </span>
-                  ) : (
-                    editingExpense ? 'Update' : 'Add'
-                  )}
+                  <ArrowDownCircle size={18} />
+                  Expense
                 </button>
                 <button
                   type="button"
-                  onClick={() => { setShowForm(false); resetForm() }}
-                  disabled={formLoading}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50"
+                  onClick={() => setFormData({ ...formData, type: 'income' })}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 border-2 rounded-lg transition min-h-[44px] ${formData.type === 'income'
+                    ? 'border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
+                    : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500'
+                    }`}
                 >
-                  Cancel
+                  <ArrowUpCircle size={18} />
+                  Income
                 </button>
               </div>
-            </form>
-          </div>
-        </div>
-      )}
+            </div>
 
-      {/* Bulk Edit Modal */}
-      {showBulkEdit && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="w-full max-w-4xl rounded-lg bg-white dark:bg-gray-800 shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
-            <form onSubmit={handleBulkUpdateSubmit} className="flex flex-col" style={{ height: '35rem' }}>
-              <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 p-6 flex-shrink-0">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Bulk Edit ({selectedExpenses.length} items)
-                </h3>
-                <button
-                  type="button"
-                  onClick={() => setShowBulkEdit(false)}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-
-              <div className="p-6 overflow-y-auto flex-1">
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                  Update details for each selected expense below.
-                </p>
-
-                <BulkEditList
-                  expenses={selectedExpenses}
-                  categories={categories}
-                  currency={currency}
-                  onExpensesChange={setEditableExpenses}
+            {/* Date and Category */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="relative z-20">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Date *
+                </label>
+                <DatePicker
+                  value={formData.date}
+                  onChange={(date) => setFormData({ ...formData, date })}
+                  placeholder="Select date"
                 />
               </div>
 
-              <div className="flex gap-3 p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex-shrink-0">
-                <button
-                  type="submit"
-                  disabled={bulkLoading}
-                  className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
-                >
-                  {bulkLoading ? 'Updating...' : 'Update All'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowBulkEdit(false)}
-                  disabled={bulkLoading}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600"
-                >
-                  Cancel
-                </button>
+              <div className="relative z-10">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Category *
+                </label>
+                <CategorySelector
+                  categories={categories}
+                  value={formData.category}
+                  onChange={(categoryId) => setFormData({ ...formData, category: categoryId })}
+                  placeholder="Select category"
+                />
               </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Bulk Delete Modal */}
-      {showBulkDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="w-full max-w-md rounded-lg bg-white dark:bg-gray-800 shadow-xl overflow-hidden">
-            <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Delete Expenses
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowBulkDelete(false)}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-              >
-                <X size={20} />
-              </button>
             </div>
 
-            <div className="p-6 space-y-4">
-              <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 rounded-lg">
-                <Trash2 size={24} />
-                <div>
-                  <p className="font-medium">Are you sure?</p>
-                  <p className="text-sm opacity-90">This action cannot be undone.</p>
+            {/* Description */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Description
+              </label>
+              <input
+                type="text"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 min-h-[44px]"
+                placeholder="e.g., Groceries, Salary..."
+              />
+            </div>
+
+            {/* Amount */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Amount *
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 font-medium">
+                  {currencySymbols[currency] || '$'}
+                </span>
+                <input
+                  type="number"
+                  step="1"
+                  min="1"
+                  value={formData.amount}
+                  onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 min-h-[44px]"
+                  placeholder="0.00"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Recurring Expense */}
+            <div>
+              <label className="flex items-center gap-2 cursor-pointer min-h-[44px]">
+                <input
+                  type="checkbox"
+                  checked={formData.isRecurring}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      isRecurring: e.target.checked,
+                      recurringEndDate: e.target.checked ? formData.recurringEndDate : ''
+                    })
+                  }
+                  className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <div className="flex items-center gap-2">
+                  <Repeat size={18} className="text-gray-600 dark:text-gray-400" />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Recurring {formData.type}</span>
                 </div>
-              </div>
-            </div>
+              </label>
+              {formData.isRecurring && (
+                <div className="mt-3 ml-6 space-y-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg" style={{ overflow: 'visible' }}>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Frequency *
+                    </label>
+                    <select
+                      value={formData.recurringPeriod}
+                      onChange={(e) => setFormData({ ...formData, recurringPeriod: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white min-h-[44px]"
+                    >
+                      <option value="weekly">Weekly</option>
+                      <option value="monthly">Monthly</option>
+                      <option value="yearly">Yearly</option>
+                    </select>
+                  </div>
 
-            <div className="flex gap-3 p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-              <button
-                type="button"
-                onClick={confirmBulkDelete}
-                className="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700"
-              >
-                Delete {selectedExpenses.length} Items
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowBulkDelete(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Bulk Add Form Modal */}
-      {showBulkForm && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black bg-opacity-50 p-4 overflow-y-auto">
-          <div className="w-full max-w-2xl my-8 rounded-lg bg-white dark:bg-gray-800 shadow-xl flex flex-col max-h-[90vh] relative">
-            <form onSubmit={handleBulkSubmit} className="flex flex-col h-full">
-              {/* Header - Fixed */}
-              <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 p-6 flex-shrink-0">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Bulk Add Expenses</h3>
-                <button
-                  type="button"
-                  onClick={() => { setShowBulkForm(false); resetBulkForm() }}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-
-              {/* Content Area - Scrollable */}
-              <div className="flex-1 flex flex-col overflow-hidden min-h-0">
-                <div className="flex flex-col p-6 overflow-y-auto flex-1">
-                  {/* Date Selection - Fixed at top */}
-                  <div className="mb-4 flex-shrink-0 relative">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Date for all expenses *
+                  <div className="relative" style={{ zIndex: 1000 }}>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      End Date *
                     </label>
                     <DatePicker
-                      value={bulkDate}
-                      onChange={(date) => setBulkDate(date)}
-                      placeholder="Select date"
+                      value={formData.recurringEndDate}
+                      onChange={(date) => setFormData({ ...formData, recurringEndDate: date })}
+                      placeholder="Select end date"
                     />
-                  </div>
-
-                  {/* Expense Rows Section */}
-                  <div className="flex flex-col">
-                    <div className="flex items-center justify-between mb-3 flex-shrink-0">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Expenses
-                      </label>
-                      <button
-                        type="button"
-                        onClick={addBulkRow}
-                        className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
-                      >
-                        + Add Row
-                      </button>
-                    </div>
-
-                    <div
-                      className="space-y-3 overflow-y-auto pr-2"
-                      style={{
-                        maxHeight: '400px',
-                        scrollbarWidth: 'thin',
-                        scrollbarColor: '#cbd5e1 #f1f5f9'
-                      }}
-                    >
-                      {bulkExpenses.map((expense, index) => (
-                        <div key={index} className="flex flex-col sm:grid sm:grid-cols-12 gap-2 items-start p-3 border border-gray-200 dark:border-gray-700 rounded-lg flex-shrink-0">
-                          <div className="col-span-12 sm:col-span-4">
-                            <input
-                              type="number"
-                              step="1"
-                              min="1"
-                              value={expense.amount}
-                              onChange={(e) => updateBulkRow(index, 'amount', e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-                              placeholder="Amount"
-                            />
-                          </div>
-                          <div className="col-span-12 sm:col-span-5 relative">
-                            <CategorySelector
-                              value={expense.category}
-                              onChange={(categoryId) => updateBulkRow(index, 'category', categoryId)}
-                              placeholder="Category"
-                            />
-                          </div>
-                          <div className="col-span-12 sm:col-span-2">
-                            <input
-                              type="text"
-                              value={expense.description}
-                              onChange={(e) => updateBulkRow(index, 'description', e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-                              placeholder="Description"
-                            />
-                          </div>
-                          <div className="col-span-12 sm:col-span-1 flex sm:block justify-end">
-                            {bulkExpenses.length > 1 && (
-                              <button
-                                type="button"
-                                onClick={() => removeBulkRow(index)}
-                                className="w-full p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
-                                title="Remove row"
-                              >
-                                <X size={18} />
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Recurring entries will be created from the start date through this end date.
+                    </p>
                   </div>
                 </div>
-              </div>
+              )}
+            </div>
+          </div>
 
-              {/* Form Actions - Fixed */}
-              <div className="flex gap-3 p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex-shrink-0">
-                <button
-                  type="submit"
-                  disabled={bulkLoading}
-                  className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {bulkLoading ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                      Adding...
-                    </span>
-                  ) : (
-                    `Add ${bulkExpenses.filter(e => e.amount && e.category).length} Expense(s)`
-                  )}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { setShowBulkForm(false); resetBulkForm() }}
-                  disabled={bulkLoading}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50"
-                >
-                  Cancel
-                </button>
+          {/* Form Actions */}
+          <div className="flex gap-3 p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 mt-auto flex-shrink-0">
+            <button
+              type="submit"
+              disabled={formLoading}
+              className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition min-h-[44px]"
+            >
+              {formLoading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                  {editingExpense ? 'Updating...' : 'Adding...'}
+                </span>
+              ) : (
+                editingExpense ? 'Update' : 'Add'
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => { setShowForm(false); resetForm() }}
+              disabled={formLoading}
+              className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 min-h-[44px]"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Bulk Edit Modal */}
+      <Modal
+        isOpen={showBulkEdit}
+        onClose={() => setShowBulkEdit(false)}
+        title={`Bulk Edit (${selectedExpenses.length} items)`}
+        maxWidth="max-w-4xl"
+      >
+        <form onSubmit={handleBulkUpdateSubmit} className="flex flex-col flex-1 h-[600px] max-h-full">
+          <div className="p-6 overflow-y-auto flex-1">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              Update details for each selected expense below.
+            </p>
+
+            <BulkEditList
+              expenses={selectedExpenses}
+              categories={categories}
+              currency={currency}
+              onExpensesChange={setEditableExpenses}
+            />
+          </div>
+
+          <div className="flex gap-3 p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex-shrink-0 mt-auto">
+            <button
+              type="submit"
+              disabled={bulkLoading}
+              className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition min-h-[44px]"
+            >
+              {bulkLoading ? 'Updating...' : 'Update All'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowBulkEdit(false)}
+              disabled={bulkLoading}
+              className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 min-h-[44px]"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Bulk Delete Modal */}
+      <Modal
+        isOpen={showBulkDelete}
+        onClose={() => setShowBulkDelete(false)}
+        title="Delete Expenses"
+        maxWidth="max-w-md"
+      >
+        <div className="flex flex-col h-full">
+          <div className="p-6 space-y-4 flex-1">
+            <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 rounded-lg">
+              <Trash2 size={24} />
+              <div>
+                <p className="font-medium">Are you sure?</p>
+                <p className="text-sm opacity-90">This action cannot be undone.</p>
               </div>
-            </form>
+            </div>
+          </div>
+          <div className="flex gap-3 p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 mt-auto flex-shrink-0">
+            <button
+              type="button"
+              onClick={confirmBulkDelete}
+              className="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition min-h-[44px]"
+            >
+              Delete {selectedExpenses.length} Items
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowBulkDelete(false)}
+              className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 min-h-[44px]"
+            >
+              Cancel
+            </button>
           </div>
         </div>
-      )}
+      </Modal>
+
+      {/* Bulk Add Form Modal */}
+      <Modal
+        isOpen={showBulkForm}
+        onClose={() => { setShowBulkForm(false); resetBulkForm() }}
+        title="Bulk Add Expenses"
+        maxWidth="max-w-2xl"
+      >
+        <form onSubmit={handleBulkSubmit} className="flex flex-col flex-1 h-[600px] max-h-[85vh]">
+          {/* Content Area - Scrollable */}
+          <div className="flex flex-col p-6 overflow-y-auto flex-1">
+            {/* Date Selection - Fixed at top */}
+            <div className="mb-4 flex-shrink-0 relative z-20">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Date for all expenses *
+              </label>
+              <DatePicker
+                value={bulkDate}
+                onChange={(date) => setBulkDate(date)}
+                placeholder="Select date"
+              />
+            </div>
+
+            {/* Expense Rows Section */}
+            <div className="flex flex-col z-10">
+              <div className="flex items-center justify-between mb-3 flex-shrink-0">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Expenses
+                </label>
+                <button
+                  type="button"
+                  onClick={addBulkRow}
+                  className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium min-h-[44px] flex items-center"
+                >
+                  + Add Row
+                </button>
+              </div>
+
+              <div
+                className="space-y-3 overflow-y-auto pr-2"
+                style={{
+                  maxHeight: '400px',
+                  scrollbarWidth: 'thin',
+                  scrollbarColor: '#cbd5e1 #f1f5f9'
+                }}
+              >
+                {bulkExpenses.map((expense, index) => (
+                  <div key={index} className="flex flex-col sm:grid sm:grid-cols-12 gap-2 items-start p-3 border border-gray-200 dark:border-gray-700 rounded-lg flex-shrink-0">
+                    <div className="col-span-12 sm:col-span-4 w-full">
+                      <input
+                        type="number"
+                        step="1"
+                        min="1"
+                        value={expense.amount}
+                        onChange={(e) => updateBulkRow(index, 'amount', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 min-h-[44px]"
+                        placeholder="Amount"
+                      />
+                    </div>
+                    <div className="col-span-12 sm:col-span-5 relative w-full">
+                      <CategorySelector
+                        categories={categories}
+                        value={expense.category}
+                        onChange={(categoryId) => updateBulkRow(index, 'category', categoryId)}
+                        placeholder="Category"
+                      />
+                    </div>
+                    <div className="col-span-12 sm:col-span-2 w-full">
+                      <input
+                        type="text"
+                        value={expense.description}
+                        onChange={(e) => updateBulkRow(index, 'description', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 min-h-[44px]"
+                        placeholder="Description"
+                      />
+                    </div>
+                    <div className="col-span-12 sm:col-span-1 flex sm:block justify-end w-full sm:w-auto">
+                      {bulkExpenses.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeBulkRow(index)}
+                          className="w-full p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg min-h-[44px] flex items-center justify-center"
+                          title="Remove row"
+                        >
+                          <X size={18} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Form Actions - Fixed */}
+          <div className="flex gap-3 p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex-shrink-0 mt-auto">
+            <button
+              type="submit"
+              disabled={bulkLoading}
+              className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition min-h-[44px]"
+            >
+              {bulkLoading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                  Adding...
+                </span>
+              ) : (
+                `Add ${bulkExpenses.filter(e => e.amount && e.category).length} Expense(s)`
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => { setShowBulkForm(false); resetBulkForm() }}
+              disabled={bulkLoading}
+              className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 min-h-[44px]"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </Modal>
       {/* Export Modal */}
       <ExportModal
         isOpen={showExportModal}
