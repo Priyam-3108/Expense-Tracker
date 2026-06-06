@@ -28,22 +28,22 @@ export default function DebtList({ debts, type }) {
 
     return (
         <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead className="bg-gray-50 dark:bg-gray-800">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-white/[0.05]">
+                <thead className="bg-gray-50 dark:bg-white/[0.02]">
                     <tr>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                             Person
                         </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                             Amount
                         </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                             Remaining
                         </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                             Date
                         </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
                             Status
                         </th>
                         <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -51,7 +51,7 @@ export default function DebtList({ debts, type }) {
                         </th>
                     </tr>
                 </thead>
-                <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                <tbody className="bg-white dark:bg-transparent divide-y divide-gray-200 dark:divide-white/[0.05]">
                     {debts.map((debt) => (
                         <tr key={debt._id}>
                             <td className="px-6 py-4 whitespace-nowrap">
@@ -77,10 +77,10 @@ export default function DebtList({ debts, type }) {
                                 )}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                  ${debt.status === 'paid' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                                        debt.status === 'partially_paid' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
-                                            'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}`}>
+                                <span className={`px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full 
+                  ${debt.status === 'paid' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300' :
+                                        debt.status === 'partially_paid' ? 'bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300' :
+                                            'bg-rose-100 text-rose-800 dark:bg-rose-500/15 dark:text-rose-300'}`}>
                                     {debt.status.replace('_', ' ')}
                                 </span>
                             </td>
@@ -97,7 +97,7 @@ export default function DebtList({ debts, type }) {
                                     )}
                                     <button
                                         onClick={() => setEditingDebt(debt)}
-                                        className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                                        className="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
                                         title="Edit"
                                     >
                                         <PencilIcon className="h-5 w-5" />

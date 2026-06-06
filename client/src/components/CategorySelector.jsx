@@ -119,35 +119,35 @@ const CategorySelector = ({
 
   const dropdownContent = (
     <div
-      className="md:bg-white md:dark:bg-gray-700 w-full flex flex-col h-full md:h-auto"
+      className="w-full flex flex-col h-full md:h-auto bg-white dark:bg-transparent"
       onClick={(e) => e.stopPropagation()}
     >
       {/* Mobile drag handle */}
       <div className="flex justify-center pt-3 pb-1 md:hidden flex-shrink-0">
-        <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full" />
+        <div className="w-12 h-1.5 bg-gray-300 dark:bg-white/[0.15] rounded-full" />
       </div>
 
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-600 md:hidden flex-shrink-0">
-        <h3 className="font-medium text-gray-900 dark:text-gray-100">Select Category</h3>
+      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-white/[0.06] md:hidden flex-shrink-0">
+        <h3 className="font-medium text-gray-900 dark:text-white">Select Category</h3>
         <button
           onClick={() => {
             setIsOpen(false)
             setSearchTerm('')
           }}
-          className="text-gray-500 min-h-[44px] min-w-[44px] flex items-center justify-center p-2 mb-[-8px] mt-[-8px]"
+          className="text-gray-500 dark:text-slate-400 min-h-[44px] min-w-[44px] flex items-center justify-center p-2 mb-[-8px] mt-[-8px] hover:text-gray-700 dark:hover:text-white transition-colors"
         >
           <X size={20} />
         </button>
       </div>
 
       {/* Search Input */}
-      <div className="p-4 md:p-2 border-b border-gray-200 dark:border-gray-600 flex-shrink-0">
+      <div className="p-4 md:p-2 border-b border-gray-200 dark:border-white/[0.06] flex-shrink-0">
         <input
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search categories..."
-          className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 min-h-[44px]"
+          className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-white/[0.08] rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-slate-500 min-h-[44px] transition-all duration-200"
           autoFocus={window.innerWidth >= 768} // Only autofocus on desktop to prevent mobile keyboard pushing sheet
         />
       </div>
@@ -155,7 +155,7 @@ const CategorySelector = ({
       {/* Categories List */}
       <div className="flex-1 overflow-y-auto min-h-0 md:max-h-60 custom-scrollbar overscroll-contain">
         {filteredCategories.length === 0 ? (
-          <div className="px-4 py-6 md:px-3 md:py-2 text-sm text-gray-500 dark:text-gray-400 text-center">
+          <div className="px-4 py-6 md:px-3 md:py-2 text-sm text-gray-500 dark:text-slate-500 text-center">
             {searchTerm ? 'No categories found' : 'No categories available'}
           </div>
         ) : (
@@ -164,7 +164,7 @@ const CategorySelector = ({
               key={category._id}
               type="button"
               onClick={() => handleSelect(category)}
-              className="w-full flex items-center gap-3 px-4 py-3 md:px-3 md:py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-600 focus:bg-gray-50 dark:focus:bg-gray-600 focus:outline-none transition min-h-[44px]"
+              className="w-full flex items-center gap-3 px-4 py-3 md:px-3 md:py-2 text-left hover:bg-gray-50 dark:hover:bg-white/[0.04] focus:bg-gray-50 dark:focus:bg-white/[0.04] focus:outline-none transition-all duration-200 min-h-[44px]"
             >
               <div
                 className="w-8 h-8 md:w-6 md:h-6 rounded-full flex items-center justify-center text-sm flex-shrink-0"
@@ -184,11 +184,11 @@ const CategorySelector = ({
 
       {/* Create New Category Button */}
       {showCreateButton && onCreateClick && (
-        <div className="border-t border-gray-200 dark:border-gray-600 flex-shrink-0 p-2 md:p-0">
+        <div className="border-t border-gray-200 dark:border-white/[0.06] flex-shrink-0 p-2 md:p-0">
           <button
             type="button"
             onClick={handleCreateClick}
-            className="w-full flex items-center justify-center md:justify-start gap-2 px-4 py-3 md:px-3 md:py-2 text-sm font-medium md:font-normal text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 focus:bg-blue-50 dark:focus:bg-blue-900/20 focus:outline-none min-h-[44px] rounded-lg md:rounded-none"
+            className="w-full flex items-center justify-center md:justify-start gap-2 px-4 py-3 md:px-3 md:py-2 text-sm font-medium md:font-normal text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 focus:bg-indigo-50 dark:focus:bg-indigo-500/10 focus:outline-none min-h-[44px] rounded-xl md:rounded-none transition-all duration-200"
           >
             <Plus size={18} className="md:w-4 md:h-4" />
             Create new category
@@ -202,7 +202,7 @@ const CategorySelector = ({
     <>
       {/* Mobile backdrop */}
       <div
-        className="fixed inset-0 bg-black/50 z-[9998] md:hidden transition-opacity"
+        className="fixed inset-0 z-[9998] md:hidden transition-opacity glass-modal-backdrop"
         style={{ opacity: isOpen ? 1 : 0 }}
         onClick={() => {
           setIsOpen(false)
@@ -214,13 +214,14 @@ const CategorySelector = ({
       <div
         ref={dropdownRef}
         className={`
-          fixed z-[9999] shadow-xl overflow-hidden bg-white dark:bg-gray-800
+          fixed z-[9999] overflow-hidden
+          bg-white dark:bg-slate-900/90 dark:backdrop-blur-xl dark:border dark:border-white/[0.08]
           ${/* Mobile: Bottom sheet */ ''}
-          bottom-0 left-0 right-0 rounded-t-2xl transition-transform duration-300 ease-out origin-bottom
+          bottom-0 left-0 right-0 rounded-t-2xl transition-transform duration-300 ease-out origin-bottom shadow-xl dark:shadow-[0_-8px_40px_rgba(0,0,0,0.4)]
           ${isOpen ? 'translate-y-0 h-[65vh] max-h-[85vh]' : 'translate-y-full'}
           
           ${/* Desktop: Absolute popover */ ''}
-          md:bottom-auto md:left-auto md:right-auto md:rounded-lg md:border md:border-gray-300 md:dark:border-gray-600 md:transition-none md:translate-y-0 md:h-auto
+          md:bottom-auto md:left-auto md:right-auto md:rounded-xl md:border md:border-gray-300 md:dark:border-white/[0.08] md:transition-none md:translate-y-0 md:h-auto md:shadow-xl md:dark:shadow-[0_12px_40px_rgba(0,0,0,0.4)]
         `}
         style={window.innerWidth >= 768 ? {
           top: dropdownPosition.ready ? `${dropdownPosition.top}px` : '-9999px',
@@ -246,7 +247,7 @@ const CategorySelector = ({
         type="button"
         onClick={handleToggle}
         disabled={disabled}
-        className={`w-full flex items-center justify-between px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[44px] ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+        className={`w-full flex items-center justify-between px-3 py-2 border border-gray-300 dark:border-white/[0.08] rounded-xl bg-white dark:bg-white/[0.04] text-left focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 min-h-[44px] transition-all duration-200 ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-gray-400 dark:hover:border-white/[0.15]'}`}
       >
         {selectedCategory ? (
           <div className="flex items-center gap-2 overflow-hidden">
@@ -259,11 +260,11 @@ const CategorySelector = ({
             <span className="text-gray-900 dark:text-white truncate">{selectedCategory.name}</span>
           </div>
         ) : (
-          <span className="text-gray-500 dark:text-gray-400 truncate">{placeholder}</span>
+          <span className="text-gray-500 dark:text-slate-500 truncate">{placeholder}</span>
         )}
         <ChevronDown
           size={16}
-          className={`text-gray-400 transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}
+          className={`text-gray-400 dark:text-slate-500 transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
 

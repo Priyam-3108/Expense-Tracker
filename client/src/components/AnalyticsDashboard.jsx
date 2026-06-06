@@ -265,8 +265,8 @@ const AnalyticsDashboard = ({
         return (
             <div className="flex items-center justify-center min-h-[400px]">
                 <div className="text-center">
-                    <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-100 border-t-blue-500 mx-auto mb-4" />
-                    <p className="text-gray-600">Loading analytics...</p>
+                    <div className="h-12 w-12 animate-spin rounded-full border-4 border-slate-700 border-t-indigo-500 mx-auto mb-4" />
+                    <p className="text-slate-500">Loading analytics...</p>
                 </div>
             </div>
         )
@@ -280,7 +280,7 @@ const AnalyticsDashboard = ({
                     <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white">
                         {isSharedView ? 'Shared Analytics' : 'Analytics'}
                     </h1>
-                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                    <p className="mt-1 text-sm text-gray-600 dark:text-slate-500">
                         {isSharedView ? 'Viewing shared expense analytics' : 'View your expense analytics and insights'}
                     </p>
                 </div>
@@ -289,8 +289,8 @@ const AnalyticsDashboard = ({
                         onClick={onShare}
                         className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors text-sm font-medium min-h-[40px] flex-shrink-0 ${
                             shareEnabled
-                                ? 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800'
-                                : 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm'
+                                ? 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-emerald-500/10 dark:text-emerald-400 border border-green-200 dark:border-emerald-500/20'
+                                : 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.2)]'
                         }`}
                     >
                         <Share2 size={16} />
@@ -301,16 +301,16 @@ const AnalyticsDashboard = ({
             </div>
 
             {/* Filters */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700">
+            <div className="glass-card overflow-hidden">
                 {/* Filter Header */}
-                <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4">
+                <div className="bg-gradient-to-r from-gray-50 to-white dark:from-white/[0.03] dark:to-transparent border-b border-gray-200 dark:border-white/[0.05] px-4 sm:px-6 py-3 sm:py-4">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
-                            <Filter size={20} className="text-gray-700 dark:text-gray-300" />
+                        <div className="p-2 bg-white dark:bg-white/[0.06] rounded-xl shadow-sm border border-gray-200 dark:border-white/[0.08]">
+                            <Filter size={20} className="text-gray-700 dark:text-slate-300" />
                         </div>
                         <div>
                             <h3 className="text-base font-semibold text-gray-900 dark:text-white">Filters</h3>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Customize your analytics view</p>
+                            <p className="text-xs text-gray-500 dark:text-slate-500 mt-0.5">Customize your analytics view</p>
                         </div>
                     </div>
                 </div>
@@ -368,7 +368,7 @@ const AnalyticsDashboard = ({
                                 <BarChart3 size={16} className="text-gray-500 dark:text-gray-400" />
                                 Type
                             </label>
-                            <div className="flex gap-2 p-1 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                            <div className="flex gap-2 p-1 bg-gray-100 dark:bg-white/[0.04] rounded-xl border border-gray-200 dark:border-white/[0.06]">
                                 {[
                                     { label: 'All', value: 'all' },
                                     { label: 'Expenses', value: 'expense' },
@@ -378,9 +378,9 @@ const AnalyticsDashboard = ({
                                         key={option.value}
                                         type="button"
                                         onClick={() => setFilterType(option.value)}
-                                        className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-all duration-200 ${filterType === option.value
-                                            ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm border border-gray-200 dark:border-gray-500'
-                                            : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                                        className={`flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${filterType === option.value
+                                            ? 'bg-white dark:bg-white/[0.08] text-indigo-600 dark:text-indigo-400 shadow-sm border border-gray-200 dark:border-white/[0.10]'
+                                            : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white'
                                             }`}
                                     >
                                         {option.label}
@@ -407,7 +407,7 @@ const AnalyticsDashboard = ({
                                         key={preset.value}
                                         type="button"
                                         onClick={() => applyQuickFilter(preset.value)}
-                                        className="px-3 py-2 text-xs font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-gray-400 dark:hover:border-gray-500 hover:shadow-sm transition-all duration-200 min-h-[36px]"
+                                        className="px-3 py-2 text-xs font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-white/[0.04] border border-gray-300 dark:border-white/[0.08] rounded-xl hover:bg-gray-50 dark:hover:bg-white/[0.08] hover:border-gray-400 dark:hover:border-white/[0.15] transition-all duration-200 min-h-[36px]"
                                     >
                                         {preset.label}
                                     </button>
@@ -418,10 +418,10 @@ const AnalyticsDashboard = ({
 
                     {/* Clear Filters Button */}
                     {hasActiveFilters && (
-                        <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-end">
+                        <div className="mt-6 pt-4 border-t border-gray-200 dark:border-white/[0.05] flex justify-end">
                             <button
                                 onClick={clearFilters}
-                                className="inline-flex items-center gap-2 rounded-lg bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:border-gray-400 dark:hover:border-gray-500 hover:shadow-sm transition-all duration-200"
+                                className="inline-flex items-center gap-2 rounded-xl bg-gray-100 dark:bg-white/[0.04] border border-gray-300 dark:border-white/[0.08] px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-white/[0.08] transition-all duration-200"
                             >
                                 <X size={16} />
                                 Clear All Filters
@@ -433,43 +433,43 @@ const AnalyticsDashboard = ({
 
             {/* Summary Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl border border-blue-200 dark:border-blue-800 p-4 sm:p-5 shadow-sm">
+                <div className="glass-card p-4 sm:p-5 border-l-2 border-l-rose-500/50">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-xs sm:text-sm font-medium text-blue-700 dark:text-blue-300">Total Expenses</p>
-                            <p className="mt-1 text-lg sm:text-2xl font-bold text-blue-900 dark:text-blue-100 leading-tight">
+                            <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-slate-400">Total Expenses</p>
+                            <p className="mt-1 text-lg sm:text-2xl font-bold text-gray-900 dark:text-white leading-tight">
                                 {formatCurrency(summary.totalExpenses, currency)}
                             </p>
-                            <p className="mt-1 text-xs text-blue-600 dark:text-blue-400">
+                            <p className="mt-1 text-xs text-gray-500 dark:text-slate-500">
                                 {summary.expenseCount} transaction{summary.expenseCount !== 1 ? 's' : ''}
                             </p>
                         </div>
-                        <div className="p-2 sm:p-3 bg-blue-200 dark:bg-blue-800/40 rounded-lg flex-shrink-0">
-                            <ArrowDownCircle size={20} className="text-blue-700 dark:text-blue-300" />
+                        <div className="p-2 sm:p-3 bg-rose-50 dark:bg-rose-500/10 rounded-xl flex-shrink-0">
+                            <ArrowDownCircle size={20} className="text-rose-500 dark:text-rose-400 drop-shadow-[0_0_6px_rgba(251,113,133,0.3)]" />
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-800/20 rounded-xl border border-emerald-200 dark:border-emerald-800 p-4 sm:p-5 shadow-sm">
+                <div className="glass-card p-4 sm:p-5 border-l-2 border-l-emerald-500/50">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-xs sm:text-sm font-medium text-emerald-700 dark:text-emerald-300">Total Income</p>
-                            <p className="mt-1 text-lg sm:text-2xl font-bold text-emerald-900 dark:text-emerald-100 leading-tight">
+                            <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-slate-400">Total Income</p>
+                            <p className="mt-1 text-lg sm:text-2xl font-bold text-gray-900 dark:text-white leading-tight">
                                 {formatCurrency(summary.totalIncome, currency)}
                             </p>
-                            <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-400">
+                            <p className="mt-1 text-xs text-gray-500 dark:text-slate-500">
                                 {summary.incomeCount} transaction{summary.incomeCount !== 1 ? 's' : ''}
                             </p>
                         </div>
-                        <div className="p-2 sm:p-3 bg-emerald-200 dark:bg-emerald-800/40 rounded-lg flex-shrink-0">
-                            <ArrowUpCircle size={20} className="text-emerald-700 dark:text-emerald-300" />
+                        <div className="p-2 sm:p-3 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl flex-shrink-0">
+                            <ArrowUpCircle size={20} className="text-emerald-500 dark:text-emerald-400 drop-shadow-[0_0_6px_rgba(52,211,153,0.3)]" />
                         </div>
                     </div>
                 </div>
 
-                <div className={`bg-gradient-to-br rounded-xl border p-4 sm:p-5 shadow-sm ${summary.netAmount >= 0
-                    ? 'from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-800/20 border-emerald-200 dark:border-emerald-800'
-                    : 'from-rose-50 to-rose-100 dark:from-rose-900/20 dark:to-rose-800/20 border-rose-200 dark:border-rose-800'
+                <div className={`glass-card p-4 sm:p-5 border-l-2 ${summary.netAmount >= 0
+                    ? 'border-l-emerald-500/50'
+                    : 'border-l-rose-500/50'
                     }`}>
                     <div className="flex items-center justify-between">
                         <div>
@@ -500,7 +500,7 @@ const AnalyticsDashboard = ({
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-5 shadow-sm">
+                <div className="glass-card p-4 sm:p-5">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Avg Daily Spending</p>
@@ -521,7 +521,7 @@ const AnalyticsDashboard = ({
             {/* Charts Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Spending Trends Line Chart */}
-                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6 shadow-sm">
+                <div className="glass-card p-4 sm:p-6">
                     <div className="flex items-center justify-between mb-3 sm:mb-4">
                         <div>
                             <h3 className="text-sm sm:text-lg font-semibold text-gray-900 dark:text-white">Spending Trends</h3>
@@ -559,11 +559,13 @@ const AnalyticsDashboard = ({
                                 />
                                 <Tooltip
                                     contentStyle={{
-                                        backgroundColor: isDark ? '#1F2937' : '#fff',
-                                        border: `1px solid ${isDark ? '#374151' : '#E5E7EB'}`,
-                                        borderRadius: '8px',
-                                        padding: '8px',
-                                        color: isDark ? '#F3F4F6' : '#374151'
+                                        backgroundColor: isDark ? 'rgba(15,23,42,0.90)' : '#fff',
+                                        border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#E5E7EB'}`,
+                                        borderRadius: '12px',
+                                        padding: '10px',
+                                        color: isDark ? '#F3F4F6' : '#374151',
+                                        backdropFilter: 'blur(16px)',
+                                        boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.4)' : '0 4px 16px rgba(0,0,0,0.1)'
                                     }}
                                     itemStyle={{ color: isDark ? '#F3F4F6' : '#374151' }}
                                     formatter={(value, name) => [
@@ -604,7 +606,7 @@ const AnalyticsDashboard = ({
                 </div>
 
                 {/* Category Breakdown Pie Chart */}
-                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6 shadow-sm">
+                <div className="glass-card p-4 sm:p-6">
                     <div className="flex items-center justify-between mb-3 sm:mb-4">
                         <div>
                             <h3 className="text-sm sm:text-lg font-semibold text-gray-900 dark:text-white">Category Breakdown</h3>
@@ -632,11 +634,13 @@ const AnalyticsDashboard = ({
                                 </Pie>
                                 <Tooltip
                                     contentStyle={{
-                                        backgroundColor: isDark ? '#1F2937' : '#fff',
-                                        border: `1px solid ${isDark ? '#374151' : '#E5E7EB'}`,
-                                        borderRadius: '8px',
-                                        padding: '8px',
-                                        color: isDark ? '#F3F4F6' : '#374151'
+                                        backgroundColor: isDark ? 'rgba(15,23,42,0.90)' : '#fff',
+                                        border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#E5E7EB'}`,
+                                        borderRadius: '12px',
+                                        padding: '10px',
+                                        color: isDark ? '#F3F4F6' : '#374151',
+                                        backdropFilter: 'blur(16px)',
+                                        boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.4)' : '0 4px 16px rgba(0,0,0,0.1)'
                                     }}
                                     itemStyle={{ color: isDark ? '#F3F4F6' : '#374151' }}
                                     formatter={(value) => formatCurrency(value, currency)}
@@ -652,7 +656,7 @@ const AnalyticsDashboard = ({
                 </div>
 
                 {/* Monthly Comparison Bar Chart */}
-                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6 shadow-sm lg:col-span-2">
+                <div className="glass-card p-4 sm:p-6 lg:col-span-2">
                     <div className="flex items-center justify-between mb-3 sm:mb-4">
                         <div>
                             <h3 className="text-sm sm:text-lg font-semibold text-gray-900 dark:text-white">Monthly Comparison</h3>
@@ -677,12 +681,13 @@ const AnalyticsDashboard = ({
                                 />
                                 <Tooltip
                                     contentStyle={{
-                                        backgroundColor: isDark ? '#1F2937' : '#FFFFFF',
-                                        borderColor: isDark ? '#374151' : '#E5E7EB',
-                                        borderRadius: '8px',
-                                        padding: '8px',
-                                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                                        color: isDark ? '#F3F4F6' : '#1F2937'
+                                        backgroundColor: isDark ? 'rgba(15,23,42,0.90)' : '#FFFFFF',
+                                        borderColor: isDark ? 'rgba(255,255,255,0.08)' : '#E5E7EB',
+                                        borderRadius: '12px',
+                                        padding: '10px',
+                                        boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.4)' : '0 4px 16px rgba(0,0,0,0.1)',
+                                        color: isDark ? '#F3F4F6' : '#1F2937',
+                                        backdropFilter: 'blur(16px)'
                                     }}
                                     itemStyle={{ color: isDark ? '#F3F4F6' : '#1F2937' }}
                                     formatter={(value) => formatCurrency(value, currency)}
@@ -720,7 +725,7 @@ const AnalyticsDashboard = ({
             {/* Top Categories & Insights */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 {/* Top Categories */}
-                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6 shadow-sm">
+                <div className="glass-card p-4 sm:p-6">
                     <h3 className="text-sm sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">Top Spending Categories</h3>
                     {topCategories.length > 0 ? (
                         <div className="space-y-4">
@@ -734,7 +739,7 @@ const AnalyticsDashboard = ({
                                                     className="w-10 h-10 rounded-lg flex items-center justify-center text-lg"
                                                     style={{ backgroundColor: `${category.color}20` }}
                                                 >
-                                                    {category.icon || '💰'}
+                                                    {category.icon || '•'}
                                                 </div>
                                                 <div>
                                                     <p className="font-medium text-gray-900 dark:text-white">{category.name}</p>
@@ -746,7 +751,7 @@ const AnalyticsDashboard = ({
                                                 <p className="text-xs text-gray-500 dark:text-gray-400">{percentage}%</p>
                                             </div>
                                         </div>
-                                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                        <div className="w-full bg-gray-200 dark:bg-white/[0.06] rounded-full h-2">
                                             <div
                                                 className="h-2 rounded-full transition-all duration-300"
                                                 style={{
@@ -767,7 +772,7 @@ const AnalyticsDashboard = ({
                 </div>
 
                 {/* Insights */}
-                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6 shadow-sm">
+                <div className="glass-card p-4 sm:p-6">
                     <h3 className="text-sm sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">Insights</h3>
                     <div className="space-y-2.5 sm:space-y-3">
                         {summary.totalExpenses > 0 && (

@@ -98,9 +98,9 @@ export default function DebtForm({ isOpen, onClose, editDebt = null, type = 'bor
                             leaveFrom="opacity-100 translate-y-0"
                             leaveTo="opacity-0 translate-y-full md:translate-y-4"
                         >
-                            <Dialog.Panel className="w-full transform overflow-y-auto rounded-t-2xl md:rounded-2xl bg-white dark:bg-gray-800 shadow-2xl transition-all" style={{ maxHeight: '95vh' }}>
+                            <Dialog.Panel className="w-full transform overflow-y-auto rounded-t-2xl md:rounded-2xl bg-white dark:bg-slate-900/95 dark:backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] border border-gray-200 dark:border-white/[0.08] transition-all" style={{ maxHeight: '95vh' }}>
                                 {/* Header */}
-                                <div className={`px-6 py-5 ${type === 'borrowed' ? 'bg-gradient-to-r from-red-500 to-orange-500' : 'bg-gradient-to-r from-green-500 to-teal-500'}`}>
+                                <div className={`px-6 py-5 ${type === 'borrowed' ? 'bg-gradient-to-r from-rose-600 to-rose-500' : 'bg-gradient-to-r from-emerald-600 to-emerald-500'}`}>
                                     <div className="flex items-center justify-between">
                                         <Dialog.Title className="text-xl font-semibold text-white flex items-center gap-2">
                                             <CurrencyDollarIcon className="h-6 w-6" />
@@ -132,7 +132,7 @@ export default function DebtForm({ isOpen, onClose, editDebt = null, type = 'bor
                                             required
                                             value={formData.personName}
                                             onChange={(e) => setFormData({ ...formData, personName: e.target.value })}
-                                            className="block w-full rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all sm:text-sm"
+                                            className="block w-full rounded-xl border border-gray-200 dark:border-white/[0.07] bg-white dark:bg-white/[0.04] px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/20 transition-all sm:text-sm"
                                             placeholder="e.g. John Doe"
                                         />
                                     </div>
@@ -152,7 +152,7 @@ export default function DebtForm({ isOpen, onClose, editDebt = null, type = 'bor
                                                 required
                                                 value={formData.amount}
                                                 onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                                                className="block w-full rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 pl-10 pr-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all sm:text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                                                className="block w-full rounded-xl border border-gray-200 dark:border-white/[0.07] bg-white dark:bg-white/[0.04] pl-10 pr-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/20 transition-all sm:text-sm disabled:opacity-60 disabled:cursor-not-allowed"
                                                 placeholder="0"
                                                 disabled={!!editDebt}
                                             />
@@ -204,26 +204,26 @@ export default function DebtForm({ isOpen, onClose, editDebt = null, type = 'bor
                                             rows={3}
                                             value={formData.notes}
                                             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                                            className="block w-full rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all sm:text-sm resize-none"
+                                            className="block w-full rounded-xl border border-gray-200 dark:border-white/[0.07] bg-white dark:bg-white/[0.04] px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:border-indigo-500/50 focus:ring-2 focus:ring-indigo-500/20 transition-all sm:text-sm resize-none"
                                             placeholder="Add any additional details..."
                                         />
                                     </div>
 
                                     {/* Action Buttons */}
-                                    <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                    <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-white/[0.06]">
                                         <button
                                             type="button"
                                             onClick={onClose}
-                                            className="flex-1 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all"
+                                            className="flex-1 rounded-xl border border-gray-300 dark:border-white/[0.08] bg-white dark:bg-white/[0.05] px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-white/[0.10] transition-all"
                                         >
                                             Cancel
                                         </button>
                                         <button
                                             type="submit"
                                             disabled={loading}
-                                            className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all disabled:opacity-60 disabled:cursor-not-allowed ${type === 'borrowed'
-                                                ? 'bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 focus:ring-red-500'
-                                                : 'bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 focus:ring-green-500'
+                                            className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed hover:scale-[1.02] ${type === 'borrowed'
+                                                ? 'bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-400 shadow-rose-500/20'
+                                                : 'bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 shadow-emerald-500/20'
                                                 }`}
                                         >
                                             {loading ? (

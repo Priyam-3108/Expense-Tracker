@@ -15,7 +15,7 @@ const Modal = ({ isOpen, onClose, title, children, maxWidth = 'max-w-lg' }) => {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
+          <div className="fixed inset-0 glass-modal-backdrop" />
         </Transition.Child>
 
         {/* This wrapper forces content to align bottom on mobile, center on desktop */}
@@ -30,28 +30,31 @@ const Modal = ({ isOpen, onClose, title, children, maxWidth = 'max-w-lg' }) => {
             leaveTo="translate-y-full md:opacity-0 md:translate-y-4 md:scale-95"
           >
             <Dialog.Panel 
-              className={`w-full ${maxWidth} transform overflow-hidden rounded-t-2xl md:rounded-2xl bg-white dark:bg-gray-800 shadow-2xl transition-all flex flex-col`}
+              className={`w-full ${maxWidth} transform overflow-hidden rounded-t-2xl md:rounded-2xl bg-white dark:bg-transparent shadow-2xl dark:shadow-none transition-all flex flex-col`}
               style={{ maxHeight: '90vh' }}
             >
-              {title && (
-                <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex-shrink-0">
-                  <Dialog.Title className="text-lg font-semibold text-gray-900 dark:text-white">
-                    {title}
-                  </Dialog.Title>
-                  <button
-                    type="button"
-                    className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-500 min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors"
-                    onClick={onClose}
-                  >
-                    <span className="sr-only">Close</span>
-                    <XMarkIcon className="h-5 w-5" aria-hidden="true" />
-                  </button>
+              {/* Glass panel wrapper for dark mode */}
+              <div className="flex flex-col h-full bg-white dark:glass-modal-panel dark:rounded-t-2xl md:dark:rounded-2xl">
+                {title && (
+                  <div className="flex items-center justify-between border-b border-gray-200 dark:border-white/[0.06] px-6 py-4 flex-shrink-0">
+                    <Dialog.Title className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {title}
+                    </Dialog.Title>
+                    <button
+                      type="button"
+                      className="rounded-xl p-2 text-gray-400 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-white/[0.06] hover:text-gray-500 dark:hover:text-white min-h-[44px] min-w-[44px] flex items-center justify-center transition-all duration-200"
+                      onClick={onClose}
+                    >
+                      <span className="sr-only">Close</span>
+                      <XMarkIcon className="h-5 w-5" aria-hidden="true" />
+                    </button>
+                  </div>
+                )}
+                
+                {/* The content wrapper controls the inner scrolling */}
+                <div className="flex-1 overflow-y-auto w-full">
+                  {children}
                 </div>
-              )}
-              
-              {/* The content wrapper controls the inner scrolling */}
-              <div className="flex-1 overflow-y-auto w-full">
-                {children}
               </div>
             </Dialog.Panel>
           </Transition.Child>

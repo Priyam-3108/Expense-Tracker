@@ -61,40 +61,23 @@ const Register = () => {
     }
   }
 
-  const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+  const isDark = true;
 
   return (
-    <div className={cn(
-      "min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative transition-all duration-500",
-      isDark
-        ? "bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950"
-        : "bg-gradient-to-br from-primary-50 via-blue-50 to-indigo-50"
-    )}>
-      {/* Animated background blobs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className={cn(
-          "absolute top-1/4 -left-20 w-96 h-96 rounded-full blur-3xl opacity-20 animate-pulse",
-          isDark ? "bg-primary-600" : "bg-primary-300"
-        )} style={{ animationDuration: '4s' }} />
-        <div className={cn(
-          "absolute bottom-1/4 -right-20 w-96 h-96 rounded-full blur-3xl opacity-20 animate-pulse",
-          isDark ? "bg-blue-600" : "bg-blue-300"
-        )} style={{ animationDuration: '6s', animationDelay: '1s' }} />
-      </div>
-
-      {/* Theme Toggle - Top Right */}
-      <div className="absolute top-6 right-6 z-10">
-        <ThemeToggle />
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative bg-slate-950 noise-overlay overflow-hidden">
+      {/* Liquid Glass Background Image Layer */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <img 
+          src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop" 
+          alt="Fluid Background" 
+          className="w-full h-full object-cover opacity-40 mix-blend-screen"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/40 via-slate-950/80 to-slate-950/90"></div>
       </div>
 
       <div className="max-w-2xl w-full relative z-10">
         {/* Glassmorphism Card */}
-        <div className={cn(
-          "rounded-3xl shadow-2xl backdrop-blur-xl transition-all duration-500 border",
-          isDark
-            ? "bg-gray-900/80 border-gray-800/50 shadow-primary-500/10"
-            : "bg-white/80 border-white/20 shadow-primary-500/20"
-        )}>
+        <div className="rounded-3xl shadow-2xl backdrop-blur-xl border bg-gray-900/80 border-gray-800/50 shadow-primary-500/10">
           {/* Card Content */}
           <div className="p-8 sm:p-10">
             {/* Logo */}
@@ -104,10 +87,7 @@ const Register = () => {
 
             {/* Title */}
             <div className="text-center mb-5">
-              <h2 className={cn(
-                "text-2xl font-bold mb-2 transition-colors",
-                isDark ? "text-white" : "text-gray-900"
-              )}>
+              <h2 className="text-2xl font-bold mb-2 text-white">
                 Get started for free
               </h2>
             </div>
@@ -119,19 +99,13 @@ const Register = () => {
                 <div className="space-y-1">
                   <label
                     htmlFor="name"
-                    className={cn(
-                      "block text-sm font-medium transition-colors",
-                      isDark ? "text-gray-300" : "text-gray-700"
-                    )}
+                    className="block text-sm font-medium text-gray-300"
                   >
                     Full Name
                   </label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                      <User className={cn(
-                        "h-5 w-5 transition-colors",
-                        isDark ? "text-gray-500 group-focus-within:text-primary-500" : "text-gray-400 group-focus-within:text-primary-600"
-                      )} />
+                      <User className="h-5 w-5 text-gray-500 group-focus-within:text-primary-500" />
                     </div>
                     <input
                       id="name"
@@ -151,9 +125,7 @@ const Register = () => {
                       className={cn(
                         "block w-full pl-11 pr-4 py-2.5 rounded-xl transition-all duration-300 text-sm font-medium min-h-[44px]",
                         "focus:outline-none focus:ring-2 focus:ring-offset-0",
-                        isDark
-                          ? "bg-gray-800/50 border-2 border-gray-700 placeholder-gray-500 text-white hover:bg-gray-800/70 focus:bg-gray-800 focus:border-primary-500 focus:ring-primary-500/20"
-                          : "bg-gray-50 border-2 border-gray-200 placeholder-gray-400 text-gray-900 hover:bg-white focus:bg-white focus:border-primary-500 focus:ring-primary-500/20",
+                        "bg-gray-800/50 border-2 border-gray-700 placeholder-gray-500 text-white hover:bg-gray-800/70 focus:bg-gray-800 focus:border-primary-500 focus:ring-primary-500/20",
                         errors.name && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
                       )}
                       placeholder="Enter your full name"
@@ -179,10 +151,7 @@ const Register = () => {
                   </label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                      <Mail className={cn(
-                        "h-5 w-5 transition-colors",
-                        isDark ? "text-gray-500 group-focus-within:text-primary-500" : "text-gray-400 group-focus-within:text-primary-600"
-                      )} />
+                    <Mail className="h-5 w-5 text-gray-500 group-focus-within:text-primary-500" />
                     </div>
                     <input
                       id="email"
@@ -195,9 +164,7 @@ const Register = () => {
                       className={cn(
                         "block w-full pl-11 pr-4 py-2.5 rounded-xl transition-all duration-300 text-sm font-medium min-h-[44px]",
                         "focus:outline-none focus:ring-2 focus:ring-offset-0",
-                        isDark
-                          ? "bg-gray-800/50 border-2 border-gray-700 placeholder-gray-500 text-white hover:bg-gray-800/70 focus:bg-gray-800 focus:border-primary-500 focus:ring-primary-500/20"
-                          : "bg-gray-50 border-2 border-gray-200 placeholder-gray-400 text-gray-900 hover:bg-white focus:bg-white focus:border-primary-500 focus:ring-primary-500/20",
+                        "bg-gray-800/50 border-2 border-gray-700 placeholder-gray-500 text-white hover:bg-gray-800/70 focus:bg-gray-800 focus:border-primary-500 focus:ring-primary-500/20",
                         errors.email && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
                       )}
                       placeholder="Enter your email"
@@ -215,19 +182,13 @@ const Register = () => {
               <div className="space-y-1">
                 <label
                   htmlFor="currency"
-                  className={cn(
-                    "block text-sm font-medium transition-colors",
-                    isDark ? "text-gray-300" : "text-gray-700"
-                  )}
+                  className="block text-sm font-medium text-gray-300"
                 >
                   Preferred Currency
                 </label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                    <span className={cn(
-                      "text-base font-semibold transition-colors",
-                      isDark ? "text-gray-500 group-focus-within:text-primary-500" : "text-gray-400 group-focus-within:text-primary-600"
-                    )}>
+                    <span className="text-base font-semibold text-gray-500 group-focus-within:text-primary-500">
                       {currencyMap[selectedCurrency || 'USD'].symbol}
                     </span>
                   </div>
@@ -237,9 +198,7 @@ const Register = () => {
                     className={cn(
                       "block w-full pl-11 pr-4 py-2.5 rounded-xl transition-all duration-300 text-sm font-medium appearance-none cursor-pointer min-h-[44px]",
                       "focus:outline-none focus:ring-2 focus:ring-offset-0",
-                      isDark
-                        ? "bg-gray-800/50 border-2 border-gray-700 text-white hover:bg-gray-800/70 focus:bg-gray-800 focus:border-primary-500 focus:ring-primary-500/20"
-                        : "bg-gray-50 border-2 border-gray-200 text-gray-900 hover:bg-white focus:bg-white focus:border-primary-500 focus:ring-primary-500/20",
+                      "bg-gray-800/50 border-2 border-gray-700 text-white hover:bg-gray-800/70 focus:bg-gray-800 focus:border-primary-500 focus:ring-primary-500/20",
                       errors.currency && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
                     )}
                   >
@@ -266,19 +225,13 @@ const Register = () => {
                 <div className="space-y-1">
                   <label
                     htmlFor="password"
-                    className={cn(
-                      "block text-sm font-medium transition-colors",
-                      isDark ? "text-gray-300" : "text-gray-700"
-                    )}
+                    className="block text-sm font-medium text-gray-300"
                   >
                     Password
                   </label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                      <Lock className={cn(
-                        "h-5 w-5 transition-colors",
-                        isDark ? "text-gray-500 group-focus-within:text-primary-500" : "text-gray-400 group-focus-within:text-primary-600"
-                      )} />
+                      <Lock className="h-5 w-5 text-gray-500 group-focus-within:text-primary-500" />
                     </div>
                     <input
                       id="password"
@@ -291,9 +244,7 @@ const Register = () => {
                       className={cn(
                         "block w-full pl-11 pr-12 py-2.5 rounded-xl transition-all duration-300 text-sm font-medium min-h-[44px]",
                         "focus:outline-none focus:ring-2 focus:ring-offset-0",
-                        isDark
-                          ? "bg-gray-800/50 border-2 border-gray-700 placeholder-gray-500 text-white hover:bg-gray-800/70 focus:bg-gray-800 focus:border-primary-500 focus:ring-primary-500/20"
-                          : "bg-gray-50 border-2 border-gray-200 placeholder-gray-400 text-gray-900 hover:bg-white focus:bg-white focus:border-primary-500 focus:ring-primary-500/20",
+                        "bg-gray-800/50 border-2 border-gray-700 placeholder-gray-500 text-white hover:bg-gray-800/70 focus:bg-gray-800 focus:border-primary-500 focus:ring-primary-500/20",
                         errors.password && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
                       )}
                       placeholder="Create a password (min. 6 characters)"
@@ -304,15 +255,9 @@ const Register = () => {
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? (
-                        <EyeOff className={cn(
-                          "h-5 w-5 transition-all duration-200",
-                          isDark ? "text-gray-400 hover:text-gray-300" : "text-gray-400 hover:text-gray-600"
-                        )} />
+                        <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-300 transition-all duration-200" />
                       ) : (
-                        <Eye className={cn(
-                          "h-5 w-5 transition-all duration-200",
-                          isDark ? "text-gray-400 hover:text-gray-300" : "text-gray-400 hover:text-gray-600"
-                        )} />
+                        <Eye className="h-5 w-5 text-gray-400 hover:text-gray-300 transition-all duration-200" />
                       )}
                     </button>
                   </div>
@@ -327,19 +272,13 @@ const Register = () => {
                 <div className="space-y-1">
                   <label
                     htmlFor="confirmPassword"
-                    className={cn(
-                      "block text-sm font-medium transition-colors",
-                      isDark ? "text-gray-300" : "text-gray-700"
-                    )}
+                    className="block text-sm font-medium text-gray-300"
                   >
                     Confirm Password
                   </label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                      <Lock className={cn(
-                        "h-5 w-5 transition-colors",
-                        isDark ? "text-gray-500 group-focus-within:text-primary-500" : "text-gray-400 group-focus-within:text-primary-600"
-                      )} />
+                      <Lock className="h-5 w-5 text-gray-500 group-focus-within:text-primary-500" />
                     </div>
                     <input
                       id="confirmPassword"
@@ -352,9 +291,7 @@ const Register = () => {
                       className={cn(
                         "block w-full pl-11 pr-12 py-2.5 rounded-xl transition-all duration-300 text-sm font-medium min-h-[44px]",
                         "focus:outline-none focus:ring-2 focus:ring-offset-0",
-                        isDark
-                          ? "bg-gray-800/50 border-2 border-gray-700 placeholder-gray-500 text-white hover:bg-gray-800/70 focus:bg-gray-800 focus:border-primary-500 focus:ring-primary-500/20"
-                          : "bg-gray-50 border-2 border-gray-200 placeholder-gray-400 text-gray-900 hover:bg-white focus:bg-white focus:border-primary-500 focus:ring-primary-500/20",
+                        "bg-gray-800/50 border-2 border-gray-700 placeholder-gray-500 text-white hover:bg-gray-800/70 focus:bg-gray-800 focus:border-primary-500 focus:ring-primary-500/20",
                         errors.confirmPassword && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
                       )}
                       placeholder="Confirm your password"
@@ -365,16 +302,10 @@ const Register = () => {
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     >
                       {showConfirmPassword ? (
-                        <EyeOff className={cn(
-                          "h-5 w-5 transition-all duration-200",
-                          isDark ? "text-gray-400 hover:text-gray-300" : "text-gray-400 hover:text-gray-600"
-                        )} />
-                      ) : (
-                        <Eye className={cn(
-                          "h-5 w-5 transition-all duration-200",
-                          isDark ? "text-gray-400 hover:text-gray-300" : "text-gray-400 hover:text-gray-600"
-                        )} />
-                      )}
+                      <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-300 transition-all duration-200" />
+                    ) : (
+                      <Eye className="h-5 w-5 text-gray-400 hover:text-gray-300 transition-all duration-200" />
+                    )}
                     </button>
                   </div>
                   {errors.confirmPassword && (
@@ -389,13 +320,11 @@ const Register = () => {
               {errors.root && (
                 <div className={cn(
                   "rounded-xl p-3 animate-in slide-in-from-top-2 border",
-                  isDark
-                    ? "bg-red-950/30 border-red-900/50 backdrop-blur-sm"
-                    : "bg-red-50 border-red-200"
+                    "bg-red-950/30 border-red-900/50 backdrop-blur-sm"
                 )}>
                   <p className={cn(
                     "text-sm font-medium flex items-center gap-2",
-                    isDark ? "text-red-400" : "text-red-800"
+                    "text-red-400"
                   )}>
                     <span className="text-base">⚠</span>
                     {errors.root.message}
@@ -412,7 +341,7 @@ const Register = () => {
                   "bg-gradient-to-r from-primary-600 via-primary-600 to-blue-600",
                   "hover:from-primary-700 hover:via-primary-700 hover:to-blue-700",
                   "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
-                  isDark ? "focus:ring-offset-gray-900" : "focus:ring-offset-white",
+                  "focus:ring-offset-gray-900",
                   "disabled:opacity-50 disabled:cursor-not-allowed",
                   "transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]",
                   "shadow-lg hover:shadow-xl shadow-primary-500/25",
@@ -434,22 +363,12 @@ const Register = () => {
             </form>
           </div>
 
-          {/* Footer */}
-          <div className={cn(
-            "px-6 py-4 border-t",
-            isDark ? "bg-gray-900/50 border-gray-800" : "bg-gray-50/50 border-gray-200"
-          )}>
-            <p className={cn(
-              "text-center text-sm",
-              isDark ? "text-gray-400" : "text-gray-600"
-            )}>
+          <div className="px-6 py-4 border-t bg-gray-900/50 border-gray-800">
+            <p className="text-center text-sm text-gray-400">
               Already have an account?{' '}
               <Link
                 to="/login"
-                className={cn(
-                  "font-semibold transition-colors hover:underline",
-                  isDark ? "text-primary-400 hover:text-primary-300" : "text-primary-600 hover:text-primary-700"
-                )}
+                className="font-semibold transition-colors hover:underline text-primary-400 hover:text-primary-300"
               >
                 Sign in
               </Link>

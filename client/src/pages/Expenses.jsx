@@ -568,7 +568,7 @@ const Expenses = () => {
                 color: category?.color || '#2563EB'
               }}
             >
-              {category?.icon || '💰'}
+              {category?.icon || '•'}
             </div>
             <span>{category?.name || 'Uncategorized'}</span>
           </div>
@@ -630,18 +630,18 @@ const Expenses = () => {
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between mb-6">
         <div>
           <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white">Expenses</h1>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+          <p className="mt-1 text-sm text-gray-600 dark:text-slate-500">
             Track your expenses and income
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {/* View Toggle */}
-          <div className="inline-flex gap-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-1 shadow-sm">
+          <div className="inline-flex gap-1 rounded-xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.03] p-1">
             <button
               onClick={() => setViewMode('list')}
-              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-all ${viewMode === 'list'
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800'
+              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${viewMode === 'list'
+                ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(99,102,241,0.2)]'
+                : 'text-gray-600 dark:text-slate-400 hover:bg-white dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white'
                 }`}
             >
               <List size={16} />
@@ -649,9 +649,9 @@ const Expenses = () => {
             </button>
             <button
               onClick={() => setViewMode('calendar')}
-              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-all ${viewMode === 'calendar'
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800'
+              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${viewMode === 'calendar'
+                ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(99,102,241,0.2)]'
+                : 'text-gray-600 dark:text-slate-400 hover:bg-white dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white'
                 }`}
             >
               <CalendarIcon size={16} />
@@ -660,7 +660,7 @@ const Expenses = () => {
           </div>
 
           {/* Divider */}
-          <div className="hidden sm:block h-8 w-px bg-gray-300 dark:bg-gray-600"></div>
+          <div className="hidden sm:block h-8 w-px bg-gray-300 dark:bg-white/[0.08]"></div>
 
           {/* Action Buttons */}
           <button
@@ -668,21 +668,21 @@ const Expenses = () => {
               resetBulkForm()
               setShowBulkForm(true)
             }}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition-all shadow-sm hover:shadow"
+            className="glass-btn"
           >
             <Layers size={18} />
             Bulk Add
           </button>
           <button
             onClick={() => setShowImportModal(true)}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition-all shadow-sm hover:shadow"
+            className="glass-btn"
           >
             <Upload size={18} />
             Import
           </button>
           <button
             onClick={() => setShowExportModal(true)}
-            className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition-all shadow-sm hover:shadow"
+            className="glass-btn"
           >
             <Download size={18} />
             Export
@@ -692,7 +692,8 @@ const Expenses = () => {
               resetForm()
               setShowForm(true)
             }}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition-all shadow-md hover:shadow-lg active:scale-95"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 transition-all duration-200 active:scale-95 hover:scale-[1.02]"
+            style={{ boxShadow: '0 0 20px rgba(99,102,241,0.2)' }}
           >
             <Plus size={18} />
             Add Expense
@@ -702,34 +703,38 @@ const Expenses = () => {
 
       {/* Summary cards */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3 mt-4 mb-4">
-        <div className="rounded-lg border border-blue-100 dark:border-blue-900/30 bg-blue-50 dark:bg-blue-900/10 p-6">
+        <div className="glass-card p-5 border-l-2 border-l-rose-500/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-blue-700 dark:text-blue-300">Total Expenses</p>
-              <p className="mt-1 text-2xl font-semibold text-blue-900 dark:text-blue-100">
+              <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Total Expenses</p>
+              <p className="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
                 {formatCurrency(totalExpenseAmount, currency)}
               </p>
             </div>
-            <ArrowDownCircle size={24} className="text-blue-600" />
+            <div className="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-500/10">
+              <ArrowDownCircle size={22} className="text-rose-500 dark:text-rose-400 drop-shadow-[0_0_6px_rgba(251,113,133,0.3)]" />
+            </div>
           </div>
         </div>
 
-        <div className="rounded-lg border border-emerald-100 dark:border-emerald-900/30 bg-emerald-50 dark:bg-emerald-900/10 p-6">
+        <div className="glass-card p-5 border-l-2 border-l-emerald-500/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Total Income</p>
-              <p className="mt-1 text-2xl font-semibold text-emerald-900 dark:text-emerald-100">
+              <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Total Income</p>
+              <p className="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
                 {formatCurrency(totalIncomeAmount, currency)}
               </p>
             </div>
-            <ArrowUpCircle size={24} className="text-emerald-600" />
+            <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-500/10">
+              <ArrowUpCircle size={22} className="text-emerald-500 dark:text-emerald-400 drop-shadow-[0_0_6px_rgba(52,211,153,0.3)]" />
+            </div>
           </div>
         </div>
 
-        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+        <div className="glass-card p-5 border-l-2 border-l-indigo-500/50">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Net Balance</p>
+              <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Net Balance</p>
               <p
                 className={`mt-1 text-2xl font-semibold ${netAmount >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
                   }`}
@@ -774,13 +779,13 @@ const Expenses = () => {
           <div className="md:hidden space-y-3">
             {/* Mobile search bar */}
             <div className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
               <input
                 type="text"
                 placeholder="Search expenses..."
                 value={searchTerm}
                 onChange={(e) => { setSearchTerm(e.target.value); setPage(1) }}
-                className="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 pl-10 pr-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors"
+                className="w-full rounded-xl border border-gray-300 dark:border-white/[0.07] bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white pl-10 pr-4 py-3 text-sm focus:border-indigo-500 dark:focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-slate-500"
               />
             </div>
 
@@ -809,21 +814,21 @@ const Expenses = () => {
             {/* Mobile pagination */}
             {pagination.totalPages > 1 && (
               <div className="flex items-center justify-between pt-2">
-                <span className="text-sm text-gray-500 dark:text-gray-400">
+                <span className="text-sm text-gray-500 dark:text-slate-500">
                   Page {pagination.currentPage} of {pagination.totalPages}
                 </span>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setPage(p => Math.max(1, p - 1))}
                     disabled={pagination.currentPage <= 1}
-                    className="px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 dark:border-gray-600 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors min-h-[40px]"
+                    className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 dark:border-white/[0.08] disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-white/[0.06] transition-all duration-200 min-h-[40px] text-gray-700 dark:text-slate-300"
                   >
                     Prev
                   </button>
                   <button
                     onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))}
                     disabled={pagination.currentPage >= pagination.totalPages}
-                    className="px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 dark:border-gray-600 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors min-h-[40px]"
+                    className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 dark:border-white/[0.08] disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-white/[0.06] transition-all duration-200 min-h-[40px] text-gray-700 dark:text-slate-300"
                   >
                     Next
                   </button>
@@ -837,17 +842,17 @@ const Expenses = () => {
       {viewMode === 'calendar' && (
         <>
           {/* Filters for Calendar View */}
-          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm mb-4">
+          <div className="glass-card p-4 mb-4">
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-4 md:flex-row md:items-center">
                 <div className="relative flex-1">
-                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
                   <input
                     type="text"
                     placeholder="Search expenses..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-10 py-2.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                    className="w-full rounded-xl border border-gray-300 dark:border-white/[0.07] px-10 py-2.5 text-sm focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200 bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-slate-500"
                   />
                 </div>
 
@@ -861,9 +866,9 @@ const Expenses = () => {
                       key={option.value}
                       type="button"
                       onClick={() => setFilterType(option.value)}
-                      className={`rounded-lg border px-4 py-2.5 text-sm font-medium transition-all ${filterType === option.value
-                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 shadow-sm'
-                        : 'border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500'
+                      className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-200 ${filterType === option.value
+                        ? 'border-indigo-500/50 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.1)]'
+                        : 'border-gray-300 dark:border-white/[0.08] text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white'
                         }`}
                     >
                       {option.label}
@@ -874,7 +879,7 @@ const Expenses = () => {
                 {hasActiveFilters && (
                   <button
                     onClick={clearFilters}
-                    className="inline-flex items-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
+                    className="inline-flex items-center gap-2 rounded-xl border border-gray-300 dark:border-white/[0.08] px-4 py-2.5 text-sm text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white transition-all duration-200"
                   >
                     <X size={16} />
                     Clear
@@ -894,12 +899,12 @@ const Expenses = () => {
             </div>
           </div>
 
-          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3 sm:p-6 shadow-sm">
+          <div className="glass-card p-3 sm:p-6">
             {/* Calendar Header */}
             <div className="flex items-center justify-between gap-2 mb-4 sm:mb-6">
               <button
                 onClick={() => setCalendarDate(subMonths(calendarDate, 1))}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition text-gray-600 dark:text-gray-400 min-h-[40px] min-w-[40px] flex items-center justify-center"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-white/[0.06] rounded-xl transition-all duration-200 text-gray-600 dark:text-slate-400 min-h-[40px] min-w-[40px] flex items-center justify-center"
                 title="Previous month"
                 aria-label="Previous month"
               >
@@ -925,7 +930,7 @@ const Expenses = () => {
                 </div>
                 <button
                   onClick={() => setCalendarDate(new Date())}
-                  className="px-2.5 py-1 text-xs sm:text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition border border-blue-200 dark:border-blue-800/50"
+                  className="px-2.5 py-1 text-xs sm:text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-xl transition-all duration-200 border border-indigo-200 dark:border-indigo-500/20"
                 >
                   Today
                 </button>
@@ -933,7 +938,7 @@ const Expenses = () => {
 
               <button
                 onClick={() => setCalendarDate(addMonths(calendarDate, 1))}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition text-gray-600 dark:text-gray-400 min-h-[40px] min-w-[40px] flex items-center justify-center"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-white/[0.06] rounded-xl transition-all duration-200 text-gray-600 dark:text-slate-400 min-h-[40px] min-w-[40px] flex items-center justify-center"
                 title="Next month"
                 aria-label="Next month"
               >
@@ -945,7 +950,7 @@ const Expenses = () => {
             <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
               {/* Day headers */}
               {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
-                <div key={i} className="p-1 sm:p-2 text-center text-xs font-semibold text-gray-500 dark:text-gray-400">
+                <div key={i} className="p-1 sm:p-2 text-center text-xs font-semibold text-gray-500 dark:text-slate-500">
                   <span className="sm:hidden">{day}</span>
                   <span className="hidden sm:inline">{['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][i]}</span>
                 </div>
@@ -966,10 +971,10 @@ const Expenses = () => {
                   <div
                     key={idx}
                     onClick={() => handleDateClick(day)}
-                    className={`min-h-[52px] sm:min-h-[100px] p-1 sm:p-2 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer transition hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-blue-300 dark:hover:border-blue-500 ${!isCurrentMonth ? 'bg-gray-50 dark:bg-gray-900/50 opacity-40' : 'bg-white dark:bg-gray-800'
-                      } ${isToday ? 'ring-2 ring-blue-500' : ''}`}
+                    className={`min-h-[52px] sm:min-h-[100px] p-1 sm:p-2 border border-gray-200 dark:border-white/[0.04] rounded-xl cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-white/[0.04] hover:border-indigo-300 dark:hover:border-indigo-500/30 ${!isCurrentMonth ? 'bg-gray-50 dark:bg-white/[0.01] opacity-40' : 'bg-white dark:bg-white/[0.02]'
+                      } ${isToday ? 'ring-2 ring-indigo-500/50' : ''}`}
                   >
-                    <div className={`text-xs sm:text-sm font-medium mb-1 ${isToday ? 'text-blue-600 dark:text-blue-400' : isCurrentMonth ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-600'}`}>
+                    <div className={`text-xs sm:text-sm font-medium mb-1 ${isToday ? 'text-indigo-600 dark:text-indigo-400' : isCurrentMonth ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-slate-600'}`}>
                       {format(day, 'd')}
                     </div>
 
@@ -1044,14 +1049,14 @@ const Expenses = () => {
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
             {/* Type Toggle */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Type</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Type</label>
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, type: 'expense' })}
-                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 border-2 rounded-lg transition min-h-[44px] ${formData.type === 'expense'
-                    ? 'border-red-500 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'
-                    : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500'
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 border-2 rounded-xl transition-all duration-200 min-h-[44px] ${formData.type === 'expense'
+                    ? 'border-rose-500/60 bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 shadow-[0_0_12px_rgba(251,113,133,0.1)]'
+                    : 'border-gray-300 dark:border-white/[0.08] text-gray-700 dark:text-slate-400 hover:border-gray-400 dark:hover:border-white/[0.15]'
                     }`}
                 >
                   <ArrowDownCircle size={18} />
@@ -1060,9 +1065,9 @@ const Expenses = () => {
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, type: 'income' })}
-                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 border-2 rounded-lg transition min-h-[44px] ${formData.type === 'income'
-                    ? 'border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
-                    : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500'
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 border-2 rounded-xl transition-all duration-200 min-h-[44px] ${formData.type === 'income'
+                    ? 'border-emerald-500/60 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 shadow-[0_0_12px_rgba(52,211,153,0.1)]'
+                    : 'border-gray-300 dark:border-white/[0.08] text-gray-700 dark:text-slate-400 hover:border-gray-400 dark:hover:border-white/[0.15]'
                     }`}
                 >
                   <ArrowUpCircle size={18} />
@@ -1074,7 +1079,7 @@ const Expenses = () => {
             {/* Date and Category */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="relative z-20">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                   Date *
                 </label>
                 <DatePicker
@@ -1085,7 +1090,7 @@ const Expenses = () => {
               </div>
 
               <div className="relative z-10">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
                   Category *
                 </label>
                 <CategorySelector
@@ -1106,7 +1111,7 @@ const Expenses = () => {
                 type="text"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 min-h-[44px]"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-white/[0.07] rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-slate-500 min-h-[44px] transition-all duration-200"
                 placeholder="e.g., Groceries, Salary..."
               />
             </div>
@@ -1126,7 +1131,7 @@ const Expenses = () => {
                   min="1"
                   value={formData.amount}
                   onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 min-h-[44px]"
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-white/[0.07] rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-slate-500 min-h-[44px] transition-all duration-200"
                   placeholder="0.00"
                   required
                 />
@@ -1146,7 +1151,7 @@ const Expenses = () => {
                       recurringEndDate: e.target.checked ? formData.recurringEndDate : ''
                     })
                   }
-                  className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  className="w-5 h-5 text-indigo-600 border-gray-300 dark:border-white/[0.15] rounded focus:ring-indigo-500"
                 />
                 <div className="flex items-center gap-2">
                   <Repeat size={18} className="text-gray-600 dark:text-gray-400" />
@@ -1154,7 +1159,7 @@ const Expenses = () => {
                 </div>
               </label>
               {formData.isRecurring && (
-                <div className="mt-3 ml-6 space-y-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg" style={{ overflow: 'visible' }}>
+                <div className="mt-3 ml-6 space-y-3 p-4 bg-gray-50 dark:bg-white/[0.03] rounded-xl border border-gray-100 dark:border-white/[0.05]" style={{ overflow: 'visible' }}>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Frequency *
@@ -1162,7 +1167,7 @@ const Expenses = () => {
                     <select
                       value={formData.recurringPeriod}
                       onChange={(e) => setFormData({ ...formData, recurringPeriod: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white min-h-[44px]"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-white/[0.07] rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white min-h-[44px] transition-all duration-200"
                     >
                       <option value="weekly">Weekly</option>
                       <option value="monthly">Monthly</option>
@@ -1189,11 +1194,12 @@ const Expenses = () => {
           </div>
 
           {/* Form Actions */}
-          <div className="flex gap-3 p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 mt-auto flex-shrink-0">
+          <div className="flex gap-3 p-6 border-t border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.02] mt-auto flex-shrink-0">
             <button
               type="submit"
               disabled={formLoading}
-              className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition min-h-[44px]"
+              className="flex-1 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-xl hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 min-h-[44px] hover:scale-[1.02]"
+              style={{ boxShadow: '0 0 15px rgba(99,102,241,0.2)' }}
             >
               {formLoading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -1208,7 +1214,7 @@ const Expenses = () => {
               type="button"
               onClick={() => { setShowForm(false); resetForm() }}
               disabled={formLoading}
-              className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 min-h-[44px]"
+              className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-white/[0.05] border border-gray-300 dark:border-white/[0.08] rounded-xl hover:bg-gray-50 dark:hover:bg-white/[0.10] disabled:opacity-50 min-h-[44px] transition-all duration-200"
             >
               Cancel
             </button>

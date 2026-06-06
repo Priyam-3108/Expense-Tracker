@@ -121,7 +121,7 @@ const DatePicker = ({ value, onChange, placeholder = "Select date", className = 
           ref={buttonRef}
           type="button"
           onClick={handleToggle}
-          className={`w-full flex items-center justify-between px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-left focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300 focus:border-transparent hover:border-gray-400 dark:hover:border-gray-600 transition ${value ? 'pr-10' : ''}`}
+          className={`w-full flex items-center justify-between px-3 py-2 border border-gray-300 dark:border-white/[0.07] rounded-xl bg-white dark:bg-white/[0.04] text-left focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 hover:border-gray-400 dark:hover:border-white/[0.15] transition-all duration-200 ${value ? 'pr-10' : ''}`}
         >
           <div className="flex items-center gap-2">
             <CalendarIcon size={18} className="text-gray-400" />
@@ -154,7 +154,7 @@ const DatePicker = ({ value, onChange, placeholder = "Select date", className = 
           />
           <div
             ref={dropdownRef}
-            className="fixed z-[9999] bg-white dark:bg-gray-800 border md:border-gray-200 dark:border-gray-700 rounded-t-2xl md:rounded-lg shadow-[0_-8px_30px_rgba(0,0,0,0.1)] md:shadow-xl p-4 w-full md:w-80 bottom-0 left-0 md:bottom-auto animate-slide-up md:animate-none"
+            className="fixed z-[9999] bg-white dark:bg-slate-900/95 dark:backdrop-blur-xl border md:border-gray-200 dark:border-white/[0.08] rounded-t-2xl md:rounded-2xl shadow-[0_-8px_30px_rgba(0,0,0,0.1)] md:shadow-[0_8px_32px_rgba(0,0,0,0.3)] p-4 w-full md:w-80 bottom-0 left-0 md:bottom-auto animate-slide-up md:animate-none"
             style={{
               ...(window.innerWidth >= 768 ? {
                 top: `${dropdownPosition.top}px`,
@@ -172,14 +172,14 @@ const DatePicker = ({ value, onChange, placeholder = "Select date", className = 
             }}
           >
             {/* Mobile Drag Indicator */}
-            <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full mx-auto mb-4 md:hidden" />
+            <div className="w-12 h-1.5 bg-gray-300 dark:bg-white/[0.15] rounded-full mx-auto mb-4 md:hidden" />
 
             {/* Calendar Header - Fixed */}
             <div className="flex items-center justify-between mb-4 flex-shrink-0">
               <button
                 type="button"
                 onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-                className="p-2 md:p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0 flex items-center justify-center"
+                className="p-2 md:p-1 hover:bg-gray-100 dark:hover:bg-white/[0.06] rounded-xl transition-all duration-200 min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0 flex items-center justify-center"
               >
                 <ChevronLeft size={20} className="text-gray-600 dark:text-gray-300" />
               </button>
@@ -189,7 +189,7 @@ const DatePicker = ({ value, onChange, placeholder = "Select date", className = 
               <button
                 type="button"
                 onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-                className="p-2 md:p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0 flex items-center justify-center"
+                className="p-2 md:p-1 hover:bg-gray-100 dark:hover:bg-white/[0.06] rounded-xl transition-all duration-200 min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0 flex items-center justify-center"
               >
                 <ChevronRight size={20} className="text-gray-600 dark:text-gray-300" />
               </button>
@@ -216,13 +216,13 @@ const DatePicker = ({ value, onChange, placeholder = "Select date", className = 
                       key={idx}
                       type="button"
                       onClick={() => handleDateSelect(day)}
-                      className={`p-2 text-sm rounded transition ${!isCurrentMonthDay
-                        ? 'text-gray-300 dark:text-gray-500 cursor-not-allowed'
+                      className={`p-2 text-sm rounded-lg transition-all duration-200 ${!isCurrentMonthDay
+                        ? 'text-gray-300 dark:text-slate-600 cursor-not-allowed'
                         : isSelected
-                          ? 'bg-blue-600 text-white font-semibold'
+                          ? 'bg-indigo-600 text-white font-semibold shadow-[0_0_10px_rgba(99,102,241,0.3)]'
                           : isToday
-                            ? 'bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-300 font-semibold'
-                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                            ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold'
+                            : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-white/[0.06]'
                         }`}
                       disabled={!isCurrentMonthDay}
                     >
@@ -234,18 +234,18 @@ const DatePicker = ({ value, onChange, placeholder = "Select date", className = 
             </div>
 
             {/* Quick actions - Fixed */}
-            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex gap-2 flex-shrink-0">
+            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-white/[0.06] flex gap-2 flex-shrink-0">
               <button
                 type="button"
                 onClick={() => handleDateSelect(new Date())}
-                className="flex-1 px-3 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition"
+                className="flex-1 px-3 py-2 text-sm text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-xl transition-all duration-200"
               >
                 Today
               </button>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="flex-1 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/20 rounded-lg transition"
+                className="flex-1 px-3 py-2 text-sm text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-white/[0.06] rounded-xl transition-all duration-200"
               >
                 Cancel
               </button>

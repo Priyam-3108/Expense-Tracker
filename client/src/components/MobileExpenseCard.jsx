@@ -11,11 +11,11 @@ const MobileExpenseCard = ({ expense, currency, onEdit, onDelete }) => {
   const isIncome = expense.type === 'income'
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden active:scale-[0.99] transition-transform">
+    <div className="glass-card overflow-hidden active:scale-[0.99] transition-all duration-200">
       {/* Colour accent strip */}
       <div
-        className="h-1 w-full"
-        style={{ backgroundColor: category?.color || (isIncome ? '#10B981' : '#EF4444') }}
+        className="h-0.5 w-full"
+        style={{ backgroundColor: category?.color || (isIncome ? '#34d399' : '#fb7185') }}
       />
 
       <div className="p-4">
@@ -25,10 +25,10 @@ const MobileExpenseCard = ({ expense, currency, onEdit, onDelete }) => {
           <div
             className="w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0"
             style={{
-              backgroundColor: `${category?.color || (isIncome ? '#10B981' : '#EF4444')}20`,
+              backgroundColor: `${category?.color || (isIncome ? '#34d399' : '#fb7185')}15`,
             }}
           >
-            {category?.icon || (isIncome ? '💰' : '💸')}
+            {category?.icon || (isIncome ? '$' : '-')}
           </div>
 
           {/* Middle content */}
@@ -36,10 +36,10 @@ const MobileExpenseCard = ({ expense, currency, onEdit, onDelete }) => {
             <p className="font-semibold text-gray-900 dark:text-white text-sm truncate">
               {expense.description || category?.name || 'No description'}
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+            <p className="text-xs text-gray-500 dark:text-slate-500 mt-0.5">
               {category?.name || 'Uncategorized'}
             </p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+            <p className="text-xs text-gray-400 dark:text-slate-600 mt-1">
               {formatDate(expense.date, 'MMM dd, yyyy')}
             </p>
           </div>
@@ -59,8 +59,8 @@ const MobileExpenseCard = ({ expense, currency, onEdit, onDelete }) => {
             <span
               className={`block mt-1 text-xs font-medium px-2 py-0.5 rounded-full ${
                 isIncome
-                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
-                  : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300'
+                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300'
+                  : 'bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300'
               }`}
             >
               {isIncome ? 'Income' : 'Expense'}
@@ -69,11 +69,11 @@ const MobileExpenseCard = ({ expense, currency, onEdit, onDelete }) => {
         </div>
 
         {/* Action row */}
-        <div className="flex items-center justify-end gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+        <div className="flex items-center justify-end gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-white/[0.05]">
           <button
             onClick={() => onEdit(expense)}
             aria-label="Edit expense"
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 rounded-lg transition-colors min-h-[44px]"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 rounded-xl transition-all duration-200 min-h-[44px]"
           >
             <Edit size={16} />
             Edit
@@ -81,7 +81,7 @@ const MobileExpenseCard = ({ expense, currency, onEdit, onDelete }) => {
           <button
             onClick={() => onDelete(expense)}
             aria-label="Delete expense"
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/20 hover:bg-rose-100 dark:hover:bg-rose-900/40 rounded-lg transition-colors min-h-[44px]"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 hover:bg-rose-100 dark:hover:bg-rose-500/20 rounded-xl transition-all duration-200 min-h-[44px]"
           >
             <Trash2 size={13} />
             Delete

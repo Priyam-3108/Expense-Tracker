@@ -21,7 +21,7 @@ export default function Debts() {
     if (loading) {
         return (
             <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
             </div>
         );
     }
@@ -32,7 +32,7 @@ export default function Debts() {
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Debt Management</h1>
                 <button
                     onClick={() => setIsFormOpen(true)}
-                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-xl shadow-[0_0_15px_rgba(99,102,241,0.15)] text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 hover:scale-[1.02] transition-all duration-200"
                 >
                     <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
                     Add Record
@@ -41,17 +41,17 @@ export default function Debts() {
 
             <DebtStats debts={debts || []} />
 
-            <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <div className="glass-card p-6">
                 <TabGroup onChange={(index) => setSelectedType(index === 0 ? 'borrowed' : 'lent')}>
-                    <TabList className="flex space-x-1 rounded-xl bg-blue-900/20 p-1 mb-6">
+                    <TabList className="flex space-x-1 rounded-xl bg-gray-100 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.06] p-1 mb-6">
                         <Tab
                             className={({ selected }) =>
                                 classNames(
                                     'w-full rounded-lg py-2.5 text-sm font-medium leading-5',
                                     'focus:outline-none',
                                     selected
-                                        ? 'bg-white dark:bg-gray-700 text-blue-700 dark:text-blue-100 shadow'
-                                        : 'text-gray-600 dark:text-gray-400 hover:bg-white/[0.12] hover:text-gray-800 dark:hover:text-white'
+                                        ? 'bg-white dark:bg-white/[0.08] text-indigo-700 dark:text-indigo-300 shadow-sm border border-gray-200 dark:border-white/[0.10]'
+                                        : 'text-gray-600 dark:text-slate-400 hover:bg-white/[0.12] hover:text-gray-800 dark:hover:text-white'
                                 )
                             }
                         >
@@ -63,8 +63,8 @@ export default function Debts() {
                                     'w-full rounded-lg py-2.5 text-sm font-medium leading-5',
                                     'focus:outline-none',
                                     selected
-                                        ? 'bg-white dark:bg-gray-700 text-blue-700 dark:text-blue-100 shadow'
-                                        : 'text-gray-600 dark:text-gray-400 hover:bg-white/[0.12] hover:text-gray-800 dark:hover:text-white'
+                                        ? 'bg-white dark:bg-white/[0.08] text-indigo-700 dark:text-indigo-300 shadow-sm border border-gray-200 dark:border-white/[0.10]'
+                                        : 'text-gray-600 dark:text-slate-400 hover:bg-white/[0.12] hover:text-gray-800 dark:hover:text-white'
                                 )
                             }
                         >

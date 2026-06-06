@@ -76,9 +76,9 @@ export default function RepaymentModal({ isOpen, onClose, debt }) {
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-2xl transition-all">
+                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white dark:bg-slate-900/95 dark:backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] border border-gray-200 dark:border-white/[0.08] transition-all">
                                 {/* Header */}
-                                <div className="bg-gradient-to-r from-green-500 to-teal-500 px-6 py-5">
+                                <div className="bg-gradient-to-r from-emerald-600 to-emerald-500 px-6 py-5">
                                     <div className="flex items-center justify-between">
                                         <Dialog.Title className="text-xl font-semibold text-white flex items-center gap-2">
                                             <BanknotesIcon className="h-6 w-6" />
@@ -97,7 +97,7 @@ export default function RepaymentModal({ isOpen, onClose, debt }) {
                                 </div>
 
                                 {/* Debt Summary */}
-                                <div className="px-6 py-4 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 border-b border-gray-200 dark:border-gray-600">
+                                <div className="px-6 py-4 bg-gray-50 dark:bg-white/[0.02] border-b border-gray-200 dark:border-white/[0.05]">
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
                                             <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Total Amount</p>
@@ -119,9 +119,9 @@ export default function RepaymentModal({ isOpen, onClose, debt }) {
                                             <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Payment Progress</span>
                                             <span className="text-xs font-semibold text-green-600 dark:text-green-400">{percentagePaid.toFixed(0)}%</span>
                                         </div>
-                                        <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2.5">
+                                        <div className="w-full bg-gray-200 dark:bg-white/[0.06] rounded-full h-2.5">
                                             <div
-                                                className="bg-gradient-to-r from-green-500 to-teal-500 h-2.5 rounded-full transition-all duration-500"
+                                                className="bg-gradient-to-r from-emerald-500 to-emerald-400 h-2.5 rounded-full transition-all duration-500"
                                                 style={{ width: `${percentagePaid}%` }}
                                             ></div>
                                         </div>
@@ -146,7 +146,7 @@ export default function RepaymentModal({ isOpen, onClose, debt }) {
                                                 max={debt.currentAmount}
                                                 value={amount}
                                                 onChange={(e) => setAmount(e.target.value)}
-                                                className="block w-full rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 pl-10 pr-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all sm:text-sm"
+                                                className="block w-full rounded-xl border border-gray-200 dark:border-white/[0.07] bg-white dark:bg-white/[0.04] pl-10 pr-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 transition-all sm:text-sm"
                                                 placeholder="0"
                                             />
                                         </div>
@@ -179,24 +179,24 @@ export default function RepaymentModal({ isOpen, onClose, debt }) {
                                             type="text"
                                             value={note}
                                             onChange={(e) => setNote(e.target.value)}
-                                            className="block w-full rounded-lg border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition-all sm:text-sm"
+                                            className="block w-full rounded-xl border border-gray-200 dark:border-white/[0.07] bg-white dark:bg-white/[0.04] px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 transition-all sm:text-sm"
                                             placeholder="e.g., Cash payment, Bank transfer..."
                                         />
                                     </div>
 
                                     {/* Action Buttons */}
-                                    <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                    <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-white/[0.06]">
                                         <button
                                             type="button"
                                             onClick={onClose}
-                                            className="flex-1 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all"
+                                            className="flex-1 rounded-xl border border-gray-300 dark:border-white/[0.08] bg-white dark:bg-white/[0.05] px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-white/[0.10] transition-all"
                                         >
                                             Cancel
                                         </button>
                                         <button
                                             type="submit"
                                             disabled={loading}
-                                            className="flex-1 rounded-lg bg-gradient-to-r from-green-500 to-teal-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg hover:from-green-600 hover:to-teal-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                                            className="flex-1 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 hover:from-emerald-500 hover:to-emerald-400 hover:scale-[1.02] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                                         >
                                             {loading ? (
                                                 <span className="flex items-center justify-center gap-2">
