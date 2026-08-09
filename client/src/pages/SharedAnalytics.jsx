@@ -105,7 +105,7 @@ const SharedAnalytics = () => {
     if (error) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
-                <div className="bg-red-50 dark:bg-red-900/20 p-6 rounded-lg text-center max-w-md">
+                <div className="glass-card p-6 text-center max-w-md">
                     <h2 className="text-xl font-bold text-red-600 dark:text-red-400 mb-2">Access Denied</h2>
                     <p className="text-gray-600 dark:text-gray-300">{error}</p>
                 </div>
@@ -116,8 +116,8 @@ const SharedAnalytics = () => {
     return (
         <div className="container mx-auto px-4 py-8">
             {profile && (
-                <div className="mb-6 flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                    <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-xl font-bold text-blue-600 dark:text-blue-300">
+                <div className="mb-6 flex items-center gap-4 p-4 glass-card">
+                    <div className="h-12 w-12 rounded-full bg-indigo-100 dark:bg-indigo-500/15 flex items-center justify-center text-xl font-bold text-indigo-600 dark:text-indigo-400">
                         {profile.avatar || profile.name.charAt(0).toUpperCase()}
                     </div>
                     <div>

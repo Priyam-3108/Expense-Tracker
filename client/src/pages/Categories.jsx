@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useExpense } from '../context/ExpenseContext'
-import { Plus, Edit, Trash2, GripVertical } from 'lucide-react'
+import { Plus, Edit, Trash2, GripVertical, Tag } from 'lucide-react'
+import EmptyState from '../components/EmptyState'
 import toast from 'react-hot-toast'
 import { useAuth } from '../context/AuthContext'
 
@@ -40,9 +41,9 @@ const Categories = () => {
   ]
 
   const colorOptions = [
-    '#EF4444', '#F97316', '#F59E0B', '#84CC16', '#10B981',
-    '#06B6D4', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899',
-    '#F43F5E', '#A855F7', '#14B8A6', '#22C55E', '#EAB308'
+    '#EF4444', '#F97316', '#F59E0B', '#10B981', '#06B6D4',
+    '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899', '#A855F7',
+    '#14B8A6', '#22C55E', '#EAB308', '#F43F5E', '#0EA5E9'
   ]
 
   useEffect(() => {
@@ -231,7 +232,7 @@ const Categories = () => {
   if (categoriesLoading) {
     return (
       <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
       </div>
     )
   }
@@ -241,12 +242,12 @@ const Categories = () => {
       <div className="flex flex-wrap gap-3 items-start justify-between">
         <div>
           <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">Categories</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400">Manage your expense categories</p>
+          <p className="text-sm text-gray-600 dark:text-slate-500">Manage your expense categories</p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={handleAddNew}
-            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 min-h-[44px] shadow-sm"
+            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-xl hover:bg-indigo-500 hover:scale-[1.02] transition-all duration-200 min-h-[44px] shadow-[0_0_15px_rgba(99,102,241,0.15)]"
           >
             <Plus size={16} />
             <span>Add Category</span>
@@ -256,7 +257,7 @@ const Categories = () => {
 
       {/* Add/Edit Category Form */}
       {showForm && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <div className="glass-card p-6">
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
             {editingCategory ? 'Edit Category' : 'Add New Category'}
           </h3>
@@ -270,7 +271,7 @@ const Categories = () => {
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 text-sm"
+                className="w-full px-3 py-3 border border-gray-300 dark:border-white/[0.07] rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-slate-500 text-sm transition-all duration-200"
                 placeholder="Enter category name"
                 maxLength={30}
               />
@@ -286,10 +287,10 @@ const Categories = () => {
                     key={icon}
                     type="button"
                     onClick={() => setFormData({ ...formData, icon })}
-                    className={`flex items-center justify-center text-xl rounded-lg border-2 min-h-[44px] transition-all ${
+                    className={`flex items-center justify-center text-xl rounded-xl border-2 min-h-[44px] transition-all duration-200 ${
                       formData.icon === icon
-                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-500'
+                        ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10'
+                        : 'border-gray-200 dark:border-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.15]'
                     }`}
                   >
                     {icon}
@@ -308,10 +309,10 @@ const Categories = () => {
                     key={color}
                     type="button"
                     onClick={() => setFormData({ ...formData, color })}
-                    className={`w-10 h-10 rounded-full border-2 transition-all ${
+                    className={`w-10 h-10 rounded-full border-2 transition-all duration-200 ${
                       formData.color === color
-                        ? 'border-gray-800 dark:border-white scale-110 shadow-md'
-                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500'
+                        ? 'border-gray-800 dark:border-white scale-110 shadow-md shadow-current/20'
+                        : 'border-gray-200 dark:border-white/[0.08] hover:border-gray-400 dark:hover:border-white/[0.20]'
                     }`}
                     style={{ backgroundColor: color }}
                     aria-label={`Select color ${color}`}
@@ -324,7 +325,7 @@ const Categories = () => {
               <button
                 type="submit"
                 disabled={formLoading}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-xl hover:bg-indigo-500 hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] shadow-[0_0_15px_rgba(99,102,241,0.15)]"
               >
                 {formLoading ? (
                   <>
@@ -339,7 +340,7 @@ const Categories = () => {
                 type="button"
                 onClick={handleCancel}
                 disabled={formLoading}
-                className="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
+                className="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-white/[0.05] border border-gray-300 dark:border-white/[0.08] rounded-xl hover:bg-gray-50 dark:hover:bg-white/[0.10] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
               >
                 Cancel
               </button>
@@ -349,31 +350,22 @@ const Categories = () => {
       )}
 
       {/* All Categories */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-        <div className="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="glass-card overflow-hidden">
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-white/[0.05]">
           <h3 className="text-base font-semibold text-gray-900 dark:text-white">All Categories</h3>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+          <p className="text-xs text-gray-500 dark:text-slate-500 mt-0.5">
             Drag and drop to reorder · {categories.length} total
           </p>
         </div>
         <div className="p-3 sm:p-6">
           {categories.length === 0 ? (
-            <div className="text-center py-8">
-              <div className="text-gray-400 mb-4">
-                <div className="w-16 h-16 mx-auto bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
-                  <Plus size={24} />
-                </div>
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No categories available</h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">Create your first custom category to get started</p>
-              <button
-                onClick={handleAddNew}
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-              >
-                <Plus size={16} />
-                Add Category
-              </button>
-            </div>
+            <EmptyState
+              icon={Tag}
+              title="No categories available"
+              description="Create your first custom category to get started."
+              actionLabel="Add Category"
+              onAction={handleAddNew}
+            />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {categories.map((category) => (
@@ -384,11 +376,11 @@ const Categories = () => {
                   onDragOver={(e) => handleDragOver(e, category)}
                   onDrop={(e) => handleDrop(e, category)}
                   onDragEnd={handleDragEnd}
-                  className={`flex items-center justify-between p-4 border rounded-lg transition-all cursor-move ${dragOverItem?._id === category._id
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 scale-105 shadow-md'
+                  className={`flex items-center justify-between p-4 border rounded-xl transition-all duration-200 cursor-move ${dragOverItem?._id === category._id
+                    ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 scale-[1.02] shadow-md'
                     : draggedItem?._id === category._id
-                      ? 'opacity-50 border-dashed border-gray-400 dark:border-gray-500'
-                      : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-sm'
+                      ? 'opacity-50 border-dashed border-gray-400 dark:border-slate-500'
+                      : 'border-gray-200 dark:border-white/[0.07] hover:bg-gray-50 dark:hover:bg-white/[0.03] hover:shadow-sm'
                     }`}
                 >
                   <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -405,11 +397,11 @@ const Categories = () => {
                       <h4 className="font-medium text-gray-900 dark:text-white truncate">{category.name}</h4>
                       <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
                         {category.isDefault ? (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-500/15 dark:text-indigo-300">
                             Default
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300">
                             Custom
                           </span>
                         )}
@@ -427,7 +419,7 @@ const Categories = () => {
                       <>
                         <button
                           onClick={() => handleEdit(category)}
-                          className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center"
+                          className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-xl transition-all duration-200 min-h-[40px] min-w-[40px] flex items-center justify-center"
                           title="Edit category"
                           aria-label={`Edit ${category.name}`}
                         >
@@ -435,9 +427,9 @@ const Categories = () => {
                         </button>
                         <button
                           onClick={() => handleDelete(category)}
-                          className={`p-2 rounded-lg transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center ${category.expenseCount > 0
-                            ? 'text-orange-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20'
-                            : 'text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'
+                          className={`p-2 rounded-xl transition-all duration-200 min-h-[40px] min-w-[40px] flex items-center justify-center ${category.expenseCount > 0
+                            ? 'text-orange-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-500/10'
+                            : 'text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10'
                             }`}
                           title="Delete category"
                           aria-label={`Delete ${category.name}`}
@@ -461,10 +453,10 @@ const Categories = () => {
 
       {/* Category Statistics */}
       {categoryStats.length > 0 && (
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="glass-card overflow-hidden">
+          <div className="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-white/[0.05]">
             <h3 className="text-base font-semibold text-gray-900 dark:text-white">Category Statistics</h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Expense breakdown by category</p>
+            <p className="text-xs text-gray-500 dark:text-slate-500">Expense breakdown by category</p>
           </div>
           <div className="p-3 sm:p-6">
             {statsLoading ? (
@@ -474,7 +466,7 @@ const Categories = () => {
             ) : (
               <div className="space-y-4">
                 {categoryStats.map((stat, index) => (
-                <div key={stat._id} className="flex items-center justify-between p-3 sm:p-4 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                <div key={stat._id} className="flex items-center justify-between p-3 sm:p-4 border border-gray-200 dark:border-white/[0.07] rounded-xl hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-all duration-200">
                     <div className="flex items-center gap-3 min-w-0 flex-1">
                       <div
                         className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0"

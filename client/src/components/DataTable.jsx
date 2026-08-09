@@ -15,8 +15,10 @@ import {
     ChevronsRight,
     Trash2,
     Edit,
-    Search
+    Search,
+    Inbox
 } from 'lucide-react'
+import EmptyState from './EmptyState'
 
 const DataTable = ({
     data,
@@ -69,17 +71,17 @@ const DataTable = ({
             {/* Toolbar: Search and Total Results */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="relative flex-1 max-w-md">
-                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
                     <input
                         type="text"
                         placeholder="Search expenses..."
                         value={searchValue || ''}
                         onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
-                        className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-10 py-3 text-sm focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 transition-colors"
+                        className="w-full pl-10 pr-4 py-3 glass-input text-sm"
                     />
                 </div>
                 {totalResults !== undefined && (
-                    <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                    <div className="text-sm text-gray-500 dark:text-slate-500 font-medium">
                         Total Results: <span className="text-gray-900 dark:text-white">{totalResults}</span>
                     </div>
                 )}
@@ -87,15 +89,15 @@ const DataTable = ({
 
             {/* Bulk Actions Toolbar */}
             {hasSelection && (
-                <div className="flex items-center justify-between bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-800">
-                    <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                <div className="flex items-center justify-between p-4 rounded-xl border border-indigo-200 dark:border-indigo-500/20 bg-indigo-50 dark:bg-indigo-500/10">
+                    <span className="text-sm font-medium text-indigo-700 dark:text-indigo-300">
                         {selectedRows.length} row(s) selected
                     </span>
                     <div className="flex gap-2">
                         {onBulkEdit && (
                             <button
                                 onClick={() => onBulkEdit(selectedRows.map(row => row.original))}
-                                className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/40 rounded-md transition-colors"
+                                className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 rounded-lg transition-all duration-200"
                             >
                                 <Edit size={16} />
                                 Edit Selected
@@ -107,7 +109,7 @@ const DataTable = ({
                                     onBulkDelete(selectedRows.map(row => row.original))
                                     setRowSelection({})
                                 }}
-                                className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/40 rounded-md transition-colors"
+                                className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-500/20 rounded-lg transition-all duration-200"
                             >
                                 <Trash2 size={16} />
                                 Delete Selected
@@ -118,16 +120,16 @@ const DataTable = ({
             )}
 
             {/* Table */}
-            <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden bg-white dark:bg-gray-800 shadow-sm">
+            <div className="glass-table">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <thead className="text-xs uppercase text-gray-500 dark:text-slate-500">
                             {table.getHeaderGroups().map(headerGroup => (
                                 <tr key={headerGroup.id}>
                                     {headerGroup.headers.map(header => (
                                         <th
                                             key={header.id}
-                                            className="px-6 py-3 font-medium whitespace-nowrap"
+                                            className="px-6 py-3.5 font-medium whitespace-nowrap"
                                             style={{ width: header.getSize() !== 150 ? header.getSize() : undefined }}
                                         >
                                             {header.isPlaceholder ? null : (
@@ -143,7 +145,7 @@ const DataTable = ({
                                                     {header.column.getCanSort() && (
                                                         <ArrowUpDown
                                                             size={14}
-                                                            className={`text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors ${header.column.getIsSorted() ? 'text-blue-600 dark:text-blue-400' : ''
+                                                            className={`text-slate-600 group-hover:text-slate-400 transition-colors ${header.column.getIsSorted() ? 'text-indigo-500 dark:text-indigo-400' : ''
                                                                 }`}
                                                         />
                                                     )}
@@ -154,30 +156,35 @@ const DataTable = ({
                                 </tr>
                             ))}
                         </thead>
-                        <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                        <tbody>
                             {isLoading ? (
                                 <tr>
                                     <td colSpan={columns.length} className="px-6 py-10 text-center">
                                         <div className="flex justify-center">
-                                            <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-100 border-t-blue-500" />
+                                            <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-700 border-t-indigo-500" />
                                         </div>
                                     </td>
                                 </tr>
                             ) : table.getRowModel().rows.length === 0 ? (
                                 <tr>
-                                    <td colSpan={columns.length} className="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
-                                        No data found
+                                    <td colSpan={columns.length}>
+                                        <EmptyState
+                                            icon={Inbox}
+                                            title="No expenses found"
+                                            description="Your expenses will appear here once you start tracking."
+                                        />
                                     </td>
                                 </tr>
                             ) : (
-                                table.getRowModel().rows.map(row => (
+                                table.getRowModel().rows.map((row, index) => (
                                     <tr
                                         key={row.id}
-                                        className={`bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${row.getIsSelected() ? 'bg-blue-50 dark:bg-blue-900/10' : ''
+                                        className={`transition-all duration-200 stagger-item ${row.getIsSelected() ? 'bg-indigo-50 dark:bg-indigo-500/5' : ''
                                             }`}
+                                        style={{ animationDelay: `${index * 30}ms` }}
                                     >
                                         {row.getVisibleCells().map(cell => (
-                                            <td key={cell.id} className="px-6 py-4">
+                                            <td key={cell.id} className="px-6 py-4 text-gray-700 dark:text-slate-300">
                                                 {flexRender(
                                                     cell.column.columnDef.cell,
                                                     cell.getContext()
@@ -192,17 +199,17 @@ const DataTable = ({
                 </div>
 
                 {/* Pagination */}
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                    <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-6 py-4 border-t border-gray-200 dark:border-white/[0.04]" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                    <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-slate-400">
                         <span className="hidden sm:inline">Page</span>
-                        <span className="font-medium">
+                        <span className="font-medium text-gray-900 dark:text-white">
                             {table.getState().pagination.pageIndex + 1} of{' '}
                             {table.getPageCount()}
                         </span>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
                         <button
-                            className="p-2.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed min-h-[40px] min-w-[40px] flex items-center justify-center"
+                            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] disabled:opacity-30 disabled:cursor-not-allowed min-h-[40px] min-w-[40px] flex items-center justify-center text-gray-500 dark:text-slate-400 transition-all duration-200"
                             onClick={() => {
                                 if (manualPagination && onPageChange) onPageChange(0)
                                 else table.setPageIndex(0)
@@ -213,7 +220,7 @@ const DataTable = ({
                             <ChevronsLeft size={18} />
                         </button>
                         <button
-                            className="p-2.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed min-h-[40px] min-w-[40px] flex items-center justify-center"
+                            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] disabled:opacity-30 disabled:cursor-not-allowed min-h-[40px] min-w-[40px] flex items-center justify-center text-gray-500 dark:text-slate-400 transition-all duration-200"
                             onClick={() => {
                                 if (manualPagination && onPageChange) onPageChange(pageIndex - 1)
                                 else table.previousPage()
@@ -224,7 +231,7 @@ const DataTable = ({
                             <ChevronLeft size={18} />
                         </button>
                         <button
-                            className="p-2.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed min-h-[40px] min-w-[40px] flex items-center justify-center"
+                            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] disabled:opacity-30 disabled:cursor-not-allowed min-h-[40px] min-w-[40px] flex items-center justify-center text-gray-500 dark:text-slate-400 transition-all duration-200"
                             onClick={() => {
                                 if (manualPagination && onPageChange) onPageChange(pageIndex + 1)
                                 else table.nextPage()
@@ -235,7 +242,7 @@ const DataTable = ({
                             <ChevronRight size={18} />
                         </button>
                         <button
-                            className="p-2.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed min-h-[40px] min-w-[40px] flex items-center justify-center"
+                            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] disabled:opacity-30 disabled:cursor-not-allowed min-h-[40px] min-w-[40px] flex items-center justify-center text-gray-500 dark:text-slate-400 transition-all duration-200"
                             onClick={() => {
                                 if (manualPagination && onPageChange) onPageChange(pageCount - 1)
                                 else table.setPageIndex(table.getPageCount() - 1)
@@ -252,10 +259,10 @@ const DataTable = ({
                                 if (manualPagination && onPageSizeChange) onPageSizeChange(newSize)
                                 else table.setPageSize(newSize)
                             }}
-                            className="ml-1 sm:ml-2 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="ml-2 rounded-lg border border-gray-300 dark:border-white/[0.08] bg-white dark:bg-white/[0.04] text-gray-700 dark:text-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all duration-200"
                         >
                             {[5, 10, 20, 30, 40, 50].map(size => (
-                                <option key={size} value={size}>
+                                <option key={size} value={size} className="bg-slate-800 text-white">
                                     Show {size}
                                 </option>
                             ))}

@@ -53,7 +53,7 @@ const BulkEditList = ({ expenses, categories, currency, onExpensesChange }) => {
                 {editableExpenses.map((expense, index) => (
                     <div
                         key={expense._id}
-                        className="grid grid-cols-12 gap-3 items-start p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 hover:border-blue-300 dark:hover:border-blue-500 transition-colors"
+                        className="grid grid-cols-12 gap-3 items-start p-3 border border-gray-200 dark:border-white/[0.07] rounded-xl bg-white dark:bg-white/[0.02] hover:border-indigo-300 dark:hover:border-white/[0.15] transition-all duration-200"
                     >
                         {/* Type Toggle */}
                         <div className="col-span-1 flex justify-center pt-2">
@@ -100,7 +100,7 @@ const BulkEditList = ({ expenses, categories, currency, onExpensesChange }) => {
                                 type="text"
                                 value={expense.description}
                                 onChange={(e) => updateExpense(index, 'description', e.target.value)}
-                                className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400"
+                                className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-white/[0.07] rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/30 bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 transition-all duration-200"
                                 placeholder="Description"
                             />
                         </div>
@@ -117,7 +117,7 @@ const BulkEditList = ({ expenses, categories, currency, onExpensesChange }) => {
                                     min="1"
                                     value={expense.amount}
                                     onChange={(e) => updateExpense(index, 'amount', e.target.value)}
-                                    className="w-full pl-9 pr-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400"
+                                    className="w-full pl-9 pr-2 py-1.5 text-sm border border-gray-300 dark:border-white/[0.07] rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/30 bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 transition-all duration-200"
                                     placeholder="0.00"
                                 />
                             </div>

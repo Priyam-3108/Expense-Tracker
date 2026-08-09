@@ -45,17 +45,25 @@ const Landing = () => {
     }, [])
 
     return (
-        <div className="landing-page">
+        <div className="landing-page bg-slate-950 noise-overlay">
+            {/* Animated Liquid Glass Orbs */}
+            <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+                <div className="liquid-orb liquid-orb-indigo" style={{ top: '-200px', right: '-100px' }} />
+                <div className="liquid-orb liquid-orb-emerald" style={{ top: '40%', left: '-150px' }} />
+                <div className="liquid-orb liquid-orb-violet" style={{ top: '60%', right: '5%' }} />
+                <div className="liquid-orb liquid-orb-rose" style={{ top: '20%', left: '30%' }} />
+            </div>
+
             {/* Navigation */}
-            <nav className={`landing-navbar ${scrolled ? 'scrolled' : ''}`}>
+            <nav className={`fixed top-0 left-0 right-0 z-50 glass-nav ${scrolled ? 'shadow-lg' : ''}`}>
                 <div className="landing-container">
                     <div className="nav-content">
                         <Logo />
                         <div className="nav-links">
-                            <a href="#features" className="nav-link">Features</a>
-                            <a href="#how-it-works" className="nav-link">How It Works</a>
-                            <Link to="/login" className="btn-secondary">Sign In</Link>
-                            <Link to="/register" className="btn-primary">
+                            <a href="#features" className="nav-link text-slate-300 hover:text-white transition-colors">Features</a>
+                            <a href="#how-it-works" className="nav-link text-slate-300 hover:text-white transition-colors">How It Works</a>
+                            <Link to="/login" className="btn-secondary btn-sm">Sign In</Link>
+                            <Link to="/register" className="btn-primary btn-sm">
                                 Get Started Free
                                 <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
                                     <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -67,35 +75,30 @@ const Landing = () => {
             </nav>
 
             {/* Hero Section */}
-            <section className="hero">
-                <div className="hero-background">
-                    <div className="gradient-blob blob-1"></div>
-                    <div className="gradient-blob blob-2"></div>
-                    <div className="gradient-blob blob-3"></div>
-                </div>
+            <section className="relative z-10 pt-36 pb-24 overflow-hidden">
                 <div className="landing-container">
                     <div className="hero-content-wrapper">
                         <div className="hero-content">
-                            <div className="hero-badge fade-in-up" style={{ animationDelay: '0.1s' }}>
-                                <span className="badge-dot"></span>
+                            <div className="glass-badge fade-in-up text-indigo-400 border-indigo-500/20 inline-flex" style={{ animationDelay: '0.1s' }}>
+                                <span className="w-2 h-2 bg-indigo-400 rounded-full animate-pulse mr-2"></span>
                                 <span>Free to use • No credit card required</span>
                             </div>
-                            <h1 className="hero-title fade-in-up" style={{ animationDelay: '0.2s' }}>
+                            <h1 className="hero-title fade-in-up text-white" style={{ animationDelay: '0.2s' }}>
                                 Track Every Expense,
                                 <span className="gradient-text">Master Your Money</span>
                             </h1>
-                            <p className="hero-subtitle fade-in-up" style={{ animationDelay: '0.3s' }}>
+                            <p className="hero-subtitle fade-in-up text-slate-400" style={{ animationDelay: '0.3s' }}>
                                 A simple, powerful expense tracker that helps you understand where your money goes.
                                 Organize expenses by categories, visualize spending patterns, and export your data anytime.
                             </p>
                             <div className="hero-cta fade-in-up" style={{ animationDelay: '0.4s' }}>
-                                <Link to="/register" className="btn-primary btn-large">
+                                <Link to="/register" className="btn-primary btn-lg">
                                     Start Tracking Free
                                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                                         <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                     </svg>
                                 </Link>
-                                <Link to="/login" className="btn-secondary btn-large">
+                                <Link to="/login" className="btn-secondary btn-lg">
                                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                                         <path d="M8 6L14 10L8 14V6Z" fill="currentColor" />
                                     </svg>
@@ -104,7 +107,7 @@ const Landing = () => {
                             </div>
                         </div>
                         <div className="hero-image fade-in-right" style={{ animationDelay: '0.5s' }}>
-                            <div className="dashboard-mockup">
+                            <div className="dashboard-mockup glass-card p-0 rounded-2xl overflow-hidden">
                                 <div className="mockup-header">
                                     <div className="mockup-dots">
                                         <span></span>
@@ -136,12 +139,12 @@ const Landing = () => {
             </section>
 
             {/* Features Section */}
-            <section id="features" className="features">
+            <section id="features" className="relative z-10 py-24">
                 <div className="landing-container">
                     <div className="section-header">
-                        <span className="section-badge">Features</span>
-                        <h2>Everything you need to manage expenses</h2>
-                        <p>Simple yet powerful tools to take control of your finances</p>
+                        <span className="glass-badge text-indigo-400 border-indigo-500/20">Features</span>
+                        <h2 className="text-white">Everything you need to manage expenses</h2>
+                        <p className="text-slate-400">Simple yet powerful tools to take control of your finances</p>
                     </div>
                     <div className="features-grid">
                         <FeatureCard
@@ -179,30 +182,30 @@ const Landing = () => {
             </section>
 
             {/* How It Works */}
-            <section id="how-it-works" className="benefits">
+            <section id="how-it-works" className="relative z-10 py-24">
                 <div className="landing-container">
                     <div className="section-header">
-                        <span className="section-badge">How It Works</span>
-                        <h2>Start tracking in 3 simple steps</h2>
+                        <span className="glass-badge text-indigo-400 border-indigo-500/20">How It Works</span>
+                        <h2 className="text-white">Start tracking in 3 simple steps</h2>
                     </div>
                     <div className="benefits-content">
                         <div className="benefit-item">
                             <div className="benefit-text">
-                                <span className="benefit-label">Step 1</span>
-                                <h2>Create your account</h2>
-                                <p>Sign up in seconds with just your name, email, and preferred currency. No credit card required, no complicated setup.</p>
+                                <span className="glass-badge text-indigo-400 border-indigo-500/20 text-xs mb-4">Step 1</span>
+                                <h2 className="text-white text-4xl font-extrabold mb-5">Create your account</h2>
+                                <p className="text-slate-400 text-lg leading-relaxed mb-6">Sign up in seconds with just your name, email, and preferred currency. No credit card required, no complicated setup.</p>
                                 <ul className="benefit-list">
-                                    <li><span>✓</span> Quick registration</li>
-                                    <li><span>✓</span> Choose your currency</li>
-                                    <li><span>✓</span> 100% free</li>
+                                    <li className="text-slate-400"><span className="text-indigo-400 font-bold text-lg">✓</span> Quick registration</li>
+                                    <li className="text-slate-400"><span className="text-indigo-400 font-bold text-lg">✓</span> Choose your currency</li>
+                                    <li className="text-slate-400"><span className="text-indigo-400 font-bold text-lg">✓</span> 100% free</li>
                                 </ul>
                             </div>
                             <div className="benefit-visual">
-                                <div className="floating-card card-1">
-                                    <div className="card-icon">👤</div>
-                                    <div className="card-content">
-                                        <div className="card-title">Register</div>
-                                        <div className="card-value">30 sec</div>
+                                <div className="floating-card card-1 glass-card flex items-center gap-4 p-6">
+                                    <div className="text-3xl">👤</div>
+                                    <div>
+                                        <div className="text-xs text-slate-500 mb-1">Register</div>
+                                        <div className="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">30 sec</div>
                                     </div>
                                 </div>
                             </div>
@@ -210,21 +213,21 @@ const Landing = () => {
 
                         <div className="benefit-item reverse">
                             <div className="benefit-text">
-                                <span className="benefit-label">Step 2</span>
-                                <h2>Add your expenses</h2>
-                                <p>Log expenses quickly with our simple form. Add amount, category, description, and date. Organize with custom categories that work for you.</p>
+                                <span className="glass-badge text-indigo-400 border-indigo-500/20 text-xs mb-4">Step 2</span>
+                                <h2 className="text-white text-4xl font-extrabold mb-5">Add your expenses</h2>
+                                <p className="text-slate-400 text-lg leading-relaxed mb-6">Log expenses quickly with our simple form. Add amount, category, description, and date. Organize with custom categories that work for you.</p>
                                 <ul className="benefit-list">
-                                    <li><span>✓</span> Quick entry</li>
-                                    <li><span>✓</span> Custom categories</li>
-                                    <li><span>✓</span> Add notes & dates</li>
+                                    <li className="text-slate-400"><span className="text-indigo-400 font-bold text-lg">✓</span> Quick entry</li>
+                                    <li className="text-slate-400"><span className="text-indigo-400 font-bold text-lg">✓</span> Custom categories</li>
+                                    <li className="text-slate-400"><span className="text-indigo-400 font-bold text-lg">✓</span> Add notes & dates</li>
                                 </ul>
                             </div>
                             <div className="benefit-visual">
-                                <div className="floating-card card-2">
-                                    <div className="card-icon">📝</div>
-                                    <div className="card-content">
-                                        <div className="card-title">Track</div>
-                                        <div className="card-value">Easy</div>
+                                <div className="floating-card card-2 glass-card flex items-center gap-4 p-6">
+                                    <div className="text-3xl">📝</div>
+                                    <div>
+                                        <div className="text-xs text-slate-500 mb-1">Track</div>
+                                        <div className="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">Easy</div>
                                     </div>
                                 </div>
                             </div>
@@ -232,17 +235,17 @@ const Landing = () => {
 
                         <div className="benefit-item">
                             <div className="benefit-text">
-                                <span className="benefit-label">Step 3</span>
-                                <h2>Understand your spending</h2>
-                                <p>View detailed analytics and charts showing where your money goes. Filter by date, category, or amount. Export reports whenever you need them.</p>
+                                <span className="glass-badge text-indigo-400 border-indigo-500/20 text-xs mb-4">Step 3</span>
+                                <h2 className="text-white text-4xl font-extrabold mb-5">Understand your spending</h2>
+                                <p className="text-slate-400 text-lg leading-relaxed mb-6">View detailed analytics and charts showing where your money goes. Filter by date, category, or amount. Export reports whenever you need them.</p>
                                 <ul className="benefit-list">
-                                    <li><span>✓</span> Visual charts</li>
-                                    <li><span>✓</span> Category breakdown</li>
-                                    <li><span>✓</span> Export to CSV/Excel/PDF</li>
+                                    <li className="text-slate-400"><span className="text-indigo-400 font-bold text-lg">✓</span> Visual charts</li>
+                                    <li className="text-slate-400"><span className="text-indigo-400 font-bold text-lg">✓</span> Category breakdown</li>
+                                    <li className="text-slate-400"><span className="text-indigo-400 font-bold text-lg">✓</span> Export to CSV/Excel/PDF</li>
                                 </ul>
                             </div>
                             <div className="benefit-visual">
-                                <div className="growth-chart">
+                                <div className="growth-chart glass-card p-8">
                                     <div className="chart-line">
                                         <svg viewBox="0 0 200 100" preserveAspectRatio="none">
                                             <defs>
@@ -263,57 +266,56 @@ const Landing = () => {
             </section>
 
             {/* CTA Section */}
-            <section id="cta" className="cta-section hidden">
-                <div className="cta-background"></div>
+            <section id="cta" className="relative z-10 py-24">
                 <div className="landing-container">
-                    <div className="cta-content">
-                        <h2>Ready to take control of your spending?</h2>
-                        <p>Join users who are already tracking their expenses and making smarter financial decisions.</p>
-                        <div className="cta-buttons">
-                            <Link to="/register" className="btn-cta-primary btn-large">
+                    <div className="glass-modal-panel p-12 sm:p-16 text-center max-w-3xl mx-auto">
+                        <h2 className="text-4xl sm:text-5xl font-extrabold text-white mb-5">Ready to take control of your spending?</h2>
+                        <p className="text-lg text-slate-400 mb-8">Join users who are already tracking their expenses and making smarter financial decisions.</p>
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+                            <Link to="/register" className="btn-primary btn-lg">
                                 Get Started Free
                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                                     <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
                             </Link>
-                            <Link to="/login" className="btn-outline btn-large">Sign In</Link>
+                            <Link to="/login" className="btn-secondary btn-lg">Sign In</Link>
                         </div>
-                        <p className="cta-note">Free forever • No credit card • Start in 30 seconds</p>
+                        <p className="text-sm text-slate-500">Free forever • No credit card • Start in 30 seconds</p>
                     </div>
                 </div>
             </section>
 
             {/* Footer */}
-            <footer className="landing-footer">
+            <footer className="relative z-10 border-t border-white/[0.06] py-20">
                 <div className="landing-container">
                     <div className="footer-content">
                         <div className="footer-brand">
                             <Logo />
-                            <p>Simple expense tracking for everyone. Take control of your finances today.</p>
+                            <p className="text-sm text-slate-500 leading-relaxed mt-4">Simple expense tracking for everyone. Take control of your finances today.</p>
                         </div>
                         <div className="footer-links">
                             <div className="footer-column">
-                                <h4>Product</h4>
-                                <a href="#features">Features</a>
-                                <a href="#how-it-works">How It Works</a>
-                                <Link to="/register">Sign Up</Link>
-                                <Link to="/login">Sign In</Link>
+                                <h4 className="text-white text-sm font-semibold mb-5">Product</h4>
+                                <a href="#features" className="block text-sm text-slate-500 hover:text-white transition-colors mb-3">Features</a>
+                                <a href="#how-it-works" className="block text-sm text-slate-500 hover:text-white transition-colors mb-3">How It Works</a>
+                                <Link to="/register" className="block text-sm text-slate-500 hover:text-white transition-colors mb-3">Sign Up</Link>
+                                <Link to="/login" className="block text-sm text-slate-500 hover:text-white transition-colors">Sign In</Link>
                             </div>
                             <div className="footer-column">
-                                <h4>Resources</h4>
-                                <Link to="/faq">FAQ</Link>
-                                <Link to="/support">Support</Link>
-                                <Link to="/docs">Documentation</Link>
+                                <h4 className="text-white text-sm font-semibold mb-5">Resources</h4>
+                                <Link to="/faq" className="block text-sm text-slate-500 hover:text-white transition-colors mb-3">FAQ</Link>
+                                <Link to="/support" className="block text-sm text-slate-500 hover:text-white transition-colors mb-3">Support</Link>
+                                <Link to="/docs" className="block text-sm text-slate-500 hover:text-white transition-colors">Documentation</Link>
                             </div>
                             <div className="footer-column">
-                                <h4>Legal</h4>
-                                <Link to="/privacy">Privacy Policy</Link>
-                                <Link to="/terms">Terms of Service</Link>
+                                <h4 className="text-white text-sm font-semibold mb-5">Legal</h4>
+                                <Link to="/privacy" className="block text-sm text-slate-500 hover:text-white transition-colors mb-3">Privacy Policy</Link>
+                                <Link to="/terms" className="block text-sm text-slate-500 hover:text-white transition-colors">Terms of Service</Link>
                             </div>
                         </div>
                     </div>
-                    <div className="footer-bottom">
-                        <p>&copy; 2025 Expense Tracker. All rights reserved.</p>
+                    <div className="mt-12 pt-8 border-t border-white/[0.06] text-center">
+                        <p className="text-sm text-slate-600">&copy; 2025 Expense Tracker. All rights reserved.</p>
                     </div>
                 </div>
             </footer>
@@ -323,10 +325,10 @@ const Landing = () => {
 
 // Feature Card Component
 const FeatureCard = ({ icon, title, description }) => (
-    <div className="feature-card">
-        <div className="feature-icon">{icon}</div>
-        <h3>{title}</h3>
-        <p>{description}</p>
+    <div className="feature-card glass-card p-8">
+        <div className="feature-icon mb-5">{icon}</div>
+        <h3 className="text-xl font-bold mb-3 text-white">{title}</h3>
+        <p className="text-sm leading-relaxed text-slate-400">{description}</p>
     </div>
 )
 

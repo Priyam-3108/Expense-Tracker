@@ -1,9 +1,10 @@
 import { useState, useRef, useMemo, useEffect } from 'react'
-import { X, Upload, FileSpreadsheet, AlertCircle, Check, ArrowRight, Loader2 } from 'lucide-react'
+import { Upload, FileSpreadsheet, AlertCircle, Check, ArrowRight, Loader2 } from 'lucide-react'
 import Papa from 'papaparse'
 import * as XLSX from 'xlsx'
 import { useExpense } from '../context/ExpenseContext'
 import toast from 'react-hot-toast'
+import Modal from './Modal'
 
 const REQUIRED_FIELDS = ['amount', 'date', 'category']
 const OPTIONAL_FIELDS = ['description', 'type', 'notes']
@@ -253,26 +254,13 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex flex-col justify-end md:items-center md:justify-center bg-black/50 backdrop-blur-sm md:p-4">
-            <div className="w-full md:max-w-4xl rounded-t-2xl md:rounded-2xl bg-white dark:bg-gray-800 shadow-2xl border border-gray-200 dark:border-gray-700 animate-slide-up md:[animation:none] flex flex-col" style={{ maxHeight: '95vh' }}>
-                {/* Header */}
-                <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                        Import Expenses
-                    </h3>
-                    <button
-                        onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                    >
-                        <X size={20} />
-                    </button>
-                </div>
-
+        <Modal isOpen={isOpen} onClose={onClose} title="Import Expenses" maxWidth="max-w-4xl">
+            <div className="flex flex-col h-full">
                 {/* Content */}
                 <div className="p-6 overflow-y-auto flex-1">
                     {step === 1 && (
                         <div
-                            className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 sm:p-12 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                            className="border-2 border-dashed border-gray-300 dark:border-white/[0.10] rounded-2xl p-6 sm:p-12 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-all duration-200"
                             onClick={() => fileInputRef.current?.click()}
                             onDragOver={(e) => e.preventDefault()}
                             onDrop={(e) => {
@@ -288,7 +276,7 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
                                 accept=".csv,.xlsx,.xls"
                                 onChange={handleFileChange}
                             />
-                            <div className="h-16 w-16 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-4">
+                            <div className="h-16 w-16 bg-indigo-100 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-full flex items-center justify-center mb-4">
                                 <Upload size={32} />
                             </div>
                             <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
@@ -310,9 +298,9 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
 
                     {step === 2 && (
                         <div className="space-y-6">
-                            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg flex items-start gap-3">
-                                <AlertCircle className="text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" size={18} />
-                                <div className="text-sm text-blue-800 dark:text-blue-200">
+                            <div className="bg-indigo-50 dark:bg-indigo-500/10 p-4 rounded-xl flex items-start gap-3 border border-indigo-100 dark:border-indigo-500/20">
+                                <AlertCircle className="text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" size={18} />
+                                <div className="text-sm text-indigo-800 dark:text-indigo-300">
                                     <p className="font-medium mb-1">Map your columns</p>
                                     <p>Match the columns from your file to the expense fields. Required fields are marked with *.</p>
                                 </div>
@@ -327,9 +315,9 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
                                         <select
                                             value={mapping[field] || ''}
                                             onChange={(e) => handleMappingChange(field, e.target.value)}
-                                            className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${!mapping[field] && REQUIRED_FIELDS.includes(field)
-                                                ? 'border-red-300 focus:ring-red-500'
-                                                : 'border-gray-300 dark:border-gray-600 focus:ring-blue-500'
+                                            className={`w-full px-3 py-2 border rounded-xl focus:outline-none focus:ring-2 bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white min-h-[44px] transition-all duration-200 ${!mapping[field] && REQUIRED_FIELDS.includes(field)
+                                                ? 'border-red-300 dark:border-red-500/30 focus:ring-red-500/30'
+                                                : 'border-gray-300 dark:border-white/[0.07] focus:ring-indigo-500/30'
                                                 }`}
                                         >
                                             <option value="">Select column...</option>
@@ -343,18 +331,18 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
 
                             <div className="mt-6">
                                 <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Preview (First 3 rows)</h4>
-                                <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
+                                <div className="overflow-x-auto border border-gray-200 dark:border-white/[0.07] rounded-xl">
                                     <table className="w-full text-sm text-left">
-                                        <thead className="bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400">
+                                        <thead className="bg-gray-50 dark:bg-white/[0.02] text-gray-500 dark:text-slate-400">
                                             <tr>
                                                 {Object.keys(mapping).filter(k => mapping[k]).map(field => (
                                                     <th key={field} className="px-4 py-2 font-medium capitalize">{field}</th>
                                                 ))}
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                                        <tbody className="divide-y divide-gray-200 dark:divide-white/[0.05]">
                                             {rawData.slice(0, 3).map((row, i) => (
-                                                <tr key={i} className="bg-white dark:bg-gray-800">
+                                                <tr key={i} className="bg-white dark:bg-transparent">
                                                     {Object.keys(mapping).filter(k => mapping[k]).map(field => (
                                                         <td key={field} className="px-4 py-2 text-gray-900 dark:text-gray-300">
                                                             {row[mapping[field]]}
@@ -371,18 +359,18 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
                 </div>
 
                 {/* Footer */}
-                <div className="p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex justify-between items-center">
+                <div className="p-4 sm:p-6 border-t border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.02] flex flex-col-reverse sm:flex-row justify-between items-center gap-3">
                     {step === 1 ? (
                         <button
                             onClick={onClose}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900"
+                            className="w-full sm:w-auto px-4 py-2 text-base sm:text-sm font-medium text-gray-700 dark:text-slate-300 hover:text-gray-900 transition-all duration-200 min-h-[44px] rounded-xl hover:bg-gray-200 dark:hover:bg-white/[0.06]"
                         >
                             Cancel
                         </button>
                     ) : (
                         <button
                             onClick={reset}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900"
+                            className="w-full sm:w-auto px-4 py-2 text-base sm:text-sm font-medium text-gray-700 dark:text-slate-300 hover:text-gray-900 transition-all duration-200 min-h-[44px] rounded-xl hover:bg-gray-200 dark:hover:bg-white/[0.06]"
                             disabled={processing}
                         >
                             Back
@@ -393,24 +381,24 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
                         <button
                             onClick={handleImport}
                             disabled={processing}
-                            className="flex items-center gap-2 px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2 text-base sm:text-sm font-medium text-white bg-indigo-600 rounded-xl hover:bg-indigo-500 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] transition-all duration-200 shadow-[0_0_15px_rgba(99,102,241,0.15)]"
                         >
                             {processing ? (
                                 <>
-                                    <Loader2 size={16} className="animate-spin" />
-                                    Importing...
+                                    <Loader2 size={18} className="animate-spin" />
+                                    <span>Importing...</span>
                                 </>
                             ) : (
                                 <>
-                                    Import Expenses
-                                    <ArrowRight size={16} />
+                                    <span>Import Expenses</span>
+                                    <ArrowRight size={18} />
                                 </>
                             )}
                         </button>
                     )}
                 </div>
             </div>
-        </div>
+        </Modal>
     )
 }
 

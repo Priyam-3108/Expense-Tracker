@@ -1,17 +1,14 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { useTheme } from '../context/ThemeContext'
 import { useForm } from 'react-hook-form'
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react'
 import { validateEmail } from '../utils/helpers'
 import { cn } from '../utils/cn'
-import ThemeToggle from '../components/ThemeToggle'
 import Logo from '../components/Logo'
 
 const Login = () => {
   const { login } = useAuth()
-  const { theme } = useTheme()
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -40,40 +37,19 @@ const Login = () => {
     }
   }
 
-  const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
-
   return (
-    <div className={cn(
-      "min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative transition-all duration-500",
-      isDark
-        ? "bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950"
-        : "bg-gradient-to-br from-primary-50 via-blue-50 to-indigo-50"
-    )}>
-      {/* Animated background blobs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className={cn(
-          "absolute top-1/4 -left-20 w-96 h-96 rounded-full blur-3xl opacity-20 animate-pulse",
-          isDark ? "bg-primary-600" : "bg-primary-300"
-        )} style={{ animationDuration: '4s' }} />
-        <div className={cn(
-          "absolute bottom-1/4 -right-20 w-96 h-96 rounded-full blur-3xl opacity-20 animate-pulse",
-          isDark ? "bg-blue-600" : "bg-blue-300"
-        )} style={{ animationDuration: '6s', animationDelay: '1s' }} />
-      </div>
-
-      {/* Theme Toggle - Top Right */}
-      <div className="absolute top-6 right-6 z-10">
-        <ThemeToggle />
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative bg-slate-950 noise-overlay overflow-hidden">
+      {/* Animated Liquid Glass Orbs */}
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        <div className="liquid-orb liquid-orb-indigo" style={{ top: '-200px', right: '-100px' }} />
+        <div className="liquid-orb liquid-orb-emerald" style={{ top: '40%', left: '-150px' }} />
+        <div className="liquid-orb liquid-orb-violet" style={{ top: '60%', right: '5%' }} />
+        <div className="liquid-orb liquid-orb-rose" style={{ top: '20%', left: '30%' }} />
       </div>
 
       <div className="max-w-md w-full relative z-10">
         {/* Glassmorphism Card */}
-        <div className={cn(
-          "rounded-3xl shadow-2xl backdrop-blur-xl transition-all duration-500 border",
-          isDark
-            ? "bg-gray-900/80 border-gray-800/50 shadow-primary-500/10"
-            : "bg-white/80 border-white/20 shadow-primary-500/20"
-        )}>
+        <div className="glass-modal-panel">
           {/* Card Content */}
           <div className="p-8 sm:p-10">
             {/* Logo */}
@@ -83,10 +59,7 @@ const Login = () => {
 
             {/* Title */}
             <div className="text-center mb-8">
-              <h2 className={cn(
-                "text-3xl font-bold mb-3 transition-colors",
-                isDark ? "text-white" : "text-gray-900"
-              )}>
+              <h2 className="text-3xl font-bold mb-3 text-white">
                 Welcome
               </h2>
             </div>
@@ -96,19 +69,13 @@ const Login = () => {
               <div className="space-y-2">
                 <label
                   htmlFor="email"
-                  className={cn(
-                    "block text-sm font-medium transition-colors",
-                    isDark ? "text-gray-300" : "text-gray-700"
-                  )}
+                  className="block text-sm font-medium text-gray-300"
                 >
                   Email address
                 </label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                    <Mail className={cn(
-                      "h-5 w-5 transition-colors",
-                      isDark ? "text-gray-500 group-focus-within:text-primary-500" : "text-gray-400 group-focus-within:text-primary-600"
-                    )} />
+                    <Mail className="h-5 w-5 text-gray-500 group-focus-within:text-primary-500" />
                   </div>
                   <input
                     id="email"
@@ -119,12 +86,10 @@ const Login = () => {
                       validate: (value) => validateEmail(value) || 'Please enter a valid email'
                     })}
                     className={cn(
-                      "block w-full pl-11 pr-4 py-3 rounded-xl transition-all duration-300 text-sm font-medium",
+                      "block w-full pl-11 pr-4 py-3 rounded-xl transition-all duration-300 text-sm font-medium min-h-[44px]",
                       "focus:outline-none focus:ring-2 focus:ring-offset-0",
-                      isDark
-                        ? "bg-gray-800/50 border-2 border-gray-700 placeholder-gray-500 text-white hover:bg-gray-800/70 focus:bg-gray-800 focus:border-primary-500 focus:ring-primary-500/20"
-                        : "bg-gray-50 border-2 border-gray-200 placeholder-gray-400 text-gray-900 hover:bg-white focus:bg-white focus:border-primary-500 focus:ring-primary-500/20",
-                      errors.email && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                      "glass-input",
+                      errors.email && "!border-red-500 focus:!border-red-500 focus:!ring-red-500/20"
                     )}
                     placeholder="Enter your email"
                   />
@@ -141,29 +106,20 @@ const Login = () => {
                 <div className="flex items-center justify-between">
                   <label
                     htmlFor="password"
-                    className={cn(
-                      "block text-sm font-medium transition-colors",
-                      isDark ? "text-gray-300" : "text-gray-700"
-                    )}
+                    className="block text-sm font-medium text-gray-300"
                   >
                     Password
                   </label>
                   <Link
                     to="/forgot-password"
-                    className={cn(
-                      "text-xs font-medium transition-colors hover:underline",
-                      isDark ? "text-primary-400 hover:text-primary-300" : "text-primary-600 hover:text-primary-700"
-                    )}
+                    className="text-xs font-medium text-primary-400 hover:text-primary-300 hover:underline transition-colors"
                   >
                     Forgot password?
                   </Link>
                 </div>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                    <Lock className={cn(
-                      "h-5 w-5 transition-colors",
-                      isDark ? "text-gray-500 group-focus-within:text-primary-500" : "text-gray-400 group-focus-within:text-primary-600"
-                    )} />
+                    <Lock className="h-5 w-5 text-gray-500 group-focus-within:text-primary-500" />
                   </div>
                   <input
                     id="password"
@@ -177,12 +133,10 @@ const Login = () => {
                       }
                     })}
                     className={cn(
-                      "block w-full pl-11 pr-12 py-3 rounded-xl transition-all duration-300 text-sm font-medium",
+                      "block w-full pl-11 pr-12 py-3 rounded-xl transition-all duration-300 text-sm font-medium min-h-[44px]",
                       "focus:outline-none focus:ring-2 focus:ring-offset-0",
-                      isDark
-                        ? "bg-gray-800/50 border-2 border-gray-700 placeholder-gray-500 text-white hover:bg-gray-800/70 focus:bg-gray-800 focus:border-primary-500 focus:ring-primary-500/20"
-                        : "bg-gray-50 border-2 border-gray-200 placeholder-gray-400 text-gray-900 hover:bg-white focus:bg-white focus:border-primary-500 focus:ring-primary-500/20",
-                      errors.password && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                      "glass-input",
+                      errors.password && "!border-red-500 focus:!border-red-500 focus:!ring-red-500/20"
                     )}
                     placeholder="Enter your password"
                   />
@@ -192,15 +146,9 @@ const Login = () => {
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? (
-                      <EyeOff className={cn(
-                        "h-5 w-5 transition-all duration-200",
-                        isDark ? "text-gray-400 hover:text-gray-300" : "text-gray-400 hover:text-gray-600"
-                      )} />
+                      <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-300 transition-all duration-200" />
                     ) : (
-                      <Eye className={cn(
-                        "h-5 w-5 transition-all duration-200",
-                        isDark ? "text-gray-400 hover:text-gray-300" : "text-gray-400 hover:text-gray-600"
-                      )} />
+                      <Eye className="h-5 w-5 text-gray-400 hover:text-gray-300 transition-all duration-200" />
                     )}
                   </button>
                 </div>
@@ -215,13 +163,11 @@ const Login = () => {
               {errors.root && (
                 <div className={cn(
                   "rounded-xl p-4 animate-in slide-in-from-top-2 border",
-                  isDark
-                    ? "bg-red-950/30 border-red-900/50 backdrop-blur-sm"
-                    : "bg-red-50 border-red-200"
+                    "bg-red-950/30 border-red-900/50 backdrop-blur-sm"
                 )}>
                   <p className={cn(
                     "text-sm font-medium flex items-center gap-2",
-                    isDark ? "text-red-400" : "text-red-800"
+                    "text-red-400"
                   )}>
                     <span className="text-base">⚠</span>
                     {errors.root.message}
@@ -238,7 +184,7 @@ const Login = () => {
                   "bg-gradient-to-r from-primary-600 via-primary-600 to-blue-600",
                   "hover:from-primary-700 hover:via-primary-700 hover:to-blue-700",
                   "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
-                  isDark ? "focus:ring-offset-gray-900" : "focus:ring-offset-white",
+                  "focus:ring-offset-gray-900",
                   "disabled:opacity-50 disabled:cursor-not-allowed",
                   "transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]",
                   "shadow-lg hover:shadow-xl shadow-primary-500/25",
@@ -260,22 +206,12 @@ const Login = () => {
             </form>
           </div>
 
-          {/* Footer */}
-          <div className={cn(
-            "px-8 py-6 border-t",
-            isDark ? "bg-gray-900/50 border-gray-800" : "bg-gray-50/50 border-gray-200"
-          )}>
-            <p className={cn(
-              "text-center text-sm",
-              isDark ? "text-gray-400" : "text-gray-600"
-            )}>
+          <div className="px-8 py-6 border-t border-white/[0.08]">
+            <p className="text-center text-sm text-gray-400">
               Don't have an account?{' '}
               <Link
                 to="/register"
-                className={cn(
-                  "font-semibold transition-colors hover:underline",
-                  isDark ? "text-primary-400 hover:text-primary-300" : "text-primary-600 hover:text-primary-700"
-                )}
+                className="font-semibold transition-colors hover:underline text-primary-400 hover:text-primary-300"
               >
                 Sign up for free
               </Link>

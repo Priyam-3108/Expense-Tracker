@@ -9,7 +9,8 @@ import {
   LogOut,
   Menu,
   X,
-  ChevronDown
+  ChevronDown,
+  Wallet
 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { cn } from '../utils/cn'
@@ -42,7 +43,7 @@ const Layout = () => {
   const navigation = [
     { name: 'Dashboard', href: '/app/dashboard', icon: Home },
     { name: 'Expenses', href: '/app/expenses', icon: CreditCard },
-    { name: 'Debts', href: '/app/debts', icon: CreditCard },
+    { name: 'Debts', href: '/app/debts', icon: Wallet },
     { name: 'Categories', href: '/app/categories', icon: Tag },
     { name: 'Analytics', href: '/app/analytics', icon: BarChart3 },
     { name: 'Profile', href: '/app/profile', icon: User },
@@ -70,40 +71,80 @@ const Layout = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  // Track click position on .btn-primary for CSS ripple effect
+  useEffect(() => {
+    const handlePointerDown = (e) => {
+      const btn = e.target.closest('.btn-primary')
+      if (!btn) return
+      const rect = btn.getBoundingClientRect()
+      btn.style.setProperty('--ripple-x', `${((e.clientX - rect.left) / rect.width) * 100}%`)
+      btn.style.setProperty('--ripple-y', `${((e.clientY - rect.top) / rect.height) * 100}%`)
+    }
+    document.addEventListener('pointerdown', handlePointerDown)
+    return () => document.removeEventListener('pointerdown', handlePointerDown)
+  }, [])
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="h-screen flex flex-col bg-background noise-overlay overflow-hidden relative">
+      {/* Animated Liquid Glass Orbs — background layer */}
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        {/* Indigo Primary — top right */}
+        <div className="liquid-orb liquid-orb-indigo" style={{ top: '-150px', right: '-100px' }} />
+        {/* Emerald Accent — center left */}
+        <div className="liquid-orb liquid-orb-emerald" style={{ top: '35%', left: '-120px' }} />
+        {/* Violet Ambient — bottom right */}
+        <div className="liquid-orb liquid-orb-violet" style={{ top: '65%', right: '5%' }} />
+        {/* Rose Whisper — top left */}
+        <div className="liquid-orb liquid-orb-rose" style={{ top: '15%', left: '25%' }} />
+      </div>
+
+      {/* Content wrapper to stay above background */}
+      <div className="relative z-10 flex flex-col h-full w-full">
       {/* Mobile sidebar overlay — always rendered, toggled by opacity for smooth fade */}
       <div
-        className={`fixed inset-0 z-40 bg-gray-600 bg-opacity-75 lg:hidden transition-opacity duration-300 ${sidebarOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        className={cn(
+          "fixed inset-0 z-40 lg:hidden transition-all duration-300",
+          sidebarOpen
+            ? 'opacity-100 pointer-events-auto'
+            : 'opacity-0 pointer-events-none'
+        )}
         onClick={() => setSidebarOpen(false)}
         aria-hidden="true"
+        style={{
+          background: 'rgba(0, 0, 0, 0.50)',
+          backdropFilter: 'blur(4px)',
+          WebkitBackdropFilter: 'blur(4px)',
+        }}
       />
 
-      {/* Sidebar */}
+      {/* ============ SIDEBAR ============ */}
       <div className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0",
+        "fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out lg:translate-x-0",
+        "bg-white dark:bg-transparent shadow-lg dark:shadow-none",
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full glass-sidebar">
           {/* Sidebar Header */}
-          <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-white/[0.06]">
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-gradient-to-br from-indigo-500 to-indigo-600 shadow-glow-indigo">
                 <span className="text-white font-bold text-lg">{currencySymbols[currency] || '$'}</span>
               </div>
-              <h1 className="ml-3 text-xl font-bold text-gray-900 dark:text-white">Expense Tracker</h1>
+              <h1 className="ml-2 text-xl font-bold text-gray-900 dark:text-white">
+                Expense Tracker
+              </h1>
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
               aria-label="Close sidebar"
-              className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="lg:hidden p-2 rounded-lg text-gray-400 dark:text-slate-400 hover:text-gray-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-all duration-200"
             >
               <X size={20} />
             </button>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-2">
+          <nav className="flex-1 px-3 py-6 space-y-1">
             {navigation.map((item) => {
               const Icon = item.icon
               return (
@@ -113,15 +154,31 @@ const Layout = () => {
                   onClick={() => setSidebarOpen(false)}
                   className={({ isActive }) =>
                     cn(
-                      "flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors min-h-[44px]",
+                      "group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 min-h-[44px] relative",
                       isActive
-                        ? "bg-primary-100 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400"
-                        : "text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                        ? "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400"
+                        : "text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white"
                     )
                   }
                 >
-                  <Icon size={20} className="mr-3" />
-                  {item.name}
+                  {({ isActive }) => (
+                    <>
+                      {/* Glowing active indicator */}
+                      {isActive && (
+                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.6)]" />
+                      )}
+                      <Icon
+                        size={20}
+                        className={cn(
+                          "mr-3 transition-all duration-200",
+                          isActive
+                            ? "drop-shadow-[0_0_6px_rgba(99,102,241,0.4)]"
+                            : "group-hover:scale-110"
+                        )}
+                      />
+                      {item.name}
+                    </>
+                  )}
                 </NavLink>
               )
             })}
@@ -129,80 +186,81 @@ const Layout = () => {
         </div>
       </div>
 
-      {/* Main content */}
-      <div className="lg:pl-64 flex-1">
+      {/* ============ MAIN CONTENT ============ */}
+      <div className="lg:pl-64 flex-1 flex flex-col min-h-0">
         {/* Top Navbar */}
-        <nav className="sticky top-0 z-30 bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
-            {/* Left side - Mobile menu button */}
-            <div className="flex items-center lg:hidden">
-              <button
-                onClick={() => setSidebarOpen(true)}
-                aria-label="Open navigation menu"
-                className="p-2.5 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              >
-                <Menu size={22} />
-              </button>
-            </div>
-
-            {/* Spacer for desktop - pushes content to the right */}
-            <div className="flex-1 hidden lg:block"></div>
-
-            {/* Right side - Theme, Profile */}
-            <div className="flex items-center space-x-2 sm:space-x-3">
-              {/* Theme Toggle */}
-              <ThemeToggle />
-
-              {/* Profile Dropdown */}
-              <div className="relative" ref={dropdownRef}>
+        <nav className="sticky top-0 z-30 bg-white dark:bg-transparent shadow-sm dark:shadow-none border-b border-gray-200 dark:border-transparent">
+          <div className="glass-nav">
+            <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
+              {/* Left side - Mobile menu button */}
+              <div className="flex items-center lg:hidden">
                 <button
-                  onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                  className="flex items-center space-x-2 px-2 sm:px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  onClick={() => setSidebarOpen(true)}
+                  aria-label="Open navigation menu"
+                  className="p-2.5 rounded-xl text-gray-400 dark:text-slate-400 hover:text-gray-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-all duration-200"
                 >
-                  <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center">
-                    <span className="text-white font-medium text-sm">
-                      {user?.name?.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                  <span className="hidden sm:block text-sm font-medium text-gray-900 dark:text-gray-100">
-                    {user?.name?.split(' ')[0]}
-                  </span>
-                  <ChevronDown
-                    size={16}
-                    className={cn(
-                      "text-gray-500 dark:text-gray-400 transition-transform duration-200",
-                      profileDropdownOpen && "rotate-180"
-                    )}
-                  />
+                  <Menu size={22} />
                 </button>
+              </div>
 
-                {/* Dropdown Menu */}
-                {profileDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-1 z-50">
-                    {/* User Info */}
-                    <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{user?.name}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
+              {/* Spacer for desktop - pushes content to the right */}
+              <div className="flex-1 hidden lg:block"></div>
+
+              {/* Right side - Theme, Profile */}
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                <ThemeToggle />
+
+                {/* Profile Dropdown */}
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                    className="flex items-center space-x-2 px-2 sm:px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-all duration-200 min-h-[44px]"
+                  >
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gradient-to-br from-indigo-500 to-violet-500 ring-2 ring-indigo-500/20 shadow-glow-indigo">
+                      <span className="text-white font-medium text-sm">
+                        {user?.name?.charAt(0).toUpperCase()}
+                      </span>
                     </div>
+                    <span className="hidden sm:block text-sm font-medium text-gray-900 dark:text-slate-200">
+                      {user?.name?.split(' ')[0]}
+                    </span>
+                    <ChevronDown
+                      size={16}
+                      className={cn(
+                        "text-gray-500 dark:text-slate-500 transition-transform duration-200",
+                        profileDropdownOpen && "rotate-180"
+                      )}
+                    />
+                  </button>
 
-                    {/* Sign out */}
-                    <button
-                      onClick={handleLogout}
-                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                    >
-                      <LogOut size={16} className="mr-2" />
-                      Sign out
-                    </button>
-                  </div>
-                )}
+                  {/* Dropdown Menu */}
+                  {profileDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-64 glass-dropdown py-2 z-50">
+                      {/* User Info */}
+                      <div className="px-4 py-3 border-b border-gray-200 dark:border-white/[0.08] min-h-[44px] flex flex-col justify-center">
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.name}</p>
+                        <p className="text-xs text-gray-500 dark:text-slate-500 truncate">{user?.email}</p>
+                      </div>
+
+                      {/* Sign out */}
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center w-full px-4 py-3 text-sm font-medium text-gray-700 dark:text-slate-300 hover:bg-red-50 dark:hover:bg-rose-500/10 hover:text-red-600 dark:hover:text-rose-400 transition-all duration-200 min-h-[44px]"
+                      >
+                        <LogOut size={18} className="mr-3" />
+                        Sign out
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </nav>
 
-        {/* Page content — extra bottom padding on mobile for bottom nav */}
-        <main className="min-h-screen p-4 sm:p-6 lg:p-8 xl:p-10 pb-20 lg:pb-8 xl:pb-10">
-          <div className="w-full max-w-none">
+        {/* Page content */}
+        <main className="relative flex-1 overflow-y-auto overflow-x-clip p-4 sm:p-6 lg:p-8 xl:p-10 pb-20 lg:pb-8 xl:pb-10">
+          <div className="relative z-10 w-full max-w-none">
             <Outlet />
           </div>
         </main>
@@ -210,6 +268,7 @@ const Layout = () => {
 
       {/* Sticky bottom navigation — mobile only */}
       <BottomNav />
+      </div>
     </div>
   )
 }

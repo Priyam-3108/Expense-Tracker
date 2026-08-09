@@ -2,9 +2,10 @@ import { createContext, useContext, useEffect, useState } from 'react'
 
 const ThemeContext = createContext()
 
-export const ThemeProvider = ({ children, defaultTheme = 'system', storageKey = 'vite-ui-theme' }) => {
+export const ThemeProvider = ({ children, defaultTheme = 'dark', storageKey = 'vite-ui-theme' }) => {
     const [theme, setTheme] = useState(() => {
-        return localStorage.getItem(storageKey) || defaultTheme
+        const stored = localStorage.getItem(storageKey)
+        return stored || defaultTheme
     })
 
     useEffect(() => {

@@ -12,7 +12,7 @@ const CategoryBadge = ({
 
   if (!category) {
     return (
-      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 ${className}`}>
+      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-white/[0.06] text-gray-800 dark:text-slate-400 ${className}`}>
         Unknown Category
       </span>
     )
