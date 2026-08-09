@@ -4,9 +4,8 @@
   <meta charset="utf-8">
   <title>Expense Tracker</title>
   <script>
-    var base = document.location.pathname.split('/').slice(0, -1).join('/');
-    sessionStorage.redirect = document.location.pathname;
-    document.location.replace(base + '/');
+    sessionStorage.redirect = location.pathname + location.search;
+    location.replace('/');
   </script>
 </head>
 <body></body>
