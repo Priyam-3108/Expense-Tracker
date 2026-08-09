@@ -19,7 +19,13 @@ app.use(helmet());
 
 // CORS configuration
 app.use(cors({
-  origin: env.corsOrigin,
+  origin: (origin, callback) => {
+    if (!origin || env.corsOrigin.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']

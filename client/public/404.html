@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Expense Tracker</title>
+  <script>
+    var base = document.location.pathname.split('/').slice(0, -1).join('/');
+    sessionStorage.redirect = document.location.pathname;
+    document.location.replace(base + '/');
+  </script>
+</head>
+<body></body>
+</html>
