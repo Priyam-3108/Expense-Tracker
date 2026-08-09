@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { useTheme } from '../context/ThemeContext'
 import { useForm } from 'react-hook-form'
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react'
 import { validateEmail } from '../utils/helpers'
@@ -10,7 +9,6 @@ import Logo from '../components/Logo'
 
 const Login = () => {
   const { login } = useAuth()
-  const { theme } = useTheme()
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -39,23 +37,19 @@ const Login = () => {
     }
   }
 
-  const isDark = true;
-
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative bg-slate-950 noise-overlay overflow-hidden">
-      {/* Liquid Glass Background Image Layer */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <img 
-          src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop" 
-          alt="Fluid Background" 
-          className="w-full h-full object-cover opacity-40 mix-blend-screen"
-        />
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/40 via-slate-950/80 to-slate-950/90"></div>
+      {/* Animated Liquid Glass Orbs */}
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        <div className="liquid-orb liquid-orb-indigo" style={{ top: '-200px', right: '-100px' }} />
+        <div className="liquid-orb liquid-orb-emerald" style={{ top: '40%', left: '-150px' }} />
+        <div className="liquid-orb liquid-orb-violet" style={{ top: '60%', right: '5%' }} />
+        <div className="liquid-orb liquid-orb-rose" style={{ top: '20%', left: '30%' }} />
       </div>
 
       <div className="max-w-md w-full relative z-10">
         {/* Glassmorphism Card */}
-        <div className="rounded-3xl shadow-2xl backdrop-blur-xl border bg-gray-900/80 border-gray-800/50 shadow-primary-500/10">
+        <div className="glass-modal-panel">
           {/* Card Content */}
           <div className="p-8 sm:p-10">
             {/* Logo */}
@@ -94,8 +88,8 @@ const Login = () => {
                     className={cn(
                       "block w-full pl-11 pr-4 py-3 rounded-xl transition-all duration-300 text-sm font-medium min-h-[44px]",
                       "focus:outline-none focus:ring-2 focus:ring-offset-0",
-                      "bg-gray-800/50 border-2 border-gray-700 placeholder-gray-500 text-white hover:bg-gray-800/70 focus:bg-gray-800 focus:border-primary-500 focus:ring-primary-500/20",
-                      errors.email && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                      "glass-input",
+                      errors.email && "!border-red-500 focus:!border-red-500 focus:!ring-red-500/20"
                     )}
                     placeholder="Enter your email"
                   />
@@ -141,8 +135,8 @@ const Login = () => {
                     className={cn(
                       "block w-full pl-11 pr-12 py-3 rounded-xl transition-all duration-300 text-sm font-medium min-h-[44px]",
                       "focus:outline-none focus:ring-2 focus:ring-offset-0",
-                      "bg-gray-800/50 border-2 border-gray-700 placeholder-gray-500 text-white hover:bg-gray-800/70 focus:bg-gray-800 focus:border-primary-500 focus:ring-primary-500/20",
-                      errors.password && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                      "glass-input",
+                      errors.password && "!border-red-500 focus:!border-red-500 focus:!ring-red-500/20"
                     )}
                     placeholder="Enter your password"
                   />
@@ -212,7 +206,7 @@ const Login = () => {
             </form>
           </div>
 
-          <div className="px-8 py-6 border-t bg-gray-900/50 border-gray-800">
+          <div className="px-8 py-6 border-t border-white/[0.08]">
             <p className="text-center text-sm text-gray-400">
               Don't have an account?{' '}
               <Link

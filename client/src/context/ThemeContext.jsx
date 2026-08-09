@@ -4,12 +4,7 @@ const ThemeContext = createContext()
 
 export const ThemeProvider = ({ children, defaultTheme = 'dark', storageKey = 'vite-ui-theme' }) => {
     const [theme, setTheme] = useState(() => {
-        // Force dark mode: clear any previously stored light/system preference
         const stored = localStorage.getItem(storageKey)
-        if (stored && stored !== 'dark') {
-            localStorage.setItem(storageKey, 'dark')
-            return 'dark'
-        }
         return stored || defaultTheme
     })
 

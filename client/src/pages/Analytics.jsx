@@ -12,16 +12,16 @@ import { X, Copy, Check, ExternalLink } from 'lucide-react'
 const Analytics = () => {
   const { user, currency } = useAuth()
   const {
-    expenses,
     categories,
-    stats,
-    trends,
-    loading,
+    loading: contextLoading,
     loadExpenses,
     loadStats,
     loadTrends,
     getCategoryStats
   } = useExpense()
+
+  // Analytics-specific local state (not shared with context, avoids race conditions)
+  const [analyticsExpenses, setAnalyticsExpenses] = useState([])
 
   // Filter state
   const [dateRange, setDateRange] = useState({
@@ -72,7 +72,7 @@ const Analytics = () => {
       setLoadingStats(true)
 
       try {
-        await Promise.all([
+        const [expenseResult] = await Promise.all([
           loadExpenses({
             startDate: startDate || undefined,
             endDate: endDate || undefined,
@@ -82,6 +82,11 @@ const Analytics = () => {
           loadStats({ startDate, endDate }),
           loadTrends(startDate ? new Date(startDate).getFullYear() : new Date().getFullYear())
         ])
+
+        // Store in local state so context overwrites can't clobber analytics data
+        if (expenseResult?.expenses) {
+          setAnalyticsExpenses(expenseResult.expenses)
+        }
 
         // Load category stats
         const stats = await getCategoryStats({ startDate, endDate })
@@ -164,9 +169,9 @@ const Analytics = () => {
   return (
     <>
       <AnalyticsDashboard
-        expenses={expenses}
+        expenses={analyticsExpenses}
         categories={categories}
-        loading={loading || loadingStats}
+        loading={contextLoading || loadingStats}
         currency={currency}
         dateRange={dateRange}
         setDateRange={setDateRange}

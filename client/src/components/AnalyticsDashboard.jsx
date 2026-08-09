@@ -8,14 +8,15 @@ import {
 } from 'recharts'
 import {
     TrendingUp, TrendingDown, Calendar, Filter, X,
-    ArrowUpCircle, ArrowDownCircle, PieChart as PieChartIcon, BarChart3, Activity, Share2
+    ArrowUpCircle, ArrowDownCircle, PieChart as PieChartIcon, BarChart3, Activity, Share2, SearchX
 } from 'lucide-react'
+import EmptyState from './EmptyState'
 import { startOfYear, endOfYear, format, parseISO, eachDayOfInterval, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachMonthOfInterval } from 'date-fns'
 
 const COLORS = [
-    '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
-    '#EC4899', '#06B6D4', '#84CC16', '#F97316', '#6366F1',
-    '#14B8A6', '#A855F7', '#F43F5E', '#0EA5E9', '#22C55E'
+    '#6366F1', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
+    '#EC4899', '#06B6D4', '#22C55E', '#F97316', '#0EA5E9',
+    '#A855F7', '#14B8A6', '#F43F5E', '#3B82F6', '#EAB308'
 ]
 
 const currencySymbols = {
@@ -846,9 +847,11 @@ const AnalyticsDashboard = ({
                         )}
 
                         {filteredExpenses.length === 0 && (
-                            <div className="text-center py-6 text-gray-400 dark:text-gray-500">
-                                <p className="text-sm">No data available for the selected filters</p>
-                            </div>
+                            <EmptyState
+                                icon={SearchX}
+                                title="No data for these filters"
+                                description="Try adjusting your date range or category selection."
+                            />
                         )}
                     </div>
                 </div>

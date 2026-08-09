@@ -314,34 +314,34 @@
     border-radius: 50%;
     pointer-events: none;
     will-change: transform;
-    filter: blur(60px);
+    filter: blur(40px);
   }
 
   .liquid-orb-indigo {
     width: 600px;
     height: 600px;
-    background: radial-gradient(circle, rgba(99, 102, 241, 0.30) 0%, rgba(99, 102, 241, 0) 70%);
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.45) 0%, rgba(99, 102, 241, 0) 70%);
     animation: orbFloat 20s ease-in-out infinite;
   }
 
   .liquid-orb-emerald {
     width: 500px;
     height: 500px;
-    background: radial-gradient(circle, rgba(52, 211, 153, 0.18) 0%, rgba(52, 211, 153, 0) 70%);
+    background: radial-gradient(circle, rgba(52, 211, 153, 0.30) 0%, rgba(52, 211, 153, 0) 70%);
     animation: orbDrift 25s ease-in-out infinite;
   }
 
   .liquid-orb-violet {
     width: 450px;
     height: 450px;
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.22) 0%, rgba(139, 92, 246, 0) 70%);
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.35) 0%, rgba(139, 92, 246, 0) 70%);
     animation: orbOrbit 18s ease-in-out infinite;
   }
 
   .liquid-orb-rose {
     width: 400px;
     height: 400px;
-    background: radial-gradient(circle, rgba(251, 113, 133, 0.12) 0%, rgba(251, 113, 133, 0) 70%);
+    background: radial-gradient(circle, rgba(251, 113, 133, 0.25) 0%, rgba(251, 113, 133, 0) 70%);
     animation: orbBreathe 22s ease-in-out infinite;
   }
 
@@ -387,17 +387,45 @@
 
   /* --- Legacy Button Compat --- */
   .btn {
-    @apply inline-flex items-center justify-center rounded-xl font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center rounded-xl font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-950 disabled:opacity-50 disabled:pointer-events-none;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .btn:active {
+    transform: scale(0.97);
   }
   
   .btn-primary {
     @apply bg-indigo-600 text-white hover:bg-indigo-500 active:bg-indigo-700;
     box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+    position: relative;
+    overflow: hidden;
   }
   
   .btn-primary:hover {
     box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
     transform: scale(1.02);
+  }
+
+  .btn-primary:active {
+    transform: scale(0.97);
+  }
+  
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(circle at var(--ripple-x, 50%) var(--ripple-y, 50%), rgba(255, 255, 255, 0.3) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+
+  .btn-primary:active::after {
+    opacity: 1;
+    transition: opacity 0s;
   }
   
   .btn-secondary {
@@ -410,15 +438,27 @@
     background: rgba(255, 255, 255, 0.10);
     border-color: rgba(255, 255, 255, 0.15);
   }
+
+  .btn-secondary:active {
+    transform: scale(0.97);
+  }
   
   .btn-danger {
     @apply bg-rose-600 text-white hover:bg-rose-500 active:bg-rose-700;
     box-shadow: 0 0 20px rgba(251, 113, 133, 0.15);
   }
+
+  .btn-danger:active {
+    transform: scale(0.97);
+  }
   
   .btn-success {
     @apply bg-emerald-600 text-white hover:bg-emerald-500 active:bg-emerald-700;
     box-shadow: 0 0 20px rgba(52, 211, 153, 0.15);
+  }
+
+  .btn-success:active {
+    transform: scale(0.97);
   }
   
   .btn-sm {
@@ -490,6 +530,221 @@
       opacity: 1;
       transform: translateY(0);
     }
+  }
+
+  .stagger-item {
+    opacity: 0;
+    animation: staggerFadeUp 0.4s ease-out forwards;
+  }
+
+  /* ================================================================
+     LIGHT MODE GLASS VARIANTS
+     When .dark is absent, glass elements use dark-on-light transparency
+     so the liquid glass effect still works on a light background.
+     ================================================================ */
+  html:not(.dark) .glass-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.3) 100%);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-top: 1px solid rgba(255, 255, 255, 0.8);
+    border-left: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.06),
+      inset 0 1px 1px rgba(255, 255, 255, 0.8);
+  }
+
+  html:not(.dark) .glass-card:hover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.4) 100%);
+    box-shadow:
+      0 16px 48px rgba(0, 0, 0, 0.1),
+      inset 0 1px 1px rgba(255, 255, 255, 1);
+  }
+
+  html:not(.dark) .glass-sidebar {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.9) 100%);
+    border-right: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.8);
+  }
+
+  html:not(.dark) .glass-nav {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.7) 100%);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.8);
+  }
+
+  html:not(.dark) .glass-bottom-nav {
+    background: linear-gradient(0deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  html:not(.dark) .glass-dropdown {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-top: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow:
+      0 24px 60px rgba(0, 0, 0, 0.15),
+      inset 0 1px 1px rgba(255, 255, 255, 1);
+  }
+
+  html:not(.dark) .glass-modal-panel {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.95) 100%);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-top: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow:
+      0 32px 80px rgba(0, 0, 0, 0.15),
+      inset 0 1px 1px rgba(255, 255, 255, 1);
+  }
+
+  html:not(.dark) .glass-table {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.3) 100%);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  html:not(.dark) .glass-table thead {
+    background: rgba(0, 0, 0, 0.02);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  html:not(.dark) .glass-table tbody tr {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+  }
+
+  html:not(.dark) .glass-table tbody tr:hover {
+    background: rgba(0, 0, 0, 0.02);
+  }
+
+  html:not(.dark) .glass-badge {
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  html:not(.dark) .glass-btn {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    color: rgba(0, 0, 0, 0.7);
+  }
+
+  html:not(.dark) .glass-btn:hover {
+    background: rgba(0, 0, 0, 0.06);
+    border-color: rgba(0, 0, 0, 0.12);
+    color: rgba(0, 0, 0, 0.9);
+  }
+
+  html:not(.dark) .glass-input {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    color: rgba(0, 0, 0, 0.85);
+  }
+
+  html:not(.dark) .glass-input:focus {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(99, 102, 241, 0.5);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  }
+
+  html:not(.dark) .glass-input::placeholder {
+    color: rgba(0, 0, 0, 0.35);
+  }
+
+  html:not(.dark) .input {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    color: rgba(0, 0, 0, 0.85);
+  }
+
+  html:not(.dark) .input:focus {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(99, 102, 241, 0.5);
+  }
+
+  html:not(.dark) .glass-modal-backdrop {
+    background: rgba(255, 255, 255, 0.4);
+  }
+
+  /* Light mode button variants */
+  html:not(.dark) .btn-secondary {
+    color: rgba(0, 0, 0, 0.65);
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  html:not(.dark) .btn-secondary:hover {
+    color: rgba(0, 0, 0, 0.9);
+    background: rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.12);
+  }
+
+  /* Light mode orb opacity — subtler on light backgrounds */
+  html:not(.dark) .liquid-orb-indigo {
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.20) 0%, rgba(99, 102, 241, 0) 70%);
+  }
+  html:not(.dark) .liquid-orb-emerald {
+    background: radial-gradient(circle, rgba(52, 211, 153, 0.15) 0%, rgba(52, 211, 153, 0) 70%);
+  }
+  html:not(.dark) .liquid-orb-violet {
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.18) 0%, rgba(139, 92, 246, 0) 70%);
+  }
+  html:not(.dark) .liquid-orb-rose {
+    background: radial-gradient(circle, rgba(251, 113, 133, 0.12) 0%, rgba(251, 113, 133, 0) 70%);
+  }
+
+  /* ================================================================
+     BUTTON RIPPLE & MICRO-INTERACTIONS
+     ================================================================ */
+
+  /* Ripple effect container */
+  .btn-ripple {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-ripple::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(circle at var(--ripple-x, 50%) var(--ripple-y, 50%), rgba(255, 255, 255, 0.35) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+
+  .btn-ripple:active::after {
+    opacity: 1;
+    transition: opacity 0s;
+  }
+
+  /* Glow pulse animation for primary buttons */
+  .btn-glow {
+    animation: pulseGlow 3s ease-in-out infinite;
+  }
+
+  /* Hover lift for cards */
+  .card-lift {
+    transition: transform 0.25s ease-out, box-shadow 0.25s ease-out;
+  }
+
+  .card-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+  }
+
+  html:not(.dark) .card-lift:hover {
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Click press effect for interactive elements */
+  .press-effect {
+    transition: transform 0.1s ease-out;
+  }
+
+  .press-effect:active {
+    transform: scale(0.96);
+  }
+
+  /* Focus ring — smooth outline for keyboard navigation */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-950;
   }
 }
 

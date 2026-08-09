@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useExpense } from '../context/ExpenseContext'
-import { Plus, Edit, Trash2, GripVertical } from 'lucide-react'
+import { Plus, Edit, Trash2, GripVertical, Tag } from 'lucide-react'
+import EmptyState from '../components/EmptyState'
 import toast from 'react-hot-toast'
 import { useAuth } from '../context/AuthContext'
 
@@ -40,9 +41,9 @@ const Categories = () => {
   ]
 
   const colorOptions = [
-    '#EF4444', '#F97316', '#F59E0B', '#84CC16', '#10B981',
-    '#06B6D4', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899',
-    '#F43F5E', '#A855F7', '#14B8A6', '#22C55E', '#EAB308'
+    '#EF4444', '#F97316', '#F59E0B', '#10B981', '#06B6D4',
+    '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899', '#A855F7',
+    '#14B8A6', '#22C55E', '#EAB308', '#F43F5E', '#0EA5E9'
   ]
 
   useEffect(() => {
@@ -358,22 +359,13 @@ const Categories = () => {
         </div>
         <div className="p-3 sm:p-6">
           {categories.length === 0 ? (
-            <div className="text-center py-8">
-              <div className="text-gray-400 mb-4">
-                <div className="w-16 h-16 mx-auto bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
-                  <Plus size={24} />
-                </div>
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No categories available</h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">Create your first custom category to get started</p>
-              <button
-                onClick={handleAddNew}
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-xl hover:bg-indigo-500"
-              >
-                <Plus size={16} />
-                Add Category
-              </button>
-            </div>
+            <EmptyState
+              icon={Tag}
+              title="No categories available"
+              description="Create your first custom category to get started."
+              actionLabel="Add Category"
+              onAction={handleAddNew}
+            />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {categories.map((category) => (

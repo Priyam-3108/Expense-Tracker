@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { PencilIcon, TrashIcon, BanknotesIcon } from '@heroicons/react/24/outline';
+import { Wallet } from 'lucide-react';
 import { useDebt } from '../context/DebtContext';
 import { useAuth } from '../context/AuthContext';
 import { formatCurrency } from '../utils/helpers';
 import DebtForm from './DebtForm';
 import RepaymentModal from './RepaymentModal';
+import EmptyState from './EmptyState';
 
 export default function DebtList({ debts, type }) {
     const { deleteDebt } = useDebt();
@@ -19,10 +21,13 @@ export default function DebtList({ debts, type }) {
     };
 
     if (!debts.length) {
+        const debtType = type === 'borrowed' ? 'money you borrowed' : 'money you lent';
         return (
-            <div className="text-center py-10">
-                <p className="text-gray-500 dark:text-gray-400">No {type} records found.</p>
-            </div>
+            <EmptyState
+                icon={Wallet}
+                title={`No ${type} records`}
+                description={`Keep track of ${debtType} — they will appear here.`}
+            />
         );
     }
 

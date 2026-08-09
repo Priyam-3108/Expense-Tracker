@@ -18,8 +18,10 @@ import {
   ArrowDownRight,
   Sparkles,
   Plus,
-  ArrowRight
+  ArrowRight,
+  Receipt
 } from 'lucide-react'
+import EmptyState from '../components/EmptyState'
 import {
   BanknotesIcon,
   ArrowDownTrayIcon,
@@ -458,12 +460,11 @@ const Dashboard = () => {
                   </div>
                 ))
               ) : (
-                <div className="text-center py-8">
-                  <div className="w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                    <Calendar className="h-6 w-6 text-slate-500" />
-                  </div>
-                  <p className="text-gray-500 dark:text-slate-500 text-sm">No recent transactions</p>
-                </div>
+                <EmptyState
+                  icon={Receipt}
+                  title="No transactions yet"
+                  description="Add your first expense or income to get started."
+                />
               )}
             </div>
           </div>

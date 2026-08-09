@@ -15,8 +15,10 @@ import {
     ChevronsRight,
     Trash2,
     Edit,
-    Search
+    Search,
+    Inbox
 } from 'lucide-react'
+import EmptyState from './EmptyState'
 
 const DataTable = ({
     data,
@@ -75,7 +77,7 @@ const DataTable = ({
                         placeholder="Search expenses..."
                         value={searchValue || ''}
                         onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
-                        className="w-full rounded-xl border border-gray-300 dark:border-white/[0.07] bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white px-10 py-3 text-sm focus:border-indigo-500 dark:focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-slate-500 backdrop-blur-sm"
+                        className="w-full pl-10 pr-4 py-3 glass-input text-sm"
                     />
                 </div>
                 {totalResults !== undefined && (
@@ -165,16 +167,21 @@ const DataTable = ({
                                 </tr>
                             ) : table.getRowModel().rows.length === 0 ? (
                                 <tr>
-                                    <td colSpan={columns.length} className="px-6 py-10 text-center text-gray-500 dark:text-slate-500">
-                                        No data found
+                                    <td colSpan={columns.length}>
+                                        <EmptyState
+                                            icon={Inbox}
+                                            title="No expenses found"
+                                            description="Your expenses will appear here once you start tracking."
+                                        />
                                     </td>
                                 </tr>
                             ) : (
-                                table.getRowModel().rows.map(row => (
+                                table.getRowModel().rows.map((row, index) => (
                                     <tr
                                         key={row.id}
-                                        className={`transition-all duration-200 ${row.getIsSelected() ? 'bg-indigo-50 dark:bg-indigo-500/5' : ''
+                                        className={`transition-all duration-200 stagger-item ${row.getIsSelected() ? 'bg-indigo-50 dark:bg-indigo-500/5' : ''
                                             }`}
+                                        style={{ animationDelay: `${index * 30}ms` }}
                                     >
                                         {row.getVisibleCells().map(cell => (
                                             <td key={cell.id} className="px-6 py-4 text-gray-700 dark:text-slate-300">

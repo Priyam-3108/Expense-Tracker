@@ -12,10 +12,26 @@ import MobileExpenseCard from '../components/MobileExpenseCard'
 import Modal from '../components/Modal'
 import { formatCurrency, formatDate, formatDateForInput, parseDateLocal, getTodayDate } from '../utils/helpers'
 import {
-  Plus, Edit, Trash2, Search, X,
-  ArrowUpCircle, ArrowDownCircle, Layers,
-  Calendar as CalendarIcon, List, Repeat, Download, Upload
+    Plus,
+    Search,
+    X,
+    Download,
+    Upload,
+    SlidersHorizontal,
+    List,
+    LayoutGrid,
+    Calendar as CalendarIcon,
+    ChevronDown,
+    FileText,
+    Receipt,
+    Layers,
+    ArrowDownCircle,
+    ArrowUpCircle,
+    Repeat,
+    Edit,
+    Trash2
 } from 'lucide-react'
+import EmptyState from '../components/EmptyState'
 import { startOfMonth, endOfMonth, eachDayOfInterval, format, isSameMonth, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns'
 import toast from 'react-hot-toast'
 
@@ -785,7 +801,7 @@ const Expenses = () => {
                 placeholder="Search expenses..."
                 value={searchTerm}
                 onChange={(e) => { setSearchTerm(e.target.value); setPage(1) }}
-                className="w-full rounded-xl border border-gray-300 dark:border-white/[0.07] bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white pl-10 pr-4 py-3 text-sm focus:border-indigo-500 dark:focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-slate-500"
+                className="w-full pl-10 pr-4 py-3 glass-input text-sm"
               />
             </div>
 
@@ -795,10 +811,11 @@ const Expenses = () => {
                 <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-100 border-t-blue-500" />
               </div>
             ) : expenses.length === 0 ? (
-              <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-                <p className="text-lg font-medium">No expenses found</p>
-                <p className="text-sm mt-1">Tap the + button to add your first one</p>
-              </div>
+              <EmptyState
+                icon={Receipt}
+                title="No expenses found"
+                description="Tap the + button to add your first expense."
+              />
             ) : (
               expenses.map((expense) => (
                 <MobileExpenseCard

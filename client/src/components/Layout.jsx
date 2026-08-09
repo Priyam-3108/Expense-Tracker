@@ -71,18 +71,33 @@ const Layout = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  // Track click position on .btn-primary for CSS ripple effect
+  useEffect(() => {
+    const handlePointerDown = (e) => {
+      const btn = e.target.closest('.btn-primary')
+      if (!btn) return
+      const rect = btn.getBoundingClientRect()
+      btn.style.setProperty('--ripple-x', `${((e.clientX - rect.left) / rect.width) * 100}%`)
+      btn.style.setProperty('--ripple-y', `${((e.clientY - rect.top) / rect.height) * 100}%`)
+    }
+    document.addEventListener('pointerdown', handlePointerDown)
+    return () => document.removeEventListener('pointerdown', handlePointerDown)
+  }, [])
+
   return (
-    <div className="h-screen flex flex-col bg-slate-950 noise-overlay overflow-hidden relative">
-      {/* Liquid Glass Background Image Layer */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <img 
-          src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop" 
-          alt="Fluid Background" 
-          className="w-full h-full object-cover opacity-40 mix-blend-screen"
-        />
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/40 via-slate-950/80 to-slate-950/90"></div>
+    <div className="h-screen flex flex-col bg-background noise-overlay overflow-hidden relative">
+      {/* Animated Liquid Glass Orbs — background layer */}
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        {/* Indigo Primary — top right */}
+        <div className="liquid-orb liquid-orb-indigo" style={{ top: '-150px', right: '-100px' }} />
+        {/* Emerald Accent — center left */}
+        <div className="liquid-orb liquid-orb-emerald" style={{ top: '35%', left: '-120px' }} />
+        {/* Violet Ambient — bottom right */}
+        <div className="liquid-orb liquid-orb-violet" style={{ top: '65%', right: '5%' }} />
+        {/* Rose Whisper — top left */}
+        <div className="liquid-orb liquid-orb-rose" style={{ top: '15%', left: '25%' }} />
       </div>
-      
+
       {/* Content wrapper to stay above background */}
       <div className="relative z-10 flex flex-col h-full w-full">
       {/* Mobile sidebar overlay — always rendered, toggled by opacity for smooth fade */}
@@ -193,8 +208,7 @@ const Layout = () => {
 
               {/* Right side - Theme, Profile */}
               <div className="flex items-center space-x-2 sm:space-x-3">
-                {/* Theme Toggle — hidden while light mode is WIP */}
-                {/* <ThemeToggle /> */}
+                <ThemeToggle />
 
                 {/* Profile Dropdown */}
                 <div className="relative" ref={dropdownRef}>
@@ -244,33 +258,8 @@ const Layout = () => {
           </div>
         </nav>
 
-        {/* Page content with animated liquid glass background */}
+        {/* Page content */}
         <main className="relative flex-1 overflow-y-auto overflow-x-clip p-4 sm:p-6 lg:p-8 xl:p-10 pb-20 lg:pb-8 xl:pb-10">
-          {/* ========== LIQUID GLASS ORBS ========== */}
-          <div className="hidden dark:block">
-            {/* Indigo Primary — top right, drifts diagonally */}
-            <div
-              className="liquid-orb liquid-orb-indigo"
-              style={{ top: '-100px', right: '-150px' }}
-            />
-            {/* Emerald Accent — center left, gentle sway */}
-            <div
-              className="liquid-orb liquid-orb-emerald"
-              style={{ top: '40%', left: '-100px' }}
-            />
-            {/* Violet Ambient — bottom right, circular drift */}
-            <div
-              className="liquid-orb liquid-orb-violet"
-              style={{ top: '70%', right: '5%' }}
-            />
-            {/* Rose Whisper — top left, scale pulse */}
-            <div
-              className="liquid-orb liquid-orb-rose"
-              style={{ top: '20%', left: '30%' }}
-            />
-          </div>
-
-          {/* Content container — sits above orbs */}
           <div className="relative z-10 w-full max-w-none">
             <Outlet />
           </div>
