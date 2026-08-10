@@ -3,6 +3,9 @@ name: Deploy Frontend to GitHub Pages
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'mobile-app/**'
+      - '**.md'
   workflow_dispatch:
 
 permissions:
