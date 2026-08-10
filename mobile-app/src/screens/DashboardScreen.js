@@ -15,6 +15,7 @@ import TransactionItem from '../components/TransactionItem';
 import { SkeletonCard, SkeletonTransactionItem } from '../components/SkeletonLoader';
 import hapticFeedback from '../utils/haptics';
 import { offlineService } from '../services/offlineService';
+import { syncEngine } from '../services/syncEngine';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function DashboardScreen({ navigation }) {
@@ -34,6 +35,14 @@ export default function DashboardScreen({ navigation }) {
   const fetchData = async () => {
     try {
       setLoading(true);
+
+      // 0. Sync any pending local items to backend first if online
+      try {
+        await syncEngine.syncNow();
+      } catch (syncErr) {
+        console.log('Background sync check error:', syncErr);
+      }
+
       // 1. Get Pending from Local DB (SQLite)
       const localPending = await offlineService.getPendingExpenses();
 
@@ -69,6 +78,7 @@ export default function DashboardScreen({ navigation }) {
 
       let fetchedExpenses = [];
       let backendStats = { income: 0, expense: 0 };
+      let isOfflineMode = false;
 
       try {
         // 2. Fetch from Server
@@ -82,19 +92,32 @@ export default function DashboardScreen({ navigation }) {
         }
 
         if (statsRes.data.success) {
-          const stats = statsRes.data.data;
-          if (Array.isArray(stats)) {
-            stats.forEach(s => {
+          const statsData = statsRes.data.data;
+          if (statsData?.totalStats) {
+            backendStats.income = parseFloat(statsData.totalStats.income) || 0;
+            backendStats.expense = parseFloat(statsData.totalStats.expenses || statsData.totalStats.expense) || 0;
+          } else if (Array.isArray(statsData)) {
+            statsData.forEach(s => {
               if (s._id === 'income') backendStats.income += parseFloat(s.total) || 0;
               if (s._id === 'expense') backendStats.expense += parseFloat(s.total) || 0;
             });
           } else {
-            backendStats.income = parseFloat(stats.totalIncome) || 0;
-            backendStats.expense = parseFloat(stats.totalExpense) || 0;
+            backendStats.income = parseFloat(statsData?.totalIncome || statsData?.income) || 0;
+            backendStats.expense = parseFloat(statsData?.totalExpense || statsData?.expenses || statsData?.expense) || 0;
           }
+        }
+
+        // Fallback: If backend stats returned zero but expenses exist, calculate from fetched expenses
+        if (backendStats.income === 0 && backendStats.expense === 0 && fetchedExpenses.length > 0) {
+          fetchedExpenses.forEach(exp => {
+            const amt = parseFloat(exp.amount) || 0;
+            if (exp.type === 'income') backendStats.income += amt;
+            else backendStats.expense += amt;
+          });
         }
       } catch (serverError) {
         console.log('Server fetch failed, using cache if available', serverError);
+        isOfflineMode = true;
         // Try to load server expenses cache
         const cache = await AsyncStorage.getItem('dashboard_server_cache');
         if (cache) {
@@ -108,24 +131,23 @@ export default function DashboardScreen({ navigation }) {
       // If we have a PENDING item that was actually synced but we didn't get ACK?
       // It remains PENDING locally.
 
-      const merged = [...formattedPending, ...fetchedExpenses];
-
-      // Remove duplicates if any (by client_uuid if server returns it)
-      // But server expense doesn't have client_uuid in the list usually unless we asked for it. 
-      // For now, simple merge is fine.
+      const merged = [...formattedPending, ...fetchedExpenses].sort((a, b) => {
+        return new Date(b.date || 0) - new Date(a.date || 0);
+      });
 
       setTransactions(merged);
 
-      // Calculate stats including local pending
+      // Calculate stats: Use authoritative backend totals when available
       let totalIncome = backendStats.income;
       let totalExpense = backendStats.expense;
 
-      // Add pending to stats locally for immediate feedback
-      formattedPending.forEach(exp => {
-        // Avoid double counting if we are unsure, but user wants "Visible immediately"
-        if (exp.type === 'income') totalIncome += exp.amount;
-        if (exp.type === 'expense') totalExpense += exp.amount;
-      });
+      // Only add pending items if we are offline (backendStats was not fetched from server)
+      if (isOfflineMode) {
+        formattedPending.forEach(exp => {
+          if (exp.type === 'income') totalIncome += (parseFloat(exp.amount) || 0);
+          if (exp.type === 'expense') totalExpense += (parseFloat(exp.amount) || 0);
+        });
+      }
 
       setSummary({
         income: totalIncome,

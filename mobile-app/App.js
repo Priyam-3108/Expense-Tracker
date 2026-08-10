@@ -1,13 +1,14 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { AuthProvider, AuthContext } from './src/context/AuthContext';
 import { ThemeProvider } from './src/context/ThemeContext';
 import { SecurityProvider, SecurityContext } from './src/context/SecurityContext';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, View, AppState } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import LockScreen from './src/screens/LockScreen';
 import { initDB } from './src/services/db';
 import { syncEngine } from './src/services/syncEngine';
+import { pingHealth } from './src/services/healthService';
 
 // Import Navigators
 import AppNavigator from './src/navigation/AppNavigator';
@@ -40,15 +41,34 @@ function RootNavigator() {
 }
 
 export default function App() {
+  const appState = useRef(AppState.currentState);
+
   useEffect(() => {
+    // 1. Instantly ping health endpoint on app launch to wake up cold/sleeping server
+    pingHealth();
+
+    // 2. Initialize local SQLite DB & background sync
     const init = async () => {
       await initDB();
-      // Try initial sync
       setTimeout(() => {
         syncEngine.syncNow();
       }, 2000);
     };
     init();
+
+    // 3. Re-ping health & sync whenever app returns to foreground from background
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
+        console.log('App returned to foreground — pinging backend health endpoint...');
+        pingHealth();
+        syncEngine.syncNow();
+      }
+      appState.current = nextAppState;
+    });
+
+    return () => {
+      subscription.remove();
+    };
   }, []);
 
   return (

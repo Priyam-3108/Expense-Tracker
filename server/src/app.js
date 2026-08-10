@@ -45,15 +45,18 @@ if (env.nodeEnv === 'development') {
   app.use(morgan('combined'));
 }
 
-// Health check endpoint
-app.get('/health', (req, res) => {
+// Health check endpoints
+const healthHandler = (req, res) => {
   res.json({
     success: true,
     message: 'Expense Tracker API is running',
     timestamp: new Date().toISOString(),
     environment: env.nodeEnv
   });
-});
+};
+
+app.get('/health', healthHandler);
+app.get('/api/health', healthHandler);
 
 // API routes
 app.use('/api/auth', authRoutes);

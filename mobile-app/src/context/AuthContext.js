@@ -1,6 +1,8 @@
 import React, { createContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { offlineService } from '../services/offlineService';
+
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -42,6 +44,9 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     await AsyncStorage.removeItem('token');
     await AsyncStorage.removeItem('user');
+    await AsyncStorage.removeItem('dashboard_server_cache');
+    await AsyncStorage.removeItem('categories_cache');
+    await offlineService.clearLocalExpenses();
   };
 
   return (

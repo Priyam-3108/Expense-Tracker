@@ -4,7 +4,8 @@ import 'react-native-get-random-values';
 
 export const offlineService = {
     async saveExpenseLocally(expenseData) {
-        const db = getDB();
+        const db = await getDB();
+        if (!db) return { success: false };
         const uuid = uuidv4();
 
         const payload = {
@@ -25,7 +26,8 @@ export const offlineService = {
     },
 
     async getPendingExpenses() {
-        const db = getDB();
+        const db = await getDB();
+        if (!db) return [];
         try {
             const results = await db.getAllAsync('SELECT * FROM local_expenses WHERE sync_status IN (?, ?)', ['PENDING', 'FAILED']);
             return results.map(row => ({
@@ -39,15 +41,15 @@ export const offlineService = {
     },
 
     async getAllLocalExpenses() {
-        const db = getDB();
+        const db = await getDB();
+        if (!db) return [];
         try {
-            // Fetch all, useful for displaying mixed list
             const results = await db.getAllAsync('SELECT * FROM local_expenses ORDER BY created_at DESC');
             return results.map(row => {
                 const data = JSON.parse(row.payload);
                 return {
                     ...data,
-                    _id: row.server_id || row.uuid, // Use server_id if available, else local uuid
+                    _id: row.server_id || row.uuid,
                     isLocal: row.sync_status !== 'SYNCED',
                     syncStatus: row.sync_status
                 };
@@ -59,7 +61,8 @@ export const offlineService = {
     },
 
     async markAsSynced(localRowId, serverId) {
-        const db = getDB();
+        const db = await getDB();
+        if (!db) return;
         try {
             await db.runAsync(
                 'UPDATE local_expenses SET sync_status = ?, server_id = ? WHERE id = ?',
@@ -71,7 +74,8 @@ export const offlineService = {
     },
 
     async markAsFailed(localRowId) {
-        const db = getDB();
+        const db = await getDB();
+        if (!db) return;
         try {
             await db.runAsync(
                 'UPDATE local_expenses SET sync_status = ? WHERE id = ?',
@@ -79,6 +83,16 @@ export const offlineService = {
             );
         } catch (error) {
             console.error('Error marking failed:', error);
+        }
+    },
+
+    async clearLocalExpenses() {
+        const db = await getDB();
+        if (!db) return;
+        try {
+            await db.runAsync('DELETE FROM local_expenses');
+        } catch (error) {
+            console.error('Error clearing local expenses:', error);
         }
     }
 };

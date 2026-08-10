@@ -21,10 +21,16 @@ export const syncEngine = {
         // Prepare payload
         // We only send the payload part which contains the expense data
         // server expects an array of expenses
-        const expensesToSync = pending.map(p => ({
-            ...p.payload,
-            client_uuid: p.uuid // Ensure client_uuid is passed
-        }));
+        const expensesToSync = pending.map(p => {
+            const data = { ...p.payload };
+            if (data.category && typeof data.category === 'object') {
+                data.category = data.category._id || data.category.id;
+            }
+            return {
+                ...data,
+                client_uuid: p.uuid
+            };
+        });
 
         try {
             const response = await api.post('/expenses/sync', { expenses: expensesToSync });
