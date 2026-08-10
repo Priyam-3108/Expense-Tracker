@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import Logo from '../components/Logo'
+import { MessageSquare } from 'lucide-react'
+import PublicNavbar from '../components/PublicNavbar'
+import PublicFooter from '../components/PublicFooter'
 import '../styles/StaticPages.css'
 
 const FAQ = () => {
@@ -10,8 +12,8 @@ const FAQ = () => {
         window.scrollTo(0, 0)
     }, [])
 
-    const toggleFAQ = (index) => {
-        setActiveIndex(activeIndex === index ? null : index)
+    const toggleFAQ = (id) => {
+        setActiveIndex(activeIndex === id ? null : id)
     }
 
     const faqs = [
@@ -114,25 +116,17 @@ const FAQ = () => {
         }
     ]
 
-    let questionIndex = 0
-
     return (
-        <div className="static-page">
+        <div className="static-page bg-slate-950 noise-overlay">
+            {/* Animated Liquid Glass Orbs */}
+            <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+                <div className="liquid-orb liquid-orb-indigo" style={{ top: '-200px', right: '-100px' }} />
+                <div className="liquid-orb liquid-orb-emerald" style={{ top: '40%', left: '-150px' }} />
+                <div className="liquid-orb liquid-orb-violet" style={{ top: '60%', right: '5%' }} />
+            </div>
+
             {/* Navigation */}
-            <nav className="static-navbar">
-                <div className="landing-container">
-                    <div className="nav-content">
-                        <Logo />
-                        <div className="nav-links">
-                            <Link to="/" className="nav-link">Home</Link>
-                            <Link to="/docs" className="nav-link">Documentation</Link>
-                            <Link to="/support" className="nav-link">Support</Link>
-                            <Link to="/login" className="btn-secondary">Sign In</Link>
-                            <Link to="/register" className="btn-primary">Get Started Free</Link>
-                        </div>
-                    </div>
-                </div>
-            </nav>
+            <PublicNavbar />
 
             {/* Content */}
             <div className="static-content">
@@ -146,41 +140,28 @@ const FAQ = () => {
                     </div>
 
                     {faqs.map((category, catIdx) => (
-                        <div key={catIdx} style={{ marginBottom: '48px' }}>
-                            <h2 style={{
-                                fontSize: '28px',
-                                fontWeight: '700',
-                                marginBottom: '24px',
-                                color: 'var(--foreground, #1a202c)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '12px'
-                            }}>
-                                <span style={{
-                                    width: '8px',
-                                    height: '32px',
-                                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                    borderRadius: '4px'
-                                }}></span>
+                        <div key={catIdx} className="mb-12">
+                            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                                <span className="w-2 h-8 bg-gradient-to-b from-indigo-500 to-violet-500 rounded-full inline-block"></span>
                                 {category.category}
                             </h2>
-                            {category.questions.map((faq) => {
-                                const currentIndex = questionIndex++
+                            {category.questions.map((faq, qIdx) => {
+                                const id = `${catIdx}-${qIdx}`
+                                const isOpen = activeIndex === id
                                 return (
                                     <div
-                                        key={currentIndex}
-                                        className={`faq-item ${activeIndex === currentIndex ? 'active' : ''}`}
-                                        onClick={() => toggleFAQ(currentIndex)}
-                                        style={{ animationDelay: `${currentIndex * 0.05}s` }}
+                                        key={qIdx}
+                                        className={`faq-item ${isOpen ? 'active' : ''}`}
+                                        onClick={() => toggleFAQ(id)}
                                     >
                                         <div className="faq-question">
                                             <span>{faq.q}</span>
                                             <div className="faq-icon">
-                                                {activeIndex === currentIndex ? '−' : '+'}
+                                                {isOpen ? '−' : '+'}
                                             </div>
                                         </div>
                                         <div className="faq-answer">
-                                            {faq.a}
+                                            <p className="pt-2 text-slate-300 leading-relaxed">{faq.a}</p>
                                         </div>
                                     </div>
                                 )
@@ -189,16 +170,16 @@ const FAQ = () => {
                     ))}
 
                     {/* Still have questions */}
-                    <div className="content-section" style={{ textAlign: 'center', marginTop: '60px' }}>
-                        <h2 className="section-title" style={{ justifyContent: 'center' }}>
-                            <span className="section-icon">💬</span>
+                    <div className="content-section text-center my-16">
+                        <h2 className="section-title justify-center text-white">
+                            <span className="section-icon"><MessageSquare className="w-5 h-5 text-indigo-400" /></span>
                             Still have questions?
                         </h2>
                         <div className="section-content">
-                            <p style={{ marginBottom: '24px' }}>
+                            <p className="mb-6 text-slate-300">
                                 Can't find what you're looking for? Our support team is here to help!
                             </p>
-                            <Link to="/support" className="btn-primary btn-large">
+                            <Link to="/support" className="btn-primary btn-lg inline-flex">
                                 Contact Support
                             </Link>
                         </div>
@@ -207,38 +188,7 @@ const FAQ = () => {
             </div>
 
             {/* Footer */}
-            <footer className="landing-footer">
-                <div className="landing-container">
-                    <div className="footer-content">
-                        <div className="footer-brand">
-                            <Logo />
-                            <p>Simple expense tracking for everyone.</p>
-                        </div>
-                        <div className="footer-links">
-                            <div className="footer-column">
-                                <h4>Product</h4>
-                                <Link to="/">Home</Link>
-                                <Link to="/register">Sign Up</Link>
-                                <Link to="/login">Sign In</Link>
-                            </div>
-                            <div className="footer-column">
-                                <h4>Resources</h4>
-                                <Link to="/faq">FAQ</Link>
-                                <Link to="/support">Support</Link>
-                                <Link to="/docs">Documentation</Link>
-                            </div>
-                            <div className="footer-column">
-                                <h4>Legal</h4>
-                                <Link to="/privacy">Privacy Policy</Link>
-                                <Link to="/terms">Terms of Service</Link>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="footer-bottom">
-                        <p>&copy; 2025 Expense Tracker. All rights reserved.</p>
-                    </div>
-                </div>
-            </footer>
+            <PublicFooter />
         </div>
     )
 }

@@ -1,20 +1,14 @@
 import { Link } from 'react-router-dom'
-import { useEffect, useState } from 'react'
-import Logo from '../components/Logo'
+import { useEffect } from 'react'
+import { User, FileText } from 'lucide-react'
+import PublicNavbar from '../components/PublicNavbar'
+import PublicFooter from '../components/PublicFooter'
 import '../styles/LandingPage.css'
 
 const Landing = () => {
-    const [scrolled, setScrolled] = useState(false)
-
     useEffect(() => {
         // Ensure page starts at top on refresh
         window.scrollTo(0, 0)
-
-        // Navbar scroll effect
-        const handleScroll = () => {
-            setScrolled(window.scrollY > 20)
-        }
-        window.addEventListener('scroll', handleScroll)
 
         // Enhanced intersection observer with stagger effect
         const observerOptions = {
@@ -39,13 +33,12 @@ const Landing = () => {
         })
 
         return () => {
-            window.removeEventListener('scroll', handleScroll)
             observer.disconnect()
         }
     }, [])
 
     return (
-        <div className="landing-page bg-slate-950 noise-overlay">
+        <div className="landing-page bg-slate-950 noise-overlay min-h-screen flex flex-col">
             {/* Animated Liquid Glass Orbs */}
             <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
                 <div className="liquid-orb liquid-orb-indigo" style={{ top: '-200px', right: '-100px' }} />
@@ -54,25 +47,8 @@ const Landing = () => {
                 <div className="liquid-orb liquid-orb-rose" style={{ top: '20%', left: '30%' }} />
             </div>
 
-            {/* Navigation */}
-            <nav className={`fixed top-0 left-0 right-0 z-50 glass-nav ${scrolled ? 'shadow-lg' : ''}`}>
-                <div className="landing-container">
-                    <div className="nav-content">
-                        <Logo />
-                        <div className="nav-links">
-                            <a href="#features" className="nav-link text-slate-300 hover:text-white transition-colors">Features</a>
-                            <a href="#how-it-works" className="nav-link text-slate-300 hover:text-white transition-colors">How It Works</a>
-                            <Link to="/login" className="btn-secondary btn-sm">Sign In</Link>
-                            <Link to="/register" className="btn-primary btn-sm">
-                                Get Started Free
-                                <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-                                    <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            </nav>
+            {/* Navigation Header */}
+            <PublicNavbar />
 
             {/* Hero Section */}
             <section className="relative z-10 pt-36 pb-24 overflow-hidden">
@@ -202,9 +178,11 @@ const Landing = () => {
                             </div>
                             <div className="benefit-visual">
                                 <div className="floating-card card-1 glass-card flex items-center gap-4 p-6">
-                                    <div className="text-3xl">👤</div>
+                                    <div className="p-3 rounded-xl bg-indigo-500/20 border border-indigo-500/30">
+                                        <User className="w-6 h-6 text-indigo-400" />
+                                    </div>
                                     <div>
-                                        <div className="text-xs text-slate-500 mb-1">Register</div>
+                                        <div className="text-xs text-slate-400 mb-1">Register</div>
                                         <div className="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">30 sec</div>
                                     </div>
                                 </div>
@@ -224,9 +202,11 @@ const Landing = () => {
                             </div>
                             <div className="benefit-visual">
                                 <div className="floating-card card-2 glass-card flex items-center gap-4 p-6">
-                                    <div className="text-3xl">📝</div>
+                                    <div className="p-3 rounded-xl bg-violet-500/20 border border-violet-500/30">
+                                        <FileText className="w-6 h-6 text-violet-400" />
+                                    </div>
                                     <div>
-                                        <div className="text-xs text-slate-500 mb-1">Track</div>
+                                        <div className="text-xs text-slate-400 mb-1">Track</div>
                                         <div className="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">Easy</div>
                                     </div>
                                 </div>
@@ -286,39 +266,7 @@ const Landing = () => {
             </section>
 
             {/* Footer */}
-            <footer className="relative z-10 border-t border-white/[0.06] py-20">
-                <div className="landing-container">
-                    <div className="footer-content">
-                        <div className="footer-brand">
-                            <Logo />
-                            <p className="text-sm text-slate-500 leading-relaxed mt-4">Simple expense tracking for everyone. Take control of your finances today.</p>
-                        </div>
-                        <div className="footer-links">
-                            <div className="footer-column">
-                                <h4 className="text-white text-sm font-semibold mb-5">Product</h4>
-                                <a href="#features" className="block text-sm text-slate-500 hover:text-white transition-colors mb-3">Features</a>
-                                <a href="#how-it-works" className="block text-sm text-slate-500 hover:text-white transition-colors mb-3">How It Works</a>
-                                <Link to="/register" className="block text-sm text-slate-500 hover:text-white transition-colors mb-3">Sign Up</Link>
-                                <Link to="/login" className="block text-sm text-slate-500 hover:text-white transition-colors">Sign In</Link>
-                            </div>
-                            <div className="footer-column">
-                                <h4 className="text-white text-sm font-semibold mb-5">Resources</h4>
-                                <Link to="/faq" className="block text-sm text-slate-500 hover:text-white transition-colors mb-3">FAQ</Link>
-                                <Link to="/support" className="block text-sm text-slate-500 hover:text-white transition-colors mb-3">Support</Link>
-                                <Link to="/docs" className="block text-sm text-slate-500 hover:text-white transition-colors">Documentation</Link>
-                            </div>
-                            <div className="footer-column">
-                                <h4 className="text-white text-sm font-semibold mb-5">Legal</h4>
-                                <Link to="/privacy" className="block text-sm text-slate-500 hover:text-white transition-colors mb-3">Privacy Policy</Link>
-                                <Link to="/terms" className="block text-sm text-slate-500 hover:text-white transition-colors">Terms of Service</Link>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="mt-12 pt-8 border-t border-white/[0.06] text-center">
-                        <p className="text-sm text-slate-600">&copy; 2025 Expense Tracker. All rights reserved.</p>
-                    </div>
-                </div>
-            </footer>
+            <PublicFooter />
         </div>
     )
 }

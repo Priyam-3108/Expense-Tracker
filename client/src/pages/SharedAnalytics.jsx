@@ -5,6 +5,8 @@ import { analyticsService } from '../services/analyticsService'
 import { formatDateForInput } from '../utils/helpers'
 import { startOfMonth, endOfMonth } from 'date-fns'
 import toast from 'react-hot-toast'
+import PublicNavbar from '../components/PublicNavbar'
+import PublicFooter from '../components/PublicFooter'
 
 const SharedAnalytics = () => {
     const { token } = useParams()
@@ -104,42 +106,58 @@ const SharedAnalytics = () => {
 
     if (error) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
-                <div className="glass-card p-6 text-center max-w-md">
-                    <h2 className="text-xl font-bold text-red-600 dark:text-red-400 mb-2">Access Denied</h2>
-                    <p className="text-gray-600 dark:text-gray-300">{error}</p>
+            <div className="static-page bg-slate-950 noise-overlay min-h-screen flex flex-col">
+                <PublicNavbar />
+                <div className="flex-1 flex flex-col items-center justify-center px-4 py-24">
+                    <div className="glass-modal-panel p-8 text-center max-w-md">
+                        <h2 className="text-xl font-bold text-red-400 mb-2">Access Denied</h2>
+                        <p className="text-slate-300">{error}</p>
+                    </div>
                 </div>
+                <PublicFooter />
             </div>
         )
     }
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            {profile && (
-                <div className="mb-6 flex items-center gap-4 p-4 glass-card">
-                    <div className="h-12 w-12 rounded-full bg-indigo-100 dark:bg-indigo-500/15 flex items-center justify-center text-xl font-bold text-indigo-600 dark:text-indigo-400">
-                        {profile.avatar || profile.name.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Shared by</p>
-                        <h2 className="text-lg font-bold text-gray-900 dark:text-white">{profile.name}</h2>
-                    </div>
-                </div>
-            )}
+        <div className="static-page bg-slate-950 noise-overlay min-h-screen flex flex-col">
+            {/* Animated Liquid Glass Orbs */}
+            <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+                <div className="liquid-orb liquid-orb-indigo" style={{ top: '-200px', right: '-100px' }} />
+                <div className="liquid-orb liquid-orb-emerald" style={{ top: '40%', left: '-150px' }} />
+            </div>
 
-            <AnalyticsDashboard
-                expenses={expenses}
-                categories={categories}
-                loading={loading}
-                currency={profile?.currency || 'USD'}
-                dateRange={dateRange}
-                setDateRange={setDateRange}
-                selectedCategory={selectedCategory}
-                setSelectedCategory={setSelectedCategory}
-                filterType={filterType}
-                setFilterType={setFilterType}
-                isSharedView={true}
-            />
+            <PublicNavbar />
+
+            <div className="flex-1 container mx-auto px-4 pt-28 pb-16 relative z-10">
+                {profile && (
+                    <div className="mb-6 flex items-center gap-4 p-4 glass-card">
+                        <div className="h-12 w-12 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-xl font-bold text-indigo-400">
+                            {profile.avatar || profile.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                            <p className="text-xs text-slate-400">Shared by</p>
+                            <h2 className="text-lg font-bold text-white">{profile.name}</h2>
+                        </div>
+                    </div>
+                )}
+
+                <AnalyticsDashboard
+                    expenses={expenses}
+                    categories={categories}
+                    loading={loading}
+                    currency={profile?.currency || 'USD'}
+                    dateRange={dateRange}
+                    setDateRange={setDateRange}
+                    selectedCategory={selectedCategory}
+                    setSelectedCategory={setSelectedCategory}
+                    filterType={filterType}
+                    setFilterType={setFilterType}
+                    isSharedView={true}
+                />
+            </div>
+
+            <PublicFooter />
         </div>
     )
 }

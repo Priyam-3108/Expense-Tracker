@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import { useEffect } from 'react'
-import Logo from '../components/Logo'
+import { HelpCircle } from 'lucide-react'
+import PublicNavbar from '../components/PublicNavbar'
+import PublicFooter from '../components/PublicFooter'
 import '../styles/StaticPages.css'
 
 const Documentation = () => {
@@ -9,22 +11,16 @@ const Documentation = () => {
     }, [])
 
     return (
-        <div className="static-page">
+        <div className="static-page bg-slate-950 noise-overlay">
+            {/* Animated Liquid Glass Orbs */}
+            <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+                <div className="liquid-orb liquid-orb-indigo" style={{ top: '-200px', right: '-100px' }} />
+                <div className="liquid-orb liquid-orb-emerald" style={{ top: '40%', left: '-150px' }} />
+                <div className="liquid-orb liquid-orb-violet" style={{ top: '60%', right: '5%' }} />
+            </div>
+
             {/* Navigation */}
-            <nav className="static-navbar">
-                <div className="landing-container">
-                    <div className="nav-content">
-                        <Logo />
-                        <div className="nav-links">
-                            <Link to="/" className="nav-link">Home</Link>
-                            <Link to="/faq" className="nav-link">FAQ</Link>
-                            <Link to="/support" className="nav-link">Support</Link>
-                            <Link to="/login" className="btn-secondary">Sign In</Link>
-                            <Link to="/register" className="btn-primary">Get Started Free</Link>
-                        </div>
-                    </div>
-                </div>
-            </nav>
+            <PublicNavbar />
 
             {/* Content */}
             <div className="static-content">
@@ -38,7 +34,7 @@ const Documentation = () => {
                     </div>
 
                     {/* Quick Start */}
-                    <div className="doc-step" style={{ animationDelay: '0.1s' }}>
+                    <div className="doc-step">
                         <div className="step-number">1</div>
                         <div className="step-content">
                             <h3>Getting Started</h3>
@@ -57,7 +53,7 @@ const Documentation = () => {
                         </div>
                     </div>
 
-                    <div className="doc-step" style={{ animationDelay: '0.2s' }}>
+                    <div className="doc-step">
                         <div className="step-number">2</div>
                         <div className="step-content">
                             <h3>Dashboard Overview</h3>
@@ -76,7 +72,7 @@ const Documentation = () => {
                         </div>
                     </div>
 
-                    <div className="doc-step" style={{ animationDelay: '0.3s' }}>
+                    <div className="doc-step">
                         <div className="step-number">3</div>
                         <div className="step-content">
                             <h3>Adding Expenses</h3>
@@ -97,7 +93,7 @@ const Documentation = () => {
                         </div>
                     </div>
 
-                    <div className="doc-step" style={{ animationDelay: '0.4s' }}>
+                    <div className="doc-step">
                         <div className="step-number">4</div>
                         <div className="step-content">
                             <h3>Managing Categories</h3>
@@ -116,7 +112,7 @@ const Documentation = () => {
                         </div>
                     </div>
 
-                    <div className="doc-step" style={{ animationDelay: '0.5s' }}>
+                    <div className="doc-step">
                         <div className="step-number">5</div>
                         <div className="step-content">
                             <h3>Using Analytics</h3>
@@ -136,7 +132,7 @@ const Documentation = () => {
                         </div>
                     </div>
 
-                    <div className="doc-step" style={{ animationDelay: '0.6s' }}>
+                    <div className="doc-step">
                         <div className="step-number">6</div>
                         <div className="step-content">
                             <h3>Exporting Data</h3>
@@ -161,7 +157,7 @@ const Documentation = () => {
                         </div>
                     </div>
 
-                    <div className="doc-step" style={{ animationDelay: '0.7s' }}>
+                    <div className="doc-step">
                         <div className="step-number">7</div>
                         <div className="step-content">
                             <h3>Filtering and Searching</h3>
@@ -181,7 +177,7 @@ const Documentation = () => {
                         </div>
                     </div>
 
-                    <div className="doc-step" style={{ animationDelay: '0.8s' }}>
+                    <div className="doc-step">
                         <div className="step-number">8</div>
                         <div className="step-content">
                             <h3>Profile & Settings</h3>
@@ -200,7 +196,7 @@ const Documentation = () => {
                         </div>
                     </div>
 
-                    <div className="doc-step" style={{ animationDelay: '0.9s' }}>
+                    <div className="doc-step">
                         <div className="step-number">9</div>
                         <div className="step-content">
                             <h3>Dark Mode</h3>
@@ -219,7 +215,7 @@ const Documentation = () => {
                         </div>
                     </div>
 
-                    <div className="doc-step" style={{ animationDelay: '1s' }}>
+                    <div className="doc-step">
                         <div className="step-number">10</div>
                         <div className="step-content">
                             <h3>Tips & Best Practices</h3>
@@ -241,20 +237,20 @@ const Documentation = () => {
                     </div>
 
                     {/* Need More Help */}
-                    <div className="content-section" style={{ textAlign: 'center', marginTop: '60px' }}>
-                        <h2 className="section-title" style={{ justifyContent: 'center' }}>
-                            <span className="section-icon">💬</span>
+                    <div className="content-section text-center my-16">
+                        <h2 className="section-title justify-center text-white">
+                            <span className="section-icon"><HelpCircle className="w-5 h-5 text-indigo-400" /></span>
                             Need More Help?
                         </h2>
                         <div className="section-content">
-                            <p style={{ marginBottom: '24px' }}>
+                            <p className="mb-6 text-slate-300">
                                 Check out our FAQ or contact our support team for personalized assistance.
                             </p>
-                            <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
-                                <Link to="/faq" className="btn-primary btn-large">
+                            <div className="flex gap-4 justify-center flex-wrap">
+                                <Link to="/faq" className="btn-primary btn-lg inline-flex">
                                     Browse FAQ
                                 </Link>
-                                <Link to="/support" className="btn-secondary btn-large">
+                                <Link to="/support" className="btn-secondary btn-lg inline-flex">
                                     Contact Support
                                 </Link>
                             </div>
@@ -264,38 +260,7 @@ const Documentation = () => {
             </div>
 
             {/* Footer */}
-            <footer className="landing-footer">
-                <div className="landing-container">
-                    <div className="footer-content">
-                        <div className="footer-brand">
-                            <Logo />
-                            <p>Simple expense tracking for everyone.</p>
-                        </div>
-                        <div className="footer-links">
-                            <div className="footer-column">
-                                <h4>Product</h4>
-                                <Link to="/">Home</Link>
-                                <Link to="/register">Sign Up</Link>
-                                <Link to="/login">Sign In</Link>
-                            </div>
-                            <div className="footer-column">
-                                <h4>Resources</h4>
-                                <Link to="/faq">FAQ</Link>
-                                <Link to="/support">Support</Link>
-                                <Link to="/docs">Documentation</Link>
-                            </div>
-                            <div className="footer-column">
-                                <h4>Legal</h4>
-                                <Link to="/privacy">Privacy Policy</Link>
-                                <Link to="/terms">Terms of Service</Link>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="footer-bottom">
-                        <p>&copy; 2025 Expense Tracker. All rights reserved.</p>
-                    </div>
-                </div>
-            </footer>
+            <PublicFooter />
         </div>
     )
 }

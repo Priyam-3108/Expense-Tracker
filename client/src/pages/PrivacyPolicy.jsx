@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import { useEffect } from 'react'
-import Logo from '../components/Logo'
+import { BarChart2, Target, Database, Link2, Settings, Cookie, Shield, Globe, RefreshCw, Mail } from 'lucide-react'
+import PublicNavbar from '../components/PublicNavbar'
+import PublicFooter from '../components/PublicFooter'
 import '../styles/StaticPages.css'
 
 const PrivacyPolicy = () => {
@@ -9,22 +11,16 @@ const PrivacyPolicy = () => {
     }, [])
 
     return (
-        <div className="static-page">
+        <div className="static-page bg-slate-950 noise-overlay">
+            {/* Animated Liquid Glass Orbs */}
+            <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+                <div className="liquid-orb liquid-orb-indigo" style={{ top: '-200px', right: '-100px' }} />
+                <div className="liquid-orb liquid-orb-emerald" style={{ top: '40%', left: '-150px' }} />
+                <div className="liquid-orb liquid-orb-violet" style={{ top: '60%', right: '5%' }} />
+            </div>
+
             {/* Navigation */}
-            <nav className="static-navbar">
-                <div className="landing-container">
-                    <div className="nav-content">
-                        <Logo />
-                        <div className="nav-links">
-                            <Link to="/" className="nav-link">Home</Link>
-                            <Link to="/faq" className="nav-link">FAQ</Link>
-                            <Link to="/support" className="nav-link">Support</Link>
-                            <Link to="/login" className="btn-secondary">Sign In</Link>
-                            <Link to="/register" className="btn-primary">Get Started Free</Link>
-                        </div>
-                    </div>
-                </div>
-            </nav>
+            <PublicNavbar />
 
             {/* Content */}
             <div className="static-content">
@@ -40,7 +36,7 @@ const PrivacyPolicy = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon">📊</span>
+                            <span className="section-icon"><BarChart2 className="w-5 h-5 text-indigo-400" /></span>
                             1. Information We Collect
                         </h2>
                         <div className="section-content">
@@ -75,7 +71,7 @@ const PrivacyPolicy = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon">🎯</span>
+                            <span className="section-icon"><Target className="w-5 h-5 text-indigo-400" /></span>
                             2. How We Use Your Information
                         </h2>
                         <div className="section-content">
@@ -97,7 +93,7 @@ const PrivacyPolicy = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon">💾</span>
+                            <span className="section-icon"><Database className="w-5 h-5 text-indigo-400" /></span>
                             3. Data Storage and Security
                         </h2>
                         <div className="section-content">
@@ -122,7 +118,7 @@ const PrivacyPolicy = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon">🔗</span>
+                            <span className="section-icon"><Link2 className="w-5 h-5 text-indigo-400" /></span>
                             4. Data Sharing and Disclosure
                         </h2>
                         <div className="section-content">
@@ -146,7 +142,7 @@ const PrivacyPolicy = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon">⚙️</span>
+                            <span className="section-icon"><Settings className="w-5 h-5 text-indigo-400" /></span>
                             5. Your Rights and Choices
                         </h2>
                         <div className="section-content">
@@ -162,14 +158,14 @@ const PrivacyPolicy = () => {
                                 <li><strong>Withdraw Consent:</strong> Stop using the service at any time</li>
                             </ul>
                             <p>
-                                To exercise these rights, visit your Profile page or contact us through our <Link to="/support" style={{ color: '#667eea', textDecoration: 'none' }}>Support page</Link>.
+                                To exercise these rights, visit your Profile page or contact us through our <Link to="/support" className="text-indigo-400 hover:text-indigo-300 underline font-medium">Support page</Link>.
                             </p>
                         </div>
                     </div>
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon">🍪</span>
+                            <span className="section-icon"><Cookie className="w-5 h-5 text-indigo-400" /></span>
                             6. Cookies and Tracking
                         </h2>
                         <div className="section-content">
@@ -192,7 +188,7 @@ const PrivacyPolicy = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon">👶</span>
+                            <span className="section-icon"><Shield className="w-5 h-5 text-indigo-400" /></span>
                             7. Children's Privacy
                         </h2>
                         <div className="section-content">
@@ -204,7 +200,7 @@ const PrivacyPolicy = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon">🌍</span>
+                            <span className="section-icon"><Globe className="w-5 h-5 text-indigo-400" /></span>
                             8. International Users
                         </h2>
                         <div className="section-content">
@@ -219,7 +215,7 @@ const PrivacyPolicy = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon">🔄</span>
+                            <span className="section-icon"><RefreshCw className="w-5 h-5 text-indigo-400" /></span>
                             9. Changes to Privacy Policy
                         </h2>
                         <div className="section-content">
@@ -239,7 +235,7 @@ const PrivacyPolicy = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon">📧</span>
+                            <span className="section-icon"><Mail className="w-5 h-5 text-indigo-400" /></span>
                             10. Contact Us
                         </h2>
                         <div className="section-content">
@@ -247,7 +243,7 @@ const PrivacyPolicy = () => {
                                 If you have questions or concerns about this Privacy Policy or our data practices, please contact us:
                             </p>
                             <ul>
-                                <li>Through our <Link to="/support" style={{ color: '#667eea', textDecoration: 'none' }}>Support page</Link></li>
+                                <li>Through our <Link to="/support" className="text-indigo-400 hover:text-indigo-300 underline font-medium">Support page</Link></li>
                                 <li>By email: privacy@expensetracker.com</li>
                             </ul>
                             <p>
@@ -259,38 +255,7 @@ const PrivacyPolicy = () => {
             </div>
 
             {/* Footer */}
-            <footer className="landing-footer">
-                <div className="landing-container">
-                    <div className="footer-content">
-                        <div className="footer-brand">
-                            <Logo />
-                            <p>Simple expense tracking for everyone.</p>
-                        </div>
-                        <div className="footer-links">
-                            <div className="footer-column">
-                                <h4>Product</h4>
-                                <Link to="/">Home</Link>
-                                <Link to="/register">Sign Up</Link>
-                                <Link to="/login">Sign In</Link>
-                            </div>
-                            <div className="footer-column">
-                                <h4>Resources</h4>
-                                <Link to="/faq">FAQ</Link>
-                                <Link to="/support">Support</Link>
-                                <Link to="/docs">Documentation</Link>
-                            </div>
-                            <div className="footer-column">
-                                <h4>Legal</h4>
-                                <Link to="/privacy">Privacy Policy</Link>
-                                <Link to="/terms">Terms of Service</Link>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="footer-bottom">
-                        <p>&copy; 2025 Expense Tracker. All rights reserved.</p>
-                    </div>
-                </div>
-            </footer>
+            <PublicFooter />
         </div>
     )
 }

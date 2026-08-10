@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import { useEffect } from 'react'
-import Logo from '../components/Logo'
+import { FileText, Briefcase, User, Lock, Scale, Copyright, AlertTriangle, RefreshCw, Mail } from 'lucide-react'
+import PublicNavbar from '../components/PublicNavbar'
+import PublicFooter from '../components/PublicFooter'
 import '../styles/StaticPages.css'
 
 const TermsOfService = () => {
@@ -9,22 +11,16 @@ const TermsOfService = () => {
     }, [])
 
     return (
-        <div className="static-page">
+        <div className="static-page bg-slate-950 noise-overlay">
+            {/* Animated Liquid Glass Orbs */}
+            <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+                <div className="liquid-orb liquid-orb-indigo" style={{ top: '-200px', right: '-100px' }} />
+                <div className="liquid-orb liquid-orb-emerald" style={{ top: '40%', left: '-150px' }} />
+                <div className="liquid-orb liquid-orb-violet" style={{ top: '60%', right: '5%' }} />
+            </div>
+
             {/* Navigation */}
-            <nav className="static-navbar">
-                <div className="landing-container">
-                    <div className="nav-content">
-                        <Logo />
-                        <div className="nav-links">
-                            <Link to="/" className="nav-link">Home</Link>
-                            <Link to="/faq" className="nav-link">FAQ</Link>
-                            <Link to="/support" className="nav-link">Support</Link>
-                            <Link to="/login" className="btn-secondary">Sign In</Link>
-                            <Link to="/register" className="btn-primary">Get Started Free</Link>
-                        </div>
-                    </div>
-                </div>
-            </nav>
+            <PublicNavbar />
 
             {/* Content */}
             <div className="static-content">
@@ -40,7 +36,7 @@ const TermsOfService = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon">📋</span>
+                            <span className="section-icon"><FileText className="w-5 h-5 text-indigo-400" /></span>
                             1. Introduction
                         </h2>
                         <div className="section-content">
@@ -55,7 +51,7 @@ const TermsOfService = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon">💼</span>
+                            <span className="section-icon"><Briefcase className="w-5 h-5 text-indigo-400" /></span>
                             2. Service Description
                         </h2>
                         <div className="section-content">
@@ -78,7 +74,7 @@ const TermsOfService = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon">👤</span>
+                            <span className="section-icon"><User className="w-5 h-5 text-indigo-400" /></span>
                             3. User Accounts
                         </h2>
                         <div className="section-content">
@@ -102,7 +98,7 @@ const TermsOfService = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon">🔒</span>
+                            <span className="section-icon"><Lock className="w-5 h-5 text-indigo-400" /></span>
                             4. Data and Privacy
                         </h2>
                         <div className="section-content">
@@ -113,14 +109,14 @@ const TermsOfService = () => {
                                 <strong>Data Security:</strong> While we implement industry-standard security measures to protect your data, no system is completely secure. You acknowledge that you provide your data at your own risk.
                             </p>
                             <p>
-                                <strong>Privacy Policy:</strong> Our collection and use of personal information is governed by our <Link to="/privacy" style={{ color: '#667eea', textDecoration: 'none' }}>Privacy Policy</Link>, which is incorporated into these terms by reference.
+                                <strong>Privacy Policy:</strong> Our collection and use of personal information is governed by our <Link to="/privacy" className="text-indigo-400 hover:text-indigo-300 underline font-medium">Privacy Policy</Link>, which is incorporated into these terms by reference.
                             </p>
                         </div>
                     </div>
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon">⚖️</span>
+                            <span className="section-icon"><Scale className="w-5 h-5 text-indigo-400" /></span>
                             5. Acceptable Use
                         </h2>
                         <div className="section-content">
@@ -140,7 +136,7 @@ const TermsOfService = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon">©️</span>
+                            <span className="section-icon"><Copyright className="w-5 h-5 text-indigo-400" /></span>
                             6. Intellectual Property
                         </h2>
                         <div className="section-content">
@@ -158,7 +154,7 @@ const TermsOfService = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon">⚠️</span>
+                            <span className="section-icon"><AlertTriangle className="w-5 h-5 text-indigo-400" /></span>
                             7. Disclaimer and Limitation of Liability
                         </h2>
                         <div className="section-content">
@@ -176,7 +172,7 @@ const TermsOfService = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon">🔄</span>
+                            <span className="section-icon"><RefreshCw className="w-5 h-5 text-indigo-400" /></span>
                             8. Changes to Terms
                         </h2>
                         <div className="section-content">
@@ -191,12 +187,12 @@ const TermsOfService = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon">📧</span>
+                            <span className="section-icon"><Mail className="w-5 h-5 text-indigo-400" /></span>
                             9. Contact Information
                         </h2>
                         <div className="section-content">
                             <p>
-                                If you have any questions about these Terms of Service, please contact us through our <Link to="/support" style={{ color: '#667eea', textDecoration: 'none' }}>Support page</Link>.
+                                If you have any questions about these Terms of Service, please contact us through our <Link to="/support" className="text-indigo-400 hover:text-indigo-300 underline font-medium">Support page</Link>.
                             </p>
                         </div>
                     </div>
@@ -204,38 +200,7 @@ const TermsOfService = () => {
             </div>
 
             {/* Footer */}
-            <footer className="landing-footer">
-                <div className="landing-container">
-                    <div className="footer-content">
-                        <div className="footer-brand">
-                            <Logo />
-                            <p>Simple expense tracking for everyone.</p>
-                        </div>
-                        <div className="footer-links">
-                            <div className="footer-column">
-                                <h4>Product</h4>
-                                <Link to="/">Home</Link>
-                                <Link to="/register">Sign Up</Link>
-                                <Link to="/login">Sign In</Link>
-                            </div>
-                            <div className="footer-column">
-                                <h4>Resources</h4>
-                                <Link to="/faq">FAQ</Link>
-                                <Link to="/support">Support</Link>
-                                <Link to="/docs">Documentation</Link>
-                            </div>
-                            <div className="footer-column">
-                                <h4>Legal</h4>
-                                <Link to="/privacy">Privacy Policy</Link>
-                                <Link to="/terms">Terms of Service</Link>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="footer-bottom">
-                        <p>&copy; 2025 Expense Tracker. All rights reserved.</p>
-                    </div>
-                </div>
-            </footer>
+            <PublicFooter />
         </div>
     )
 }

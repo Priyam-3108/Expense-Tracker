@@ -342,7 +342,24 @@
   }
 }
 
-/* Responsive */
+/* Footer Base Styles */
+.footer-content {
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: 60px;
+}
+
+.footer-links {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+}
+
+.footer-column {
+  display: flex;
+  flex-direction: column;
+}
+
 @media (max-width: 1024px) {
   .hero-content-wrapper {
     grid-template-columns: 1fr;
