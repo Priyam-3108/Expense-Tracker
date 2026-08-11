@@ -247,7 +247,7 @@ const Categories = () => {
         <div className="flex gap-2">
           <button
             onClick={handleAddNew}
-            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-xl hover:bg-indigo-500 hover:scale-[1.02] transition-all duration-200 min-h-[44px] shadow-[0_0_15px_rgba(99,102,241,0.15)]"
+            className="btn-primary btn-md"
           >
             <Plus size={16} />
             <span>Add Category</span>
@@ -271,7 +271,7 @@ const Categories = () => {
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-3 py-3 border border-gray-300 dark:border-white/[0.07] rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-slate-500 text-sm transition-all duration-200"
+                className="glass-input w-full py-3"
                 placeholder="Enter category name"
                 maxLength={30}
               />
@@ -325,7 +325,7 @@ const Categories = () => {
               <button
                 type="submit"
                 disabled={formLoading}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-xl hover:bg-indigo-500 hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] shadow-[0_0_15px_rgba(99,102,241,0.15)]"
+                className="btn-primary btn-md w-full sm:w-auto"
               >
                 {formLoading ? (
                   <>
@@ -340,7 +340,7 @@ const Categories = () => {
                 type="button"
                 onClick={handleCancel}
                 disabled={formLoading}
-                className="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-white/[0.05] border border-gray-300 dark:border-white/[0.08] rounded-xl hover:bg-gray-50 dark:hover:bg-white/[0.10] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
+                className="btn-secondary btn-md w-full sm:w-auto"
               >
                 Cancel
               </button>

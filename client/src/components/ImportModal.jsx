@@ -260,7 +260,7 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
                 <div className="p-6 overflow-y-auto flex-1">
                     {step === 1 && (
                         <div
-                            className="border-2 border-dashed border-gray-300 dark:border-white/[0.10] rounded-2xl p-6 sm:p-12 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-all duration-200"
+                            className="border-2 border-dashed border-gray-300 dark:border-white/[0.10] rounded-xl p-6 sm:p-12 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-all duration-200"
                             onClick={() => fileInputRef.current?.click()}
                             onDragOver={(e) => e.preventDefault()}
                             onDrop={(e) => {
@@ -315,9 +315,9 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
                                         <select
                                             value={mapping[field] || ''}
                                             onChange={(e) => handleMappingChange(field, e.target.value)}
-                                            className={`w-full px-3 py-2 border rounded-xl focus:outline-none focus:ring-2 bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white min-h-[44px] transition-all duration-200 ${!mapping[field] && REQUIRED_FIELDS.includes(field)
+                                            className={`glass-input w-full min-h-[44px] focus:outline-none focus:ring-2 ${!mapping[field] && REQUIRED_FIELDS.includes(field)
                                                 ? 'border-red-300 dark:border-red-500/30 focus:ring-red-500/30'
-                                                : 'border-gray-300 dark:border-white/[0.07] focus:ring-indigo-500/30'
+                                                : 'focus:ring-indigo-500/30'
                                                 }`}
                                         >
                                             <option value="">Select column...</option>
@@ -331,18 +331,18 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
 
                             <div className="mt-6">
                                 <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Preview (First 3 rows)</h4>
-                                <div className="overflow-x-auto border border-gray-200 dark:border-white/[0.07] rounded-xl">
+                                <div className="overflow-x-auto glass-table">
                                     <table className="w-full text-sm text-left">
-                                        <thead className="bg-gray-50 dark:bg-white/[0.02] text-gray-500 dark:text-slate-400">
+                                        <thead className="text-gray-500 dark:text-slate-400">
                                             <tr>
                                                 {Object.keys(mapping).filter(k => mapping[k]).map(field => (
                                                     <th key={field} className="px-4 py-2 font-medium capitalize">{field}</th>
                                                 ))}
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-gray-200 dark:divide-white/[0.05]">
+                                        <tbody>
                                             {rawData.slice(0, 3).map((row, i) => (
-                                                <tr key={i} className="bg-white dark:bg-transparent">
+                                                <tr key={i}>
                                                     {Object.keys(mapping).filter(k => mapping[k]).map(field => (
                                                         <td key={field} className="px-4 py-2 text-gray-900 dark:text-gray-300">
                                                             {row[mapping[field]]}
@@ -363,14 +363,14 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
                     {step === 1 ? (
                         <button
                             onClick={onClose}
-                            className="w-full sm:w-auto px-4 py-2 text-base sm:text-sm font-medium text-gray-700 dark:text-slate-300 hover:text-gray-900 transition-all duration-200 min-h-[44px] rounded-xl hover:bg-gray-200 dark:hover:bg-white/[0.06]"
+                            className="btn-secondary btn-md w-full sm:w-auto"
                         >
                             Cancel
                         </button>
                     ) : (
                         <button
                             onClick={reset}
-                            className="w-full sm:w-auto px-4 py-2 text-base sm:text-sm font-medium text-gray-700 dark:text-slate-300 hover:text-gray-900 transition-all duration-200 min-h-[44px] rounded-xl hover:bg-gray-200 dark:hover:bg-white/[0.06]"
+                            className="btn-secondary btn-md w-full sm:w-auto"
                             disabled={processing}
                         >
                             Back
@@ -381,7 +381,7 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
                         <button
                             onClick={handleImport}
                             disabled={processing}
-                            className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-2 text-base sm:text-sm font-medium text-white bg-indigo-600 rounded-xl hover:bg-indigo-500 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] transition-all duration-200 shadow-[0_0_15px_rgba(99,102,241,0.15)]"
+                            className="btn-primary btn-md w-full sm:w-auto"
                         >
                             {processing ? (
                                 <>

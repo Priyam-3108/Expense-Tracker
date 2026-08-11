@@ -21,8 +21,8 @@ const Logo = ({ className = "", size = "default" }) => {
                 <path d="M20 10L28 16V24L20 30L12 24V16L20 10Z" fill="white" opacity="0.9" />
                 <defs>
                     <linearGradient id="logo-gradient" x1="0" y1="0" x2="40" y2="40">
-                        <stop offset="0%" stopColor="#667eea" />
-                        <stop offset="100%" stopColor="#764ba2" />
+                        <stop offset="0%" stopColor="#665efd" />
+                        <stop offset="100%" stopColor="#533afd" />
                     </linearGradient>
                 </defs>
             </svg>

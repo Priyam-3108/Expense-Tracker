@@ -22,7 +22,7 @@ export default function DebtStats({ debts }) {
                         <p className="text-xs text-gray-500 dark:text-slate-500 mt-1">{borrowed.filter(d => d.status !== 'paid').length} active debts</p>
                     </div>
                     <div className="p-3 bg-rose-50 dark:bg-rose-500/10 rounded-xl">
-                        <ArrowTrendingDownIcon className="w-6 h-6 text-rose-500 dark:text-rose-400 drop-shadow-[0_0_6px_rgba(251,113,133,0.3)]" />
+                        <ArrowTrendingDownIcon className="w-6 h-6 text-rose-500 dark:text-rose-400" />
                     </div>
                 </div>
             </div>
@@ -37,7 +37,7 @@ export default function DebtStats({ debts }) {
                         <p className="text-xs text-gray-500 dark:text-slate-500 mt-1">{lent.filter(d => d.status !== 'paid').length} active loans</p>
                     </div>
                     <div className="p-3 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl">
-                        <ArrowTrendingUpIcon className="w-6 h-6 text-emerald-500 dark:text-emerald-400 drop-shadow-[0_0_6px_rgba(52,211,153,0.3)]" />
+                        <ArrowTrendingUpIcon className="w-6 h-6 text-emerald-500 dark:text-emerald-400" />
                     </div>
                 </div>
             </div>

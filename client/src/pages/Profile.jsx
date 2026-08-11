@@ -99,7 +99,7 @@ const Profile = () => {
                   name="name"
                   value={profileForm.name}
                   onChange={(e) => setProfileForm((prev) => ({ ...prev, name: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-white/[0.07] rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white transition-all duration-200"
+                  className="glass-input w-full"
                   required
                 />
               </div>
@@ -114,7 +114,7 @@ const Profile = () => {
                   name="email"
                   value={profileForm.email}
                   onChange={(e) => setProfileForm((prev) => ({ ...prev, email: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-white/[0.07] rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white transition-all duration-200"
+                  className="glass-input w-full"
                   required
                 />
               </div>
@@ -128,7 +128,7 @@ const Profile = () => {
                   name="currency"
                   value={profileForm.currency}
                   onChange={(e) => setProfileForm((prev) => ({ ...prev, currency: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-white/[0.07] rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white transition-all duration-200"
+                  className="glass-input w-full"
                   required
                 >
                   <option value="USD">US Dollar ($)</option>
@@ -146,7 +146,7 @@ const Profile = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-500 hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_15px_rgba(99,102,241,0.15)]"
+                  className="btn-primary btn-md"
                 >
                   {loading ? 'Updating...' : 'Update Profile'}
                 </button>
@@ -169,7 +169,7 @@ const Profile = () => {
                   name="currentPassword"
                   value={passwordForm.currentPassword}
                   onChange={(e) => setPasswordForm((prev) => ({ ...prev, currentPassword: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-white/[0.07] rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white transition-all duration-200"
+                  className="glass-input w-full"
                   required
                 />
               </div>
@@ -184,7 +184,7 @@ const Profile = () => {
                   name="newPassword"
                   value={passwordForm.newPassword}
                   onChange={(e) => setPasswordForm((prev) => ({ ...prev, newPassword: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-white/[0.07] rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white transition-all duration-200"
+                  className="glass-input w-full"
                   required
                   minLength={6}
                 />
@@ -201,7 +201,7 @@ const Profile = () => {
                   name="confirmPassword"
                   value={passwordForm.confirmPassword}
                   onChange={(e) => setPasswordForm((prev) => ({ ...prev, confirmPassword: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-white/[0.07] rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white transition-all duration-200"
+                  className="glass-input w-full"
                   required
                 />
               </div>
@@ -210,7 +210,7 @@ const Profile = () => {
                 <button
                   type="submit"
                   disabled={passwordLoading}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-500 hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_15px_rgba(99,102,241,0.15)]"
+                  className="btn-primary btn-md"
                 >
                   {passwordLoading ? 'Changing...' : 'Change Password'}
                 </button>

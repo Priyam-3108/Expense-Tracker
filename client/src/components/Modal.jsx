@@ -29,14 +29,13 @@ const Modal = ({ isOpen, onClose, title, children, maxWidth = 'max-w-lg' }) => {
             leaveFrom="translate-y-0 md:opacity-100 md:scale-100"
             leaveTo="translate-y-full md:opacity-0 md:translate-y-4 md:scale-95"
           >
-            <Dialog.Panel 
-              className={`w-full ${maxWidth} transform overflow-hidden rounded-t-2xl md:rounded-2xl bg-white dark:bg-transparent shadow-2xl dark:shadow-none transition-all flex flex-col`}
+            <Dialog.Panel
+              className={`w-full ${maxWidth} transform overflow-hidden rounded-t-2xl md:rounded-2xl transition-all flex flex-col glass-modal-panel`}
               style={{ maxHeight: '90vh' }}
             >
-              {/* Glass panel wrapper for dark mode */}
-              <div className="flex flex-col h-full bg-white dark:glass-modal-panel dark:rounded-t-2xl md:dark:rounded-2xl">
+              <div className="flex flex-col h-full">
                 {title && (
-                  <div className="flex items-center justify-between border-b border-gray-200 dark:border-white/[0.06] px-6 py-4 flex-shrink-0">
+                  <div className="flex items-center justify-between border-b border-gray-200 dark:border-white/[0.08] px-6 py-4 flex-shrink-0">
                     <Dialog.Title className="text-lg font-semibold text-gray-900 dark:text-white">
                       {title}
                     </Dialog.Title>
@@ -50,7 +49,7 @@ const Modal = ({ isOpen, onClose, title, children, maxWidth = 'max-w-lg' }) => {
                     </button>
                   </div>
                 )}
-                
+
                 {/* The content wrapper controls the inner scrolling */}
                 <div className="flex-1 overflow-y-auto w-full">
                   {children}

@@ -70,17 +70,17 @@ const ExportModal = ({ isOpen, onClose, onExport, loading }) => {
                 </div>
             </div>
 
-            <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 border-t border-gray-200 dark:border-white/[0.06] p-4 bg-gray-50 dark:bg-white/[0.02]">
+            <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 border-t border-gray-200 dark:border-white/[0.08] p-4 bg-gray-50 dark:bg-white/[0.02]">
                 <button
                     onClick={onClose}
-                    className="w-full sm:w-auto rounded-xl px-4 py-2 text-base sm:text-sm font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-all duration-200 min-h-[44px]"
+                    className="btn-secondary btn-md w-full sm:w-auto"
                 >
                     Cancel
                 </button>
                 <button
                     onClick={handleExport}
                     disabled={loading}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-base sm:text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-[0_0_15px_rgba(99,102,241,0.15)] min-h-[44px] hover:scale-[1.02]"
+                    className="btn-primary btn-md w-full sm:w-auto"
                 >
                     {loading ? (
                         <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />

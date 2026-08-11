@@ -59,18 +59,10 @@ const Register = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative bg-slate-950 noise-overlay overflow-hidden">
-      {/* Animated Liquid Glass Orbs */}
-      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        <div className="liquid-orb liquid-orb-indigo" style={{ top: '-200px', left: '10%' }} />
-        <div className="liquid-orb liquid-orb-emerald" style={{ top: '50%', right: '-150px' }} />
-        <div className="liquid-orb liquid-orb-violet" style={{ top: '20%', right: '20%' }} />
-        <div className="liquid-orb liquid-orb-rose" style={{ top: '70%', left: '10%' }} />
-      </div>
-
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden gradient-mesh-bg">
       <div className="max-w-2xl w-full relative z-10">
-        {/* Glassmorphism Card */}
-        <div className="glass-modal-panel">
+        {/* Auth Card */}
+        <div className="bg-white rounded-2xl border border-[#e3e8ee] shadow-[0_8px_24px_rgba(0,55,112,0.08)]">
           {/* Card Content */}
           <div className="p-8 sm:p-10">
             {/* Logo */}
@@ -80,7 +72,7 @@ const Register = () => {
 
             {/* Title */}
             <div className="text-center mb-5">
-              <h2 className="text-2xl font-bold mb-2 text-white">
+              <h2 className="text-2xl font-light tracking-tight mb-2 text-[#0d253d]">
                 Get started for free
               </h2>
             </div>
@@ -92,13 +84,13 @@ const Register = () => {
                 <div className="space-y-1">
                   <label
                     htmlFor="name"
-                    className="block text-sm font-medium text-gray-300"
+                    className="block text-sm font-medium text-[#273951]"
                   >
                     Full Name
                   </label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                      <User className="h-5 w-5 text-gray-500 group-focus-within:text-primary-500" />
+                      <User className="h-5 w-5 text-[#64748d] group-focus-within:text-primary-500" />
                     </div>
                     <input
                       id="name"
@@ -118,7 +110,7 @@ const Register = () => {
                       className={cn(
                         "block w-full pl-11 pr-4 py-2.5 rounded-xl transition-all duration-300 text-sm font-medium min-h-[44px]",
                         "focus:outline-none focus:ring-2 focus:ring-offset-0",
-                        "glass-input",
+                        "bg-white border border-[#a8c3de] text-[#0d253d] placeholder:text-[#64748d]/60 focus:border-primary-500 focus:ring-primary-500/20",
                         errors.name && "!border-red-500 focus:!border-red-500 focus:!ring-red-500/20"
                       )}
                       placeholder="Enter your full name"
@@ -135,13 +127,13 @@ const Register = () => {
                 <div className="space-y-1">
                   <label
                     htmlFor="email"
-                    className="block text-sm font-medium text-gray-300"
+                    className="block text-sm font-medium text-[#273951]"
                   >
                     Email address
                   </label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-500 group-focus-within:text-primary-500" />
+                    <Mail className="h-5 w-5 text-[#64748d] group-focus-within:text-primary-500" />
                     </div>
                     <input
                       id="email"
@@ -154,7 +146,7 @@ const Register = () => {
                       className={cn(
                         "block w-full pl-11 pr-4 py-2.5 rounded-xl transition-all duration-300 text-sm font-medium min-h-[44px]",
                         "focus:outline-none focus:ring-2 focus:ring-offset-0",
-                        "glass-input",
+                        "bg-white border border-[#a8c3de] text-[#0d253d] placeholder:text-[#64748d]/60 focus:border-primary-500 focus:ring-primary-500/20",
                         errors.email && "!border-red-500 focus:!border-red-500 focus:!ring-red-500/20"
                       )}
                       placeholder="Enter your email"
@@ -172,13 +164,13 @@ const Register = () => {
               <div className="space-y-1">
                 <label
                   htmlFor="currency"
-                  className="block text-sm font-medium text-gray-300"
+                  className="block text-sm font-medium text-[#273951]"
                 >
                   Preferred Currency
                 </label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                    <span className="text-base font-semibold text-gray-500 group-focus-within:text-primary-500">
+                    <span className="text-base font-semibold text-[#64748d] group-focus-within:text-primary-500">
                       {currencyMap[selectedCurrency || 'USD'].symbol}
                     </span>
                   </div>
@@ -188,7 +180,7 @@ const Register = () => {
                     className={cn(
                       "block w-full pl-11 pr-4 py-2.5 rounded-xl transition-all duration-300 text-sm font-medium appearance-none cursor-pointer min-h-[44px]",
                       "focus:outline-none focus:ring-2 focus:ring-offset-0",
-                      "glass-input",
+                      "bg-white border border-[#a8c3de] text-[#0d253d] placeholder:text-[#64748d]/60 focus:border-primary-500 focus:ring-primary-500/20",
                       errors.currency && "!border-red-500 focus:!border-red-500 focus:!ring-red-500/20"
                     )}
                   >
@@ -215,13 +207,13 @@ const Register = () => {
                 <div className="space-y-1">
                   <label
                     htmlFor="password"
-                    className="block text-sm font-medium text-gray-300"
+                    className="block text-sm font-medium text-[#273951]"
                   >
                     Password
                   </label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                      <Lock className="h-5 w-5 text-gray-500 group-focus-within:text-primary-500" />
+                      <Lock className="h-5 w-5 text-[#64748d] group-focus-within:text-primary-500" />
                     </div>
                     <input
                       id="password"
@@ -234,7 +226,7 @@ const Register = () => {
                       className={cn(
                         "block w-full pl-11 pr-12 py-2.5 rounded-xl transition-all duration-300 text-sm font-medium min-h-[44px]",
                         "focus:outline-none focus:ring-2 focus:ring-offset-0",
-                        "glass-input",
+                        "bg-white border border-[#a8c3de] text-[#0d253d] placeholder:text-[#64748d]/60 focus:border-primary-500 focus:ring-primary-500/20",
                         errors.password && "!border-red-500 focus:!border-red-500 focus:!ring-red-500/20"
                       )}
                       placeholder="Create a password (min. 6 characters)"
@@ -245,9 +237,9 @@ const Register = () => {
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? (
-                        <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-300 transition-all duration-200" />
+                        <EyeOff className="h-5 w-5 text-[#64748d] hover:text-[#273951] transition-all duration-200" />
                       ) : (
-                        <Eye className="h-5 w-5 text-gray-400 hover:text-gray-300 transition-all duration-200" />
+                        <Eye className="h-5 w-5 text-[#64748d] hover:text-[#273951] transition-all duration-200" />
                       )}
                     </button>
                   </div>
@@ -262,13 +254,13 @@ const Register = () => {
                 <div className="space-y-1">
                   <label
                     htmlFor="confirmPassword"
-                    className="block text-sm font-medium text-gray-300"
+                    className="block text-sm font-medium text-[#273951]"
                   >
                     Confirm Password
                   </label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                      <Lock className="h-5 w-5 text-gray-500 group-focus-within:text-primary-500" />
+                      <Lock className="h-5 w-5 text-[#64748d] group-focus-within:text-primary-500" />
                     </div>
                     <input
                       id="confirmPassword"
@@ -281,7 +273,7 @@ const Register = () => {
                       className={cn(
                         "block w-full pl-11 pr-12 py-2.5 rounded-xl transition-all duration-300 text-sm font-medium min-h-[44px]",
                         "focus:outline-none focus:ring-2 focus:ring-offset-0",
-                        "glass-input",
+                        "bg-white border border-[#a8c3de] text-[#0d253d] placeholder:text-[#64748d]/60 focus:border-primary-500 focus:ring-primary-500/20",
                         errors.confirmPassword && "!border-red-500 focus:!border-red-500 focus:!ring-red-500/20"
                       )}
                       placeholder="Confirm your password"
@@ -292,9 +284,9 @@ const Register = () => {
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     >
                       {showConfirmPassword ? (
-                      <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-300 transition-all duration-200" />
+                      <EyeOff className="h-5 w-5 text-[#64748d] hover:text-[#273951] transition-all duration-200" />
                     ) : (
-                      <Eye className="h-5 w-5 text-gray-400 hover:text-gray-300 transition-all duration-200" />
+                      <Eye className="h-5 w-5 text-[#64748d] hover:text-[#273951] transition-all duration-200" />
                     )}
                     </button>
                   </div>
@@ -310,11 +302,11 @@ const Register = () => {
               {errors.root && (
                 <div className={cn(
                   "rounded-xl p-3 animate-in slide-in-from-top-2 border",
-                    "bg-red-950/30 border-red-900/50 backdrop-blur-sm"
+                    "bg-red-50 border-red-200"
                 )}>
                   <p className={cn(
                     "text-sm font-medium flex items-center gap-2",
-                    "text-red-400"
+                    "text-red-600"
                   )}>
                     <span className="text-base">⚠</span>
                     {errors.root.message}
@@ -327,13 +319,11 @@ const Register = () => {
                 type="submit"
                 disabled={isLoading}
                 className={cn(
-                  "relative w-full py-3 px-4 rounded-xl font-semibold text-white text-sm mt-4",
-                  "bg-gradient-to-r from-primary-600 via-primary-600 to-blue-600",
-                  "hover:from-primary-700 hover:via-primary-700 hover:to-blue-700",
+                  "relative w-full py-3 px-4 rounded-full font-semibold text-white text-sm mt-4",
+                  "bg-primary-500 hover:bg-primary-600",
                   "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
-                  "focus:ring-offset-gray-900",
                   "disabled:opacity-50 disabled:cursor-not-allowed",
-                  "transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]",
+                  "transform transition-all duration-200 active:scale-[0.98]",
                   "shadow-lg hover:shadow-xl shadow-primary-500/25",
                   "overflow-hidden group"
                 )}
@@ -353,12 +343,12 @@ const Register = () => {
             </form>
           </div>
 
-          <div className="px-6 py-4 border-t border-white/[0.08]">
-            <p className="text-center text-sm text-gray-400">
+          <div className="px-6 py-4 border-t border-[#e3e8ee]">
+            <p className="text-center text-sm text-[#64748d]">
               Already have an account?{' '}
               <Link
                 to="/login"
-                className="font-semibold transition-colors hover:underline text-primary-400 hover:text-primary-300"
+                className="font-semibold transition-colors hover:underline text-primary-500 hover:text-primary-700"
               >
                 Sign in
               </Link>

@@ -81,7 +81,7 @@ function AppRoutes() {
 function App() {
   return (
     <AuthProvider>
-      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
         <ExpenseProvider>
           <DebtProvider>
             <AppRoutes />

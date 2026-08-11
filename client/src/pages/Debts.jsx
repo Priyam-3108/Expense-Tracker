@@ -32,7 +32,7 @@ export default function Debts() {
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Debt Management</h1>
                 <button
                     onClick={() => setIsFormOpen(true)}
-                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-xl shadow-[0_0_15px_rgba(99,102,241,0.15)] text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 hover:scale-[1.02] transition-all duration-200"
+                    className="btn-primary btn-md inline-flex items-center"
                 >
                     <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
                     Add Record

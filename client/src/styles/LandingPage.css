@@ -4,6 +4,20 @@
   overflow-x: hidden;
 }
 
+/* Gradient Mesh Backdrop — Stripi's signature hero band.
+   Cream / lavender / indigo / ruby stops washed across the upper third.
+   Absolutely-positioned overlay behind hero content. */
+.gradient-mesh-hero {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 720px;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--gradient-mesh-stops), #ffffff;
+}
+
 .landing-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -34,13 +48,14 @@
 
 .hero-title {
   font-size: 56px;
-  font-weight: 800;
-  line-height: 1.1;
+  font-weight: 300;
+  line-height: 1.03;
+  letter-spacing: -1.4px;
   margin-bottom: 24px;
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #533afd 0%, #ea2261 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -113,7 +128,7 @@
 }
 
 .mockup-item.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #533afd;
   border-color: transparent;
 }
 
@@ -134,7 +149,7 @@
 
 .chart-bar {
   flex: 1;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(180deg, #665efd 0%, #533afd 100%);
   border-radius: 8px 8px 0 0;
   animation: growBar 1s ease-out backwards;
   transition: transform 0.3s ease;
@@ -169,7 +184,8 @@
 
 .section-header h2 {
   font-size: 42px;
-  font-weight: 800;
+  font-weight: 300;
+  letter-spacing: -0.9px;
   margin-bottom: 16px;
 }
 
@@ -366,6 +382,15 @@
     gap: 40px;
   }
 
+  .hero-title {
+    font-size: 48px;
+    letter-spacing: -0.96px;
+  }
+
+  .gradient-mesh-hero {
+    height: 600px;
+  }
+
   .features-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -395,6 +420,7 @@
 
   .hero-title {
     font-size: 36px;
+    letter-spacing: -0.5px;
   }
 
   .hero-subtitle {
@@ -406,7 +432,8 @@
   }
 
   .section-header h2 {
-    font-size: 32px;
+    font-size: 26px;
+    letter-spacing: -0.26px;
   }
 
   .features-grid {
@@ -415,5 +442,9 @@
 
   .footer-links {
     grid-template-columns: 1fr;
+  }
+
+  .gradient-mesh-hero {
+    height: 480px;
   }
 }

@@ -13,12 +13,11 @@ const navItems = [
 /**
  * Sticky bottom navigation bar shown on mobile (lg:hidden).
  * Provides native-app-like thumb-friendly navigation.
- * Liquid glass variant — transparent with blur so background orbs show through.
  */
 const BottomNav = () => {
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 z-40 lg:hidden bg-white dark:bg-transparent border-t border-gray-200 dark:border-transparent shadow-[0_-4px_20px_rgba(0,0,0,0.08)] dark:shadow-none"
+      className="fixed bottom-0 inset-x-0 z-40 lg:hidden shadow-[0_-4px_20px_rgba(0,55,112,0.08)]"
       aria-label="Mobile navigation"
     >
       <div className="glass-bottom-nav">

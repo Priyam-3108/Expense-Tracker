@@ -62,7 +62,7 @@ export default function RepaymentModal({ isOpen, onClose, debt }) {
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                 >
-                    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
+                    <div className="fixed inset-0 glass-modal-backdrop" />
                 </Transition.Child>
 
                 <div className="fixed inset-0 overflow-y-auto">
@@ -76,9 +76,9 @@ export default function RepaymentModal({ isOpen, onClose, debt }) {
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white dark:bg-slate-900/95 dark:backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] border border-gray-200 dark:border-white/[0.08] transition-all">
+                            <Dialog.Panel className="glass-modal-panel w-full max-w-md transform overflow-hidden rounded-xl transition-all">
                                 {/* Header */}
-                                <div className="bg-gradient-to-r from-emerald-600 to-emerald-500 px-6 py-5">
+                                <div className="bg-[#10b981] px-6 py-5 rounded-t-xl">
                                     <div className="flex items-center justify-between">
                                         <Dialog.Title className="text-xl font-semibold text-white flex items-center gap-2">
                                             <BanknotesIcon className="h-6 w-6" />
@@ -146,7 +146,7 @@ export default function RepaymentModal({ isOpen, onClose, debt }) {
                                                 max={debt.currentAmount}
                                                 value={amount}
                                                 onChange={(e) => setAmount(e.target.value)}
-                                                className="block w-full rounded-xl border border-gray-200 dark:border-white/[0.07] bg-white dark:bg-white/[0.04] pl-10 pr-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 transition-all sm:text-sm"
+                                                className="glass-input block w-full pl-10 pr-4 py-2.5"
                                                 placeholder="0"
                                             />
                                         </div>
@@ -179,7 +179,7 @@ export default function RepaymentModal({ isOpen, onClose, debt }) {
                                             type="text"
                                             value={note}
                                             onChange={(e) => setNote(e.target.value)}
-                                            className="block w-full rounded-xl border border-gray-200 dark:border-white/[0.07] bg-white dark:bg-white/[0.04] px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 transition-all sm:text-sm"
+                                            className="glass-input block w-full px-4 py-2.5"
                                             placeholder="e.g., Cash payment, Bank transfer..."
                                         />
                                     </div>
@@ -189,14 +189,14 @@ export default function RepaymentModal({ isOpen, onClose, debt }) {
                                         <button
                                             type="button"
                                             onClick={onClose}
-                                            className="flex-1 rounded-xl border border-gray-300 dark:border-white/[0.08] bg-white dark:bg-white/[0.05] px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-white/[0.10] transition-all"
+                                            className="btn-secondary btn-md flex-1"
                                         >
                                             Cancel
                                         </button>
                                         <button
                                             type="submit"
                                             disabled={loading}
-                                            className="flex-1 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 hover:from-emerald-500 hover:to-emerald-400 hover:scale-[1.02] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                                            className="btn-success btn-md flex-1"
                                         >
                                             {loading ? (
                                                 <span className="flex items-center justify-center gap-2">

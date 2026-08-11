@@ -121,7 +121,7 @@ const DatePicker = ({ value, onChange, placeholder = "Select date", className = 
           ref={buttonRef}
           type="button"
           onClick={handleToggle}
-          className={`w-full flex items-center justify-between px-3 py-2 border border-gray-300 dark:border-white/[0.07] rounded-xl bg-white dark:bg-white/[0.04] text-left focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 hover:border-gray-400 dark:hover:border-white/[0.15] transition-all duration-200 ${value ? 'pr-10' : ''}`}
+          className={`glass-input w-full flex items-center justify-between text-left ${value ? 'pr-10' : ''}`}
         >
           <div className="flex items-center gap-2">
             <CalendarIcon size={18} className="text-gray-400" />
@@ -149,12 +149,12 @@ const DatePicker = ({ value, onChange, placeholder = "Select date", className = 
         <>
           {/* Mobile backdrop */}
           <div
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9998] md:hidden transition-opacity"
+            className="fixed inset-0 z-[9998] md:hidden transition-opacity glass-modal-backdrop"
             onClick={() => setIsOpen(false)}
           />
           <div
             ref={dropdownRef}
-            className="fixed z-[9999] bg-white dark:bg-slate-900/95 dark:backdrop-blur-xl border md:border-gray-200 dark:border-white/[0.08] rounded-t-2xl md:rounded-2xl shadow-[0_-8px_30px_rgba(0,0,0,0.1)] md:shadow-[0_8px_32px_rgba(0,0,0,0.3)] p-4 w-full md:w-80 bottom-0 left-0 md:bottom-auto animate-slide-up md:animate-none"
+            className="fixed z-[9999] glass-dropdown rounded-t-2xl md:rounded-2xl p-4 w-full md:w-80 bottom-0 left-0 md:bottom-auto animate-slide-up md:animate-none"
             style={{
               ...(window.innerWidth >= 768 ? {
                 top: `${dropdownPosition.top}px`,

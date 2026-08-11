@@ -1,8 +1,14 @@
 import { createContext, useContext, useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 
 const ThemeContext = createContext()
 
-export const ThemeProvider = ({ children, defaultTheme = 'dark', storageKey = 'vite-ui-theme' }) => {
+// Marketing/auth pages are always light, regardless of the saved app theme —
+// they don't participate in the light/dark toggle (Stripi's marketing site has no dark mode).
+const isPublicRoute = (pathname) => !pathname.startsWith('/app')
+
+export const ThemeProvider = ({ children, defaultTheme = 'light', storageKey = 'vite-ui-theme' }) => {
+    const { pathname } = useLocation()
     const [theme, setTheme] = useState(() => {
         const stored = localStorage.getItem(storageKey)
         return stored || defaultTheme
@@ -12,6 +18,11 @@ export const ThemeProvider = ({ children, defaultTheme = 'dark', storageKey = 'v
         const root = window.document.documentElement
 
         root.classList.remove('light', 'dark')
+
+        if (isPublicRoute(pathname)) {
+            root.classList.add('light')
+            return
+        }
 
         if (theme === 'system') {
             const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -23,7 +34,7 @@ export const ThemeProvider = ({ children, defaultTheme = 'dark', storageKey = 'v
         }
 
         root.classList.add(theme)
-    }, [theme])
+    }, [theme, pathname])
 
     const value = {
         theme,

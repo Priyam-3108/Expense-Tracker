@@ -85,59 +85,41 @@ const Layout = () => {
   }, [])
 
   return (
-    <div className="h-screen flex flex-col bg-background noise-overlay overflow-hidden relative">
-      {/* Animated Liquid Glass Orbs — background layer */}
-      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        {/* Indigo Primary — top right */}
-        <div className="liquid-orb liquid-orb-indigo" style={{ top: '-150px', right: '-100px' }} />
-        {/* Emerald Accent — center left */}
-        <div className="liquid-orb liquid-orb-emerald" style={{ top: '35%', left: '-120px' }} />
-        {/* Violet Ambient — bottom right */}
-        <div className="liquid-orb liquid-orb-violet" style={{ top: '65%', right: '5%' }} />
-        {/* Rose Whisper — top left */}
-        <div className="liquid-orb liquid-orb-rose" style={{ top: '15%', left: '25%' }} />
-      </div>
-
-      {/* Content wrapper to stay above background */}
+    <div className="h-screen flex flex-col bg-background overflow-hidden relative">
+      {/* Content wrapper */}
       <div className="relative z-10 flex flex-col h-full w-full">
       {/* Mobile sidebar overlay — always rendered, toggled by opacity for smooth fade */}
       <div
         className={cn(
-          "fixed inset-0 z-40 lg:hidden transition-all duration-300",
+          "fixed inset-0 z-40 lg:hidden transition-all duration-300 bg-[#0d253d]/50",
           sidebarOpen
             ? 'opacity-100 pointer-events-auto'
             : 'opacity-0 pointer-events-none'
         )}
         onClick={() => setSidebarOpen(false)}
         aria-hidden="true"
-        style={{
-          background: 'rgba(0, 0, 0, 0.50)',
-          backdropFilter: 'blur(4px)',
-          WebkitBackdropFilter: 'blur(4px)',
-        }}
       />
 
       {/* ============ SIDEBAR ============ */}
       <div className={cn(
         "fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out lg:translate-x-0",
-        "bg-white dark:bg-transparent shadow-lg dark:shadow-none",
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="flex flex-col h-full glass-sidebar">
           {/* Sidebar Header */}
-          <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-white/[0.06]">
-            <div className="flex items-center">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-gradient-to-br from-indigo-500 to-indigo-600 shadow-glow-indigo">
+          <div className="flex items-center justify-between h-16 px-4 sm:px-6 border-b border-gray-200 dark:border-white/[0.08]">
+            <div className="flex items-center min-w-0">
+              <div className="w-8 h-8 shrink-0 rounded-lg flex items-center justify-center bg-gradient-to-br from-indigo-500 to-indigo-600 shadow-glow-indigo">
                 <span className="text-white font-bold text-lg">{currencySymbols[currency] || '$'}</span>
               </div>
-              <h1 className="ml-2 text-xl font-bold text-gray-900 dark:text-white">
+              <h1 className="ml-2 text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate whitespace-nowrap">
                 Expense Tracker
               </h1>
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
               aria-label="Close sidebar"
-              className="lg:hidden p-2 rounded-lg text-gray-400 dark:text-slate-400 hover:text-gray-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-all duration-200"
+              className="lg:hidden p-2 rounded-lg text-gray-400 dark:text-white/50 hover:text-gray-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/[0.08] transition-all duration-200 shrink-0"
             >
               <X size={20} />
             </button>
@@ -156,8 +138,8 @@ const Layout = () => {
                     cn(
                       "group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 min-h-[44px] relative",
                       isActive
-                        ? "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400"
-                        : "text-gray-600 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white"
+                        ? "bg-indigo-50 dark:bg-white/10 text-indigo-700 dark:text-white"
+                        : "text-gray-600 dark:text-white/60 hover:bg-gray-100 dark:hover:bg-white/[0.08] hover:text-gray-900 dark:hover:text-white"
                     )
                   }
                 >
@@ -189,7 +171,7 @@ const Layout = () => {
       {/* ============ MAIN CONTENT ============ */}
       <div className="lg:pl-64 flex-1 flex flex-col min-h-0">
         {/* Top Navbar */}
-        <nav className="sticky top-0 z-30 bg-white dark:bg-transparent shadow-sm dark:shadow-none border-b border-gray-200 dark:border-transparent">
+        <nav className="sticky top-0 z-30">
           <div className="glass-nav">
             <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
               {/* Left side - Mobile menu button */}

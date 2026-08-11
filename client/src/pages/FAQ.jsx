@@ -117,14 +117,7 @@ const FAQ = () => {
     ]
 
     return (
-        <div className="static-page bg-slate-950 noise-overlay">
-            {/* Animated Liquid Glass Orbs */}
-            <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-                <div className="liquid-orb liquid-orb-indigo" style={{ top: '-200px', right: '-100px' }} />
-                <div className="liquid-orb liquid-orb-emerald" style={{ top: '40%', left: '-150px' }} />
-                <div className="liquid-orb liquid-orb-violet" style={{ top: '60%', right: '5%' }} />
-            </div>
-
+        <div className="static-page">
             {/* Navigation */}
             <PublicNavbar />
 
@@ -141,8 +134,8 @@ const FAQ = () => {
 
                     {faqs.map((category, catIdx) => (
                         <div key={catIdx} className="mb-12">
-                            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                                <span className="w-2 h-8 bg-gradient-to-b from-indigo-500 to-violet-500 rounded-full inline-block"></span>
+                            <h2 className="text-2xl font-bold text-[#0d253d] mb-6 flex items-center gap-3">
+                                <span className="w-2 h-8 bg-gradient-to-b from-[#533afd] to-[#ea2261] rounded-full inline-block"></span>
                                 {category.category}
                             </h2>
                             {category.questions.map((faq, qIdx) => {
@@ -161,7 +154,7 @@ const FAQ = () => {
                                             </div>
                                         </div>
                                         <div className="faq-answer">
-                                            <p className="pt-2 text-slate-300 leading-relaxed">{faq.a}</p>
+                                            <p className="pt-2 text-[#64748d] leading-relaxed">{faq.a}</p>
                                         </div>
                                     </div>
                                 )
@@ -171,12 +164,12 @@ const FAQ = () => {
 
                     {/* Still have questions */}
                     <div className="content-section text-center my-16">
-                        <h2 className="section-title justify-center text-white">
-                            <span className="section-icon"><MessageSquare className="w-5 h-5 text-indigo-400" /></span>
+                        <h2 className="section-title justify-center text-[#0d253d]">
+                            <span className="section-icon"><MessageSquare className="w-5 h-5 text-[#4434d4]" /></span>
                             Still have questions?
                         </h2>
                         <div className="section-content">
-                            <p className="mb-6 text-slate-300">
+                            <p className="mb-6 text-[#64748d]">
                                 Can't find what you're looking for? Our support team is here to help!
                             </p>
                             <Link to="/support" className="btn-primary btn-lg inline-flex">

@@ -71,7 +71,7 @@ const DataTable = ({
             {/* Toolbar: Search and Total Results */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="relative flex-1 max-w-md">
-                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-slate-500" />
                     <input
                         type="text"
                         placeholder="Search expenses..."
@@ -145,7 +145,7 @@ const DataTable = ({
                                                     {header.column.getCanSort() && (
                                                         <ArrowUpDown
                                                             size={14}
-                                                            className={`text-slate-600 group-hover:text-slate-400 transition-colors ${header.column.getIsSorted() ? 'text-indigo-500 dark:text-indigo-400' : ''
+                                                            className={`text-gray-400 dark:text-slate-600 group-hover:text-gray-600 dark:group-hover:text-slate-400 transition-colors ${header.column.getIsSorted() ? 'text-indigo-500 dark:text-indigo-400' : ''
                                                                 }`}
                                                         />
                                                     )}
@@ -161,7 +161,7 @@ const DataTable = ({
                                 <tr>
                                     <td colSpan={columns.length} className="px-6 py-10 text-center">
                                         <div className="flex justify-center">
-                                            <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-700 border-t-indigo-500" />
+                                            <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 dark:border-slate-700 border-t-indigo-500" />
                                         </div>
                                     </td>
                                 </tr>
@@ -199,7 +199,7 @@ const DataTable = ({
                 </div>
 
                 {/* Pagination */}
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-6 py-4 border-t border-gray-200 dark:border-white/[0.04]" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-6 py-4 border-t border-gray-200 dark:border-white/[0.04]">
                     <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-slate-400">
                         <span className="hidden sm:inline">Page</span>
                         <span className="font-medium text-gray-900 dark:text-white">
@@ -262,7 +262,7 @@ const DataTable = ({
                             className="ml-2 rounded-lg border border-gray-300 dark:border-white/[0.08] bg-white dark:bg-white/[0.04] text-gray-700 dark:text-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all duration-200"
                         >
                             {[5, 10, 20, 30, 40, 50].map(size => (
-                                <option key={size} value={size} className="bg-slate-800 text-white">
+                                <option key={size} value={size} className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">
                                     Show {size}
                                 </option>
                             ))}

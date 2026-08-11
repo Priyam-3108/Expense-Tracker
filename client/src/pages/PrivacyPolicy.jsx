@@ -11,14 +11,7 @@ const PrivacyPolicy = () => {
     }, [])
 
     return (
-        <div className="static-page bg-slate-950 noise-overlay">
-            {/* Animated Liquid Glass Orbs */}
-            <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-                <div className="liquid-orb liquid-orb-indigo" style={{ top: '-200px', right: '-100px' }} />
-                <div className="liquid-orb liquid-orb-emerald" style={{ top: '40%', left: '-150px' }} />
-                <div className="liquid-orb liquid-orb-violet" style={{ top: '60%', right: '5%' }} />
-            </div>
-
+        <div className="static-page">
             {/* Navigation */}
             <PublicNavbar />
 

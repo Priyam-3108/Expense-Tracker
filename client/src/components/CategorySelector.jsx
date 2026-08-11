@@ -119,7 +119,7 @@ const CategorySelector = ({
 
   const dropdownContent = (
     <div
-      className="w-full flex flex-col h-full md:h-auto bg-white dark:bg-transparent"
+      className="w-full flex flex-col h-full md:h-auto"
       onClick={(e) => e.stopPropagation()}
     >
       {/* Mobile drag handle */}
@@ -147,7 +147,7 @@ const CategorySelector = ({
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search categories..."
-          className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-white/[0.08] rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-slate-500 min-h-[44px] transition-all duration-200"
+          className="glass-input w-full min-h-[44px]"
           autoFocus={window.innerWidth >= 768} // Only autofocus on desktop to prevent mobile keyboard pushing sheet
         />
       </div>
@@ -214,14 +214,13 @@ const CategorySelector = ({
       <div
         ref={dropdownRef}
         className={`
-          fixed z-[9999] overflow-hidden
-          bg-white dark:bg-slate-900/90 dark:backdrop-blur-xl dark:border dark:border-white/[0.08]
+          fixed z-[9999] overflow-hidden glass-dropdown
           ${/* Mobile: Bottom sheet */ ''}
-          bottom-0 left-0 right-0 rounded-t-2xl transition-transform duration-300 ease-out origin-bottom shadow-xl dark:shadow-[0_-8px_40px_rgba(0,0,0,0.4)]
+          bottom-0 left-0 right-0 rounded-t-2xl md:rounded-xl transition-transform duration-300 ease-out origin-bottom
           ${isOpen ? 'translate-y-0 h-[65vh] max-h-[85vh]' : 'translate-y-full'}
-          
+
           ${/* Desktop: Absolute popover */ ''}
-          md:bottom-auto md:left-auto md:right-auto md:rounded-xl md:border md:border-gray-300 md:dark:border-white/[0.08] md:transition-none md:translate-y-0 md:h-auto md:shadow-xl md:dark:shadow-[0_12px_40px_rgba(0,0,0,0.4)]
+          md:bottom-auto md:left-auto md:right-auto md:transition-none md:translate-y-0 md:h-auto
         `}
         style={window.innerWidth >= 768 ? {
           top: dropdownPosition.ready ? `${dropdownPosition.top}px` : '-9999px',
@@ -247,7 +246,7 @@ const CategorySelector = ({
         type="button"
         onClick={handleToggle}
         disabled={disabled}
-        className={`w-full flex items-center justify-between px-3 py-2 border border-gray-300 dark:border-white/[0.08] rounded-xl bg-white dark:bg-white/[0.04] text-left focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 min-h-[44px] transition-all duration-200 ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-gray-400 dark:hover:border-white/[0.15]'}`}
+        className={`glass-input w-full flex items-center justify-between text-left min-h-[44px] ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
         {selectedCategory ? (
           <div className="flex items-center gap-2 overflow-hidden">

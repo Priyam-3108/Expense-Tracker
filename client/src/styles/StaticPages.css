@@ -1,4 +1,4 @@
-/* Static Pages Shared Styles - Liquid Glass Theme */
+/* Static Pages Shared Styles — Stripi light canvas theme */
 
 .static-page {
   width: 100%;
@@ -6,8 +6,8 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #020617; /* bg-slate-950 */
-  color: #f8fafc;
+  background-color: #ffffff;
+  color: #0d253d;
 }
 
 .static-container {
@@ -34,31 +34,27 @@
 .page-badge {
   display: inline-flex;
   align-items: center;
-  background: rgba(99, 102, 241, 0.15);
-  color: #818cf8;
-  border: 1px solid rgba(99, 102, 241, 0.3);
+  background: #b9b9f9;
+  color: #4434d4;
+  border: none;
   padding: 6px 18px;
   border-radius: 9999px;
   font-size: 13px;
   font-weight: 600;
   margin-bottom: 20px;
-  backdrop-filter: blur(8px);
 }
 
 .page-title {
   font-size: 48px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-weight: 300;
+  letter-spacing: -0.96px;
   margin-bottom: 16px;
-  background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #818cf8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #0d253d;
 }
 
 .page-subtitle {
   font-size: 18px;
-  color: #94a3b8;
+  color: #64748d;
   max-width: 700px;
   margin: 0 auto;
   line-height: 1.7;
@@ -66,21 +62,18 @@
 
 .page-updated {
   font-size: 14px;
-  color: #64748b;
+  color: #64748d;
   margin-top: 12px;
 }
 
 /* Content Sections */
 .content-section {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
-  border-radius: 24px;
+  background: #ffffff;
+  border-radius: 12px;
   padding: 40px;
   margin-bottom: 32px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  border: 1px solid #e3e8ee;
+  box-shadow: 0 1px 3px rgba(0, 55, 112, 0.08);
   animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
@@ -92,7 +85,7 @@
   font-size: 24px;
   font-weight: 700;
   margin-bottom: 24px;
-  color: #ffffff;
+  color: #0d253d;
   display: flex;
   align-items: center;
   gap: 14px;
@@ -101,13 +94,13 @@
 .section-icon {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #b9b9f9;
+  border: none;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #a5b4fc;
+  color: #4434d4;
   font-size: 20px;
   flex-shrink: 0;
 }
@@ -115,7 +108,7 @@
 .section-content {
   font-size: 16px;
   line-height: 1.8;
-  color: #cbd5e1;
+  color: #273951;
 }
 
 .section-content p {
@@ -132,12 +125,12 @@
   padding-left: 28px;
   position: relative;
   margin-bottom: 12px;
-  color: #cbd5e1;
+  color: #273951;
 }
 
 .section-content ul li::before {
   content: "•";
-  color: #818cf8;
+  color: #533afd;
   font-weight: bold;
   font-size: 22px;
   position: absolute;
@@ -146,20 +139,17 @@
 }
 
 .section-content strong {
-  color: #ffffff;
+  color: #0d253d;
   font-weight: 600;
 }
 
-/* FAQ Accordion - Liquid Glass Styling & Layout Fix */
+/* FAQ Accordion */
 .faq-item {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
-  border-radius: 20px;
+  background: #ffffff;
+  border-radius: 12px;
   padding: 24px 28px;
   margin-bottom: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid #e3e8ee;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards;
@@ -167,8 +157,8 @@
 }
 
 .faq-item:hover {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 100%);
-  border-color: rgba(99, 102, 241, 0.3);
+  border-color: #b9b9f9;
+  box-shadow: 0 8px 24px rgba(0, 55, 112, 0.08);
   transform: translateY(-2px);
 }
 
@@ -179,20 +169,20 @@
   gap: 16px;
   font-size: 18px;
   font-weight: 600;
-  color: #ffffff;
+  color: #0d253d;
   user-select: none;
 }
 
 .faq-icon {
   width: 32px;
   height: 32px;
-  background: rgba(99, 102, 241, 0.15);
-  border: 1px solid rgba(99, 102, 241, 0.25);
+  background: #f2f0ff;
+  border: 1px solid #e4e0ff;
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #a5b4fc;
+  color: #4434d4;
   font-size: 18px;
   transition: transform 0.3s ease, background-color 0.3s ease;
   flex-shrink: 0;
@@ -200,7 +190,7 @@
 
 .faq-item.active .faq-icon {
   transform: rotate(180deg);
-  background: rgba(99, 102, 241, 0.3);
+  background: #533afd;
   color: #ffffff;
 }
 
@@ -211,7 +201,7 @@
   transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, margin-top 0.35s ease;
   font-size: 16px;
   line-height: 1.7;
-  color: #94a3b8;
+  color: #64748d;
   margin-top: 0;
 }
 
@@ -219,7 +209,7 @@
   max-height: 600px;
   opacity: 1;
   margin-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid #e3e8ee;
   padding-top: 16px;
 }
 
@@ -232,13 +222,11 @@
 }
 
 .support-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
-  border-radius: 20px;
+  background: #ffffff;
+  border-radius: 12px;
   padding: 32px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid #e3e8ee;
+  box-shadow: 0 1px 3px rgba(0, 55, 112, 0.08);
   text-align: center;
   transition: all 0.3s ease;
   animation: fadeInUp 0.4s ease-out backwards;
@@ -249,20 +237,20 @@
 
 .support-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(99, 102, 241, 0.3);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+  border-color: #b9b9f9;
+  box-shadow: 0 16px 40px rgba(0, 55, 112, 0.1);
 }
 
 .support-icon {
   width: 64px;
   height: 64px;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 18px;
+  background: #f2f0ff;
+  border: none;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #a5b4fc;
+  color: #4434d4;
   font-size: 30px;
   margin: 0 auto 20px;
 }
@@ -271,12 +259,12 @@
   font-size: 20px;
   font-weight: 700;
   margin-bottom: 12px;
-  color: #ffffff;
+  color: #0d253d;
 }
 
 .support-card p {
   font-size: 15px;
-  color: #94a3b8;
+  color: #64748d;
   margin-bottom: 24px;
   line-height: 1.6;
   flex-grow: 1;
@@ -284,14 +272,12 @@
 
 /* Documentation Steps */
 .doc-step {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
-  border-radius: 20px;
+  background: #ffffff;
+  border-radius: 12px;
   padding: 36px;
   margin-bottom: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid #e3e8ee;
+  box-shadow: 0 1px 3px rgba(0, 55, 112, 0.08);
   display: grid;
   grid-template-columns: 70px 1fr;
   gap: 28px;
@@ -302,28 +288,28 @@
 .step-number {
   width: 60px;
   height: 60px;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  border-radius: 18px;
+  background: #533afd;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #ffffff;
   font-size: 26px;
   font-weight: 800;
-  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 8px 20px rgba(83, 58, 253, 0.25);
 }
 
 .step-content h3 {
   font-size: 22px;
   font-weight: 700;
   margin-bottom: 12px;
-  color: #ffffff;
+  color: #0d253d;
 }
 
 .step-content p {
   font-size: 16px;
   line-height: 1.7;
-  color: #cbd5e1;
+  color: #273951;
   margin-bottom: 14px;
 }
 
@@ -337,13 +323,13 @@
   padding-left: 28px;
   position: relative;
   margin-bottom: 10px;
-  color: #cbd5e1;
+  color: #273951;
   font-size: 15px;
 }
 
 .step-content ul li::before {
   content: "✓";
-  color: #818cf8;
+  color: #533afd;
   font-weight: bold;
   position: absolute;
   left: 8px;
@@ -369,6 +355,7 @@
 
   .page-title {
     font-size: 34px;
+    letter-spacing: -0.5px;
   }
 
   .section-title {

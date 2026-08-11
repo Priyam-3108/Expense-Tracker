@@ -38,14 +38,9 @@ const Landing = () => {
     }, [])
 
     return (
-        <div className="landing-page bg-slate-950 noise-overlay min-h-screen flex flex-col">
-            {/* Animated Liquid Glass Orbs */}
-            <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-                <div className="liquid-orb liquid-orb-indigo" style={{ top: '-200px', right: '-100px' }} />
-                <div className="liquid-orb liquid-orb-emerald" style={{ top: '40%', left: '-150px' }} />
-                <div className="liquid-orb liquid-orb-violet" style={{ top: '60%', right: '5%' }} />
-                <div className="liquid-orb liquid-orb-rose" style={{ top: '20%', left: '30%' }} />
-            </div>
+        <div className="landing-page min-h-screen flex flex-col bg-white">
+            {/* Gradient Mesh Backdrop — Stripi signature hero band */}
+            <div className="gradient-mesh-hero" aria-hidden="true" />
 
             {/* Navigation Header */}
             <PublicNavbar />
@@ -55,15 +50,15 @@ const Landing = () => {
                 <div className="landing-container">
                     <div className="hero-content-wrapper">
                         <div className="hero-content">
-                            <div className="glass-badge fade-in-up text-indigo-400 border-indigo-500/20 inline-flex" style={{ animationDelay: '0.1s' }}>
-                                <span className="w-2 h-2 bg-indigo-400 rounded-full animate-pulse mr-2"></span>
+                            <div className="pill-tag-soft fade-in-up inline-flex" style={{ animationDelay: '0.1s' }}>
+                                <span className="w-2 h-2 bg-[#533afd] rounded-full animate-pulse mr-2"></span>
                                 <span>Free to use • No credit card required</span>
                             </div>
-                            <h1 className="hero-title fade-in-up text-white" style={{ animationDelay: '0.2s' }}>
+                            <h1 className="hero-title fade-in-up text-[#0d253d]" style={{ animationDelay: '0.2s' }}>
                                 Track Every Expense,
                                 <span className="gradient-text">Master Your Money</span>
                             </h1>
-                            <p className="hero-subtitle fade-in-up text-slate-400" style={{ animationDelay: '0.3s' }}>
+                            <p className="hero-subtitle fade-in-up text-[#64748d]" style={{ animationDelay: '0.3s' }}>
                                 A simple, powerful expense tracker that helps you understand where your money goes.
                                 Organize expenses by categories, visualize spending patterns, and export your data anytime.
                             </p>
@@ -118,9 +113,9 @@ const Landing = () => {
             <section id="features" className="relative z-10 py-24">
                 <div className="landing-container">
                     <div className="section-header">
-                        <span className="glass-badge text-indigo-400 border-indigo-500/20">Features</span>
-                        <h2 className="text-white">Everything you need to manage expenses</h2>
-                        <p className="text-slate-400">Simple yet powerful tools to take control of your finances</p>
+                        <span className="pill-tag-soft inline-flex">Features</span>
+                        <h2 className="text-[#0d253d]">Everything you need to manage expenses</h2>
+                        <p className="text-[#64748d]">Simple yet powerful tools to take control of your finances</p>
                     </div>
                     <div className="features-grid">
                         <FeatureCard
@@ -161,29 +156,29 @@ const Landing = () => {
             <section id="how-it-works" className="relative z-10 py-24">
                 <div className="landing-container">
                     <div className="section-header">
-                        <span className="glass-badge text-indigo-400 border-indigo-500/20">How It Works</span>
-                        <h2 className="text-white">Start tracking in 3 simple steps</h2>
+                        <span className="pill-tag-soft inline-flex">How It Works</span>
+                        <h2 className="text-[#0d253d]">Start tracking in 3 simple steps</h2>
                     </div>
                     <div className="benefits-content">
                         <div className="benefit-item">
                             <div className="benefit-text">
-                                <span className="glass-badge text-indigo-400 border-indigo-500/20 text-xs mb-4">Step 1</span>
-                                <h2 className="text-white text-4xl font-extrabold mb-5">Create your account</h2>
-                                <p className="text-slate-400 text-lg leading-relaxed mb-6">Sign up in seconds with just your name, email, and preferred currency. No credit card required, no complicated setup.</p>
+                                <span className="pill-tag-soft inline-flex mb-4">Step 1</span>
+                                <h2 className="text-[#0d253d] text-4xl font-light tracking-tight mb-5">Create your account</h2>
+                                <p className="text-[#64748d] text-lg leading-relaxed mb-6">Sign up in seconds with just your name, email, and preferred currency. No credit card required, no complicated setup.</p>
                                 <ul className="benefit-list">
-                                    <li className="text-slate-400"><span className="text-indigo-400 font-bold text-lg">✓</span> Quick registration</li>
-                                    <li className="text-slate-400"><span className="text-indigo-400 font-bold text-lg">✓</span> Choose your currency</li>
-                                    <li className="text-slate-400"><span className="text-indigo-400 font-bold text-lg">✓</span> 100% free</li>
+                                    <li className="text-[#64748d]"><span className="text-[#533afd] font-bold text-lg">✓</span> Quick registration</li>
+                                    <li className="text-[#64748d]"><span className="text-[#533afd] font-bold text-lg">✓</span> Choose your currency</li>
+                                    <li className="text-[#64748d]"><span className="text-[#533afd] font-bold text-lg">✓</span> 100% free</li>
                                 </ul>
                             </div>
                             <div className="benefit-visual">
                                 <div className="floating-card card-1 glass-card flex items-center gap-4 p-6">
-                                    <div className="p-3 rounded-xl bg-indigo-500/20 border border-indigo-500/30">
-                                        <User className="w-6 h-6 text-indigo-400" />
+                                    <div className="p-3 rounded-xl bg-[#b9b9f9]/40 border border-[#533afd]/20">
+                                        <User className="w-6 h-6 text-[#533afd]" />
                                     </div>
                                     <div>
-                                        <div className="text-xs text-slate-400 mb-1">Register</div>
-                                        <div className="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">30 sec</div>
+                                        <div className="text-xs text-[#64748d] mb-1">Register</div>
+                                        <div className="text-2xl font-bold bg-gradient-to-r from-[#533afd] to-[#ea2261] bg-clip-text text-transparent">30 sec</div>
                                     </div>
                                 </div>
                             </div>
@@ -191,23 +186,23 @@ const Landing = () => {
 
                         <div className="benefit-item reverse">
                             <div className="benefit-text">
-                                <span className="glass-badge text-indigo-400 border-indigo-500/20 text-xs mb-4">Step 2</span>
-                                <h2 className="text-white text-4xl font-extrabold mb-5">Add your expenses</h2>
-                                <p className="text-slate-400 text-lg leading-relaxed mb-6">Log expenses quickly with our simple form. Add amount, category, description, and date. Organize with custom categories that work for you.</p>
+                                <span className="pill-tag-soft inline-flex mb-4">Step 2</span>
+                                <h2 className="text-[#0d253d] text-4xl font-light tracking-tight mb-5">Add your expenses</h2>
+                                <p className="text-[#64748d] text-lg leading-relaxed mb-6">Log expenses quickly with our simple form. Add amount, category, description, and date. Organize with custom categories that work for you.</p>
                                 <ul className="benefit-list">
-                                    <li className="text-slate-400"><span className="text-indigo-400 font-bold text-lg">✓</span> Quick entry</li>
-                                    <li className="text-slate-400"><span className="text-indigo-400 font-bold text-lg">✓</span> Custom categories</li>
-                                    <li className="text-slate-400"><span className="text-indigo-400 font-bold text-lg">✓</span> Add notes & dates</li>
+                                    <li className="text-[#64748d]"><span className="text-[#533afd] font-bold text-lg">✓</span> Quick entry</li>
+                                    <li className="text-[#64748d]"><span className="text-[#533afd] font-bold text-lg">✓</span> Custom categories</li>
+                                    <li className="text-[#64748d]"><span className="text-[#533afd] font-bold text-lg">✓</span> Add notes & dates</li>
                                 </ul>
                             </div>
                             <div className="benefit-visual">
                                 <div className="floating-card card-2 glass-card flex items-center gap-4 p-6">
-                                    <div className="p-3 rounded-xl bg-violet-500/20 border border-violet-500/30">
-                                        <FileText className="w-6 h-6 text-violet-400" />
+                                    <div className="p-3 rounded-xl bg-[#f96bee]/15 border border-[#f96bee]/30">
+                                        <FileText className="w-6 h-6 text-[#c026a3]" />
                                     </div>
                                     <div>
-                                        <div className="text-xs text-slate-400 mb-1">Track</div>
-                                        <div className="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">Easy</div>
+                                        <div className="text-xs text-[#64748d] mb-1">Track</div>
+                                        <div className="text-2xl font-bold bg-gradient-to-r from-[#533afd] to-[#ea2261] bg-clip-text text-transparent">Easy</div>
                                     </div>
                                 </div>
                             </div>
@@ -215,13 +210,13 @@ const Landing = () => {
 
                         <div className="benefit-item">
                             <div className="benefit-text">
-                                <span className="glass-badge text-indigo-400 border-indigo-500/20 text-xs mb-4">Step 3</span>
-                                <h2 className="text-white text-4xl font-extrabold mb-5">Understand your spending</h2>
-                                <p className="text-slate-400 text-lg leading-relaxed mb-6">View detailed analytics and charts showing where your money goes. Filter by date, category, or amount. Export reports whenever you need them.</p>
+                                <span className="pill-tag-soft inline-flex mb-4">Step 3</span>
+                                <h2 className="text-[#0d253d] text-4xl font-light tracking-tight mb-5">Understand your spending</h2>
+                                <p className="text-[#64748d] text-lg leading-relaxed mb-6">View detailed analytics and charts showing where your money goes. Filter by date, category, or amount. Export reports whenever you need them.</p>
                                 <ul className="benefit-list">
-                                    <li className="text-slate-400"><span className="text-indigo-400 font-bold text-lg">✓</span> Visual charts</li>
-                                    <li className="text-slate-400"><span className="text-indigo-400 font-bold text-lg">✓</span> Category breakdown</li>
-                                    <li className="text-slate-400"><span className="text-indigo-400 font-bold text-lg">✓</span> Export to CSV/Excel/PDF</li>
+                                    <li className="text-[#64748d]"><span className="text-[#533afd] font-bold text-lg">✓</span> Visual charts</li>
+                                    <li className="text-[#64748d]"><span className="text-[#533afd] font-bold text-lg">✓</span> Category breakdown</li>
+                                    <li className="text-[#64748d]"><span className="text-[#533afd] font-bold text-lg">✓</span> Export to CSV/Excel/PDF</li>
                                 </ul>
                             </div>
                             <div className="benefit-visual">
@@ -230,8 +225,8 @@ const Landing = () => {
                                         <svg viewBox="0 0 200 100" preserveAspectRatio="none">
                                             <defs>
                                                 <linearGradient id="line-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                                    <stop offset="0%" stopColor="#667eea" />
-                                                    <stop offset="100%" stopColor="#764ba2" />
+                                                    <stop offset="0%" stopColor="#533afd" />
+                                                    <stop offset="100%" stopColor="#ea2261" />
                                                 </linearGradient>
                                             </defs>
                                             <path d="M0,80 Q50,60 100,40 T200,10" stroke="url(#line-gradient)" strokeWidth="3" fill="none" className="chart-path" />
@@ -248,9 +243,9 @@ const Landing = () => {
             {/* CTA Section */}
             <section id="cta" className="relative z-10 py-24">
                 <div className="landing-container">
-                    <div className="glass-modal-panel p-12 sm:p-16 text-center max-w-3xl mx-auto">
-                        <h2 className="text-4xl sm:text-5xl font-extrabold text-white mb-5">Ready to take control of your spending?</h2>
-                        <p className="text-lg text-slate-400 mb-8">Join users who are already tracking their expenses and making smarter financial decisions.</p>
+                    <div className="p-12 sm:p-16 text-center max-w-3xl mx-auto rounded-2xl bg-white border border-[#e3e8ee] shadow-[0_8px_24px_rgba(0,55,112,0.08)]">
+                        <h2 className="text-4xl sm:text-5xl font-light tracking-tight text-[#0d253d] mb-5">Ready to take control of your spending?</h2>
+                        <p className="text-lg text-[#64748d] mb-8">Join users who are already tracking their expenses and making smarter financial decisions.</p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
                             <Link to="/register" className="btn-primary btn-lg">
                                 Get Started Free
@@ -260,7 +255,7 @@ const Landing = () => {
                             </Link>
                             <Link to="/login" className="btn-secondary btn-lg">Sign In</Link>
                         </div>
-                        <p className="text-sm text-slate-500">Free forever • No credit card • Start in 30 seconds</p>
+                        <p className="text-sm text-[#64748d]">Free forever • No credit card • Start in 30 seconds</p>
                     </div>
                 </div>
             </section>
@@ -275,12 +270,12 @@ const Landing = () => {
 const FeatureCard = ({ icon, title, description }) => (
     <div className="feature-card glass-card p-8">
         <div className="feature-icon mb-5">{icon}</div>
-        <h3 className="text-xl font-bold mb-3 text-white">{title}</h3>
-        <p className="text-sm leading-relaxed text-slate-400">{description}</p>
+        <h3 className="text-xl font-bold mb-3 text-[#0d253d]">{title}</h3>
+        <p className="text-sm leading-relaxed text-[#64748d]">{description}</p>
     </div>
 )
 
-// Icon Components - Updated to match actual features
+// Icon Components — retinted to the Stripi gradient-mesh stops (indigo / ruby / magenta / lavender)
 const CategoryIcon = () => (
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
         <rect width="32" height="32" rx="8" fill="url(#icon-gradient-1)" />
@@ -290,8 +285,8 @@ const CategoryIcon = () => (
         <rect x="17" y="17" width="7" height="7" rx="1.5" stroke="white" strokeWidth="2" />
         <defs>
             <linearGradient id="icon-gradient-1" x1="0" y1="0" x2="32" y2="32">
-                <stop offset="0%" stopColor="#667eea" />
-                <stop offset="100%" stopColor="#764ba2" />
+                <stop offset="0%" stopColor="#665efd" />
+                <stop offset="100%" stopColor="#533afd" />
             </linearGradient>
         </defs>
     </svg>
@@ -304,8 +299,8 @@ const CurrencyIcon = () => (
         <path d="M16 11V21M13 14C13 12.8954 13.8954 12 15 12H17C18.1046 12 19 12.8954 19 14C19 15.1046 18.1046 16 17 16H15C13.8954 16 13 16.8954 13 18C13 19.1046 13.8954 20 15 20H17C18.1046 20 19 19.1046 19 18" stroke="white" strokeWidth="2" strokeLinecap="round" />
         <defs>
             <linearGradient id="icon-gradient-2" x1="0" y1="0" x2="32" y2="32">
-                <stop offset="0%" stopColor="#f093fb" />
-                <stop offset="100%" stopColor="#f5576c" />
+                <stop offset="0%" stopColor="#f96bee" />
+                <stop offset="100%" stopColor="#ea2261" />
             </linearGradient>
         </defs>
     </svg>
@@ -318,8 +313,8 @@ const ChartIcon = () => (
         <path d="M20 12H24V16" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         <defs>
             <linearGradient id="icon-gradient-3" x1="0" y1="0" x2="32" y2="32">
-                <stop offset="0%" stopColor="#4facfe" />
-                <stop offset="100%" stopColor="#00f2fe" />
+                <stop offset="0%" stopColor="#918dfd" />
+                <stop offset="100%" stopColor="#4434d4" />
             </linearGradient>
         </defs>
     </svg>
@@ -332,8 +327,8 @@ const ExportIcon = () => (
         <path d="M10 18V22C10 23.1046 10.8954 24 12 24H20C21.1046 24 22 23.1046 22 22V18" stroke="white" strokeWidth="2" strokeLinecap="round" />
         <defs>
             <linearGradient id="icon-gradient-4" x1="0" y1="0" x2="32" y2="32">
-                <stop offset="0%" stopColor="#43e97b" />
-                <stop offset="100%" stopColor="#38f9d7" />
+                <stop offset="0%" stopColor="#533afd" />
+                <stop offset="100%" stopColor="#2e2b8c" />
             </linearGradient>
         </defs>
     </svg>
@@ -345,8 +340,8 @@ const FilterIcon = () => (
         <path d="M8 10H24M10 16H22M12 22H20" stroke="white" strokeWidth="2" strokeLinecap="round" />
         <defs>
             <linearGradient id="icon-gradient-5" x1="0" y1="0" x2="32" y2="32">
-                <stop offset="0%" stopColor="#fa709a" />
-                <stop offset="100%" stopColor="#fee140" />
+                <stop offset="0%" stopColor="#ea2261" />
+                <stop offset="100%" stopColor="#f96bee" />
             </linearGradient>
         </defs>
     </svg>
@@ -358,8 +353,8 @@ const DarkModeIcon = () => (
         <path d="M16 8C11.5817 8 8 11.5817 8 16C8 20.4183 11.5817 24 16 24C20.4183 24 24 20.4183 24 16C24 15.3128 23.9119 14.6463 23.7478 14.0104C23.371 14.1218 22.9719 14.1818 22.5587 14.1818C20.0655 14.1818 18.0451 12.1613 18.0451 9.66818C18.0451 9.25503 18.1051 8.85596 18.2164 8.47908C17.5796 8.31503 16.9128 8.22727 16.2232 8.22727C16.1489 8.22727 16.0748 8.22858 16.0011 8.23119C16.0006 8.22079 16 8.21036 16 8.2C16 8.08954 15.9895 7.98015 15.9691 7.87277C15.9893 7.87429 16.0097 7.87506 16.0302 7.87506C16.0201 7.91671 16.0149 7.95998 16.0149 8.00434C16.0149 8.00289 16.0149 8.00145 16.015 8C16.0099 8 16.005 8 16 8Z" fill="white" />
         <defs>
             <linearGradient id="icon-gradient-6" x1="0" y1="0" x2="32" y2="32">
-                <stop offset="0%" stopColor="#30cfd0" />
-                <stop offset="100%" stopColor="#330867" />
+                <stop offset="0%" stopColor="#1c1e54" />
+                <stop offset="100%" stopColor="#0d253d" />
             </linearGradient>
         </defs>
     </svg>

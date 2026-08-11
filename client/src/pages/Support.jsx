@@ -11,14 +11,7 @@ const Support = () => {
     }, [])
 
     return (
-        <div className="static-page bg-slate-950 noise-overlay">
-            {/* Animated Liquid Glass Orbs */}
-            <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-                <div className="liquid-orb liquid-orb-indigo" style={{ top: '-200px', right: '-100px' }} />
-                <div className="liquid-orb liquid-orb-emerald" style={{ top: '40%', left: '-150px' }} />
-                <div className="liquid-orb liquid-orb-violet" style={{ top: '60%', right: '5%' }} />
-            </div>
-
+        <div className="static-page">
             {/* Navigation */}
             <PublicNavbar />
 
@@ -196,41 +189,41 @@ const Support = () => {
                     </div>
 
                     {/* Additional Resources */}
-                    <div className="glass-modal-panel p-8 sm:p-10 rounded-3xl border border-indigo-500/30">
-                        <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
-                            <span className="w-10 h-10 bg-indigo-500/20 border border-indigo-500/30 rounded-xl flex items-center justify-center">
-                                <Target className="w-5 h-5 text-indigo-400" />
+                    <div className="p-8 sm:p-10 rounded-2xl bg-white border border-[#e3e8ee] shadow-[0_8px_24px_rgba(0,55,112,0.08)]">
+                        <h2 className="text-2xl font-bold text-[#0d253d] mb-4 flex items-center gap-3">
+                            <span className="w-10 h-10 bg-[#f2f0ff] border border-[#e4e0ff] rounded-xl flex items-center justify-center">
+                                <Target className="w-5 h-5 text-[#4434d4]" />
                             </span>
                             Additional Resources
                         </h2>
-                        <div className="text-slate-300">
+                        <div className="text-[#64748d]">
                             <p className="mb-6">
                                 Explore these resources to get the most out of Expense Tracker:
                             </p>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <Link to="/docs" className="glass-card p-4 rounded-xl flex items-center justify-between text-white hover:border-indigo-500/40 transition-all">
+                                <Link to="/docs" className="bg-[#f6f9fc] border border-[#e3e8ee] p-4 rounded-xl flex items-center justify-between text-[#0d253d] hover:bg-[#eef2f6] transition-all">
                                     <span className="font-medium flex items-center gap-2.5">
-                                        <BookOpen className="w-4 h-4 text-indigo-400" /> User Documentation
+                                        <BookOpen className="w-4 h-4" /> User Documentation
                                     </span>
-                                    <ArrowRight className="w-4 h-4 text-indigo-400" />
+                                    <ArrowRight className="w-4 h-4" />
                                 </Link>
-                                <Link to="/faq" className="glass-card p-4 rounded-xl flex items-center justify-between text-white hover:border-indigo-500/40 transition-all">
+                                <Link to="/faq" className="bg-[#f6f9fc] border border-[#e3e8ee] p-4 rounded-xl flex items-center justify-between text-[#0d253d] hover:bg-[#eef2f6] transition-all">
                                     <span className="font-medium flex items-center gap-2.5">
-                                        <HelpCircle className="w-4 h-4 text-indigo-400" /> Frequently Asked Questions
+                                        <HelpCircle className="w-4 h-4" /> Frequently Asked Questions
                                     </span>
-                                    <ArrowRight className="w-4 h-4 text-indigo-400" />
+                                    <ArrowRight className="w-4 h-4" />
                                 </Link>
-                                <Link to="/privacy" className="glass-card p-4 rounded-xl flex items-center justify-between text-white hover:border-indigo-500/40 transition-all">
+                                <Link to="/privacy" className="bg-[#f6f9fc] border border-[#e3e8ee] p-4 rounded-xl flex items-center justify-between text-[#0d253d] hover:bg-[#eef2f6] transition-all">
                                     <span className="font-medium flex items-center gap-2.5">
-                                        <ShieldCheck className="w-4 h-4 text-indigo-400" /> Privacy Policy
+                                        <ShieldCheck className="w-4 h-4" /> Privacy Policy
                                     </span>
-                                    <ArrowRight className="w-4 h-4 text-indigo-400" />
+                                    <ArrowRight className="w-4 h-4" />
                                 </Link>
-                                <Link to="/terms" className="glass-card p-4 rounded-xl flex items-center justify-between text-white hover:border-indigo-500/40 transition-all">
+                                <Link to="/terms" className="bg-[#f6f9fc] border border-[#e3e8ee] p-4 rounded-xl flex items-center justify-between text-[#0d253d] hover:bg-[#eef2f6] transition-all">
                                     <span className="font-medium flex items-center gap-2.5">
-                                        <Scale className="w-4 h-4 text-indigo-400" /> Terms of Service
+                                        <Scale className="w-4 h-4" /> Terms of Service
                                     </span>
-                                    <ArrowRight className="w-4 h-4 text-indigo-400" />
+                                    <ArrowRight className="w-4 h-4" />
                                 </Link>
                             </div>
                         </div>

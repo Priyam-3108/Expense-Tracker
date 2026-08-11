@@ -708,8 +708,7 @@ const Expenses = () => {
               resetForm()
               setShowForm(true)
             }}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 transition-all duration-200 active:scale-95 hover:scale-[1.02]"
-            style={{ boxShadow: '0 0 20px rgba(99,102,241,0.2)' }}
+            className="btn-primary btn-md"
           >
             <Plus size={18} />
             Add Expense
@@ -795,7 +794,7 @@ const Expenses = () => {
           <div className="md:hidden space-y-3">
             {/* Mobile search bar */}
             <div className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-slate-500" />
               <input
                 type="text"
                 placeholder="Search expenses..."
@@ -863,7 +862,7 @@ const Expenses = () => {
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-4 md:flex-row md:items-center">
                 <div className="relative flex-1">
-                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-slate-500" />
                   <input
                     type="text"
                     placeholder="Search expenses..."
@@ -1215,8 +1214,7 @@ const Expenses = () => {
             <button
               type="submit"
               disabled={formLoading}
-              className="flex-1 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-xl hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 min-h-[44px] hover:scale-[1.02]"
-              style={{ boxShadow: '0 0 15px rgba(99,102,241,0.2)' }}
+              className="btn-primary btn-md flex-1"
             >
               {formLoading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -1231,7 +1229,7 @@ const Expenses = () => {
               type="button"
               onClick={() => { setShowForm(false); resetForm() }}
               disabled={formLoading}
-              className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-white/[0.05] border border-gray-300 dark:border-white/[0.08] rounded-xl hover:bg-gray-50 dark:hover:bg-white/[0.10] disabled:opacity-50 min-h-[44px] transition-all duration-200"
+              className="btn-secondary btn-md flex-1"
             >
               Cancel
             </button>
@@ -1260,11 +1258,11 @@ const Expenses = () => {
             />
           </div>
 
-          <div className="flex gap-3 p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex-shrink-0 mt-auto">
+          <div className="flex gap-3 p-6 border-t border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.02] flex-shrink-0 mt-auto">
             <button
               type="submit"
               disabled={bulkLoading}
-              className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition min-h-[44px]"
+              className="btn-primary btn-md flex-1"
             >
               {bulkLoading ? 'Updating...' : 'Update All'}
             </button>
@@ -1272,7 +1270,7 @@ const Expenses = () => {
               type="button"
               onClick={() => setShowBulkEdit(false)}
               disabled={bulkLoading}
-              className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 min-h-[44px]"
+              className="btn-secondary btn-md flex-1"
             >
               Cancel
             </button>
@@ -1289,7 +1287,7 @@ const Expenses = () => {
       >
         <div className="flex flex-col h-full">
           <div className="p-6 space-y-4 flex-1">
-            <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 rounded-lg">
+            <div className="flex items-center gap-3 p-4 bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 rounded-xl">
               <Trash2 size={24} />
               <div>
                 <p className="font-medium">Are you sure?</p>
@@ -1297,18 +1295,18 @@ const Expenses = () => {
               </div>
             </div>
           </div>
-          <div className="flex gap-3 p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 mt-auto flex-shrink-0">
+          <div className="flex gap-3 p-6 border-t border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.02] mt-auto flex-shrink-0">
             <button
               type="button"
               onClick={confirmBulkDelete}
-              className="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition min-h-[44px]"
+              className="btn-danger btn-md flex-1"
             >
               Delete {selectedExpenses.length} Items
             </button>
             <button
               type="button"
               onClick={() => setShowBulkDelete(false)}
-              className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 min-h-[44px]"
+              className="btn-secondary btn-md flex-1"
             >
               Cancel
             </button>
@@ -1410,11 +1408,11 @@ const Expenses = () => {
           </div>
 
           {/* Form Actions - Fixed */}
-          <div className="flex gap-3 p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex-shrink-0 mt-auto">
+          <div className="flex gap-3 p-6 border-t border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.02] flex-shrink-0 mt-auto">
             <button
               type="submit"
               disabled={bulkLoading}
-              className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition min-h-[44px]"
+              className="btn-primary btn-md flex-1"
             >
               {bulkLoading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -1429,7 +1427,7 @@ const Expenses = () => {
               type="button"
               onClick={() => { setShowBulkForm(false); resetBulkForm() }}
               disabled={bulkLoading}
-              className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 min-h-[44px]"
+              className="btn-secondary btn-md flex-1"
             >
               Cancel
             </button>

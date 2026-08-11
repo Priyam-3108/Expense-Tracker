@@ -158,7 +158,7 @@ const Dashboard = () => {
               <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Total Expenses</p>
               <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mt-1 md:mt-2">
                 {loading ? (
-                  <span className="inline-block w-24 h-8 rounded-lg animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
+                  <span className="inline-block w-24 h-8 rounded-lg animate-pulse bg-gray-100 dark:bg-white/[0.06]" />
                 ) : formatCurrency(totalExpenses, currency)}
               </p>
             </div>
@@ -175,7 +175,7 @@ const Dashboard = () => {
               <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Total Income</p>
               <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mt-1 md:mt-2">
                 {loading ? (
-                  <span className="inline-block w-24 h-8 rounded-lg animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
+                  <span className="inline-block w-24 h-8 rounded-lg animate-pulse bg-gray-100 dark:bg-white/[0.06]" />
                 ) : formatCurrency(totalIncome, currency)}
               </p>
             </div>
@@ -196,7 +196,7 @@ const Dashboard = () => {
                   : 'text-rose-600 dark:text-rose-400'
               }`}>
                 {loading ? (
-                  <span className="inline-block w-24 h-8 rounded-lg animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
+                  <span className="inline-block w-24 h-8 rounded-lg animate-pulse bg-gray-100 dark:bg-white/[0.06]" />
                 ) : formatCurrency(netAmount, currency)}
               </p>
             </div>
@@ -262,7 +262,7 @@ const Dashboard = () => {
                 }}
               >
                 {availableYears.map(year => (
-                  <option key={year} value={year} className="bg-slate-800 text-white">{year}</option>
+                  <option key={year} value={year} className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">{year}</option>
                 ))}
               </select>
             </div>
@@ -345,44 +345,30 @@ const Dashboard = () => {
             <div className="grid grid-cols-2 md:grid-cols-1 gap-3">
               <button
                 onClick={() => navigate('/app/expenses', { state: { action: 'add_expense' } })}
-                className="group w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium rounded-xl text-white transition-all duration-200 min-h-[44px] hover:scale-[1.02] active:scale-[0.98]"
-                style={{
-                  background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-                  boxShadow: '0 0 20px rgba(99,102,241,0.2)',
-                }}
+                className="btn-primary group w-full justify-center min-h-[44px]"
               >
                 <Plus size={16} className="group-hover:rotate-90 transition-transform duration-300" />
                 Add Expense
               </button>
               <button
                 onClick={() => navigate('/app/expenses', { state: { action: 'add_income' } })}
-                className="group w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium rounded-xl text-white transition-all duration-200 min-h-[44px] hover:scale-[1.02] active:scale-[0.98]"
-                style={{
-                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                  boxShadow: '0 0 20px rgba(52,211,153,0.15)',
-                }}
+                className="btn-success group w-full justify-center min-h-[44px]"
               >
                 <Plus size={16} className="group-hover:rotate-90 transition-transform duration-300" />
                 Add Income
               </button>
               <button
                 onClick={() => navigate('/app/categories')}
-                className="group w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium rounded-xl text-white transition-all duration-200 min-h-[44px] hover:scale-[1.02] active:scale-[0.98]"
-                style={{
-                  background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
-                  boxShadow: '0 0 20px rgba(139,92,246,0.15)',
-                }}
+                className="group w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium rounded-full border transition-all duration-200 min-h-[44px] hover:-translate-y-px"
+                style={{ borderColor: 'rgba(139,92,246,0.4)', color: '#7c3aed', background: 'rgba(139,92,246,0.06)' }}
               >
                 <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-300" />
                 Categories
               </button>
               <button
                 onClick={() => navigate('/app/debts')}
-                className="group w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium rounded-xl text-white transition-all duration-200 min-h-[44px] hover:scale-[1.02] active:scale-[0.98]"
-                style={{
-                  background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                  boxShadow: '0 0 20px rgba(245,158,11,0.15)',
-                }}
+                className="group w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium rounded-full border transition-all duration-200 min-h-[44px] hover:-translate-y-px"
+                style={{ borderColor: 'rgba(217,119,6,0.4)', color: '#b45309', background: 'rgba(217,119,6,0.06)' }}
               >
                 <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-300" />
                 Debts
@@ -411,12 +397,12 @@ const Dashboard = () => {
                 <div className="space-y-3">
                   {[1, 2, 3].map((i) => (
                     <div key={i} className="flex items-center gap-3 p-3 rounded-xl animate-pulse">
-                      <div className="w-10 h-10 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }} />
+                      <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-white/[0.06]" />
                       <div className="flex-1 space-y-2">
-                        <div className="h-3 rounded w-24" style={{ background: 'rgba(255,255,255,0.06)' }} />
-                        <div className="h-2 rounded w-16" style={{ background: 'rgba(255,255,255,0.04)' }} />
+                        <div className="h-3 rounded w-24 bg-gray-100 dark:bg-white/[0.06]" />
+                        <div className="h-2 rounded w-16 bg-gray-100 dark:bg-white/[0.04]" />
                       </div>
-                      <div className="h-4 rounded w-16" style={{ background: 'rgba(255,255,255,0.06)' }} />
+                      <div className="h-4 rounded w-16 bg-gray-100 dark:bg-white/[0.06]" />
                     </div>
                   ))}
                 </div>

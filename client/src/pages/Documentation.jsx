@@ -11,14 +11,7 @@ const Documentation = () => {
     }, [])
 
     return (
-        <div className="static-page bg-slate-950 noise-overlay">
-            {/* Animated Liquid Glass Orbs */}
-            <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-                <div className="liquid-orb liquid-orb-indigo" style={{ top: '-200px', right: '-100px' }} />
-                <div className="liquid-orb liquid-orb-emerald" style={{ top: '40%', left: '-150px' }} />
-                <div className="liquid-orb liquid-orb-violet" style={{ top: '60%', right: '5%' }} />
-            </div>
-
+        <div className="static-page">
             {/* Navigation */}
             <PublicNavbar />
 
@@ -238,12 +231,12 @@ const Documentation = () => {
 
                     {/* Need More Help */}
                     <div className="content-section text-center my-16">
-                        <h2 className="section-title justify-center text-white">
-                            <span className="section-icon"><HelpCircle className="w-5 h-5 text-indigo-400" /></span>
+                        <h2 className="section-title justify-center text-[#0d253d]">
+                            <span className="section-icon"><HelpCircle className="w-5 h-5 text-[#4434d4]" /></span>
                             Need More Help?
                         </h2>
                         <div className="section-content">
-                            <p className="mb-6 text-slate-300">
+                            <p className="mb-6 text-[#64748d]">
                                 Check out our FAQ or contact our support team for personalized assistance.
                             </p>
                             <div className="flex gap-4 justify-center flex-wrap">

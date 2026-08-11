@@ -266,8 +266,8 @@ const AnalyticsDashboard = ({
         return (
             <div className="flex items-center justify-center min-h-[400px]">
                 <div className="text-center">
-                    <div className="h-12 w-12 animate-spin rounded-full border-4 border-slate-700 border-t-indigo-500 mx-auto mb-4" />
-                    <p className="text-slate-500">Loading analytics...</p>
+                    <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 dark:border-slate-700 border-t-indigo-500 mx-auto mb-4" />
+                    <p className="text-gray-500 dark:text-slate-500">Loading analytics...</p>
                 </div>
             </div>
         )
@@ -291,7 +291,7 @@ const AnalyticsDashboard = ({
                         className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors text-sm font-medium min-h-[40px] flex-shrink-0 ${
                             shareEnabled
                                 ? 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-emerald-500/10 dark:text-emerald-400 border border-green-200 dark:border-emerald-500/20'
-                                : 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.2)]'
+                                : 'btn-primary'
                         }`}
                     >
                         <Share2 size={16} />
@@ -560,15 +560,14 @@ const AnalyticsDashboard = ({
                                 />
                                 <Tooltip
                                     contentStyle={{
-                                        backgroundColor: isDark ? 'rgba(15,23,42,0.90)' : '#fff',
-                                        border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#E5E7EB'}`,
+                                        backgroundColor: 'rgba(30,41,59,0.92)',
+                                        border: '1px solid rgba(255,255,255,0.10)',
                                         borderRadius: '12px',
                                         padding: '10px',
-                                        color: isDark ? '#F3F4F6' : '#374151',
-                                        backdropFilter: 'blur(16px)',
-                                        boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.4)' : '0 4px 16px rgba(0,0,0,0.1)'
+                                        color: '#F3F4F6',
+                                        boxShadow: '0 12px 40px rgba(0,0,0,0.4)'
                                     }}
-                                    itemStyle={{ color: isDark ? '#F3F4F6' : '#374151' }}
+                                    itemStyle={{ color: '#F3F4F6' }}
                                     formatter={(value, name) => [
                                         formatCurrency(value, currency),
                                         name === 'expenses' ? 'Expenses' : name === 'income' ? 'Income' : 'Net'
@@ -635,15 +634,14 @@ const AnalyticsDashboard = ({
                                 </Pie>
                                 <Tooltip
                                     contentStyle={{
-                                        backgroundColor: isDark ? 'rgba(15,23,42,0.90)' : '#fff',
-                                        border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#E5E7EB'}`,
+                                        backgroundColor: 'rgba(30,41,59,0.92)',
+                                        border: '1px solid rgba(255,255,255,0.10)',
                                         borderRadius: '12px',
                                         padding: '10px',
-                                        color: isDark ? '#F3F4F6' : '#374151',
-                                        backdropFilter: 'blur(16px)',
-                                        boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.4)' : '0 4px 16px rgba(0,0,0,0.1)'
+                                        color: '#F3F4F6',
+                                        boxShadow: '0 12px 40px rgba(0,0,0,0.4)'
                                     }}
-                                    itemStyle={{ color: isDark ? '#F3F4F6' : '#374151' }}
+                                    itemStyle={{ color: '#F3F4F6' }}
                                     formatter={(value) => formatCurrency(value, currency)}
                                 />
                             </PieChart>
@@ -682,15 +680,14 @@ const AnalyticsDashboard = ({
                                 />
                                 <Tooltip
                                     contentStyle={{
-                                        backgroundColor: isDark ? 'rgba(15,23,42,0.90)' : '#FFFFFF',
-                                        borderColor: isDark ? 'rgba(255,255,255,0.08)' : '#E5E7EB',
+                                        backgroundColor: 'rgba(30,41,59,0.92)',
+                                        borderColor: 'rgba(255,255,255,0.10)',
                                         borderRadius: '12px',
                                         padding: '10px',
-                                        boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.4)' : '0 4px 16px rgba(0,0,0,0.1)',
-                                        color: isDark ? '#F3F4F6' : '#1F2937',
-                                        backdropFilter: 'blur(16px)'
+                                        boxShadow: '0 12px 40px rgba(0,0,0,0.4)',
+                                        color: '#F3F4F6'
                                     }}
-                                    itemStyle={{ color: isDark ? '#F3F4F6' : '#1F2937' }}
+                                    itemStyle={{ color: '#F3F4F6' }}
                                     formatter={(value) => formatCurrency(value, currency)}
                                     cursor={{ fill: isDark ? '#374151' : '#F3F4F6', opacity: 0.4 }}
                                 />
