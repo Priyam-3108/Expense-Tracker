@@ -2,130 +2,127 @@
  * Gradient color configurations for premium UI
  */
 
+/**
+ * Stripe (DESIGN.md) Atmospheric Gradient Mesh and Signature Gradients
+ */
+
 export const gradients = {
-    // Primary gradients
+    // Stripe Atmospheric Gradient Mesh (hero backdrop wash)
+    mesh: {
+        colors: ['#f5e9d4', '#f96bee', '#533afd', '#1c1e54'],
+        start: { x: 0, y: 0 },
+        end: { x: 1, y: 1 },
+    },
+
+    // Electric Indigo Primary
     primary: {
-        colors: ['#667eea', '#764ba2'],
+        colors: ['#533afd', '#4434d4'],
         start: { x: 0, y: 0 },
         end: { x: 1, y: 1 },
     },
 
     primaryLight: {
-        colors: ['#a8b5ff', '#9b8cff'],
+        colors: ['#665efd', '#533afd'],
         start: { x: 0, y: 0 },
         end: { x: 1, y: 1 },
     },
 
-    // Income gradient (green)
+    // Income gradient
     income: {
-        colors: ['#11998e', '#38ef7d'],
+        colors: ['#059669', '#10b981'],
         start: { x: 0, y: 0 },
         end: { x: 1, y: 1 },
     },
 
-    // Expense gradient (red/orange)
+    // Expense / Ruby gradient
     expense: {
-        colors: ['#eb3349', '#f45c43'],
+        colors: ['#ea2261', '#f96bee'],
         start: { x: 0, y: 0 },
         end: { x: 1, y: 1 },
     },
 
-    // Balance card gradient
+    // Balance card gradient (Stripe Gradient Mesh for Light, Deep Navy Mesh for Dark)
     balance: {
-        colors: ['#4F46E5', '#7C3AED', '#EC4899'],
+        colors: ['#f5e9d4', '#f96bee', '#533afd', '#1c1e54'],
         start: { x: 0, y: 0 },
         end: { x: 1, y: 1 },
     },
 
     // Dark balance gradient
     balanceDark: {
-        colors: ['#312e81', '#581c87', '#831843'],
+        colors: ['#1c1e54', '#533afd', '#0d253d'],
         start: { x: 0, y: 0 },
         end: { x: 1, y: 1 },
     },
 
     // Success gradient
     success: {
-        colors: ['#56ab2f', '#a8e063'],
+        colors: ['#059669', '#10b981'],
         start: { x: 0, y: 0 },
         end: { x: 1, y: 1 },
     },
 
     // Warning gradient
     warning: {
-        colors: ['#f2994a', '#f2c94c'],
+        colors: ['#9b6829', '#fbbf24'],
         start: { x: 0, y: 0 },
         end: { x: 1, y: 1 },
     },
 
     // Danger gradient
     danger: {
-        colors: ['#eb3349', '#f45c43'],
+        colors: ['#ea2261', '#f96bee'],
         start: { x: 0, y: 0 },
         end: { x: 1, y: 1 },
     },
 
     // Info gradient
     info: {
-        colors: ['#2193b0', '#6dd5ed'],
+        colors: ['#533afd', '#665efd'],
         start: { x: 0, y: 0 },
         end: { x: 1, y: 1 },
     },
 
-    // Purple gradient
+    // Purple / Indigo gradient
     purple: {
-        colors: ['#8E2DE2', '#4A00E0'],
+        colors: ['#533afd', '#665efd'],
         start: { x: 0, y: 0 },
         end: { x: 1, y: 1 },
     },
 
     // Teal gradient
     teal: {
-        colors: ['#06beb6', '#48b1bf'],
+        colors: ['#059669', '#34d399'],
         start: { x: 0, y: 0 },
         end: { x: 1, y: 1 },
     },
 
-    // Orange gradient
+    // Lemon / Orange gradient
     orange: {
-        colors: ['#f46b45', '#eea849'],
+        colors: ['#9b6829', '#f5e9d4'],
         start: { x: 0, y: 0 },
         end: { x: 1, y: 1 },
     },
 
-    // Blue gradient
-    blue: {
-        colors: ['#2E3192', '#1BFFFF'],
-        start: { x: 0, y: 0 },
-        end: { x: 1, y: 1 },
-    },
-
-    // Sunset gradient
-    sunset: {
-        colors: ['#ff6b6b', '#feca57', '#ee5a6f'],
-        start: { x: 0, y: 0 },
-        end: { x: 1, y: 1 },
-    },
-
-    // Ocean gradient
-    ocean: {
-        colors: ['#2E3192', '#1BFFFF'],
-        start: { x: 0, y: 0 },
-        end: { x: 1, y: 1 },
-    },
-
-    // Dark card gradient
+    // Dark card gradient (Dark App Shell)
     darkCard: {
-        colors: ['#1f2937', '#111827'],
+        colors: ['#1c1e54', '#0d253d'],
         start: { x: 0, y: 0 },
         end: { x: 0, y: 1 },
     },
 
-    // Light card gradient
+    // Light card gradient (Clean Canvas)
     lightCard: {
-        colors: ['#ffffff', '#f9fafb'],
+        colors: ['#ffffff', '#f6f9fc'],
         start: { x: 0, y: 0 },
         end: { x: 0, y: 1 },
+    },
+
+    // Warm Cream Band card gradient
+    creamCard: {
+        colors: ['#f5e9d4', '#f6f9fc'],
+        start: { x: 0, y: 0 },
+        end: { x: 1, y: 1 },
     },
 };
 

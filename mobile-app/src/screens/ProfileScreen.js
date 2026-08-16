@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, StatusBar } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -26,34 +27,37 @@ function ProfileScreen({ navigation }) {
             paddingTop: 50,
             paddingBottom: spacing.xl,
             backgroundColor: colors.card,
-            ...shadows.md,
+            borderBottomWidth: 1,
+            borderBottomColor: colors.border,
+            ...shadows.sm,
         },
         profileSection: {
             alignItems: 'center',
-            marginBottom: spacing.md,
+            marginBottom: spacing.xs,
         },
-        avatar: {
+        avatarGradient: {
             width: 80,
             height: 80,
             borderRadius: 40,
-            backgroundColor: colors.primary,
             justifyContent: 'center',
             alignItems: 'center',
-            marginBottom: spacing.md,
+            marginBottom: spacing.sm,
         },
         avatarText: {
-            fontSize: 32,
-            fontWeight: 'bold',
+            fontSize: 26,
+            fontWeight: '300', // Sohne thin display
             color: '#ffffff',
         },
         userName: {
             fontSize: 24,
-            fontWeight: 'bold',
+            fontWeight: '300', // Sohne thin display style
             color: colors.text,
-            marginBottom: spacing.xs,
+            marginBottom: 2,
+            letterSpacing: -0.64,
         },
         userEmail: {
-            fontSize: 14,
+            fontSize: 13,
+            fontWeight: '300',
             color: colors.subText,
         },
         content: {
@@ -64,27 +68,29 @@ function ProfileScreen({ navigation }) {
             paddingHorizontal: spacing.lg,
         },
         sectionTitle: {
-            fontSize: 13,
+            fontSize: 11,
             fontWeight: '600',
             color: colors.subText,
             textTransform: 'uppercase',
-            letterSpacing: 0.5,
-            marginBottom: spacing.sm,
+            letterSpacing: 0.8,
+            marginBottom: spacing.xs,
         },
         menuItem: {
             flexDirection: 'row',
             alignItems: 'center',
             backgroundColor: colors.card,
-            padding: spacing.md,
-            borderRadius: borderRadius.md,
-            marginBottom: spacing.sm,
+            padding: 14,
+            borderRadius: borderRadius.lg,
+            marginBottom: spacing.xs,
+            borderWidth: 1,
+            borderColor: colors.border,
             ...shadows.sm,
         },
         iconContainer: {
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            backgroundColor: `${colors.primary}20`,
+            width: 38,
+            height: 38,
+            borderRadius: 19,
+            backgroundColor: colors.primarySubdued,
             justifyContent: 'center',
             alignItems: 'center',
             marginRight: spacing.md,
@@ -93,49 +99,54 @@ function ProfileScreen({ navigation }) {
             flex: 1,
         },
         menuTitle: {
-            fontSize: 16,
-            fontWeight: '600',
+            fontSize: 15,
+            fontWeight: '300', // Sohne thin style
             color: colors.text,
-            marginBottom: 2,
+            marginBottom: 1,
+            letterSpacing: -0.2,
         },
         menuSubtitle: {
-            fontSize: 13,
+            fontSize: 12,
+            fontWeight: '300',
             color: colors.subText,
         },
         toggle: {
-            width: 50,
-            height: 28,
-            borderRadius: 14,
+            width: 44,
+            height: 24,
+            borderRadius: 12,
             padding: 2,
             justifyContent: 'center',
         },
         toggleThumb: {
-            width: 24,
-            height: 24,
-            borderRadius: 12,
+            width: 20,
+            height: 20,
+            borderRadius: 10,
         },
         logoutButton: {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: colors.danger,
-            padding: spacing.md,
-            borderRadius: borderRadius.md,
+            backgroundColor: colors.danger || '#ea2261',
+            paddingVertical: 12,
+            paddingHorizontal: 20,
+            borderRadius: 9999, // Stripe pill button
             marginHorizontal: spacing.lg,
             marginVertical: spacing.xl,
             ...shadows.md,
         },
         logoutText: {
-            fontSize: 16,
-            fontWeight: '600',
+            fontSize: 15,
+            fontWeight: '400',
             color: '#ffffff',
-            marginLeft: spacing.sm,
+            marginLeft: spacing.xs,
         },
         version: {
             textAlign: 'center',
             fontSize: 12,
+            fontWeight: '300',
             color: colors.subText,
             marginBottom: spacing.xl,
+            fontVariant: ['tabular-nums'],
         },
     });
 
@@ -183,6 +194,20 @@ function ProfileScreen({ navigation }) {
                             <View style={[styles.toggleThumb, { backgroundColor: '#ffffff' }]} />
                         </TouchableOpacity>
                     ),
+                },
+            ],
+        },
+        {
+            section: 'Organisation',
+            items: [
+                {
+                    icon: 'grid-outline',
+                    title: 'Categories',
+                    subtitle: 'Manage expense categories',
+                    onPress: () => {
+                        hapticFeedback.light();
+                        navigation.navigate('CategoriesList');
+                    },
                 },
             ],
         },
@@ -248,9 +273,14 @@ function ProfileScreen({ navigation }) {
             {/* Header with Profile */}
             <View style={styles.header}>
                 <View style={styles.profileSection}>
-                    <View style={styles.avatar}>
+                    <LinearGradient
+                        colors={['#7b68fe', '#533afd', '#4434d4']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                        style={styles.avatarGradient}
+                    >
                         <Text style={styles.avatarText}>{getInitials(user?.name)}</Text>
-                    </View>
+                    </LinearGradient>
                     <Text style={styles.userName}>{user?.name || 'User'}</Text>
                     <Text style={styles.userEmail}>{user?.email || 'user@example.com'}</Text>
                 </View>

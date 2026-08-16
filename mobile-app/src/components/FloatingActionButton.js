@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -45,7 +45,7 @@ function FloatingActionButton({ onPress, icon = 'add', style }) {
                 onPressOut={handlePressOut}
             >
                 <LinearGradient
-                    colors={['#6366f1', '#8b5cf6']}
+                    colors={[colors.primary || '#533afd', colors.primaryDark || '#4434d4']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={[styles.button, shadows.xl]}

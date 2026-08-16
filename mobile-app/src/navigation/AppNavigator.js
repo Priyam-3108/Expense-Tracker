@@ -10,6 +10,8 @@ import hapticFeedback from '../utils/haptics';
 import DashboardScreen from '../screens/DashboardScreen';
 import AddExpenseScreen from '../screens/AddExpenseScreen';
 import AnalyticsScreen from '../screens/AnalyticsScreen';
+import DebtScreen from '../screens/DebtScreen';
+import AddDebtScreen from '../screens/AddDebtScreen';
 import CategoriesScreen from '../screens/CategoriesScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import AddEditCategoryScreen from '../screens/AddEditCategoryScreen';
@@ -27,21 +29,22 @@ function DashboardStack() {
         <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="DashboardMain" component={DashboardScreen} />
             <Stack.Screen name="Search" component={SearchScreen} />
+            <Stack.Screen name="AddExpense" component={AddExpenseScreen} />
         </Stack.Navigator>
     );
 }
 
-// Categories Stack
-function CategoriesStack() {
+// Debt Stack
+function DebtStack() {
     return (
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="CategoriesList" component={CategoriesScreen} />
-            <Stack.Screen name="AddEditCategory" component={AddEditCategoryScreen} />
+            <Stack.Screen name="DebtMain" component={DebtScreen} />
+            <Stack.Screen name="AddDebt" component={AddDebtScreen} />
         </Stack.Navigator>
     );
 }
 
-// Profile Stack
+// Profile Stack (includes Categories, Budget, Export, AppLock)
 function ProfileStack() {
     return (
         <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -49,6 +52,8 @@ function ProfileStack() {
             <Stack.Screen name="BudgetSettings" component={BudgetSettingsScreen} />
             <Stack.Screen name="ExportData" component={ExportDataScreen} />
             <Stack.Screen name="AppLock" component={AppLockScreen} />
+            <Stack.Screen name="CategoriesList" component={CategoriesScreen} />
+            <Stack.Screen name="AddEditCategory" component={AddEditCategoryScreen} />
         </Stack.Navigator>
     );
 }
@@ -61,21 +66,14 @@ function AppNavigator() {
             screenOptions={({ route }) => ({
                 headerShown: false,
                 tabBarIcon: ({ focused, color, size }) => {
-                    let iconName;
-
-                    if (route.name === 'Dashboard') {
-                        iconName = focused ? 'home' : 'home-outline';
-                    } else if (route.name === 'AddExpense') {
-                        iconName = focused ? 'add-circle' : 'add-circle-outline';
-                    } else if (route.name === 'Analytics') {
-                        iconName = focused ? 'bar-chart' : 'bar-chart-outline';
-                    } else if (route.name === 'Categories') {
-                        iconName = focused ? 'grid' : 'grid-outline';
-                    } else if (route.name === 'Profile') {
-                        iconName = focused ? 'person' : 'person-outline';
-                    }
-
-                    return <Ionicons name={iconName} size={size} color={color} />;
+                    const icons = {
+                        Dashboard: focused ? 'home' : 'home-outline',
+                        Analytics: focused ? 'bar-chart' : 'bar-chart-outline',
+                        AddExpense: focused ? 'add-circle' : 'add-circle-outline',
+                        Debts: focused ? 'card' : 'card-outline',
+                        Profile: focused ? 'person' : 'person-outline',
+                    };
+                    return <Ionicons name={icons[route.name] || 'ellipse'} size={size} color={color} />;
                 },
                 tabBarActiveTintColor: colors.primary,
                 tabBarInactiveTintColor: colors.subText,
@@ -93,8 +91,8 @@ function AppNavigator() {
                     shadowRadius: 8,
                 },
                 tabBarLabelStyle: {
-                    fontSize: 12,
-                    fontWeight: '600',
+                    fontSize: 11,
+                    fontWeight: '500',
                 },
                 tabBarButton: (props) => (
                     <TouchableOpacity
@@ -122,13 +120,13 @@ function AppNavigator() {
                 component={AddExpenseScreen}
                 options={{
                     tabBarLabel: 'Add',
-                    tabBarIconStyle: { marginTop: -5 },
+                    tabBarIconStyle: { marginTop: -3 },
                 }}
             />
             <Tab.Screen
-                name="Categories"
-                component={CategoriesStack}
-                options={{ tabBarLabel: 'Categories' }}
+                name="Debts"
+                component={DebtStack}
+                options={{ tabBarLabel: 'Debts' }}
             />
             <Tab.Screen
                 name="Profile"

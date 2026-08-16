@@ -10,7 +10,7 @@ function InsightCard({
     type = 'info', // 'info', 'success', 'warning', 'danger'
     trend // 'up', 'down', or null
 }) {
-    const { colors, spacing, borderRadius, shadows } = useTheme();
+    const { colors, isDark, borderRadius, shadows } = useTheme();
 
     const getTypeColor = () => {
         switch (type) {
@@ -21,7 +21,7 @@ function InsightCard({
             case 'danger':
                 return colors.danger;
             default:
-                return colors.info;
+                return colors.primary;
         }
     };
 
@@ -29,27 +29,27 @@ function InsightCard({
 
     const styles = StyleSheet.create({
         container: {
-            backgroundColor: colors.card,
-            borderRadius: borderRadius.md,
-            padding: spacing.md,
-            marginBottom: spacing.md,
-            borderLeftWidth: 4,
-            borderLeftColor: typeColor,
+            backgroundColor: isDark ? colors.card : '#f5e9d4', // Stripe canvas-cream warm band
+            borderRadius: borderRadius.lg,
+            padding: 16,
+            marginBottom: 12,
+            borderWidth: 1,
+            borderColor: isDark ? colors.border : '#e3e8ee',
             ...shadows.sm,
         },
         header: {
             flexDirection: 'row',
             alignItems: 'center',
-            marginBottom: spacing.sm,
+            marginBottom: 8,
         },
         iconContainer: {
-            width: 36,
-            height: 36,
-            borderRadius: 18,
-            backgroundColor: `${typeColor}20`,
+            width: 32,
+            height: 32,
+            borderRadius: 16,
+            backgroundColor: isDark ? `${typeColor}20` : '#ffffff',
             justifyContent: 'center',
             alignItems: 'center',
-            marginRight: spacing.sm,
+            marginRight: 10,
         },
         titleContainer: {
             flex: 1,
@@ -59,16 +59,28 @@ function InsightCard({
         },
         title: {
             fontSize: 15,
-            fontWeight: '600',
-            color: colors.text,
+            fontWeight: '300', // Sohne thin style
+            color: '#0d253d', // Stripe Ink
+            letterSpacing: -0.2,
         },
         message: {
-            fontSize: 14,
-            color: colors.subText,
-            lineHeight: 20,
+            fontSize: 13,
+            fontWeight: '300',
+            color: '#273951', // Stripe Ink-secondary
+            lineHeight: 19,
         },
-        trendIcon: {
-            marginLeft: spacing.sm,
+        pillTag: {
+            backgroundColor: colors.primarySubdued || '#b9b9f9',
+            paddingHorizontal: 8,
+            paddingVertical: 2,
+            borderRadius: 9999,
+            marginLeft: 6,
+        },
+        pillTagText: {
+            fontSize: 10,
+            fontWeight: '600',
+            color: colors.primaryDark || '#4434d4',
+            letterSpacing: 0.1,
         },
     });
 
@@ -76,17 +88,20 @@ function InsightCard({
         <View style={styles.container}>
             <View style={styles.header}>
                 <View style={styles.iconContainer}>
-                    <Ionicons name={icon} size={20} color={typeColor} />
+                    <Ionicons name={icon} size={18} color={typeColor} />
                 </View>
                 <View style={styles.titleContainer}>
                     <Text style={styles.title}>{title}</Text>
-                    {trend && (
+                    {trend ? (
                         <Ionicons
                             name={trend === 'up' ? 'trending-up' : 'trending-down'}
-                            size={20}
+                            size={18}
                             color={trend === 'up' ? colors.success : colors.danger}
-                            style={styles.trendIcon}
                         />
+                    ) : (
+                        <View style={styles.pillTag}>
+                            <Text style={styles.pillTagText}>INSIGHT</Text>
+                        </View>
                     )}
                 </View>
             </View>

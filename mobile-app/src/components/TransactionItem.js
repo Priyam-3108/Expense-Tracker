@@ -1,16 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import hapticFeedback from '../utils/haptics';
 
-function TransactionItem({
-    item,
-    onPress,
-    onEdit,
-    onDelete
-}) {
-    const { colors, spacing, borderRadius } = useTheme();
+function TransactionItem({ item, onPress, onEdit, onDelete }) {
+    const { colors, spacing, borderRadius, shadows } = useTheme();
 
     const formatAmount = (amount) => {
         return new Intl.NumberFormat('en-IN', {
@@ -23,10 +19,7 @@ function TransactionItem({
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-IN', {
-            day: '2-digit',
-            month: 'short'
-        });
+        return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
     };
 
     const getCategoryIcon = (categoryName) => {
@@ -44,130 +37,97 @@ function TransactionItem({
         return iconMap[categoryName?.toLowerCase()] || 'pricetag';
     };
 
-    const getCategoryColor = (categoryName) => {
+    const getCategoryColor = (category) => {
+        // If category object has a color set, use it directly
+        if (item.category?.color) return item.category.color;
+
         const colorMap = {
             food: '#f59e0b',
-            transport: '#3b82f6',
+            transport: '#533afd',
             shopping: '#ec4899',
             entertainment: '#8b5cf6',
             health: '#10b981',
-            bills: '#ef4444',
-            education: '#6366f1',
+            bills: '#ea2261',
+            education: '#3b82f6',
             salary: '#10b981',
             other: '#64748b',
         };
-        return colorMap[categoryName?.toLowerCase()] || colors.primary;
+        return colorMap[category?.toLowerCase()] || colors.primary;
     };
 
     const isIncome = item.type === 'income';
-    const categoryColor = getCategoryColor(item.category?.name || item.category);
-    const categoryIcon = getCategoryIcon(item.category?.name || item.category);
-
-    const styles = StyleSheet.create({
-        container: {
-            flexDirection: 'row',
-            alignItems: 'center',
-            backgroundColor: colors.card,
-            padding: spacing.md,
-            borderRadius: borderRadius.md,
-            marginBottom: spacing.sm,
-            borderLeftWidth: 4,
-            borderLeftColor: categoryColor,
-        },
-        iconContainer: {
-            width: 48,
-            height: 48,
-            borderRadius: 24,
-            backgroundColor: `${categoryColor}20`,
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginRight: spacing.md,
-        },
-        content: {
-            flex: 1,
-        },
-        categoryName: {
-            fontSize: 16,
-            fontWeight: '600',
-            color: colors.text,
-            marginBottom: 4,
-        },
-        date: {
-            fontSize: 13,
-            color: colors.subText,
-        },
-        amountContainer: {
-            alignItems: 'flex-end',
-        },
-        amount: {
-            fontSize: 18,
-            fontWeight: 'bold',
-            color: isIncome ? colors.success : colors.expense,
-            marginBottom: 4,
-        },
-        actions: {
-            flexDirection: 'row',
-            gap: 8,
-        },
-        actionButton: {
-            padding: 4,
-        },
-    });
+    const catName = item.category?.name || item.category || 'Uncategorized';
+    const categoryColor = getCategoryColor(catName);
+    const categoryIcon = getCategoryIcon(catName);
+    const amountColor = isIncome ? colors.income : colors.expense;
 
     return (
         <TouchableOpacity
-            style={styles.container}
+            style={[
+                styles.container,
+                {
+                    backgroundColor: colors.card,
+                    borderColor: colors.border,
+                    borderRadius: borderRadius.lg,
+                    marginBottom: spacing.sm,
+                },
+                shadows.sm,
+            ]}
             onPress={() => {
                 hapticFeedback.light();
                 onPress && onPress(item);
             }}
-            activeOpacity={0.7}
+            activeOpacity={0.75}
         >
-            <View style={styles.iconContainer}>
-                <Ionicons name={categoryIcon} size={24} color={categoryColor} />
-            </View>
+            {/* Category icon - solid circle with gradient */}
+            <LinearGradient
+                colors={[categoryColor + 'cc', categoryColor]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.iconCircle}
+            >
+                <Ionicons name={categoryIcon} size={20} color="#ffffff" />
+            </LinearGradient>
 
+            {/* Content */}
             <View style={styles.content}>
-                <Text style={styles.categoryName}>
-                    {item.category?.name || item.category || 'Uncategorized'}
+                <Text style={[styles.categoryName, { color: colors.text }]} numberOfLines={1}>
+                    {catName}
                 </Text>
-                <Text style={styles.date}>
-                    {formatDate(item.date)} {item.notes ? `• ${item.notes.substring(0, 20)}${item.notes.length > 20 ? '...' : ''}` : ''}
+                <Text style={[styles.meta, { color: colors.subText }]} numberOfLines={1}>
+                    {formatDate(item.date)}
+                    {item.notes ? ` · ${item.notes.substring(0, 20)}${item.notes.length > 20 ? '…' : ''}` : ''}
                 </Text>
             </View>
 
-            <View style={styles.amountContainer}>
-                <Text style={styles.amount}>
-                    {isIncome ? '+' : '-'} {formatAmount(Math.abs(item.amount))}
+            {/* Right side: amount + sync status */}
+            <View style={styles.right}>
+                <Text style={[styles.amount, { color: amountColor }]}>
+                    {isIncome ? '+' : '-'}{formatAmount(Math.abs(item.amount))}
                 </Text>
-                <View style={[styles.actions, { alignItems: 'center' }]}>
+                <View style={styles.statusRow}>
                     {item.syncStatus === 'PENDING' && (
-                        <Ionicons name="time-outline" size={16} color={colors.warning} style={{ marginRight: 4 }} />
+                        <Ionicons name="time-outline" size={13} color={colors.warning} />
                     )}
                     {item.syncStatus === 'FAILED' && (
-                        <Ionicons name="alert-circle-outline" size={16} color={colors.danger} style={{ marginRight: 4 }} />
+                        <Ionicons name="alert-circle-outline" size={13} color={colors.danger} />
                     )}
-
                     {onEdit && (
                         <TouchableOpacity
-                            style={styles.actionButton}
-                            onPress={() => {
-                                hapticFeedback.light();
-                                onEdit(item);
-                            }}
+                            style={styles.actionBtn}
+                            onPress={() => { hapticFeedback.light(); onEdit(item); }}
+                            hitSlop={{ top: 8, bottom: 8, left: 8, right: 4 }}
                         >
-                            <Ionicons name="create-outline" size={18} color={colors.primary} />
+                            <Ionicons name="create-outline" size={15} color={colors.primary} />
                         </TouchableOpacity>
                     )}
                     {onDelete && (
                         <TouchableOpacity
-                            style={styles.actionButton}
-                            onPress={() => {
-                                hapticFeedback.light();
-                                onDelete(item);
-                            }}
+                            style={styles.actionBtn}
+                            onPress={() => { hapticFeedback.light(); onDelete(item); }}
+                            hitSlop={{ top: 8, bottom: 8, left: 4, right: 8 }}
                         >
-                            <Ionicons name="trash-outline" size={18} color={colors.danger} />
+                            <Ionicons name="trash-outline" size={15} color={colors.danger} />
                         </TouchableOpacity>
                     )}
                 </View>
@@ -175,5 +135,54 @@ function TransactionItem({
         </TouchableOpacity>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 13,
+        borderWidth: 1,
+    },
+    iconCircle: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
+    },
+    content: {
+        flex: 1,
+    },
+    categoryName: {
+        fontSize: 15,
+        fontWeight: '400',
+        marginBottom: 3,
+        letterSpacing: -0.2,
+    },
+    meta: {
+        fontSize: 12,
+        fontWeight: '400',
+        fontVariant: ['tabular-nums'],
+    },
+    right: {
+        alignItems: 'flex-end',
+        gap: 4,
+    },
+    amount: {
+        fontSize: 15,
+        fontWeight: '500',
+        letterSpacing: -0.4,
+        fontVariant: ['tabular-nums'],
+    },
+    statusRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+    },
+    actionBtn: {
+        padding: 2,
+    },
+});
 
 export default TransactionItem;

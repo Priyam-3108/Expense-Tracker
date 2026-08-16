@@ -105,14 +105,14 @@ export default function ActionSheet({ visible, onClose, options = [], title, sub
                                     let iconBgColor = `${colors.border}80`;
 
                                     if (option.style === 'destructive') {
-                                        textColor = '#EF4444';
-                                        iconBgColor = isDark ? '#7F1D1D' : '#FEE2E2';
+                                        textColor = colors.danger || '#ea2261';
+                                        iconBgColor = isDark ? '#3d1624' : '#fce4ec';
                                     } else if (option.style === 'primary') {
-                                        textColor = colors.primary;
-                                        iconBgColor = isDark ? `${colors.primary}40` : `${colors.primary}20`;
+                                        textColor = colors.primary || '#533afd';
+                                        iconBgColor = isDark ? '#1f1e4d' : '#eef0fe';
                                     } else if (option.style === 'secondary') {
-                                        textColor = colors.secondary;
-                                        iconBgColor = isDark ? `${colors.secondary}40` : `${colors.secondary}20`;
+                                        textColor = colors.text;
+                                        iconBgColor = isDark ? `${colors.border}80` : '#f6f9fc';
                                     }
 
                                     return (
@@ -166,7 +166,7 @@ export default function ActionSheet({ visible, onClose, options = [], title, sub
                                 style={[
                                     styles.cancelButton,
                                     {
-                                        backgroundColor: isDark ? '#374151' : '#F3F4F6',
+                                        backgroundColor: isDark ? '#273951' : '#e3e8ee',
                                         borderColor: colors.border,
                                     },
                                 ]}
@@ -186,42 +186,44 @@ export default function ActionSheet({ visible, onClose, options = [], title, sub
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        backgroundColor: 'rgba(13, 37, 61, 0.65)',
         justifyContent: 'flex-end',
     },
     sheetContainer: {
-        borderTopLeftRadius: 28,
-        borderTopRightRadius: 28,
-        paddingBottom: 20,
-        shadowColor: '#000',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        paddingBottom: 24,
+        shadowColor: '#003770',
         shadowOffset: { width: 0, height: -4 },
         shadowOpacity: 0.15,
-        shadowRadius: 12,
+        shadowRadius: 16,
         elevation: 10,
     },
     handleBar: {
         alignItems: 'center',
-        paddingVertical: 12,
+        paddingVertical: 10,
     },
     handle: {
-        width: 40,
+        width: 36,
         height: 4,
         borderRadius: 2,
     },
     headerSection: {
         paddingHorizontal: 20,
-        paddingBottom: 16,
+        paddingBottom: 14,
         borderBottomWidth: 1,
-        marginBottom: 8,
+        marginBottom: 6,
     },
     title: {
-        fontSize: 20,
-        fontWeight: '800',
-        marginBottom: 4,
+        fontSize: 18,
+        fontWeight: '300', // Sohne thin style
+        letterSpacing: -0.22,
+        marginBottom: 2,
     },
     subtitle: {
-        fontSize: 14,
-        lineHeight: 20,
+        fontSize: 13,
+        fontWeight: '300',
+        lineHeight: 18,
     },
     optionsContainer: {
         paddingHorizontal: 12,
@@ -229,42 +231,43 @@ const styles = StyleSheet.create({
     option: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 16,
+        paddingVertical: 14,
         paddingHorizontal: 12,
-        borderRadius: 12,
+        borderRadius: 8,
     },
     iconContainer: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 14,
+        marginRight: 12,
     },
     optionIcon: {
-        fontSize: 20,
+        fontSize: 18,
     },
     optionTextContainer: {
         flex: 1,
     },
     optionText: {
-        fontSize: 17,
-        fontWeight: '600',
+        fontSize: 15,
+        fontWeight: '400',
+        letterSpacing: -0.2,
     },
     optionDescription: {
-        fontSize: 13,
-        marginTop: 2,
+        fontSize: 12,
+        marginTop: 1,
     },
     cancelButton: {
         marginHorizontal: 16,
         marginTop: 12,
-        paddingVertical: 16,
-        borderRadius: 14,
+        paddingVertical: 12,
+        borderRadius: 9999, // Stripe pill button
         alignItems: 'center',
         borderWidth: 1,
     },
     cancelText: {
-        fontSize: 17,
-        fontWeight: '700',
+        fontSize: 15,
+        fontWeight: '400',
     },
 });

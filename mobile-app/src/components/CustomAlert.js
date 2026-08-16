@@ -139,13 +139,13 @@ export default function CustomAlert({
                                     let textColor = colors.text;
 
                                     if (button.style === 'destructive') {
-                                        backgroundColor = '#EF4444';
+                                        backgroundColor = colors.danger || '#ea2261';
                                         textColor = 'white';
                                     } else if (button.style === 'primary') {
-                                        backgroundColor = colors.primary;
+                                        backgroundColor = colors.primary || '#533afd';
                                         textColor = 'white';
                                     } else if (button.style === 'cancel') {
-                                        backgroundColor = isDark ? '#374151' : '#F3F4F6';
+                                        backgroundColor = isDark ? '#273951' : '#e3e8ee';
                                         textColor = colors.text;
                                     }
 
@@ -164,7 +164,7 @@ export default function CustomAlert({
                                                 button.onPress && button.onPress();
                                                 onClose && onClose();
                                             }}
-                                            activeOpacity={0.7}
+                                            activeOpacity={0.75}
                                         >
                                             <Text style={[buttonTextStyle, { color: textColor }]}>
                                                 {button.text}
@@ -184,7 +184,7 @@ export default function CustomAlert({
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        backgroundColor: 'rgba(13, 37, 61, 0.65)', // Stripe ink overlay
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
@@ -192,37 +192,42 @@ const styles = StyleSheet.create({
     alertContainer: {
         width: width - 60,
         maxWidth: 400,
-        borderRadius: 24,
+        borderRadius: 16,
         padding: 24,
         alignItems: 'center',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.3,
-        shadowRadius: 20,
+        shadowColor: '#003770',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.15,
+        shadowRadius: 24,
         elevation: 10,
+        borderWidth: 1,
+        borderColor: 'rgba(227, 232, 238, 0.5)',
     },
     iconContainer: {
-        width: 64,
-        height: 64,
-        borderRadius: 32,
+        width: 56,
+        height: 56,
+        borderRadius: 28,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 16,
     },
     icon: {
-        fontSize: 32,
+        fontSize: 26,
         fontWeight: 'bold',
     },
     title: {
-        fontSize: 20,
-        fontWeight: '800',
-        marginBottom: 8,
+        fontSize: 18,
+        fontWeight: '300', // Sohne thin style
+        letterSpacing: -0.22,
+        marginBottom: 6,
         textAlign: 'center',
     },
     message: {
-        fontSize: 15,
+        fontSize: 14,
+        fontWeight: '300',
         textAlign: 'center',
-        marginBottom: 24,
-        lineHeight: 22,
+        marginBottom: 20,
+        lineHeight: 20,
     },
     buttonContainer: {
         flexDirection: 'row',
@@ -231,15 +236,16 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     button: {
-        paddingVertical: 14,
-        paddingHorizontal: 20,
-        borderRadius: 12,
+        paddingVertical: 10,
+        paddingHorizontal: 16,
+        borderRadius: 9999, // Stripe pill button (rounded.pill)
         alignItems: 'center',
         justifyContent: 'center',
-        minWidth: 100,
+        minWidth: 90,
     },
     buttonText: {
-        fontSize: 16,
-        fontWeight: '700',
+        fontSize: 14,
+        fontWeight: '400', // Stripe button-sm typography
+        letterSpacing: 0,
     },
 });

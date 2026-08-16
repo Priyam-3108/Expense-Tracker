@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useCallback } from 'react';
+import React, { useState, useContext, useCallback } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, RefreshControl, StatusBar, ScrollView } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,7 +20,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function DashboardScreen({ navigation }) {
   const { signOut, user } = useContext(AuthContext);
-  const { theme, toggleTheme, isDark, colors, spacing, borderRadius, shadows } = useTheme();
+  const { toggleTheme, isDark, colors, spacing } = useTheme();
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -215,11 +215,11 @@ export default function DashboardScreen({ navigation }) {
       {/* Top Header */}
       <View style={styles.topHeader}>
         <View>
-          <Text style={[styles.greeting, { color: colors.textSecondary }]}>
-            Welcome back,
+          <Text style={[styles.greeting, { color: colors.subText }]}>
+            Welcome back
           </Text>
           <Text style={[styles.userName, { color: colors.text }]}>
-            {user?.name || 'User'}
+            {user?.name?.split(' ')[0] || 'User'}
           </Text>
         </View>
         <View style={styles.headerActions}>
@@ -228,63 +228,41 @@ export default function DashboardScreen({ navigation }) {
               hapticFeedback.light();
               toggleTheme(isDark ? 'light' : 'dark');
             }}
-            style={[styles.iconButton, { backgroundColor: colors.card }]}
+            style={[styles.iconButton, { backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1 }]}
           >
-            <Ionicons
-              name={isDark ? 'sunny' : 'moon'}
-              size={20}
-              color={colors.text}
-            />
+            <Ionicons name={isDark ? 'sunny-outline' : 'moon-outline'} size={18} color={colors.text} />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => {
-              hapticFeedback.medium();
-              signOut();
-            }}
-            style={[styles.iconButton, { backgroundColor: colors.card }]}
+            onPress={() => { hapticFeedback.medium(); signOut(); }}
+            style={[styles.iconButton, { backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1 }]}
           >
-            <Ionicons name="log-out-outline" size={20} color={colors.danger} />
+            <Ionicons name="log-out-outline" size={18} color={colors.danger} />
           </TouchableOpacity>
         </View>
       </View>
 
       {/* Balance Card */}
-      <BalanceCard
-        balance={summary.balance}
-        onPress={() => {
-          hapticFeedback.light();
-        }}
-      />
+      <BalanceCard balance={summary.balance} onPress={() => hapticFeedback.light()} />
 
-      {/* Summary Cards */}
+      {/* Summary Cards Row */}
       <View style={styles.summaryRow}>
-        <SummaryCard
-          title="Income"
-          amount={summary.income}
-          type="income"
-          icon="trending-up"
-        />
-        <View style={{ width: spacing.md }} />
-        <SummaryCard
-          title="Expense"
-          amount={summary.expense}
-          type="expense"
-          icon="trending-down"
-        />
+        <SummaryCard title="Income" amount={summary.income} type="income" icon="trending-up" />
+        <View style={{ width: 12 }} />
+        <SummaryCard title="Expenses" amount={summary.expense} type="expense" icon="trending-down" />
       </View>
 
       {/* Recent Transactions Header */}
       <View style={styles.sectionHeader}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>
-          Recent Transactions
-        </Text>
+        <View style={styles.sectionTitleRow}>
+          <View style={[styles.sectionDot, { backgroundColor: colors.primary }]} />
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Recent</Text>
+        </View>
         <TouchableOpacity
-          onPress={() => {
-            hapticFeedback.light();
-            // Navigate to search/filter screen
-          }}
+          onPress={() => { hapticFeedback.light(); navigation.navigate('Search'); }}
+          style={[styles.seeAllBtn, { backgroundColor: colors.primarySubdued, borderColor: colors.primary + '30' }]}
         >
-          <Ionicons name="search" size={22} color={colors.primary} />
+          <Ionicons name="search-outline" size={13} color={colors.primary} />
+          <Text style={[styles.seeAllText, { color: colors.primary }]}>Search</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -442,32 +420,33 @@ export default function DashboardScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
   listContent: {
     padding: 20,
-    paddingTop: 50,
-    paddingBottom: 100,
+    paddingTop: 52,
+    paddingBottom: 110,
   },
   topHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 20,
   },
   greeting: {
-    fontSize: 14,
-    fontWeight: '500',
-    marginBottom: 4,
+    fontSize: 12,
+    fontWeight: '400',
+    marginBottom: 3,
+    letterSpacing: 0.2,
+    textTransform: 'uppercase',
   },
   userName: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 28,
+    fontWeight: '300',
+    letterSpacing: -0.7,
   },
   headerActions: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 10,
   },
   iconButton: {
     width: 40,
@@ -478,26 +457,51 @@ const styles = StyleSheet.create({
   },
   summaryRow: {
     flexDirection: 'row',
-    marginBottom: 24,
+    marginBottom: 22,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 14,
+  },
+  sectionTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  sectionDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 22,
+    fontWeight: '300',
+    letterSpacing: -0.4,
   },
+  seeAllBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 9999,
+    borderWidth: 1,
+  },
+  seeAllText: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  searchIconButton: { padding: 6 },
   emptyButton: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 11,
+    borderRadius: 9999,
   },
   emptyButtonText: {
     color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '400',
   },
 });

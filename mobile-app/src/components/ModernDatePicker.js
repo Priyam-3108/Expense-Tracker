@@ -137,7 +137,7 @@ export default function ModernDatePicker({ visible, onClose, selectedDate, onDat
                             <Text style={[styles.todayText, { color: colors.primary }]}>Today</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            style={[styles.closeButton, { backgroundColor: colors.border }]}
+                            style={[styles.closeButton, { backgroundColor: isDark ? '#273951' : '#e3e8ee' }]}
                             onPress={onClose}
                         >
                             <Text style={[styles.closeText, { color: colors.text }]}>Cancel</Text>
@@ -152,7 +152,7 @@ export default function ModernDatePicker({ visible, onClose, selectedDate, onDat
 const styles = StyleSheet.create({
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        backgroundColor: 'rgba(13, 37, 61, 0.65)',
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
@@ -160,12 +160,12 @@ const styles = StyleSheet.create({
     calendarContainer: {
         width: '100%',
         maxWidth: 400,
-        borderRadius: 20,
+        borderRadius: 16,
         borderWidth: 1,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.3,
-        shadowRadius: 20,
+        shadowColor: '#003770',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.15,
+        shadowRadius: 24,
         elevation: 10,
         overflow: 'hidden',
     },
@@ -173,39 +173,40 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 20,
+        padding: 16,
         borderBottomWidth: 1,
     },
     navButton: {
-        padding: 8,
-        minWidth: 40,
+        padding: 6,
+        minWidth: 36,
         alignItems: 'center',
     },
     navText: {
-        fontSize: 32,
+        fontSize: 28,
         fontWeight: '300',
     },
     monthYear: {
-        fontSize: 18,
-        fontWeight: '700',
-        letterSpacing: 0.5,
+        fontSize: 16,
+        fontWeight: '300', // Sohne thin style
+        letterSpacing: -0.22,
     },
     dayNamesRow: {
         flexDirection: 'row',
         paddingHorizontal: 10,
-        paddingVertical: 12,
+        paddingVertical: 10,
     },
     dayNameCell: {
         flex: 1,
         alignItems: 'center',
     },
     dayNameText: {
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: '600',
         textTransform: 'uppercase',
+        letterSpacing: 0.1,
     },
     daysContainer: {
-        paddingVertical: 8,
+        paddingVertical: 4,
     },
     daysGrid: {
         flexDirection: 'row',
@@ -218,41 +219,42 @@ const styles = StyleSheet.create({
         aspectRatio: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 12,
-        marginVertical: 4,
+        borderRadius: 9999, // Stripe pill geometry
+        marginVertical: 2,
     },
     emptyCell: {
         backgroundColor: 'transparent',
     },
     dayText: {
-        fontSize: 16,
-        fontWeight: '500',
+        fontSize: 14,
+        fontWeight: '400',
+        fontVariant: ['tabular-nums'],
     },
     footer: {
         flexDirection: 'row',
-        padding: 16,
+        padding: 14,
         gap: 10,
         borderTopWidth: 1,
     },
     todayButton: {
         flex: 1,
-        paddingVertical: 12,
-        borderRadius: 10,
+        paddingVertical: 10,
+        borderRadius: 9999, // Stripe pill button (rounded.pill)
         alignItems: 'center',
-        borderWidth: 2,
+        borderWidth: 1,
     },
     todayText: {
-        fontSize: 15,
-        fontWeight: '600',
+        fontSize: 14,
+        fontWeight: '400',
     },
     closeButton: {
         flex: 1,
-        paddingVertical: 12,
-        borderRadius: 10,
+        paddingVertical: 10,
+        borderRadius: 9999, // Stripe pill button (rounded.pill)
         alignItems: 'center',
     },
     closeText: {
-        fontSize: 15,
-        fontWeight: '600',
+        fontSize: 14,
+        fontWeight: '400',
     },
 });

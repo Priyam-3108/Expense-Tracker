@@ -48,8 +48,9 @@ function ProgressBar({
         },
         label: {
             fontSize: 14,
-            fontWeight: '600',
+            fontWeight: '300', // Sohne thin style
             color: colors.text,
+            letterSpacing: -0.2,
         },
         amounts: {
             flexDirection: 'row',
@@ -58,23 +59,25 @@ function ProgressBar({
         },
         amount: {
             fontSize: 13,
-            fontWeight: '600',
+            fontWeight: '300',
             color: progressColor,
+            fontVariant: ['tabular-nums'],
         },
         budget: {
             fontSize: 13,
             color: colors.subText,
+            fontVariant: ['tabular-nums'],
         },
         progressContainer: {
             height,
             backgroundColor: colors.borderLight,
-            borderRadius: height / 2,
+            borderRadius: 9999, // Stripe pill radius
             overflow: 'hidden',
         },
         progressBar: {
             height: '100%',
             backgroundColor: progressColor,
-            borderRadius: height / 2,
+            borderRadius: 9999,
         },
         footer: {
             flexDirection: 'row',
@@ -84,12 +87,14 @@ function ProgressBar({
         },
         percentage: {
             fontSize: 12,
-            fontWeight: '600',
+            fontWeight: '400',
             color: progressColor,
+            fontVariant: ['tabular-nums'],
         },
         remaining: {
             fontSize: 12,
             color: colors.subText,
+            fontVariant: ['tabular-nums'],
         },
     });
 

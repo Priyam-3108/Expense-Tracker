@@ -79,7 +79,7 @@ export default function LoginScreen({ navigation }) {
             </TouchableOpacity>
 
             <View style={[styles.footer, { borderTopColor: colors.border }]}>
-              <Text style={[styles.footerText, { color: colors.subText }]}>Don't have an account? </Text>
+              <Text style={[styles.footerText, { color: colors.subText }]}>{"Don't have an account? "}</Text>
               <TouchableOpacity onPress={() => navigation.navigate('Register')}>
                 <Text style={[styles.linkText, { color: colors.primary }]}>Sign up for free</Text>
               </TouchableOpacity>
@@ -95,48 +95,49 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   scrollContent: { flexGrow: 1, justifyContent: 'center', padding: 20 },
   card: {
-    borderRadius: 24,
-    padding: 32,
-    shadowColor: '#000',
+    borderRadius: 16, // Stripe rounded.xl container
+    padding: 28,
+    shadowColor: '#003770',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.1,
-    shadowRadius: 16,
+    shadowOpacity: 0.12,
+    shadowRadius: 24,
     elevation: 8,
     borderWidth: 1,
   },
   header: { marginBottom: 28, alignItems: 'center' },
-  title: { fontSize: 28, fontWeight: '800', marginBottom: 6, letterSpacing: -0.5 },
-  subtitle: { fontSize: 15, fontWeight: '400' },
+  title: { fontSize: 32, fontWeight: '300', marginBottom: 4, letterSpacing: -0.64 }, // Sohne thin display
+  subtitle: { fontSize: 14, fontWeight: '300', letterSpacing: -0.2 },
   inputContainer: { marginBottom: 20 },
-  label: { fontSize: 14, fontWeight: '600', marginBottom: 8 },
+  label: { fontSize: 13, fontWeight: '400', marginBottom: 6, letterSpacing: 0 },
   input: {
-    borderWidth: 2,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 16,
-    fontWeight: '500',
+    borderWidth: 1,
+    borderRadius: 6, // Stripe text-input rounded.sm (6px)
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 15,
+    fontWeight: '300',
   },
   button: {
-    paddingVertical: 16,
-    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 9999, // Stripe button-primary-pill
     alignItems: 'center',
     marginTop: 10,
-    shadowColor: '#4F46E5',
+    shadowColor: '#003770',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.15,
     shadowRadius: 8,
     elevation: 4,
   },
-  buttonDisabled: { opacity: 0.7 },
-  buttonText: { color: 'white', fontWeight: '700', fontSize: 16, letterSpacing: 0.3 },
+  buttonDisabled: { opacity: 0.6 },
+  buttonText: { color: 'white', fontWeight: '400', fontSize: 15, letterSpacing: 0 },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
     marginTop: 24,
     borderTopWidth: 1,
-    paddingTop: 24
+    paddingTop: 20
   },
-  footerText: { fontSize: 14 },
-  linkText: { fontWeight: '700', fontSize: 14 },
+  footerText: { fontSize: 14, fontWeight: '300' },
+  linkText: { fontWeight: '400', fontSize: 14 },
 });

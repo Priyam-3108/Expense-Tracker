@@ -4,14 +4,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 
-function SummaryCard({
-    title,
-    amount = 0,
-    icon,
-    type = 'income', // 'income' or 'expense'
-    onPress
-}) {
-    const { colors, spacing, borderRadius, shadows } = useTheme();
+function SummaryCard({ title, amount = 0, icon, type = 'income', onPress }) {
+    const { colors, borderRadius, shadows } = useTheme();
 
     const formatAmount = (amt) => {
         return new Intl.NumberFormat('en-IN', {
@@ -22,73 +16,104 @@ function SummaryCard({
         }).format(amt);
     };
 
-    const gradientColors = type === 'income'
-        ? ['#059669', '#10b981', '#34d399']
-        : ['#dc2626', '#ef4444', '#f87171'];
+    const isIncome = type === 'income';
+    const iconName = icon || (isIncome ? 'trending-up' : 'trending-down');
 
-    const iconName = icon || (type === 'income' ? 'trending-up' : 'trending-down');
+    // Use distinct gradients for each type
+    const gradientColors = isIncome
+        ? ['#059669', '#10b981']
+        : ['#c71852', '#ea2261'];
+    const accentColor = isIncome ? colors.income : colors.expense;
+    const bgColor    = isIncome ? (colors.incomeBg  || '#ecfdf5') : (colors.expenseBg || '#fff0f5');
 
     return (
         <TouchableOpacity
             activeOpacity={0.8}
             onPress={onPress}
-            style={[styles.container, { flex: 1 }]}
+            style={[
+                styles.container,
+                {
+                    backgroundColor: colors.card,
+                    borderColor: colors.border,
+                    borderRadius: borderRadius.lg,
+                },
+                shadows.sm,
+            ]}
         >
-            <LinearGradient
-                colors={gradientColors}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={[
-                    styles.gradient,
-                    { borderRadius: borderRadius.md },
-                    shadows.md,
-                ]}
-            >
-                <View style={styles.iconContainer}>
-                    <Ionicons name={iconName} size={24} color="#ffffff" />
-                </View>
+            {/* Top row: icon + badge */}
+            <View style={styles.topRow}>
+                <LinearGradient
+                    colors={gradientColors}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.iconGradient}
+                >
+                    <Ionicons name={iconName} size={16} color="#ffffff" />
+                </LinearGradient>
 
-                <View style={styles.content}>
-                    <Text style={styles.title}>{title}</Text>
-                    <Text style={styles.amount}>{formatAmount(amount)}</Text>
+                <View style={[styles.badge, { backgroundColor: bgColor }]}>
+                    <Text style={[styles.badgeText, { color: accentColor }]}>
+                        {isIncome ? '↑ IN' : '↓ OUT'}
+                    </Text>
                 </View>
-            </LinearGradient>
+            </View>
+
+            {/* Bottom: label + amount */}
+            <View style={styles.bottom}>
+                <Text style={[styles.title, { color: colors.subText }]}>{title}</Text>
+                <Text style={[styles.amount, { color: colors.text }]}>
+                    {formatAmount(amount)}
+                </Text>
+            </View>
         </TouchableOpacity>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
+        padding: 14,
+        minHeight: 108,
+        justifyContent: 'space-between',
+        borderWidth: 1,
         marginBottom: 12,
     },
-    gradient: {
-        padding: 16,
-        minHeight: 100,
+    topRow: {
+        flexDirection: 'row',
         justifyContent: 'space-between',
+        alignItems: 'center',
     },
-    iconContainer: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: 'rgba(255,255,255,0.2)',
+    iconGradient: {
+        width: 34,
+        height: 34,
+        borderRadius: 17,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 8,
     },
-    content: {
-        gap: 4,
+    badge: {
+        paddingHorizontal: 7,
+        paddingVertical: 3,
+        borderRadius: 9999,
+    },
+    badgeText: {
+        fontSize: 10,
+        fontWeight: '600',
+        letterSpacing: 0.2,
+    },
+    bottom: {
+        gap: 2,
+        marginTop: 10,
     },
     title: {
-        fontSize: 13,
-        color: 'rgba(255,255,255,0.9)',
-        fontWeight: '500',
-        letterSpacing: 0.3,
+        fontSize: 12,
+        fontWeight: '400',
+        letterSpacing: -0.1,
     },
     amount: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        color: '#ffffff',
-        letterSpacing: 0.5,
+        fontSize: 19,
+        fontWeight: '400',
+        letterSpacing: -0.5,
+        fontVariant: ['tabular-nums'],
     },
 });
 

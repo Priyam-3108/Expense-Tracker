@@ -8,7 +8,7 @@ import { SecurityUtils } from '../utils/security';
 import hapticFeedback from '../utils/haptics';
 
 function AppLockScreen({ navigation }) {
-    const { colors, isDark, spacing, borderRadius } = useTheme();
+    const { colors, isDark } = useTheme();
     const {
         isAppLockEnabled,
         isBiometricsEnabled,
@@ -201,21 +201,24 @@ function AppLockScreen({ navigation }) {
         button: {
             marginTop: 20,
             backgroundColor: colors.card,
-            padding: 15,
-            borderRadius: borderRadius.md,
+            paddingVertical: 12,
+            paddingHorizontal: 20,
+            borderRadius: 9999, // Stripe pill button
             alignItems: 'center',
             borderWidth: 1,
             borderColor: colors.border,
         },
         buttonText: {
             color: colors.text,
-            fontWeight: '600',
-            fontSize: 16,
+            fontWeight: '400',
+            fontSize: 15,
+            letterSpacing: 0,
         },
         description: {
             fontSize: 13,
+            fontWeight: '300',
             color: colors.subText,
-            marginTop: 5,
+            marginTop: 4,
             lineHeight: 18,
         }
     });
@@ -265,40 +268,39 @@ function AppLockScreen({ navigation }) {
 
             {/* PIN MODAL */}
             <Modal visible={showPinModal} animationType="slide" transparent={false}>
-                <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+                <SafeAreaView style={{ flex: 1, backgroundColor: isDark ? '#0d253d' : colors.background }}>
                     <View style={{ padding: 20 }}>
                         <TouchableOpacity onPress={() => setShowPinModal(false)} style={{ alignSelf: 'flex-end', padding: 10 }}>
-                            <Ionicons name="close" size={28} color={colors.text} />
+                            <Ionicons name="close" size={26} color={colors.text} />
                         </TouchableOpacity>
 
-                        <Text style={{ fontSize: 22, fontWeight: 'bold', color: colors.text, textAlign: 'center', marginTop: 40 }}>
+                        <Text style={{ fontSize: 28, fontWeight: '300', color: colors.text, textAlign: 'center', marginTop: 30, letterSpacing: -0.64 }}>
                             {pinMode === 'CHANGE_VERIFY' ? 'Enter Old PIN' :
                                 pinStep === 'ENTER' ? (pinMode === 'CHANGE_NEW' ? 'Enter New PIN' : 'Create PIN') :
                                     'Confirm PIN'}
                         </Text>
 
                         {/* Dots */}
-                        <View style={{ flexDirection: 'row', justifyContent: 'center', marginVertical: 40 }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'center', marginVertical: 36 }}>
                             {[0, 1, 2, 3].map(i => (
                                 <View key={i} style={{
-                                    width: 16, height: 16, borderRadius: 8, borderWidth: 1, borderColor: colors.text,
+                                    width: 14, height: 14, borderRadius: 7, borderWidth: 1, borderColor: colors.border,
                                     marginHorizontal: 10,
-                                    backgroundColor: i < modalPin.length ? colors.text : 'transparent'
+                                    backgroundColor: i < modalPin.length ? (colors.primary || '#533afd') : 'transparent'
                                 }} />
                             ))}
-                            {/* Simplified 4 dots for setup? Or dynamic */}
                         </View>
 
-                        {modalError ? <Text style={{ color: colors.danger, textAlign: 'center', marginBottom: 20 }}>{modalError}</Text> : null}
+                        {modalError ? <Text style={{ color: colors.danger || '#ea2261', textAlign: 'center', marginBottom: 20, fontSize: 13 }}>{modalError}</Text> : null}
                     </View>
 
-                    <View style={{ flex: 1, justifyContent: 'flex-end', paddingBottom: 50 }}>
+                    <View style={{ flex: 1, justifyContent: 'flex-end', paddingBottom: 40 }}>
                         {renderKeypad()}
                         <TouchableOpacity
-                            style={{ alignSelf: 'center', marginTop: 20, padding: 15, width: 120, alignItems: 'center', backgroundColor: colors.primary, borderRadius: 30 }}
+                            style={{ alignSelf: 'center', marginTop: 20, paddingVertical: 12, paddingHorizontal: 24, minWidth: 120, alignItems: 'center', backgroundColor: colors.primary || '#533afd', borderRadius: 9999 }}
                             onPress={handleSubmitPin}
                         >
-                            <Text style={{ color: '#fff', fontWeight: 'bold' }}>
+                            <Text style={{ color: '#fff', fontWeight: '400', fontSize: 15 }}>
                                 {pinMode === 'CHANGE_VERIFY' ? 'Next' : (pinStep === 'ENTER' ? 'Next' : 'Save')}
                             </Text>
                         </TouchableOpacity>
@@ -317,16 +319,17 @@ const localStyles = StyleSheet.create({
         justifyContent: 'center',
     },
     key: {
-        width: 75,
-        height: 75,
-        borderRadius: 37.5,
+        width: 70,
+        height: 70,
+        borderRadius: 35,
         alignItems: 'center',
         justifyContent: 'center',
-        margin: 10,
+        margin: 8,
     },
     keyText: {
-        fontSize: 28,
-        fontWeight: '600',
+        fontSize: 24,
+        fontWeight: '300',
+        fontVariant: ['tabular-nums'],
     }
 });
 

@@ -150,35 +150,36 @@ const LockScreen = () => {
     const styles = StyleSheet.create({
         container: {
             flex: 1,
-            backgroundColor: colors.background,
+            backgroundColor: isDark ? '#0d253d' : colors.background, // Stripe dark-app shell (#0d253d)
             alignItems: 'center',
             justifyContent: 'center',
         },
         title: {
-            fontSize: 22,
-            fontWeight: '600',
+            fontSize: 28,
+            fontWeight: '300', // Sohne thin display
             color: colors.text,
-            marginBottom: 40,
+            marginBottom: 36,
+            letterSpacing: -0.64,
         },
         pinContainer: {
             flexDirection: 'row',
-            marginBottom: 50,
+            marginBottom: 44,
         },
         dot: {
-            width: 16,
-            height: 16,
-            borderRadius: 8,
+            width: 14,
+            height: 14,
+            borderRadius: 7,
             borderWidth: 1,
-            borderColor: colors.text,
+            borderColor: colors.border,
             marginHorizontal: 10,
         },
         dotFilled: {
-            backgroundColor: colors.primary,
-            borderColor: colors.primary,
+            backgroundColor: colors.primary || '#533afd', // Electric Indigo
+            borderColor: colors.primary || '#533afd',
         },
         dotError: {
-            borderColor: colors.danger,
-            backgroundColor: colors.danger,
+            borderColor: colors.danger || '#ea2261',
+            backgroundColor: colors.danger || '#ea2261',
         },
         keypad: {
             width: '100%',
@@ -188,30 +189,35 @@ const LockScreen = () => {
             justifyContent: 'center',
         },
         key: {
-            width: 75,
-            height: 75,
-            borderRadius: 37.5,
+            width: 70,
+            height: 70,
+            borderRadius: 35,
             alignItems: 'center',
             justifyContent: 'center',
-            margin: 10,
-            backgroundColor: isDark ? '#333' : '#eee', // Subtle key background
+            margin: 8,
+            backgroundColor: isDark ? '#1c1e54' : '#ffffff', // Stripe Brand Dark 900 or white
+            borderWidth: 1,
+            borderColor: colors.border,
         },
         keyText: {
-            fontSize: 28,
-            fontWeight: '600',
+            fontSize: 24,
+            fontWeight: '300', // Sohne thin style
             color: colors.text,
+            fontVariant: ['tabular-nums'],
         },
         transparentKey: {
             backgroundColor: 'transparent',
+            borderWidth: 0,
         },
         bioButton: {
-            marginTop: 30,
+            marginTop: 24,
             alignItems: 'center',
         },
         bioText: {
             color: colors.primary,
             marginTop: 8,
-            fontSize: 14,
+            fontSize: 13,
+            fontWeight: '300',
         }
     });
 

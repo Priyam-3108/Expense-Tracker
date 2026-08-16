@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, StatusBar, RefreshControl, Alert, Platform } from 'react-native';
+import { useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import DraggableFlatList, { ScaleDecorator } from 'react-native-draggable-flatlist';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useTheme } from '../context/ThemeContext';
@@ -21,7 +23,6 @@ function CategoriesScreen({ navigation }) {
     const fetchCategories = async () => {
         try {
             const response = await categoryService.getCategories();
-            // Try to find the array in common locations
             let cats = [];
             const raw = response.data;
 
@@ -36,12 +37,11 @@ function CategoriesScreen({ navigation }) {
             }
 
             if (cats && cats.length > 0) {
-                // Ensure all categories have required fields
                 cats = cats.map(c => ({
                     ...c,
                     name: c.name || 'Unnamed',
                     icon: c.icon || '💰',
-                    color: c.color || '#3B82F6'
+                    color: c.color || '#533afd'
                 }));
                 setCategories(cats);
             } else {
@@ -90,60 +90,45 @@ function CategoriesScreen({ navigation }) {
 
         const hasExpenses = category.expenseCount > 0;
         const message = hasExpenses
-            ? `Are you sure you want to delete "${category.name}"? This category has ${category.expenseCount} associated expense${category.expenseCount !== 1 ? 's' : ''}. You'll need to reassign or delete those expenses first.`
-            : `Are you sure you want to delete "${category.name}"? This action cannot be undone.`;
+            ? `Delete "${category.name}"? It has ${category.expenseCount} expense(s). Reassign them first.`
+            : `Delete "${category.name}"? This cannot be undone.`;
 
-        Alert.alert(
-            'Delete Category',
-            message,
-            [
-                { text: 'Cancel', style: 'cancel' },
-                {
-                    text: 'Delete',
-                    style: 'destructive',
-                    onPress: async () => {
-                        hapticFeedback.medium();
-
-                        try {
-                            const response = await categoryService.deleteCategory(category._id);
-                            const success = response?.data?.success !== false;
-
-                            if (success) {
-                                hapticFeedback.success();
-                                Alert.alert('Success', 'Category deleted successfully');
-                                fetchCategories();
-                            } else {
-                                const errorMsg = response?.data?.message || 'Failed to delete category';
-                                hapticFeedback.error();
-                                Alert.alert('Error', errorMsg);
-                            }
-                        } catch (error) {
-                            console.error('Error deleting category:', error);
-                            const errorMessage = error.response?.data?.message || 'Failed to delete category';
+        Alert.alert('Delete Category', message, [
+            { text: 'Cancel', style: 'cancel' },
+            {
+                text: 'Delete',
+                style: 'destructive',
+                onPress: async () => {
+                    hapticFeedback.medium();
+                    try {
+                        const response = await categoryService.deleteCategory(category._id);
+                        const success = response?.data?.success !== false;
+                        if (success) {
+                            hapticFeedback.success();
+                            fetchCategories();
+                        } else {
                             hapticFeedback.error();
-                            Alert.alert('Error', errorMessage);
+                            Alert.alert('Error', response?.data?.message || 'Failed to delete');
                         }
+                    } catch (error) {
+                        hapticFeedback.error();
+                        Alert.alert('Error', error.response?.data?.message || 'Failed to delete category');
                     }
                 }
-            ]
-        );
+            }
+        ]);
     };
 
     const handleDragEnd = async ({ data }) => {
-        // Update local state immediately for smooth UX
         setCategories(data);
         hapticFeedback.medium();
-
         try {
-            // Send new order to backend
             const newOrder = data.map(cat => cat._id);
             await categoryService.updateCategoryOrder(newOrder);
             hapticFeedback.success();
         } catch (error) {
-            console.error('Error updating category order:', error);
             hapticFeedback.error();
             Alert.alert('Error', 'Failed to save category order');
-            // Revert to previous order
             fetchCategories();
         }
     };
@@ -151,180 +136,102 @@ function CategoriesScreen({ navigation }) {
     const renderCategoryIcon = (item) => {
         const icon = item.icon;
         if (icon && [...icon].length <= 2) {
-            // It's likely an Emoji
-            return <Text style={{ fontSize: 24 }}>{icon}</Text>;
+            return <Text style={{ fontSize: 22 }}>{icon}</Text>;
         }
         if (icon && icon.length > 2) {
-            // It's likely an Ionicon name
-            return <Ionicons name={icon} size={24} color={item.color || colors.primary} />;
+            return <Ionicons name={icon} size={22} color="#ffffff" />;
         }
-        // Fallback: First letter of name
         return (
-            <Text style={{ fontSize: 20, fontWeight: 'bold', color: item.color || colors.primary }}>
+            <Text style={{ fontSize: 18, fontWeight: '600', color: '#ffffff' }}>
                 {(item.name || '?').charAt(0).toUpperCase()}
             </Text>
         );
     };
 
     const renderCategory = ({ item, drag, isActive }) => {
-        const itemStyles = StyleSheet.create({
-            categoryItem: {
-                flexDirection: 'row',
-                alignItems: 'center',
-                backgroundColor: isActive ? colors.borderLight : colors.card,
-                paddingVertical: spacing.md,
-                paddingHorizontal: spacing.sm,
-                borderRadius: borderRadius.lg,
-                marginBottom: spacing.sm,
-                marginHorizontal: spacing.md,
-                borderLeftWidth: 4,
-                borderLeftColor: item.color || colors.primary,
-                ...shadows.sm,
-                opacity: isActive ? 0.9 : 1,
-                transform: [{ scale: isActive ? 1.02 : 1 }],
-            },
-            dragHandle: {
-                paddingHorizontal: spacing.xs,
-                paddingVertical: spacing.sm,
-                marginRight: spacing.xs,
-            },
-            iconContainer: {
-                width: 52,
-                height: 52,
-                borderRadius: 26,
-                backgroundColor: `${item.color || colors.primary}15`,
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginRight: spacing.md,
-                borderWidth: 1.5,
-                borderColor: `${item.color || colors.primary}30`,
-            },
-            content: {
-                flex: 1,
-                justifyContent: 'center',
-            },
-            categoryName: {
-                fontSize: 17,
-                fontWeight: '700',
-                color: colors.text,
-                marginBottom: spacing.xs,
-                letterSpacing: 0.2,
-            },
-            categoryInfo: {
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: spacing.xs,
-                flexWrap: 'wrap',
-            },
-            badge: {
-                paddingHorizontal: spacing.sm,
-                paddingVertical: 2,
-                borderRadius: borderRadius.sm,
-                backgroundColor: item.isDefault ? colors.primary + '15' : colors.success + '15',
-                borderWidth: 1,
-                borderColor: item.isDefault ? colors.primary + '30' : colors.success + '30',
-            },
-            badgeText: {
-                fontSize: 10,
-                fontWeight: '700',
-                color: item.isDefault ? colors.primary : colors.success,
-                letterSpacing: 0.5,
-            },
-            expenseCount: {
-                fontSize: 12,
-                fontWeight: '600',
-                color: colors.primary,
-                backgroundColor: colors.primary + '10',
-                paddingHorizontal: spacing.sm,
-                paddingVertical: 2,
-                borderRadius: borderRadius.sm,
-            },
-            actions: {
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: spacing.xs,
-                marginLeft: spacing.xs,
-            },
-            actionButton: {
-                width: 36,
-                height: 36,
-                borderRadius: 18,
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: colors.borderLight,
-            },
-            readOnlyText: {
-                fontSize: 10,
-                color: colors.subText,
-                fontStyle: 'italic',
-                fontWeight: '500',
-                paddingHorizontal: spacing.sm,
-            },
-        });
+        const catColor = item.color || colors.primary;
 
         return (
             <ScaleDecorator>
                 <TouchableOpacity
-                    style={itemStyles.categoryItem}
                     onPress={() => handleCategoryPress(item)}
                     onLongPress={drag}
-                    delayLongPress={500}
-                    activeOpacity={0.7}
+                    delayLongPress={400}
+                    activeOpacity={0.75}
                     disabled={isActive}
+                    style={[
+                        styles.catCard,
+                        {
+                            backgroundColor: isActive ? colors.cardElevated : colors.card,
+                            borderColor: isActive ? catColor + '60' : colors.border,
+                            transform: [{ scale: isActive ? 1.02 : 1 }],
+                            ...shadows.sm,
+                        }
+                    ]}
                 >
-                    {/* Drag Handle - Visual indicator only */}
-                    <View style={itemStyles.dragHandle}>
-                        <Ionicons name="reorder-two" size={24} color={colors.subText} />
-                    </View>
+                    {/* Left accent line */}
+                    <View style={[styles.accentLine, { backgroundColor: catColor }]} />
 
-                    {/* Icon */}
-                    <View style={itemStyles.iconContainer}>
+                    {/* Icon pill */}
+                    <LinearGradient
+                        colors={[catColor + 'dd', catColor]}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                        style={styles.iconGradient}
+                    >
                         {renderCategoryIcon(item)}
-                    </View>
+                    </LinearGradient>
 
-                    {/* Content */}
-                    <View style={itemStyles.content}>
-                        <Text style={itemStyles.categoryName}>{item.name}</Text>
-                        <View style={itemStyles.categoryInfo}>
-                            <View style={itemStyles.badge}>
-                                <Text style={itemStyles.badgeText}>
-                                    {item.isDefault ? 'DEFAULT' : 'CUSTOM'}
-                                </Text>
-                            </View>
+                    {/* Text block */}
+                    <View style={styles.catContent}>
+                        <Text style={[styles.catName, { color: colors.text }]} numberOfLines={1}>
+                            {item.name}
+                        </Text>
+                        <View style={styles.catMeta}>
+                            {item.isDefault ? (
+                                <View style={[styles.pill, { backgroundColor: colors.primarySubdued }]}>
+                                    <Text style={[styles.pillText, { color: colors.primary }]}>Default</Text>
+                                </View>
+                            ) : (
+                                <View style={[styles.pill, { backgroundColor: colors.successBg || '#ecfdf5' }]}>
+                                    <Text style={[styles.pillText, { color: colors.success }]}>Custom</Text>
+                                </View>
+                            )}
                             {item.expenseCount > 0 && (
-                                <Text style={itemStyles.expenseCount}>
-                                    {item.expenseCount} exp.
-                                </Text>
+                                <View style={[styles.pill, { backgroundColor: colors.borderLight }]}>
+                                    <Text style={[styles.pillText, { color: colors.subText }]}>
+                                        {item.expenseCount} txn{item.expenseCount !== 1 ? 's' : ''}
+                                    </Text>
+                                </View>
                             )}
                         </View>
                     </View>
 
-                    {/* Actions */}
-                    <View style={itemStyles.actions}>
+                    {/* Right actions */}
+                    <View style={styles.catActions}>
                         {!item.isDefault ? (
                             <>
                                 <TouchableOpacity
-                                    style={itemStyles.actionButton}
+                                    style={[styles.actionBtn, { backgroundColor: colors.primarySubdued }]}
                                     onPress={() => navigation.navigate('AddEditCategory', { category: item })}
                                 >
-                                    <Ionicons name="create-outline" size={20} color={colors.primary} />
+                                    <Ionicons name="pencil" size={14} color={colors.primary} />
                                 </TouchableOpacity>
                                 <TouchableOpacity
-                                    style={itemStyles.actionButton}
+                                    style={[styles.actionBtn, { backgroundColor: colors.dangerBg || '#fff0f5' }]}
                                     onPress={() => handleDeleteCategory(item)}
                                 >
-                                    <Ionicons
-                                        name="trash-outline"
-                                        size={20}
-                                        color={item.expenseCount > 0 ? '#F97316' : '#EF4444'}
-                                    />
+                                    <Ionicons name="trash-outline" size={14} color={colors.danger} />
                                 </TouchableOpacity>
                             </>
                         ) : (
-                            <Text style={{ fontSize: 11, color: colors.subText, fontStyle: 'italic', paddingHorizontal: spacing.sm }}>
-                                Read-only
-                            </Text>
+                            <View style={[styles.actionBtn, { backgroundColor: colors.borderLight }]}>
+                                <Ionicons name="lock-closed-outline" size={14} color={colors.subText} />
+                            </View>
                         )}
+                        <View style={[styles.dragHandle, { backgroundColor: colors.borderLight }]}>
+                            <Ionicons name="menu" size={14} color={colors.subText} />
+                        </View>
                     </View>
                 </TouchableOpacity>
             </ScaleDecorator>
@@ -338,17 +245,18 @@ function CategoriesScreen({ navigation }) {
             subtitle="Create custom categories to organize your transactions"
             action={
                 <TouchableOpacity
-                    style={[mainStyles.emptyButton, { backgroundColor: colors.primary }]}
+                    style={[styles.emptyButton, { backgroundColor: colors.primary }]}
                     onPress={handleAddCategory}
                 >
-                    <Text style={mainStyles.emptyButtonText}>Add Category</Text>
+                    <Ionicons name="add" size={16} color="#ffffff" style={{ marginRight: 6 }} />
+                    <Text style={styles.emptyButtonText}>Add Category</Text>
                 </TouchableOpacity>
             }
         />
     );
 
     const renderLoading = () => (
-        <View style={mainStyles.loadingContainer}>
+        <View style={{ padding: spacing.lg }}>
             <SkeletonTransactionItem />
             <SkeletonTransactionItem />
             <SkeletonTransactionItem />
@@ -357,7 +265,15 @@ function CategoriesScreen({ navigation }) {
         </View>
     );
 
-    const mainStyles = StyleSheet.create({
+    const renderListHeader = () => (
+        <View style={[styles.listHeader, { borderBottomColor: colors.border }]}>
+            <Text style={[styles.listHeaderText, { color: colors.subText }]}>
+                {categories.length} {categories.length === 1 ? 'category' : 'categories'} · Long press to reorder
+            </Text>
+        </View>
+    );
+
+    const styles = StyleSheet.create({
         container: {
             flex: 1,
             backgroundColor: colors.background,
@@ -366,55 +282,134 @@ function CategoriesScreen({ navigation }) {
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
-            paddingHorizontal: spacing.lg,
+            paddingHorizontal: 20,
             paddingTop: 50,
-            paddingBottom: spacing.md,
+            paddingBottom: 16,
+        },
+        titleBlock: {
+            flex: 1,
         },
         title: {
-            fontSize: 28,
-            fontWeight: 'bold',
+            fontSize: 32,
+            fontWeight: '300',
             color: colors.text,
-        },
-        subtitle: {
-            fontSize: 14,
-            color: colors.subText,
-            marginTop: spacing.xs,
+            letterSpacing: -0.64,
         },
         addButton: {
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            backgroundColor: colors.primary,
-            justifyContent: 'center',
+            flexDirection: 'row',
             alignItems: 'center',
+            gap: 6,
+            backgroundColor: colors.primary,
+            paddingHorizontal: 14,
+            paddingVertical: 9,
+            borderRadius: 9999,
             ...shadows.md,
         },
-        emptyButton: {
-            paddingHorizontal: 24,
-            paddingVertical: 12,
+        addButtonText: {
+            color: '#ffffff',
+            fontSize: 14,
+            fontWeight: '500',
+        },
+        listHeader: {
+            paddingHorizontal: 20,
+            paddingVertical: 10,
+            borderBottomWidth: 1,
+            marginBottom: 8,
+        },
+        listHeaderText: {
+            fontSize: 12,
+            fontWeight: '400',
+            letterSpacing: 0.1,
+        },
+        catCard: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            borderRadius: 14,
+            marginBottom: 10,
+            marginHorizontal: 16,
+            borderWidth: 1,
+            overflow: 'hidden',
+        },
+        accentLine: {
+            width: 4,
+            alignSelf: 'stretch',
+        },
+        iconGradient: {
+            width: 46,
+            height: 46,
             borderRadius: 12,
+            justifyContent: 'center',
+            alignItems: 'center',
+            margin: 12,
+        },
+        catContent: {
+            flex: 1,
+            paddingVertical: 12,
+        },
+        catName: {
+            fontSize: 16,
+            fontWeight: '400',
+            marginBottom: 5,
+            letterSpacing: -0.2,
+        },
+        catMeta: {
+            flexDirection: 'row',
+            gap: 6,
+            flexWrap: 'wrap',
+        },
+        pill: {
+            paddingHorizontal: 8,
+            paddingVertical: 2,
+            borderRadius: 9999,
+        },
+        pillText: {
+            fontSize: 11,
+            fontWeight: '500',
+        },
+        catActions: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 6,
+            paddingRight: 12,
+        },
+        actionBtn: {
+            width: 30,
+            height: 30,
+            borderRadius: 15,
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+        dragHandle: {
+            width: 30,
+            height: 30,
+            borderRadius: 15,
+            justifyContent: 'center',
+            alignItems: 'center',
+        },
+        emptyButton: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingHorizontal: 20,
+            paddingVertical: 11,
+            borderRadius: 9999,
         },
         emptyButtonText: {
             color: '#ffffff',
-            fontSize: 16,
-            fontWeight: '600',
-        },
-        loadingContainer: {
-            padding: spacing.lg,
+            fontSize: 15,
+            fontWeight: '400',
         },
         listContent: {
-            // Dynamic padding: tab bar height + safe area bottom + extra spacing
-            paddingBottom: (Platform.OS === 'ios' ? 88 : 85) + insets.bottom + spacing.lg,
+            paddingBottom: (Platform.OS === 'ios' ? 88 : 85) + insets.bottom + 16,
         },
     });
 
     if (loading) {
         return (
-            <View style={mainStyles.container}>
+            <View style={styles.container}>
                 <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
-                <View style={mainStyles.header}>
-                    <View>
-                        <Text style={mainStyles.title}>Categories</Text>
+                <View style={styles.header}>
+                    <View style={styles.titleBlock}>
+                        <Text style={styles.title}>Categories</Text>
                     </View>
                 </View>
                 {renderLoading()}
@@ -423,21 +418,21 @@ function CategoriesScreen({ navigation }) {
     }
 
     return (
-        <GestureHandlerRootView style={mainStyles.container}>
+        <GestureHandlerRootView style={styles.container}>
             <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
 
             {/* Header */}
-            <View style={mainStyles.header}>
-                <View>
-                    <Text style={mainStyles.title}>Categories</Text>
-                    <Text style={mainStyles.subtitle}>Long press to reorder</Text>
+            <View style={styles.header}>
+                <View style={styles.titleBlock}>
+                    <Text style={styles.title}>Categories</Text>
                 </View>
-                <TouchableOpacity style={mainStyles.addButton} onPress={handleAddCategory}>
-                    <Ionicons name="add" size={24} color="#ffffff" />
+                <TouchableOpacity style={styles.addButton} onPress={handleAddCategory}>
+                    <Ionicons name="add" size={18} color="#ffffff" />
+                    <Text style={styles.addButtonText}>New</Text>
                 </TouchableOpacity>
             </View>
 
-            {/* Categories List with Drag & Drop */}
+            {/* Category List */}
             <DraggableFlatList
                 data={categories}
                 renderItem={renderCategory}
@@ -446,6 +441,7 @@ function CategoriesScreen({ navigation }) {
                 activationDistance={10}
                 autoscrollSpeed={100}
                 autoscrollThreshold={80}
+                ListHeaderComponent={categories.length > 0 ? renderListHeader : null}
                 ListEmptyComponent={renderEmpty}
                 showsVerticalScrollIndicator={false}
                 refreshControl={
@@ -456,7 +452,7 @@ function CategoriesScreen({ navigation }) {
                         colors={[colors.primary]}
                     />
                 }
-                contentContainerStyle={mainStyles.listContent}
+                contentContainerStyle={styles.listContent}
             />
         </GestureHandlerRootView>
     );

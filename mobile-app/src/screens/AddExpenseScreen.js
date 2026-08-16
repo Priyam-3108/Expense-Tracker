@@ -1,41 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Modal, StatusBar, Switch } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+    View, Text, TextInput, TouchableOpacity, StyleSheet,
+    ScrollView, Modal, StatusBar, Switch, Platform,
+    KeyboardAvoidingView, Animated
+} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import ModernDatePicker from '../components/ModernDatePicker';
 import CustomAlert from '../components/CustomAlert';
-import { expenseService } from '../services/expenseService';
 import { categoryService } from '../services/categoryService';
 import { useTheme } from '../context/ThemeContext';
 import { offlineService } from '../services/offlineService';
 import { syncEngine } from '../services/syncEngine';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import hapticFeedback from '../utils/haptics';
 
 export default function AddExpenseScreen({ navigation, route }) {
-    const { colors, isDark } = useTheme();
+    const { colors, isDark, shadows, borderRadius } = useTheme();
     const [description, setDescription] = useState('');
     const [amount, setAmount] = useState('');
-    const [type, setType] = useState('expense'); // 'expense' or 'income'
+    const [type, setType] = useState('expense');
     const [category, setCategory] = useState('');
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
     const [pickerVisible, setPickerVisible] = useState(false);
-
-    // Editing State
     const [isEditing, setIsEditing] = useState(false);
     const [editId, setEditId] = useState(null);
-
-    // Date State
     const [date, setDate] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
-
-    // Recurring State
     const [isRecurring, setIsRecurring] = useState(false);
     const [recurringPeriod, setRecurringPeriod] = useState('monthly');
     const [recurringEndDate, setRecurringEndDate] = useState(new Date());
     const [showEndDatePicker, setShowEndDatePicker] = useState(false);
-
-    // Alert States
     const [showAlert, setShowAlert] = useState(false);
     const [alertConfig, setAlertConfig] = useState({ type: 'default', title: '', message: '', buttons: [] });
+
+    const typeAnim = useRef(new Animated.Value(type === 'expense' ? 0 : 1)).current;
 
     useEffect(() => {
         fetchCategories();
@@ -52,142 +52,84 @@ export default function AddExpenseScreen({ navigation, route }) {
             if (exp.recurringPeriod) setRecurringPeriod(exp.recurringPeriod);
             if (exp.recurringEndDate) setRecurringEndDate(new Date(exp.recurringEndDate));
         } else {
-            setIsEditing(false);
-            setEditId(null);
-            setDescription('');
-            setAmount('');
-            setType('expense');
-            setCategory('');
-            setDate(new Date());
-            setIsRecurring(false);
-            setRecurringPeriod('monthly');
-            setRecurringEndDate(new Date());
+            resetForm();
         }
     }, [route.params]);
+
+    const resetForm = () => {
+        setIsEditing(false); setEditId(null); setDescription(''); setAmount('');
+        setType('expense'); setCategory(''); setDate(new Date());
+        setIsRecurring(false); setRecurringPeriod('monthly'); setRecurringEndDate(new Date());
+    };
+
+    const switchType = (t) => {
+        hapticFeedback.light();
+        setType(t);
+        Animated.spring(typeAnim, {
+            toValue: t === 'expense' ? 0 : 1,
+            useNativeDriver: false,
+            tension: 60, friction: 8,
+        }).start();
+    };
 
     const fetchCategories = async () => {
         try {
             const res = await categoryService.getCategories();
-            // Check for nested structure commonly used in this project's backend
             let cats = [];
             if (res.data.success) {
-                if (res.data.data && Array.isArray(res.data.data.categories)) {
-                    cats = res.data.data.categories;
-                } else if (Array.isArray(res.data.data)) {
-                    cats = res.data.data;
-                }
+                if (res.data.data && Array.isArray(res.data.data.categories)) cats = res.data.data.categories;
+                else if (Array.isArray(res.data.data)) cats = res.data.data;
             }
             if (cats.length > 0) {
                 setCategories(cats);
                 await AsyncStorage.setItem('categories_cache', JSON.stringify(cats));
             }
-        } catch (error) {
-            console.log('Failed to load categories from API, checking cache', error);
-            // Try cache
+        } catch {
             try {
                 const cached = await AsyncStorage.getItem('categories_cache');
-                if (cached) {
-                    setCategories(JSON.parse(cached));
-                } else {
-                    setAlertConfig({
-                        type: 'danger',
-                        title: 'Offline',
-                        message: 'No Internet and no cached categories.',
-                        buttons: [{ text: 'OK', style: 'primary' }]
-                    });
-                    setShowAlert(true);
-                }
-            } catch (cacheErr) {
-                console.error('Cache load failed', cacheErr);
-            }
+                if (cached) setCategories(JSON.parse(cached));
+            } catch { /* ignore */ }
         }
     };
 
     const handleSubmit = async () => {
         if (!amount || !category) {
-            setAlertConfig({
-                type: 'warning',
-                title: 'Missing Information',
-                message: 'Please fill amount and category fields',
-                buttons: [{ text: 'OK', style: 'primary' }]
-            });
+            setAlertConfig({ type: 'warning', title: 'Missing Fields', message: 'Please enter an amount and select a category.', buttons: [{ text: 'OK', style: 'primary' }] });
             setShowAlert(true);
             return;
         }
-
         if (isRecurring && recurringEndDate < date) {
-            setAlertConfig({
-                type: 'warning',
-                title: 'Invalid Date',
-                message: 'Recurring end date must be after the start date',
-                buttons: [{ text: 'OK', style: 'primary' }]
-            });
+            setAlertConfig({ type: 'warning', title: 'Invalid Date', message: 'End date must be after start date.', buttons: [{ text: 'OK', style: 'primary' }] });
             setShowAlert(true);
             return;
         }
 
         setLoading(true);
         try {
-            const formatDateToYYYYMMDD = (d) => {
-                if (!d) return '';
-                const dateObj = typeof d === 'string' ? new Date(d) : d;
-                const year = dateObj.getFullYear();
-                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-                const day = String(dateObj.getDate()).padStart(2, '0');
-                return `${year}-${month}-${day}`;
+            const fmt = (d) => {
+                const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0'), day = String(d.getDate()).padStart(2, '0');
+                return `${y}-${m}-${day}`;
             };
-
             const payload = {
-                description: description,
-                amount: parseFloat(amount),
-                type,
-                category,
-                date: formatDateToYYYYMMDD(date), // Send selected date formatted as YYYY-MM-DD
-                isRecurring,
-                ...(isRecurring && {
-                    recurringPeriod,
-                    recurringEndDate: formatDateToYYYYMMDD(recurringEndDate)
-                })
+                ...(isEditing && editId && { _id: editId, id: editId }),
+                description, amount: parseFloat(amount), type, category,
+                date: fmt(date), isRecurring,
+                ...(isRecurring && { recurringPeriod, recurringEndDate: fmt(recurringEndDate) }),
             };
 
-            // OFFLINE-FIRST: Save locally
             await offlineService.saveExpenseLocally(payload);
-
-            // Trigger background sync
             syncEngine.syncNow();
 
-             setAlertConfig({
-                type: 'success',
-                title: 'Saved',
-                message: 'Transaction saved successfully!',
-                buttons: [{
-                    text: 'OK',
-                    style: 'primary',
-                    onPress: () => {
-                        setDescription('');
-                        setAmount('');
-                        setCategory('');
-                        setType('expense');
-                        setDate(new Date());
-                        setIsRecurring(false);
-                        setRecurringPeriod('monthly');
-                        setRecurringEndDate(new Date());
-                        setIsEditing(false);
-                        setEditId(null);
-                        navigation.setParams({ expense: undefined });
-                        navigation.goBack();
-                    }
-                }]
+            hapticFeedback.success();
+            setAlertConfig({
+                type: 'success', title: isEditing ? 'Updated!' : 'Saved!',
+                message: `Transaction ${isEditing ? 'updated' : 'saved'} successfully.`,
+                buttons: [{ text: 'OK', style: 'primary', onPress: () => { resetForm(); navigation.setParams({ expense: undefined }); navigation.goBack(); } }],
             });
             setShowAlert(true);
         } catch (error) {
-            const msg = error.message || 'Failed to save transaction';
-            setAlertConfig({
-                type: 'danger',
-                title: 'Error',
-                message: msg,
-                buttons: [{ text: 'OK', style: 'primary' }]
-            });
+            hapticFeedback.error();
+            setAlertConfig({ type: 'danger', title: 'Error', message: error.message || 'Failed to save.', buttons: [{ text: 'OK', style: 'primary' }] });
             setShowAlert(true);
         } finally {
             setLoading(false);
@@ -195,208 +137,387 @@ export default function AddExpenseScreen({ navigation, route }) {
     };
 
     const periods = [
-        { label: 'Daily', value: 'daily' },
-        { label: 'Weekly', value: 'weekly' },
-        { label: 'Monthly', value: 'monthly' },
-        { label: 'Yearly', value: 'yearly' }
+        { label: 'Daily', value: 'daily', icon: 'sunny-outline' },
+        { label: 'Weekly', value: 'weekly', icon: 'calendar-clear-outline' },
+        { label: 'Monthly', value: 'monthly', icon: 'calendar-outline' },
+        { label: 'Yearly', value: 'yearly', icon: 'stats-chart-outline' },
     ];
 
+    const isExpense = type === 'expense';
+    const typeColor = isExpense ? colors.danger : colors.success;
+    const selectedCat = categories.find(c => c._id === category);
+    const formattedDate = date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+
+    // ─── STYLES ───────────────────────────────────────────────────────────────
+    const s = StyleSheet.create({
+        outer: { flex: 1, backgroundColor: colors.background },
+        scrollContent: { flexGrow: 1, paddingBottom: 100 },
+
+        // ── Header ──
+        header: {
+            paddingTop: Platform.OS === 'ios' ? 54 : 44,
+            paddingHorizontal: 20,
+            paddingBottom: 12,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 12,
+        },
+        backBtn: {
+            width: 38, height: 38, borderRadius: 19,
+            backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border,
+            justifyContent: 'center', alignItems: 'center',
+        },
+        headerTitle: {
+            fontSize: 20, fontWeight: '400', color: colors.text, letterSpacing: -0.3,
+        },
+
+        // ── Amount hero ──
+        heroCard: {
+            marginHorizontal: 16, marginBottom: 20, borderRadius: 20,
+            overflow: 'hidden', ...shadows.lg,
+        },
+        heroGradient: { padding: 28, alignItems: 'center', justifyContent: 'center' },
+        heroCurrencyLabel: { fontSize: 16, color: 'rgba(255,255,255,0.7)', fontWeight: '300', marginBottom: 4 },
+        heroInput: {
+            fontSize: 52, fontWeight: '200', color: '#ffffff',
+            letterSpacing: -2, textAlign: 'center',
+            fontVariant: ['tabular-nums'], minWidth: 120,
+        },
+        heroPlaceholder: { fontSize: 52, fontWeight: '200', color: 'rgba(255,255,255,0.35)', letterSpacing: -2 },
+        heroDate: {
+            marginTop: 12, flexDirection: 'row', alignItems: 'center', gap: 6,
+            backgroundColor: 'rgba(255,255,255,0.15)', paddingHorizontal: 14, paddingVertical: 6,
+            borderRadius: 9999, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)',
+        },
+        heroDateText: { color: 'rgba(255,255,255,0.9)', fontSize: 13, fontWeight: '400' },
+
+        // ── Type toggle ──
+        typeToggle: {
+            flexDirection: 'row', marginHorizontal: 16, marginBottom: 20,
+            backgroundColor: colors.card, borderRadius: 16, padding: 4,
+            borderWidth: 1, borderColor: colors.border, ...shadows.sm,
+        },
+        typeBtn: {
+            flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+            gap: 7, paddingVertical: 13, borderRadius: 13,
+        },
+        typeBtnText: { fontSize: 15, fontWeight: '500', letterSpacing: -0.2 },
+
+        // ── Section label ──
+        sectionLabel: {
+            fontSize: 11, fontWeight: '600', color: colors.subText,
+            letterSpacing: 0.8, textTransform: 'uppercase',
+            marginHorizontal: 20, marginBottom: 8,
+        },
+
+        // ── Category chips ──
+        chipsScroll: { paddingHorizontal: 16, paddingBottom: 4 },
+        chip: {
+            flexDirection: 'row', alignItems: 'center', gap: 6,
+            paddingHorizontal: 14, paddingVertical: 9,
+            borderRadius: 9999, borderWidth: 1.5, marginRight: 8, marginBottom: 8,
+        },
+        chipDot: { width: 8, height: 8, borderRadius: 4 },
+        chipText: { fontSize: 13, fontWeight: '400' },
+
+        // ── Description ──
+        inputWrapper: {
+            marginHorizontal: 16, marginBottom: 16, borderRadius: 14,
+            backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border,
+            ...shadows.sm,
+        },
+        textInput: {
+            padding: 16, fontSize: 15, fontWeight: '300',
+            color: colors.text, minHeight: 52,
+        },
+
+        // ── Recurring ──
+        recurringRow: {
+            flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+            marginHorizontal: 16, marginBottom: 16, backgroundColor: colors.card,
+            borderRadius: 14, padding: 16, borderWidth: 1, borderColor: colors.border,
+            ...shadows.sm,
+        },
+        recurringLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+        recurringIcon: {
+            width: 36, height: 36, borderRadius: 18,
+            backgroundColor: colors.primarySubdued, justifyContent: 'center', alignItems: 'center',
+        },
+        recurringTitle: { fontSize: 15, fontWeight: '400', color: colors.text },
+        recurringSubtitle: { fontSize: 12, color: colors.subText, marginTop: 1 },
+        recurringCard: {
+            marginHorizontal: 16, marginBottom: 16, backgroundColor: colors.card,
+            borderRadius: 14, padding: 16, borderWidth: 1, borderColor: colors.border, ...shadows.sm,
+        },
+        periodRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 },
+        periodBtn: {
+            flexDirection: 'row', alignItems: 'center', gap: 5,
+            paddingHorizontal: 14, paddingVertical: 8,
+            borderRadius: 9999, borderWidth: 1,
+        },
+        periodText: { fontSize: 13, fontWeight: '400' },
+
+        // ── Date button ──
+        dateTrigger: {
+            marginHorizontal: 16, marginBottom: 16, backgroundColor: colors.card,
+            borderRadius: 14, padding: 16, borderWidth: 1, borderColor: colors.border,
+            flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+            ...shadows.sm,
+        },
+        dateTriggerLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+        dateIcon: {
+            width: 36, height: 36, borderRadius: 18,
+            backgroundColor: colors.primarySubdued, justifyContent: 'center', alignItems: 'center',
+        },
+        dateText: { fontSize: 15, fontWeight: '300', color: colors.text },
+        dateLabel: { fontSize: 11, color: colors.subText, marginBottom: 1, fontWeight: '400' },
+
+        // ── Submit ──
+        submitWrapper: {
+            position: 'absolute', bottom: 0, left: 0, right: 0,
+            padding: 16, paddingBottom: Platform.OS === 'ios' ? 32 : 20,
+            backgroundColor: colors.background,
+            borderTopWidth: 1, borderTopColor: colors.border,
+        },
+        submitBtn: {
+            borderRadius: 16, overflow: 'hidden', ...shadows.md,
+        },
+        submitGradient: {
+            flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+            gap: 8, paddingVertical: 16,
+        },
+        submitText: { color: '#ffffff', fontSize: 16, fontWeight: '500', letterSpacing: -0.2 },
+
+        // ── Category picker modal ──
+        modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+        modalSheet: {
+            backgroundColor: colors.card,
+            borderTopLeftRadius: 24, borderTopRightRadius: 24,
+            padding: 20, maxHeight: '65%',
+        },
+        modalHandle: {
+            width: 40, height: 4, borderRadius: 2, backgroundColor: colors.border,
+            alignSelf: 'center', marginBottom: 16,
+        },
+        modalTitle: { fontSize: 18, fontWeight: '400', color: colors.text, marginBottom: 12, letterSpacing: -0.3 },
+        catOption: {
+            flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+            paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: colors.borderLight,
+        },
+        catOptionLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+        catDot: { width: 14, height: 14, borderRadius: 7 },
+        catOptionText: { fontSize: 15, fontWeight: '300', color: colors.text },
+    });
+
+    const submitGradient = isExpense
+        ? [colors.dangerDark || '#c71852', colors.danger]
+        : [colors.successDark || '#059669', colors.success];
+
     return (
-        <ScrollView contentContainerStyle={[styles.container, { backgroundColor: colors.background }]}>
-            <StatusBar barStyle={isDark ? "light-content" : "dark-content"} backgroundColor={colors.background} />
+        <KeyboardAvoidingView style={s.outer} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+            <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
 
-            <View style={styles.header}>
-                <Text style={[styles.headerTitle, { color: colors.text }]}>{isEditing ? 'Edit Transaction' : 'Add Transaction'}</Text>
-            </View>
-
-            <View style={[styles.typeContainer, { borderColor: colors.primary }]}>
-                <TouchableOpacity
-                    style={[styles.typeButton, type === 'expense' && { backgroundColor: colors.primary }, { borderTopLeftRadius: 10, borderBottomLeftRadius: 10 }]}
-                    onPress={() => setType('expense')}
-                >
-                    <Text style={[styles.typeText, { color: type === 'expense' ? 'white' : colors.primary }]}>Expense</Text>
+            {/* Header */}
+            <View style={s.header}>
+                <TouchableOpacity style={s.backBtn} onPress={() => navigation.goBack()}>
+                    <Ionicons name="arrow-back" size={18} color={colors.text} />
                 </TouchableOpacity>
-                <TouchableOpacity
-                    style={[styles.typeButton, type === 'income' && { backgroundColor: colors.primary }, { borderTopRightRadius: 10, borderBottomRightRadius: 10 }]}
-                    onPress={() => setType('income')}
-                >
-                    <Text style={[styles.typeText, { color: type === 'income' ? 'white' : colors.primary }]}>Income</Text>
-                </TouchableOpacity>
+                <Text style={s.headerTitle}>{isEditing ? 'Edit Transaction' : 'Add Transaction'}</Text>
             </View>
 
-            {/* Date Selection */}
-            <Text style={[styles.label, { color: colors.subText }]}>Date</Text>
-            <TouchableOpacity
-                style={[styles.input, styles.dateInput, { backgroundColor: colors.card, borderColor: colors.border }]}
-                onPress={() => setShowDatePicker(true)}
-            >
-                <Text style={{ color: colors.text, fontSize: 16 }}>{date.toLocaleDateString()}</Text>
-            </TouchableOpacity>
-            <ModernDatePicker
-                visible={showDatePicker}
-                selectedDate={date}
-                onDateSelect={(selectedDate) => setDate(selectedDate)}
-                onClose={() => setShowDatePicker(false)}
-            />
+            <ScrollView contentContainerStyle={s.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
 
-            <Text style={[styles.label, { color: colors.subText }]}>Description (Optional)</Text>
-            <TextInput
-                style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
-                placeholder="e.g. Grocery, Salary"
-                placeholderTextColor={colors.subText}
-                value={description}
-                onChangeText={setDescription}
-            />
-
-            <Text style={[styles.label, { color: colors.subText }]}>Amount</Text>
-            <TextInput
-                style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
-                placeholder="0.00"
-                placeholderTextColor={colors.subText}
-                value={amount}
-                onChangeText={setAmount}
-                keyboardType="numeric"
-            />
-
-            <Text style={[styles.label, { color: colors.subText }]}>Category</Text>
-            <TouchableOpacity
-                style={[styles.pickerTrigger, { backgroundColor: colors.card, borderColor: colors.border }]}
-                onPress={() => setPickerVisible(true)}
-            >
-                <Text style={{ color: category ? colors.text : colors.subText, fontSize: 16 }}>
-                    {category ? categories.find(c => c._id === category)?.name : 'Select Category'}
-                </Text>
-                <Text style={{ color: colors.subText }}>▼</Text>
-            </TouchableOpacity>
-
-            {/* Recurring Toggle */}
-            <View style={[styles.row, { marginBottom: 20, justifyContent: 'space-between', alignItems: 'center' }]}>
-                <Text style={[styles.label, { color: colors.text, marginBottom: 0 }]}>Recursive Transaction?</Text>
-                <Switch
-                    trackColor={{ false: "#767577", true: colors.primary }}
-                    thumbColor={isRecurring ? "#f4f3f4" : "#f4f3f4"}
-                    onValueChange={setIsRecurring}
-                    value={isRecurring}
-                />
-            </View>
-
-            {isRecurring && (
-                <View style={[styles.recurringContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                    <Text style={[styles.label, { color: colors.subText, marginTop: 10 }]}>Frequency</Text>
-                    <View style={styles.periodContainer}>
-                        {periods.map(p => (
-                            <TouchableOpacity
-                                key={p.value}
-                                style={[
-                                    styles.periodButton,
-                                    recurringPeriod === p.value && { backgroundColor: colors.primary, borderColor: colors.primary },
-                                    { borderColor: colors.border }
-                                ]}
-                                onPress={() => setRecurringPeriod(p.value)}
-                            >
-                                <Text style={[
-                                    styles.periodText,
-                                    { color: recurringPeriod === p.value ? 'white' : colors.text }
-                                ]}>{p.label}</Text>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-
-                    <Text style={[styles.label, { color: colors.subText }]}>End Date</Text>
-                    <TouchableOpacity
-                        style={[styles.input, styles.dateInput, { backgroundColor: colors.background, borderColor: colors.border }]}
-                        onPress={() => setShowEndDatePicker(true)}
+                {/* ── Hero Amount Card ── */}
+                <View style={s.heroCard}>
+                    <LinearGradient
+                        colors={isExpense
+                            ? ['#2e0a1a', '#c71852', '#ea2261']
+                            : ['#0a2e22', '#059669', '#10b981']}
+                        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                        style={s.heroGradient}
                     >
-                        <Text style={{ color: colors.text, fontSize: 16 }}>{recurringEndDate.toLocaleDateString()}</Text>
+                        <Text style={s.heroCurrencyLabel}>Amount (₹)</Text>
+                        <TextInput
+                            style={s.heroInput}
+                            placeholder="0"
+                            placeholderTextColor="rgba(255,255,255,0.3)"
+                            value={amount}
+                            onChangeText={setAmount}
+                            keyboardType="numeric"
+                            returnKeyType="done"
+                        />
+                        <TouchableOpacity style={s.heroDate} onPress={() => setShowDatePicker(true)}>
+                            <Ionicons name="calendar-outline" size={14} color="rgba(255,255,255,0.8)" />
+                            <Text style={s.heroDateText}>{formattedDate}</Text>
+                            <Ionicons name="chevron-down" size={12} color="rgba(255,255,255,0.6)" />
+                        </TouchableOpacity>
+                    </LinearGradient>
+                </View>
+
+                {/* Date Picker */}
+                <ModernDatePicker
+                    visible={showDatePicker}
+                    selectedDate={date}
+                    onDateSelect={setDate}
+                    onClose={() => setShowDatePicker(false)}
+                />
+
+                {/* ── Type Toggle ── */}
+                <View style={s.typeToggle}>
+                    <TouchableOpacity
+                        style={[s.typeBtn, isExpense && { backgroundColor: colors.dangerBg || '#fff0f5' }]}
+                        onPress={() => switchType('expense')}
+                    >
+                        <Ionicons name="arrow-down-circle" size={20} color={isExpense ? colors.danger : colors.subText} />
+                        <Text style={[s.typeBtnText, { color: isExpense ? colors.danger : colors.subText }]}>Expense</Text>
                     </TouchableOpacity>
-                    <ModernDatePicker
-                        visible={showEndDatePicker}
-                        selectedDate={recurringEndDate}
-                        onDateSelect={(selectedDate) => setRecurringEndDate(selectedDate)}
-                        onClose={() => setShowEndDatePicker(false)}
+                    <TouchableOpacity
+                        style={[s.typeBtn, !isExpense && { backgroundColor: colors.successBg || '#ecfdf5' }]}
+                        onPress={() => switchType('income')}
+                    >
+                        <Ionicons name="arrow-up-circle" size={20} color={!isExpense ? colors.success : colors.subText} />
+                        <Text style={[s.typeBtnText, { color: !isExpense ? colors.success : colors.subText }]}>Income</Text>
+                    </TouchableOpacity>
+                </View>
+
+                {/* ── Category Chips ── */}
+                <Text style={s.sectionLabel}>Category</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.chipsScroll} style={{ marginBottom: 16 }}>
+                    {categories.map(cat => {
+                        const isSelected = category === cat._id;
+                        const catColor = cat.color || colors.primary;
+                        return (
+                            <TouchableOpacity
+                                key={cat._id}
+                                style={[s.chip, {
+                                    backgroundColor: isSelected ? catColor + '20' : colors.card,
+                                    borderColor: isSelected ? catColor : colors.border,
+                                }]}
+                                onPress={() => { hapticFeedback.light(); setCategory(cat._id); }}
+                            >
+                                <View style={[s.chipDot, { backgroundColor: catColor }]} />
+                                <Text style={[s.chipText, { color: isSelected ? catColor : colors.text }]}>{cat.name}</Text>
+                                {isSelected && <Ionicons name="checkmark" size={13} color={catColor} />}
+                            </TouchableOpacity>
+                        );
+                    })}
+                </ScrollView>
+
+                {/* ── Description ── */}
+                <Text style={s.sectionLabel}>Notes (optional)</Text>
+                <View style={s.inputWrapper}>
+                    <TextInput
+                        style={s.textInput}
+                        placeholder="e.g. Grocery run, monthly salary..."
+                        placeholderTextColor={colors.subText}
+                        value={description}
+                        onChangeText={setDescription}
+                        multiline
+                        maxLength={200}
                     />
                 </View>
-            )}
 
-            <TouchableOpacity
-                style={[styles.submitButton, { backgroundColor: colors.success, opacity: loading ? 0.7 : 1 }]}
-                onPress={handleSubmit}
-                disabled={loading}
-            >
-                <Text style={styles.submitButtonText}>{loading ? 'Saving...' : (isEditing ? 'Update Transaction' : 'Save Transaction')}</Text>
-            </TouchableOpacity>
+                {/* ── Recurring Toggle ── */}
+                <TouchableOpacity style={s.recurringRow} onPress={() => setIsRecurring(v => !v)} activeOpacity={0.8}>
+                    <View style={s.recurringLeft}>
+                        <View style={s.recurringIcon}>
+                            <Ionicons name="repeat" size={18} color={colors.primary} />
+                        </View>
+                        <View>
+                            <Text style={s.recurringTitle}>Recurring</Text>
+                            <Text style={s.recurringSubtitle}>{isRecurring ? `Repeats ${recurringPeriod}` : 'One-time transaction'}</Text>
+                        </View>
+                    </View>
+                    <Switch
+                        trackColor={{ false: colors.border, true: colors.primary }}
+                        thumbColor="#ffffff"
+                        onValueChange={v => setIsRecurring(v)}
+                        value={isRecurring}
+                    />
+                </TouchableOpacity>
 
-            <Modal transparent={true} visible={pickerVisible} animationType="slide">
-                <View style={styles.modalBg}>
-                    <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
-                        <View style={styles.modalHeader}>
-                            <Text style={[styles.modalTitle, { color: colors.text }]}>Select Category</Text>
-                            <TouchableOpacity onPress={() => setPickerVisible(false)}>
-                                <Text style={{ fontSize: 24, color: colors.subText }}>×</Text>
-                            </TouchableOpacity>
+                {isRecurring && (
+                    <View style={s.recurringCard}>
+                        <Text style={[s.sectionLabel, { marginHorizontal: 0, marginBottom: 0 }]}>Frequency</Text>
+                        <View style={s.periodRow}>
+                            {periods.map(p => {
+                                const isActive = recurringPeriod === p.value;
+                                return (
+                                    <TouchableOpacity
+                                        key={p.value}
+                                        style={[s.periodBtn, { backgroundColor: isActive ? colors.primary : colors.background, borderColor: isActive ? colors.primary : colors.border }]}
+                                        onPress={() => { hapticFeedback.light(); setRecurringPeriod(p.value); }}
+                                    >
+                                        <Ionicons name={p.icon} size={13} color={isActive ? '#ffffff' : colors.subText} />
+                                        <Text style={[s.periodText, { color: isActive ? '#ffffff' : colors.text }]}>{p.label}</Text>
+                                    </TouchableOpacity>
+                                );
+                            })}
                         </View>
 
-                        <ScrollView>
-                            {/* Rendering categories exactly as they come to preserve order */}
+                        <Text style={[s.sectionLabel, { marginHorizontal: 0, marginTop: 16, marginBottom: 8 }]}>End Date</Text>
+                        <TouchableOpacity style={[s.dateTrigger, { marginHorizontal: 0, marginBottom: 0 }]} onPress={() => setShowEndDatePicker(true)}>
+                            <View style={s.dateTriggerLeft}>
+                                <View style={s.dateIcon}>
+                                    <Ionicons name="calendar-outline" size={16} color={colors.primary} />
+                                </View>
+                                <View>
+                                    <Text style={s.dateLabel}>End Date</Text>
+                                    <Text style={s.dateText}>{recurringEndDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</Text>
+                                </View>
+                            </View>
+                            <Ionicons name="chevron-forward" size={16} color={colors.subText} />
+                        </TouchableOpacity>
+                        <ModernDatePicker
+                            visible={showEndDatePicker}
+                            selectedDate={recurringEndDate}
+                            onDateSelect={setRecurringEndDate}
+                            onClose={() => setShowEndDatePicker(false)}
+                        />
+                    </View>
+                )}
+
+                <View style={{ height: 90 }} />
+            </ScrollView>
+
+            {/* ── Fixed Submit Button ── */}
+            <View style={s.submitWrapper}>
+                <TouchableOpacity
+                    style={[s.submitBtn, { opacity: loading ? 0.7 : 1 }]}
+                    onPress={handleSubmit}
+                    disabled={loading}
+                    activeOpacity={0.85}
+                >
+                    <LinearGradient colors={submitGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={s.submitGradient}>
+                        <Ionicons name={loading ? 'hourglass-outline' : (isEditing ? 'pencil' : 'checkmark-circle')} size={20} color="#ffffff" />
+                        <Text style={s.submitText}>{loading ? 'Saving…' : (isEditing ? 'Update Transaction' : 'Save Transaction')}</Text>
+                    </LinearGradient>
+                </TouchableOpacity>
+            </View>
+
+            {/* Category Modal */}
+            <Modal transparent visible={pickerVisible} animationType="slide" onRequestClose={() => setPickerVisible(false)}>
+                <TouchableOpacity style={s.modalBg} activeOpacity={1} onPress={() => setPickerVisible(false)}>
+                    <View style={s.modalSheet}>
+                        <View style={s.modalHandle} />
+                        <Text style={s.modalTitle}>Select Category</Text>
+                        <ScrollView showsVerticalScrollIndicator={false}>
                             {categories.map(cat => (
-                                <TouchableOpacity
-                                    key={cat._id}
-                                    style={[styles.catOption, { borderBottomColor: colors.border }]}
-                                    onPress={() => {
-                                        setCategory(cat._id);
-                                        setPickerVisible(false);
-                                    }}
-                                >
-                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                        {/* Optional color dot if category has color */}
-                                        <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: cat.color || colors.primary, marginRight: 10 }} />
-                                        <Text style={[styles.catText, { color: colors.text }]}>{cat.name}</Text>
+                                <TouchableOpacity key={cat._id} style={s.catOption} onPress={() => { hapticFeedback.light(); setCategory(cat._id); setPickerVisible(false); }}>
+                                    <View style={s.catOptionLeft}>
+                                        <View style={[s.catDot, { backgroundColor: cat.color || colors.primary }]} />
+                                        <Text style={s.catOptionText}>{cat.name}</Text>
                                     </View>
-                                    {category === cat._id && <Text style={{ color: colors.primary, fontWeight: 'bold' }}>✓</Text>}
+                                    {category === cat._id && <Ionicons name="checkmark-circle" size={20} color={colors.primary} />}
                                 </TouchableOpacity>
                             ))}
                         </ScrollView>
-
                     </View>
-                </View>
+                </TouchableOpacity>
             </Modal>
 
-            {/* Custom Alert */}
-            <CustomAlert
-                visible={showAlert}
-                type={alertConfig.type}
-                title={alertConfig.title}
-                message={alertConfig.message}
-                buttons={alertConfig.buttons}
-                onClose={() => setShowAlert(false)}
-            />
-
-        </ScrollView>
+            <CustomAlert visible={showAlert} type={alertConfig.type} title={alertConfig.title}
+                message={alertConfig.message} buttons={alertConfig.buttons} onClose={() => setShowAlert(false)} />
+        </KeyboardAvoidingView>
     );
 }
-
-const styles = StyleSheet.create({
-    container: { flexGrow: 1, padding: 20 },
-    header: { alignItems: 'center', marginBottom: 25, marginTop: 10 },
-    headerTitle: { fontSize: 24, fontWeight: '800' },
-    typeContainer: { flexDirection: 'row', marginBottom: 20, borderWidth: 1, borderRadius: 12 },
-    typeButton: { flex: 1, paddingVertical: 12, alignItems: 'center' },
-    typeText: { fontWeight: '700', fontSize: 16 },
-    label: { marginBottom: 6, fontSize: 14, fontWeight: '600' },
-    input: { padding: 14, borderRadius: 12, marginBottom: 15, borderWidth: 1, fontSize: 16 },
-    dateInput: { justifyContent: 'center' },
-    pickerTrigger: { padding: 14, borderRadius: 12, marginBottom: 20, borderWidth: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    submitButton: { padding: 16, borderRadius: 12, alignItems: 'center', marginTop: 10, shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 8, elevation: 4 },
-    submitButtonText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
-    row: { flexDirection: 'row' },
-    recurringContainer: { padding: 15, borderRadius: 12, marginBottom: 20, borderWidth: 1 },
-    periodContainer: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: 15 },
-    periodButton: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20, borderWidth: 1, marginRight: 8, marginBottom: 8 },
-    periodText: { fontSize: 13, fontWeight: '600' },
-    modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-    modalContent: { padding: 20, borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '60%' },
-    modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-    modalTitle: { fontSize: 20, fontWeight: 'bold' },
-    catOption: { paddingVertical: 16, borderBottomWidth: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    catText: { fontSize: 16, fontWeight: '500' },
-});
