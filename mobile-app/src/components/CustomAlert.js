@@ -227,6 +227,7 @@ const styles = StyleSheet.create({
     buttonContainer: {
         flexDirection: 'row',
         width: '100%',
+        justifyContent: 'center',
         gap: 8,
     },
     button: {

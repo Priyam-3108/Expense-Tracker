@@ -51,6 +51,17 @@ export default function AddExpenseScreen({ navigation, route }) {
             setIsRecurring(exp.isRecurring || false);
             if (exp.recurringPeriod) setRecurringPeriod(exp.recurringPeriod);
             if (exp.recurringEndDate) setRecurringEndDate(new Date(exp.recurringEndDate));
+        } else {
+            setIsEditing(false);
+            setEditId(null);
+            setDescription('');
+            setAmount('');
+            setType('expense');
+            setCategory('');
+            setDate(new Date());
+            setIsRecurring(false);
+            setRecurringPeriod('monthly');
+            setRecurringEndDate(new Date());
         }
     }, [route.params]);
 
@@ -145,14 +156,27 @@ export default function AddExpenseScreen({ navigation, route }) {
             // Trigger background sync
             syncEngine.syncNow();
 
-            setAlertConfig({
+             setAlertConfig({
                 type: 'success',
                 title: 'Saved',
                 message: 'Transaction saved successfully!',
                 buttons: [{
                     text: 'OK',
                     style: 'primary',
-                    onPress: () => navigation.goBack()
+                    onPress: () => {
+                        setDescription('');
+                        setAmount('');
+                        setCategory('');
+                        setType('expense');
+                        setDate(new Date());
+                        setIsRecurring(false);
+                        setRecurringPeriod('monthly');
+                        setRecurringEndDate(new Date());
+                        setIsEditing(false);
+                        setEditId(null);
+                        navigation.setParams({ expense: undefined });
+                        navigation.goBack();
+                    }
                 }]
             });
             setShowAlert(true);

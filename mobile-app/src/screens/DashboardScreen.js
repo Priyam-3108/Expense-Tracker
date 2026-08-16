@@ -34,7 +34,9 @@ export default function DashboardScreen({ navigation }) {
 
   const fetchData = async () => {
     try {
-      setLoading(true);
+      if (transactions.length === 0) {
+        setLoading(true);
+      }
 
       // 0. Sync any pending local items to backend first if online
       try {
@@ -317,7 +319,7 @@ export default function DashboardScreen({ navigation }) {
   );
 
   const renderLoading = () => (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.listContent}>
       <View style={styles.topHeader}>
         <View>
           <Text style={[styles.greeting, { color: colors.textSecondary }]}>
