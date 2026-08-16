@@ -18,6 +18,16 @@ export const syncEngine = {
 
         console.log(`Syncing ${pending.length} expenses...`);
 
+        const formatDateToYYYYMMDD = (d) => {
+            if (!d) return '';
+            const dateObj = typeof d === 'string' ? new Date(d) : d;
+            if (isNaN(dateObj.getTime())) return d;
+            const year = dateObj.getFullYear();
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
         // Prepare payload
         // We only send the payload part which contains the expense data
         // server expects an array of expenses
@@ -25,6 +35,12 @@ export const syncEngine = {
             const data = { ...p.payload };
             if (data.category && typeof data.category === 'object') {
                 data.category = data.category._id || data.category.id;
+            }
+            if (data.date) {
+                data.date = formatDateToYYYYMMDD(data.date);
+            }
+            if (data.recurringEndDate) {
+                data.recurringEndDate = formatDateToYYYYMMDD(data.recurringEndDate);
             }
             return {
                 ...data,

@@ -117,16 +117,25 @@ export default function AddExpenseScreen({ navigation, route }) {
 
         setLoading(true);
         try {
+            const formatDateToYYYYMMDD = (d) => {
+                if (!d) return '';
+                const dateObj = typeof d === 'string' ? new Date(d) : d;
+                const year = dateObj.getFullYear();
+                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                const day = String(dateObj.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+
             const payload = {
                 description: description,
                 amount: parseFloat(amount),
                 type,
                 category,
-                date: date.toISOString(), // Send selected date
+                date: formatDateToYYYYMMDD(date), // Send selected date formatted as YYYY-MM-DD
                 isRecurring,
                 ...(isRecurring && {
                     recurringPeriod,
-                    recurringEndDate: recurringEndDate.toISOString()
+                    recurringEndDate: formatDateToYYYYMMDD(recurringEndDate)
                 })
             };
 
