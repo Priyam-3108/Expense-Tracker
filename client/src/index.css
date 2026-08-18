@@ -124,25 +124,25 @@
   }
 
   .dark {
-    /* Stripi dark-app shell — brand-dark-900 navy, same indigo primary */
-    --background: 236 51% 22%;
-    --foreground: 0 0% 100%;
-    --card: 235 45% 18%;
-    --card-foreground: 0 0% 100%;
-    --popover: 235 45% 16%;
-    --popover-foreground: 0 0% 100%;
+    /* Spendly dark shell — true deep navy, same indigo primary */
+    --background: 228 35% 7%;    /* #0b0d1a — almost black navy */
+    --foreground: 220 20% 96%;   /* #f0f2f9 — off-white */
+    --card: 228 30% 11%;         /* #131726 — card surface */
+    --card-foreground: 220 20% 96%;
+    --popover: 228 28% 10%;      /* #10132a — dropdown surface */
+    --popover-foreground: 220 20% 96%;
     --primary: 251 98% 65%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 234 40% 16%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 234 40% 16%;
-    --muted-foreground: 220 20% 70%;
-    --accent: 234 40% 20%;
-    --accent-foreground: 0 0% 100%;
+    --secondary: 228 25% 15%;    /* #191e34 */
+    --secondary-foreground: 220 20% 96%;
+    --muted: 228 25% 15%;
+    --muted-foreground: 220 15% 55%;
+    --accent: 228 28% 18%;       /* #1c2240 */
+    --accent-foreground: 220 20% 96%;
     --destructive: 340 82% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 234 35% 26%;
-    --input: 234 35% 26%;
+    --border: 228 20% 18%;       /* #1d2237 — subtle hairline */
+    --input: 228 20% 18%;
     --ring: 251 98% 65%;
   }
 
@@ -191,13 +191,13 @@
   }
 
   .dark .glass-card {
-    background: #232559;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    background: #131726;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
   }
 
   .dark .glass-card:hover {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
   }
 
   /* --- SIDEBAR --- */
@@ -207,8 +207,8 @@
   }
 
   .dark .glass-sidebar {
-    background: #1c1e54;
-    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    background: #0e1120;
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
   }
 
   /* --- NAVBAR --- */
@@ -218,8 +218,10 @@
   }
 
   .dark .glass-nav {
-    background: #1c1e54;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(13, 14, 27, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   }
 
   /* --- BOTTOM NAV --- */
@@ -229,8 +231,8 @@
   }
 
   .dark .glass-bottom-nav {
-    background: #1c1e54;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: #0e1120;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
   }
 
   /* --- DROPDOWN --- */
@@ -242,9 +244,9 @@
   }
 
   .dark .glass-dropdown {
-    background: #232559;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    background: #151828;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
   }
 
   /* --- INPUT --- */
@@ -267,9 +269,9 @@
   }
 
   .dark .glass-input {
-    background: #232559;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    color: #ffffff;
+    background: #1a1f35;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #e8ecf4;
   }
 
   .dark .glass-input::placeholder {
@@ -304,21 +306,21 @@
   }
 
   .dark .glass-table {
-    background: #232559;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #131726;
+    border: 1px solid rgba(255, 255, 255, 0.07);
   }
 
   .dark .glass-table thead {
-    background: rgba(255, 255, 255, 0.03);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.025);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   }
 
   .dark .glass-table tbody tr {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   }
 
   .dark .glass-table tbody tr:hover {
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.035);
   }
 
   /* --- BADGE --- */
@@ -335,9 +337,10 @@
     color: #ffffff;
   }
 
-  /* --- MODAL BACKDROP --- */
   .glass-modal-backdrop {
-    background: rgba(13, 37, 61, 0.5);
+    background: rgba(5, 6, 15, 0.65);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
   }
 
   /* --- MODAL PANEL --- */
@@ -349,9 +352,9 @@
   }
 
   .dark .glass-modal-panel {
-    background: #232559;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.45);
+    background: #151828;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.55);
   }
 
   /* --- ANIMATED BACKGROUND ORBS (Liquid Glass Engine) ---
@@ -663,9 +666,9 @@
   }
 
   .dark .input {
-    background: #232559;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    color: #ffffff;
+    background: #1a1f35;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #e8ecf4;
   }
 
   /* --- Card Components (legacy compat) --- */

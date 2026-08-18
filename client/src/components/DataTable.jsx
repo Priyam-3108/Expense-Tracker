@@ -123,7 +123,7 @@ const DataTable = ({
             <div className="glass-table">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">
-                        <thead className="text-xs uppercase text-gray-500 dark:text-slate-500">
+                        <thead className="text-xs uppercase text-gray-500 dark:text-slate-400">
                             {table.getHeaderGroups().map(headerGroup => (
                                 <tr key={headerGroup.id}>
                                     {headerGroup.headers.map(header => (
@@ -161,7 +161,7 @@ const DataTable = ({
                                 <tr>
                                     <td colSpan={columns.length} className="px-6 py-10 text-center">
                                         <div className="flex justify-center">
-                                            <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 dark:border-slate-700 border-t-indigo-500" />
+                                            <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 dark:border-white/[0.08] border-t-[#533afd]" />
                                         </div>
                                     </td>
                                 </tr>
@@ -184,7 +184,7 @@ const DataTable = ({
                                         style={{ animationDelay: `${index * 30}ms` }}
                                     >
                                         {row.getVisibleCells().map(cell => (
-                                            <td key={cell.id} className="px-6 py-4 text-gray-700 dark:text-slate-300">
+                                            <td key={cell.id} className="px-6 py-4 text-gray-700 dark:text-slate-200">
                                                 {flexRender(
                                                     cell.column.columnDef.cell,
                                                     cell.getContext()
@@ -199,7 +199,7 @@ const DataTable = ({
                 </div>
 
                 {/* Pagination */}
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-6 py-4 border-t border-gray-200 dark:border-white/[0.04]">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-6 py-4 border-t border-gray-200 dark:border-white/[0.06]">
                     <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-slate-400">
                         <span className="hidden sm:inline">Page</span>
                         <span className="font-medium text-gray-900 dark:text-white">
@@ -259,10 +259,10 @@ const DataTable = ({
                                 if (manualPagination && onPageSizeChange) onPageSizeChange(newSize)
                                 else table.setPageSize(newSize)
                             }}
-                            className="ml-2 rounded-lg border border-gray-300 dark:border-white/[0.08] bg-white dark:bg-white/[0.04] text-gray-700 dark:text-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all duration-200"
+                            className="ml-2 rounded-lg border border-gray-200 dark:border-white/[0.07] bg-white dark:bg-[#1a1f35] text-gray-700 dark:text-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#533afd]/30 transition-all duration-200"
                         >
                             {[5, 10, 20, 30, 40, 50].map(size => (
-                                <option key={size} value={size} className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">
+                                <option key={size} value={size} className="bg-white dark:bg-[#131726] text-gray-900 dark:text-white">
                                     Show {size}
                                 </option>
                             ))}

@@ -108,12 +108,15 @@ const Layout = () => {
         <div className="flex flex-col h-full glass-sidebar">
           {/* Sidebar Header */}
           <div className="flex items-center justify-between h-16 px-4 sm:px-6 border-b border-gray-200 dark:border-white/[0.08]">
-            <div className="flex items-center min-w-0">
-              <div className="w-8 h-8 shrink-0 rounded-lg flex items-center justify-center bg-gradient-to-br from-indigo-500 to-indigo-600 shadow-glow-indigo">
-                <span className="text-white font-bold text-lg">{currencySymbols[currency] || '$'}</span>
+              <div className="flex items-center min-w-0">
+              <div className="w-8 h-8 shrink-0 rounded-xl flex items-center justify-center shadow-lg" style={{background: 'linear-gradient(135deg, #665efd 0%, #533afd 100%)'}}>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M3 4h10M3 8h7M3 12h5" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+                  <circle cx="13" cy="12" r="2.5" fill="#ea2261"/>
+                </svg>
               </div>
-              <h1 className="ml-2 text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate whitespace-nowrap">
-                Expense Tracker
+              <h1 className="ml-2.5 text-lg font-semibold tracking-tight text-gray-900 dark:text-white truncate whitespace-nowrap">
+                Spendly
               </h1>
             </div>
             <button
@@ -138,8 +141,8 @@ const Layout = () => {
                     cn(
                       "group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 min-h-[44px] relative",
                       isActive
-                        ? "bg-indigo-50 dark:bg-white/10 text-indigo-700 dark:text-white"
-                        : "text-gray-600 dark:text-white/60 hover:bg-gray-100 dark:hover:bg-white/[0.08] hover:text-gray-900 dark:hover:text-white"
+                        ? "bg-[#533afd]/10 dark:bg-[#533afd]/15 text-[#533afd] dark:text-[#8b7ffe]"
+                        : "text-gray-600 dark:text-white/50 hover:bg-gray-100 dark:hover:bg-white/[0.05] hover:text-gray-900 dark:hover:text-white"
                     )
                   }
                 >
@@ -147,7 +150,7 @@ const Layout = () => {
                     <>
                       {/* Glowing active indicator */}
                       {isActive && (
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.6)]" />
+                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full bg-[#533afd] shadow-[0_0_8px_rgba(83,58,253,0.5)]" />
                       )}
                       <Icon
                         size={20}

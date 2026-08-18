@@ -78,13 +78,14 @@ const Landing = () => {
                             </div>
                         </div>
                         <div className="hero-image fade-in-right" style={{ animationDelay: '0.5s' }}>
-                            <div className="dashboard-mockup glass-card p-0 rounded-2xl overflow-hidden">
+                            <div className="dashboard-mockup glass-card p-0 rounded-2xl overflow-hidden" style={{background:'#0b0d1e',border:'1px solid rgba(255,255,255,0.1)'}}>
                                 <div className="mockup-header">
                                     <div className="mockup-dots">
                                         <span></span>
                                         <span></span>
                                         <span></span>
                                     </div>
+                                    <div style={{fontSize:'11px',color:'rgba(255,255,255,0.5)',marginLeft:'auto'}}>Spendly Dashboard</div>
                                 </div>
                                 <div className="mockup-content">
                                     <div className="mockup-sidebar">
@@ -93,13 +94,31 @@ const Landing = () => {
                                         <div className="mockup-item"></div>
                                         <div className="mockup-item"></div>
                                     </div>
-                                    <div className="mockup-main">
-                                        <div className="mockup-chart">
-                                            <div className="chart-bar" style={{ height: '60%' }}></div>
-                                            <div className="chart-bar" style={{ height: '80%' }}></div>
-                                            <div className="chart-bar" style={{ height: '45%' }}></div>
-                                            <div className="chart-bar" style={{ height: '90%' }}></div>
-                                            <div className="chart-bar" style={{ height: '70%' }}></div>
+                                    <div className="mockup-main" style={{flexDirection:'column',gap:'14px',padding:'20px'}}>
+                                        {/* Stat strip */}
+                                        <div style={{display:'flex',gap:'10px'}}>
+                                            <div style={{flex:1,padding:'10px 12px',borderRadius:'10px',background:'rgba(52,211,153,0.12)',border:'1px solid rgba(52,211,153,0.2)'}}>
+                                                <div style={{fontSize:'9px',color:'rgba(255,255,255,0.5)',marginBottom:'3px',textTransform:'uppercase',letterSpacing:'0.5px'}}>Income</div>
+                                                <div style={{fontSize:'14px',fontWeight:600,color:'#34d399',fontVariant:'tabular-nums'}}>₹48,500</div>
+                                            </div>
+                                            <div style={{flex:1,padding:'10px 12px',borderRadius:'10px',background:'rgba(251,113,133,0.12)',border:'1px solid rgba(251,113,133,0.2)'}}>
+                                                <div style={{fontSize:'9px',color:'rgba(255,255,255,0.5)',marginBottom:'3px',textTransform:'uppercase',letterSpacing:'0.5px'}}>Expenses</div>
+                                                <div style={{fontSize:'14px',fontWeight:600,color:'#fb7185',fontVariant:'tabular-nums'}}>₹31,200</div>
+                                            </div>
+                                        </div>
+                                        {/* Chart */}
+                                        <div className="mockup-chart" style={{flex:1}}>
+                                            <div className="chart-bar" style={{height:'55%',background:'linear-gradient(180deg,#34d399,#059669)'}}></div>
+                                            <div className="chart-bar" style={{height:'80%'}}></div>
+                                            <div className="chart-bar" style={{height:'42%',background:'linear-gradient(180deg,#34d399,#059669)'}}></div>
+                                            <div className="chart-bar" style={{height:'95%'}}></div>
+                                            <div className="chart-bar" style={{height:'68%',background:'linear-gradient(180deg,#34d399,#059669)'}}></div>
+                                        </div>
+                                        {/* Category pills */}
+                                        <div style={{display:'flex',gap:'6px',flexWrap:'wrap'}}>
+                                            {[['Food','#ea2261'],['Travel','#533afd'],['Bills','#f59e0b']].map(([label,color]) => (
+                                                <span key={label} style={{fontSize:'9px',padding:'3px 8px',borderRadius:'9999px',background:`${color}20`,border:`1px solid ${color}40`,color}}>{label}</span>
+                                            ))}
                                         </div>
                                     </div>
                                 </div>
@@ -240,22 +259,34 @@ const Landing = () => {
                 </div>
             </section>
 
-            {/* CTA Section */}
             <section id="cta" className="relative z-10 py-24">
                 <div className="landing-container">
-                    <div className="p-12 sm:p-16 text-center max-w-3xl mx-auto rounded-2xl bg-white border border-[#e3e8ee] shadow-[0_8px_24px_rgba(0,55,112,0.08)]">
-                        <h2 className="text-4xl sm:text-5xl font-light tracking-tight text-[#0d253d] mb-5">Ready to take control of your spending?</h2>
-                        <p className="text-lg text-[#64748d] mb-8">Join users who are already tracking their expenses and making smarter financial decisions.</p>
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-                            <Link to="/register" className="btn-primary btn-lg">
-                                Get Started Free
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                    <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                            </Link>
-                            <Link to="/login" className="btn-secondary btn-lg">Sign In</Link>
+                    <div
+                        className="p-12 sm:p-16 text-center max-w-3xl mx-auto rounded-3xl overflow-hidden relative"
+                        style={{
+                            background: 'linear-gradient(135deg, #1a1050 0%, #2e1b8a 40%, #533afd 80%, #6d5cff 100%)',
+                            boxShadow: '0 32px 80px rgba(83,58,253,0.35), 0 8px 24px rgba(83,58,253,0.2)',
+                        }}
+                    >
+                        {/* Decorative orbs */}
+                        <div style={{position:'absolute',top:'-60px',right:'-60px',width:'200px',height:'200px',borderRadius:'50%',background:'rgba(255,255,255,0.05)',pointerEvents:'none'}} />
+                        <div style={{position:'absolute',bottom:'-40px',left:'-40px',width:'150px',height:'150px',borderRadius:'50%',background:'rgba(234,34,97,0.12)',pointerEvents:'none'}} />
+                        <div className="relative z-10">
+                            <span className="pill-tag-soft inline-flex mb-6" style={{background:'rgba(255,255,255,0.12)',color:'rgba(255,255,255,0.9)',borderColor:'rgba(255,255,255,0.2)'}}>
+                                <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse mr-2"></span>
+                                Free forever · No credit card
+                            </span>
+                            <h2 className="text-4xl sm:text-5xl font-light tracking-tight text-white mb-5">Ready to take control of your spending?</h2>
+                            <p className="text-lg text-white/70 mb-8">Join users who are already tracking their expenses and making smarter financial decisions.</p>
+                            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
+                                <Link to="/register" className="btn-lg inline-flex items-center justify-center gap-2 font-medium rounded-2xl" style={{background:'#ffffff',color:'#533afd',paddingInline:'1.75rem',paddingBlock:'0.875rem',fontSize:'1rem'}}>
+                                    Get Started Free
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                                </Link>
+                                <Link to="/login" className="btn-lg inline-flex items-center justify-center font-medium rounded-2xl" style={{background:'rgba(255,255,255,0.12)',color:'#ffffff',border:'1px solid rgba(255,255,255,0.2)',paddingInline:'1.75rem',paddingBlock:'0.875rem',fontSize:'1rem'}}>Sign In</Link>
+                            </div>
+                            <p className="text-sm text-white/50">Start in 30 seconds · Cancel anytime</p>
                         </div>
-                        <p className="text-sm text-[#64748d]">Free forever • No credit card • Start in 30 seconds</p>
                     </div>
                 </div>
             </section>
@@ -266,12 +297,11 @@ const Landing = () => {
     )
 }
 
-// Feature Card Component
 const FeatureCard = ({ icon, title, description }) => (
     <div className="feature-card glass-card p-8">
         <div className="feature-icon mb-5">{icon}</div>
-        <h3 className="text-xl font-bold mb-3 text-[#0d253d]">{title}</h3>
-        <p className="text-sm leading-relaxed text-[#64748d]">{description}</p>
+        <h3 className="text-xl font-semibold mb-3 text-[#0d253d] tracking-tight">{title}</h3>
+        <p className="text-sm leading-relaxed text-[#64748d] font-light">{description}</p>
     </div>
 )
 
