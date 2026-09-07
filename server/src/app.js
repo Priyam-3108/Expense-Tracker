@@ -20,10 +20,18 @@ app.use(helmet());
 // CORS configuration
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || env.corsOrigin.includes(origin)) {
+    const allowedOrigins = env.corsOrigin;
+    // Allow no origin (mobile apps, desktop apps) or origins in whitelist
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      // In development, log and allow for debugging
+      if (env.nodeEnv === 'development') {
+        console.warn(`CORS request from ${origin} not in whitelist. Allowed: ${allowedOrigins.join(', ')}`);
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
     }
   },
   credentials: true,

@@ -7,6 +7,8 @@ import Layout from './components/Layout'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 import Dashboard from './pages/Dashboard'
 import Expenses from './pages/Expenses'
 import Categories from './pages/Categories'
@@ -46,6 +48,8 @@ function AppRoutes() {
       {/* Public Routes */}
       <Route path="/login" element={user ? <Navigate to="/app/dashboard" replace /> : <Login />} />
       <Route path="/register" element={user ? <Navigate to="/app/dashboard" replace /> : <Register />} />
+      <Route path="/forgot-password" element={user ? <Navigate to="/app/dashboard" replace /> : <ForgotPassword />} />
+      <Route path="/reset-password/:token" element={user ? <Navigate to="/app/dashboard" replace /> : <ResetPassword />} />
 
       {/* Static Pages - Public Routes */}
       <Route path="/terms" element={<TermsOfService />} />
