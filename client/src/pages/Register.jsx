@@ -2,16 +2,35 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useForm } from 'react-hook-form'
-import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react'
+import { Mail, Lock, User, ShieldCheck, Sparkles, CreditCard } from 'lucide-react'
 import { validateEmail, validatePassword } from '../utils/helpers'
 import { cn } from '../utils/cn'
 import Logo from '../components/Logo'
+import AuthLayout from '../components/AuthLayout'
+import AuthField from '../components/AuthField'
+import AuthSubmit, { AuthError } from '../components/AuthSubmit'
+
+const CURRENCIES = [
+  ['USD', 'US Dollar ($)', '$'],
+  ['EUR', 'Euro (€)', '€'],
+  ['INR', 'Indian Rupee (₹)', '₹'],
+  ['GBP', 'British Pound (£)', '£'],
+  ['JPY', 'Japanese Yen (¥)', '¥'],
+  ['CNY', 'Chinese Yuan (¥)', '¥'],
+  ['CAD', 'Canadian Dollar (C$)', 'C$'],
+  ['AUD', 'Australian Dollar (A$)', 'A$'],
+]
+const SYMBOL = Object.fromEntries(CURRENCIES.map(([code, , sym]) => [code, sym]))
+
+const PANEL_POINTS = [
+  { icon: Sparkles, label: 'Free forever', text: 'No credit card, no trial clock.' },
+  { icon: CreditCard, label: 'Your currency', text: 'Pick from 8 currencies at sign-up.' },
+  { icon: ShieldCheck, label: 'Private by default', text: 'Your data is yours — export or delete anytime.' },
+]
 
 const Register = () => {
   const { register: registerUser } = useAuth()
   const navigate = useNavigate()
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
   const {
@@ -20,30 +39,13 @@ const Register = () => {
     formState: { errors },
     setError,
     watch,
-  } = useForm({
-    defaultValues: {
-      currency: 'USD'
-    }
-  })
+  } = useForm({ defaultValues: { currency: 'USD' } })
 
   const password = watch('password')
-  const selectedCurrency = watch('currency')
-
-  // Currency display mapping
-  const currencyMap = {
-    'USD': { name: 'US Dollar ($)', symbol: '$' },
-    'EUR': { name: 'Euro (€)', symbol: '€' },
-    'INR': { name: 'Indian Rupee (₹)', symbol: '₹' },
-    'GBP': { name: 'British Pound (£)', symbol: '£' },
-    'JPY': { name: 'Japanese Yen (¥)', symbol: '¥' },
-    'CNY': { name: 'Chinese Yuan (¥)', symbol: '¥' },
-    'CAD': { name: 'Canadian Dollar (C$)', symbol: 'C$' },
-    'AUD': { name: 'Australian Dollar (A$)', symbol: 'A$' }
-  }
+  const selectedCurrency = watch('currency') || 'USD'
 
   const onSubmit = async (data) => {
     setIsLoading(true)
-
     try {
       const result = await registerUser(data.name, data.email, data.password, data.currency)
       if (result.success) {
@@ -51,7 +53,7 @@ const Register = () => {
       } else {
         setError('root', { message: result.error })
       }
-    } catch (error) {
+    } catch {
       setError('root', { message: 'An unexpected error occurred' })
     } finally {
       setIsLoading(false)
@@ -59,304 +61,150 @@ const Register = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden gradient-mesh-bg">
-      <div className="max-w-2xl w-full relative z-10">
-        {/* Auth Card */}
-        <div className="bg-white rounded-2xl border border-[#e3e8ee] shadow-[0_8px_24px_rgba(0,55,112,0.08)]">
-          {/* Card Content */}
-          <div className="p-8 sm:p-10">
-            {/* Logo */}
-            <div className="flex justify-center mb-5">
-              <Logo size="default" />
-            </div>
-
-            {/* Title */}
-            <div className="text-center mb-5">
-              <h2 className="text-2xl font-light tracking-tight mb-2 text-[#0d253d]">
-                Get started for free
-              </h2>
-            </div>
-
-            <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-              {/* Row 1: Name and Email */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Name field */}
-                <div className="space-y-1">
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium text-[#273951]"
-                  >
-                    Full Name
-                  </label>
-                  <div className="relative group">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                      <User className="h-5 w-5 text-[#64748d] group-focus-within:text-primary-500" />
-                    </div>
-                    <input
-                      id="name"
-                      type="text"
-                      autoComplete="name"
-                      {...register('name', {
-                        required: 'Name is required',
-                        minLength: {
-                          value: 2,
-                          message: 'Name must be at least 2 characters'
-                        },
-                        maxLength: {
-                          value: 50,
-                          message: 'Name cannot exceed 50 characters'
-                        }
-                      })}
-                      className={cn(
-                        "block w-full pl-11 pr-4 py-2.5 rounded-xl transition-all duration-300 text-sm font-medium min-h-[44px]",
-                        "focus:outline-none focus:ring-2 focus:ring-offset-0",
-                        "bg-white border border-[#a8c3de] text-[#0d253d] placeholder:text-[#64748d]/60 focus:border-primary-500 focus:ring-primary-500/20",
-                        errors.name && "!border-red-500 focus:!border-red-500 focus:!ring-red-500/20"
-                      )}
-                      placeholder="Enter your full name"
-                    />
-                  </div>
-                  {errors.name && (
-                    <p className="text-sm text-red-500 flex items-center gap-1 animate-in slide-in-from-left-1">
-                      <span>•</span> {errors.name.message}
-                    </p>
-                  )}
-                </div>
-
-                {/* Email field */}
-                <div className="space-y-1">
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-[#273951]"
-                  >
-                    Email address
-                  </label>
-                  <div className="relative group">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-[#64748d] group-focus-within:text-primary-500" />
-                    </div>
-                    <input
-                      id="email"
-                      type="email"
-                      autoComplete="email"
-                      {...register('email', {
-                        required: 'Email is required',
-                        validate: (value) => validateEmail(value) || 'Please enter a valid email'
-                      })}
-                      className={cn(
-                        "block w-full pl-11 pr-4 py-2.5 rounded-xl transition-all duration-300 text-sm font-medium min-h-[44px]",
-                        "focus:outline-none focus:ring-2 focus:ring-offset-0",
-                        "bg-white border border-[#a8c3de] text-[#0d253d] placeholder:text-[#64748d]/60 focus:border-primary-500 focus:ring-primary-500/20",
-                        errors.email && "!border-red-500 focus:!border-red-500 focus:!ring-red-500/20"
-                      )}
-                      placeholder="Enter your email"
-                    />
-                  </div>
-                  {errors.email && (
-                    <p className="text-sm text-red-500 flex items-center gap-1 animate-in slide-in-from-left-1">
-                      <span>•</span> {errors.email.message}
-                    </p>
-                  )}
-                </div>
+    <AuthLayout
+      formWidth="lg"
+      eyebrow="Get started for free"
+      headline={<>Start tracking<br /><span className="text-primary-200">in 30 seconds.</span></>}
+      subcopy="Create your account with just a name, email and preferred currency. No credit card required."
+      panelChildren={
+        <ul className="mt-10 flex flex-col gap-5">
+          {PANEL_POINTS.map(({ icon: Icon, label, text }) => (
+            <li key={label} className="flex items-start gap-4">
+              <div className="p-2 rounded-xl bg-white/[0.08] shrink-0">
+                <Icon size={18} className="text-primary-200" />
               </div>
-
-              {/* Currency field - Full Width */}
-              <div className="space-y-1">
-                <label
-                  htmlFor="currency"
-                  className="block text-sm font-medium text-[#273951]"
-                >
-                  Preferred Currency
-                </label>
-                <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                    <span className="text-base font-semibold text-[#64748d] group-focus-within:text-primary-500">
-                      {currencyMap[selectedCurrency || 'USD'].symbol}
-                    </span>
-                  </div>
-                  <select
-                    id="currency"
-                    {...register('currency', { required: 'Currency is required' })}
-                    className={cn(
-                      "block w-full pl-11 pr-4 py-2.5 rounded-xl transition-all duration-300 text-sm font-medium appearance-none cursor-pointer min-h-[44px]",
-                      "focus:outline-none focus:ring-2 focus:ring-offset-0",
-                      "bg-white border border-[#a8c3de] text-[#0d253d] placeholder:text-[#64748d]/60 focus:border-primary-500 focus:ring-primary-500/20",
-                      errors.currency && "!border-red-500 focus:!border-red-500 focus:!ring-red-500/20"
-                    )}
-                  >
-                    <option value="USD">US Dollar ($)</option>
-                    <option value="EUR">Euro (€)</option>
-                    <option value="INR">Indian Rupee (₹)</option>
-                    <option value="GBP">British Pound (£)</option>
-                    <option value="JPY">Japanese Yen (¥)</option>
-                    <option value="CNY">Chinese Yuan (¥)</option>
-                    <option value="CAD">Canadian Dollar (C$)</option>
-                    <option value="AUD">Australian Dollar (A$)</option>
-                  </select>
-                </div>
-                {errors.currency && (
-                  <p className="text-sm text-red-500 flex items-center gap-1 animate-in slide-in-from-left-1">
-                    <span>•</span> {errors.currency.message}
-                  </p>
-                )}
+              <div>
+                <div className="text-white font-medium text-sm">{label}</div>
+                <div className="text-white/50 text-sm">{text}</div>
               </div>
-
-              {/* Row 2: Password and Confirm Password */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Password field */}
-                <div className="space-y-1">
-                  <label
-                    htmlFor="password"
-                    className="block text-sm font-medium text-[#273951]"
-                  >
-                    Password
-                  </label>
-                  <div className="relative group">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                      <Lock className="h-5 w-5 text-[#64748d] group-focus-within:text-primary-500" />
-                    </div>
-                    <input
-                      id="password"
-                      type={showPassword ? 'text' : 'password'}
-                      autoComplete="new-password"
-                      {...register('password', {
-                        required: 'Password is required',
-                        validate: (value) => validatePassword(value) || 'Password must be at least 6 characters'
-                      })}
-                      className={cn(
-                        "block w-full pl-11 pr-12 py-2.5 rounded-xl transition-all duration-300 text-sm font-medium min-h-[44px]",
-                        "focus:outline-none focus:ring-2 focus:ring-offset-0",
-                        "bg-white border border-[#a8c3de] text-[#0d253d] placeholder:text-[#64748d]/60 focus:border-primary-500 focus:ring-primary-500/20",
-                        errors.password && "!border-red-500 focus:!border-red-500 focus:!ring-red-500/20"
-                      )}
-                      placeholder="Create a password (min. 6 characters)"
-                    />
-                    <button
-                      type="button"
-                      className="absolute inset-y-0 right-0 pr-3.5 flex items-center"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-5 w-5 text-[#64748d] hover:text-[#273951] transition-all duration-200" />
-                      ) : (
-                        <Eye className="h-5 w-5 text-[#64748d] hover:text-[#273951] transition-all duration-200" />
-                      )}
-                    </button>
-                  </div>
-                  {errors.password && (
-                    <p className="text-sm text-red-500 flex items-center gap-1 animate-in slide-in-from-left-1">
-                      <span>•</span> {errors.password.message}
-                    </p>
-                  )}
-                </div>
-
-                {/* Confirm Password field */}
-                <div className="space-y-1">
-                  <label
-                    htmlFor="confirmPassword"
-                    className="block text-sm font-medium text-[#273951]"
-                  >
-                    Confirm Password
-                  </label>
-                  <div className="relative group">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                      <Lock className="h-5 w-5 text-[#64748d] group-focus-within:text-primary-500" />
-                    </div>
-                    <input
-                      id="confirmPassword"
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      autoComplete="new-password"
-                      {...register('confirmPassword', {
-                        required: 'Please confirm your password',
-                        validate: (value) => value === password || 'Passwords do not match'
-                      })}
-                      className={cn(
-                        "block w-full pl-11 pr-12 py-2.5 rounded-xl transition-all duration-300 text-sm font-medium min-h-[44px]",
-                        "focus:outline-none focus:ring-2 focus:ring-offset-0",
-                        "bg-white border border-[#a8c3de] text-[#0d253d] placeholder:text-[#64748d]/60 focus:border-primary-500 focus:ring-primary-500/20",
-                        errors.confirmPassword && "!border-red-500 focus:!border-red-500 focus:!ring-red-500/20"
-                      )}
-                      placeholder="Confirm your password"
-                    />
-                    <button
-                      type="button"
-                      className="absolute inset-y-0 right-0 pr-3.5 flex items-center"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    >
-                      {showConfirmPassword ? (
-                      <EyeOff className="h-5 w-5 text-[#64748d] hover:text-[#273951] transition-all duration-200" />
-                    ) : (
-                      <Eye className="h-5 w-5 text-[#64748d] hover:text-[#273951] transition-all duration-200" />
-                    )}
-                    </button>
-                  </div>
-                  {errors.confirmPassword && (
-                    <p className="text-sm text-red-500 flex items-center gap-1 animate-in slide-in-from-left-1">
-                      <span>•</span> {errors.confirmPassword.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* Error message */}
-              {errors.root && (
-                <div className={cn(
-                  "rounded-xl p-3 animate-in slide-in-from-top-2 border",
-                    "bg-red-50 border-red-200"
-                )}>
-                  <p className={cn(
-                    "text-sm font-medium flex items-center gap-2",
-                    "text-red-600"
-                  )}>
-                    <span className="text-base">⚠</span>
-                    {errors.root.message}
-                  </p>
-                </div>
-              )}
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isLoading}
-                className={cn(
-                  "relative w-full py-3 px-4 rounded-full font-semibold text-white text-sm mt-4",
-                  "bg-primary-500 hover:bg-primary-600",
-                  "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
-                  "disabled:opacity-50 disabled:cursor-not-allowed",
-                  "transform transition-all duration-200 active:scale-[0.98]",
-                  "shadow-lg hover:shadow-xl shadow-primary-500/25",
-                  "overflow-hidden group"
-                )}
-              >
-                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
-                <span className="relative flex items-center justify-center gap-2">
-                  {isLoading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-                      Creating account...
-                    </>
-                  ) : (
-                    'Create account'
-                  )}
-                </span>
-              </button>
-            </form>
-          </div>
-
-          <div className="px-6 py-4 border-t border-[#e3e8ee]">
-            <p className="text-center text-sm text-[#64748d]">
-              Already have an account?{' '}
-              <Link
-                to="/login"
-                className="font-semibold transition-colors hover:underline text-primary-500 hover:text-primary-700"
-              >
-                Sign in
-              </Link>
-            </p>
-          </div>
-        </div>
+            </li>
+          ))}
+        </ul>
+      }
+    >
+      <div className="lg:hidden flex justify-center mb-8">
+        <Logo size="large" />
       </div>
-    </div>
+
+      <div className="mb-8">
+        <h1 className="text-3xl font-light tracking-tight text-ink mb-2">Create your account</h1>
+        <p className="text-ink-mute text-sm">Free forever. No credit card required.</p>
+      </div>
+
+      <div className="bg-white rounded-2xl border border-[#e3e8ee] shadow-[0_8px_32px_rgba(0,55,112,0.08)] p-8">
+        <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <AuthField
+              id="name"
+              label="Full name"
+              icon={User}
+              autoComplete="name"
+              placeholder="Jane Doe"
+              error={errors.name?.message}
+              {...register('name', {
+                required: 'Name is required',
+                minLength: { value: 2, message: 'Name must be at least 2 characters' },
+                maxLength: { value: 50, message: 'Name cannot exceed 50 characters' },
+              })}
+            />
+            <AuthField
+              id="email"
+              label="Email address"
+              icon={Mail}
+              type="email"
+              autoComplete="email"
+              placeholder="you@example.com"
+              error={errors.email?.message}
+              {...register('email', {
+                required: 'Email is required',
+                validate: (v) => validateEmail(v) || 'Please enter a valid email',
+              })}
+            />
+          </div>
+
+          {/* Currency — native select styled to match AuthField */}
+          <div className="space-y-1.5">
+            <label htmlFor="currency" className="block text-sm font-medium text-ink-secondary">
+              Preferred currency
+            </label>
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                <span className="text-base font-semibold text-ink-mute group-focus-within:text-primary-500">
+                  {SYMBOL[selectedCurrency]}
+                </span>
+              </div>
+              <select
+                id="currency"
+                {...register('currency', { required: 'Currency is required' })}
+                className={cn(
+                  'block w-full pl-11 pr-10 py-3 rounded-xl text-sm min-h-[44px] bg-white appearance-none cursor-pointer',
+                  'text-ink border border-[#a8c3de] transition-all duration-200',
+                  'focus:outline-none focus:ring-2 focus:ring-offset-0 focus:border-primary-500 focus:ring-primary-500/15',
+                  errors.currency && 'border-red-400'
+                )}
+              >
+                {CURRENCIES.map(([code, name]) => (
+                  <option key={code} value={code}>{name}</option>
+                ))}
+              </select>
+              <svg
+                className="pointer-events-none absolute inset-y-0 right-3.5 my-auto h-4 w-4 text-ink-mute"
+                viewBox="0 0 20 20" fill="none"
+              >
+                <path d="M6 8l4 4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            {errors.currency && (
+              <p className="text-sm text-red-500 flex items-center gap-1">
+                <span aria-hidden="true">•</span> {errors.currency.message}
+              </p>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <AuthField
+              id="password"
+              label="Password"
+              icon={Lock}
+              type="password"
+              autoComplete="new-password"
+              placeholder="Min. 6 characters"
+              error={errors.password?.message}
+              {...register('password', {
+                required: 'Password is required',
+                validate: (v) => validatePassword(v) || 'Password must be at least 6 characters',
+              })}
+            />
+            <AuthField
+              id="confirmPassword"
+              label="Confirm password"
+              icon={Lock}
+              type="password"
+              autoComplete="new-password"
+              placeholder="Re-enter password"
+              error={errors.confirmPassword?.message}
+              {...register('confirmPassword', {
+                required: 'Please confirm your password',
+                validate: (v) => v === password || 'Passwords do not match',
+              })}
+            />
+          </div>
+
+          <AuthError message={errors.root?.message} />
+
+          <AuthSubmit loading={isLoading} loadingText="Creating account...">
+            Create account
+          </AuthSubmit>
+        </form>
+      </div>
+
+      <p className="text-center text-sm text-ink-mute mt-6">
+        Already have an account?{' '}
+        <Link to="/login" className="font-semibold text-primary-500 hover:underline">
+          Sign in
+        </Link>
+      </p>
+    </AuthLayout>
   )
 }
 

@@ -7,34 +7,29 @@ import '../styles/LandingPage.css'
 
 const Landing = () => {
     useEffect(() => {
-        // Ensure page starts at top on refresh
         window.scrollTo(0, 0)
 
-        // Enhanced intersection observer with stagger effect
-        const observerOptions = {
-            threshold: 0.15,
-            rootMargin: '0px 0px -50px 0px'
+        const els = document.querySelectorAll('.feature-card, .benefit-item, .section-header')
+
+        // Reduced motion: reveal everything immediately, skip the observer.
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            els.forEach((el) => el.classList.add('animate-in'))
+            return
         }
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry, index) => {
-                if (entry.isIntersecting) {
-                    // Add stagger delay based on index
-                    setTimeout(() => {
-                        entry.target.classList.add('animate-in')
-                    }, index * 100)
-                }
-            })
-        }, observerOptions)
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => entry.target.classList.add('animate-in'), index * 100)
+                    }
+                })
+            },
+            { threshold: 0.15, rootMargin: '0px 0px -50px 0px' }
+        )
 
-        // Observe all animatable elements
-        document.querySelectorAll('.feature-card, .benefit-item, .section-header').forEach((el) => {
-            observer.observe(el)
-        })
-
-        return () => {
-            observer.disconnect()
-        }
+        els.forEach((el) => observer.observe(el))
+        return () => observer.disconnect()
     }, [])
 
     return (
@@ -59,8 +54,8 @@ const Landing = () => {
                                 <span className="gradient-text">Master Your Money</span>
                             </h1>
                             <p className="hero-subtitle fade-in-up text-[#64748d]" style={{ animationDelay: '0.3s' }}>
-                                A simple, powerful expense tracker that helps you understand where your money goes.
-                                Organize expenses by categories, visualize spending patterns, and export your data anytime.
+                                A simple, powerful expense tracker that shows you where your money goes.
+                                Organize by category, spot spending patterns, and export anytime.
                             </p>
                             <div className="hero-cta fade-in-up" style={{ animationDelay: '0.4s' }}>
                                 <Link to="/register" className="btn-primary btn-lg">
@@ -69,12 +64,7 @@ const Landing = () => {
                                         <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                     </svg>
                                 </Link>
-                                <Link to="/login" className="btn-secondary btn-lg">
-                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                        <path d="M8 6L14 10L8 14V6Z" fill="currentColor" />
-                                    </svg>
-                                    View Demo
-                                </Link>
+                                <Link to="/login" className="btn-secondary btn-lg">Sign In</Link>
                             </div>
                         </div>
                         <div className="hero-image fade-in-right" style={{ animationDelay: '0.5s' }}>
@@ -85,7 +75,7 @@ const Landing = () => {
                                         <span></span>
                                         <span></span>
                                     </div>
-                                    <div style={{fontSize:'11px',color:'rgba(255,255,255,0.5)',marginLeft:'auto'}}>Spendly Dashboard</div>
+                                    <div style={{fontSize:'11px',color:'rgba(255,255,255,0.5)',marginLeft:'auto'}}>Spendly — sample dashboard</div>
                                 </div>
                                 <div className="mockup-content">
                                     <div className="mockup-sidebar">
@@ -261,29 +251,23 @@ const Landing = () => {
 
             <section id="cta" className="relative z-10 py-24">
                 <div className="landing-container">
-                    <div
-                        className="p-12 sm:p-16 text-center max-w-3xl mx-auto rounded-3xl overflow-hidden relative"
-                        style={{
-                            background: 'linear-gradient(135deg, #1a1050 0%, #2e1b8a 40%, #533afd 80%, #6d5cff 100%)',
-                            boxShadow: '0 32px 80px rgba(83,58,253,0.35), 0 8px 24px rgba(83,58,253,0.2)',
-                        }}
-                    >
+                    <div className="cta-gradient-indigo p-12 sm:p-16 text-center max-w-3xl mx-auto rounded-3xl overflow-hidden relative shadow-[0_32px_80px_rgba(83,58,253,0.35),0_8px_24px_rgba(83,58,253,0.2)]">
                         {/* Decorative orbs */}
-                        <div style={{position:'absolute',top:'-60px',right:'-60px',width:'200px',height:'200px',borderRadius:'50%',background:'rgba(255,255,255,0.05)',pointerEvents:'none'}} />
-                        <div style={{position:'absolute',bottom:'-40px',left:'-40px',width:'150px',height:'150px',borderRadius:'50%',background:'rgba(234,34,97,0.12)',pointerEvents:'none'}} />
+                        <div className="pointer-events-none absolute -top-14 -right-14 w-52 h-52 rounded-full bg-white/[0.05]" />
+                        <div className="pointer-events-none absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-ruby/[0.12]" />
                         <div className="relative z-10">
-                            <span className="pill-tag-soft inline-flex mb-6" style={{background:'rgba(255,255,255,0.12)',color:'rgba(255,255,255,0.9)',borderColor:'rgba(255,255,255,0.2)'}}>
+                            <span className="pill-tag-soft inline-flex mb-6 bg-white/[0.12] text-white/90 border border-white/20">
                                 <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse mr-2"></span>
                                 Free forever · No credit card
                             </span>
                             <h2 className="text-4xl sm:text-5xl font-light tracking-tight text-white mb-5">Ready to take control of your spending?</h2>
-                            <p className="text-lg text-white/70 mb-8">Join users who are already tracking their expenses and making smarter financial decisions.</p>
+                            <p className="text-lg text-white/70 mb-8">Take control of your expenses and make smarter financial decisions.</p>
                             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4">
-                                <Link to="/register" className="btn-lg inline-flex items-center justify-center gap-2 font-medium rounded-2xl" style={{background:'#ffffff',color:'#533afd',paddingInline:'1.75rem',paddingBlock:'0.875rem',fontSize:'1rem'}}>
+                                <Link to="/register" className="btn-lg inline-flex items-center justify-center gap-2 font-medium rounded-2xl bg-white text-primary-500 px-7 py-3.5 text-base">
                                     Get Started Free
                                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                                 </Link>
-                                <Link to="/login" className="btn-lg inline-flex items-center justify-center font-medium rounded-2xl" style={{background:'rgba(255,255,255,0.12)',color:'#ffffff',border:'1px solid rgba(255,255,255,0.2)',paddingInline:'1.75rem',paddingBlock:'0.875rem',fontSize:'1rem'}}>Sign In</Link>
+                                <Link to="/login" className="btn-lg inline-flex items-center justify-center font-medium rounded-2xl bg-white/[0.12] text-white border border-white/20 px-7 py-3.5 text-base">Sign In</Link>
                             </div>
                             <p className="text-sm text-white/50">Start in 30 seconds · Cancel anytime</p>
                         </div>

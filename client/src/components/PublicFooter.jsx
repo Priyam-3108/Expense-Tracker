@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { LogoMark } from './Logo'
 
 const PublicFooter = () => {
     return (
@@ -12,12 +13,7 @@ const PublicFooter = () => {
                     <div className="md:col-span-1 space-y-5">
                         {/* Logo mark */}
                         <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-xl flex items-center justify-center shadow-lg" style={{background:'linear-gradient(135deg,#665efd,#533afd)'}}>
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                    <path d="M3 4h10M3 8h7M3 12h5" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-                                    <circle cx="13" cy="12" r="2.5" fill="#ea2261"/>
-                                </svg>
-                            </div>
+                            <LogoMark size={32} />
                             <span className="text-white font-semibold text-lg tracking-tight">Spendly</span>
                         </div>
                         <p className="text-sm leading-relaxed" style={{color:'rgba(255,255,255,0.4)'}}>

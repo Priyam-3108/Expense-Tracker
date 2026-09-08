@@ -30,6 +30,16 @@
   background: var(--gradient-mesh-stops), #ffffff;
 }
 
+/* Deep-indigo panel gradient — auth left panel + landing CTA band.
+   Single source so the two stay in sync. */
+.panel-gradient-indigo {
+  background: linear-gradient(145deg, #1a1050 0%, #2e1b8a 45%, #533afd 100%);
+}
+
+.cta-gradient-indigo {
+  background: linear-gradient(135deg, #1a1050 0%, #2e1b8a 40%, #533afd 80%, #6d5cff 100%);
+}
+
 /* Stripi pill-tag-soft — subdued indigo eyebrow badge */
 .pill-tag-soft {
   align-items: center;

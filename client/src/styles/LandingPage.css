@@ -210,7 +210,7 @@
 .benefits-content {
   display: flex;
   flex-direction: column;
-  gap: 100px;
+  gap: 72px;
 }
 
 .benefit-item {
@@ -451,5 +451,33 @@
 
   .gradient-mesh-hero {
     height: 480px;
+  }
+}
+
+/* Respect reduced-motion — kill the scroll reveals, floats and path draw. */
+@media (prefers-reduced-motion: reduce) {
+  .fade-in-up,
+  .fade-in-right,
+  .chart-bar,
+  .chart-path,
+  .benefit-list li {
+    animation: none !important;
+  }
+
+  .floating-card {
+    animation: none !important;
+  }
+
+  .feature-card,
+  .benefit-item,
+  .section-header {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .dashboard-mockup:hover,
+  .chart-bar:hover {
+    transform: none !important;
   }
 }
