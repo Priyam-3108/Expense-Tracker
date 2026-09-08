@@ -48,7 +48,7 @@ New directory: `client/src/components/form/`
 | `SegmentedToggle` | Two-option animated pill | `value`, `onChange`, `options: [{value,label,icon,activeColor}]` |
 | `SectionLabel` | Uppercase tracked muted label | `children` |
 | `FieldCard` | Rounded bordered card wrapper | `children`, `className`, `as` |
-| `IconRow` | Icon-circle + label/value + chevron trigger | `icon`, `iconColor`, `label`, `value`, `onClick` |
+| ~~`IconRow`~~ | **Not built.** The web `DatePicker` already renders its own trigger button; date fields are placed in a labeled block / `FieldCard` instead of reimplementing a picker-opening row. | — |
 | `StickyFormFooter` | Fixed-bottom full-width gradient submit bar | `variant`, `loading`, `label`, `loadingLabel`, `onCancel?` |
 | `CategoryChips` | Horizontal-scroll color-dot chips + checkmark | `categories`, `value`, `onChange`, `onCreateClick?` |
 
@@ -72,7 +72,7 @@ Tailwind arbitrary-value gradient utilities — no new dependencies.
 ```
 Expenses.jsx  ─┐
 DebtForm.jsx  ─┼─► compose ─► form/{AmountHero, SegmentedToggle, SectionLabel,
-Categories.jsx ┘              FieldCard, IconRow, StickyFormFooter, CategoryChips}
+Categories.jsx ┘              FieldCard, StickyFormFooter, CategoryChips, gradients}
                              (all presentational: value in, callbacks out)
 ```
 
@@ -105,7 +105,7 @@ The Expense form modal today sets `h-[600px] max-h-full` on the `<form>`; keep t
 - `SegmentedToggle` — Expense / Income (icons `ArrowDownCircle` / `ArrowUpCircle`).
 - `SectionLabel "Category"` + `CategoryChips` (replaces `CategorySelector` **in this form only**).
 - `SectionLabel "Notes (optional)"` + `FieldCard` wrapping the description input.
-- Recurring: toggle row (`FieldCard` + checkbox styled as switch) + subtitle; when on, `SectionLabel "Frequency"` + pill buttons (weekly/monthly/yearly — web's existing option set) + `IconRow` for end date opening `DatePicker`.
+- Recurring: toggle row (`FieldCard` + checkbox) + label; when on, `SectionLabel "Frequency"` + pill buttons (weekly/monthly/yearly — web's existing option set) + `SectionLabel "End Date *"` + `DatePicker` (as built — no `IconRow`).
 - `StickyFormFooter variant={type}` — "Add" / "Update", loading → "Adding…" / "Updating…".
 
 ### Debt form (`DebtForm.jsx`)
@@ -114,7 +114,7 @@ The Expense form modal today sets `h-[600px] max-h-full` on the `<form>`; keep t
 - `AmountHero variant={type}` (`borrowed` → pink, `lent` → green); `disabled` + note when `editDebt`.
 - `SegmentedToggle` — "I Borrowed" / "I Lent" — hidden when editing (matches mobile).
 - `SectionLabel "Person Name"` + `FieldCard` input.
-- `IconRow` × 2 for Date and Due Date (optional), each opening `DatePicker`.
+- `SectionLabel` + `DatePicker` × 2 for Date and Due Date (optional), in a 2-col grid (as built — no `IconRow`).
 - `SectionLabel "Notes (optional)"` + `FieldCard` textarea.
 - `StickyFormFooter variant={type}` — "Save Record" / "Update Record".
 
@@ -159,13 +159,13 @@ The Expense form modal today sets `h-[600px] max-h-full` on the `<form>`; keep t
   `BulkEditList.jsx`, `AnalyticsDashboard.jsx`); only the expense Add/Edit form
   swaps to `CategoryChips`.
 
-## Files touched (anticipated)
+## Files touched (as built)
 
 - New: `client/src/components/form/AmountHero.jsx`, `SegmentedToggle.jsx`,
-  `SectionLabel.jsx`, `FieldCard.jsx`, `IconRow.jsx`, `StickyFormFooter.jsx`,
-  `CategoryChips.jsx`, `gradients.js`, `Showcase.jsx`
-- Edit: `client/src/pages/Expenses.jsx` (form body only)
-- Edit: `client/src/components/DebtForm.jsx` (container + body)
-- Edit: `client/src/pages/Debts.jsx` (prop wiring if `DebtForm` signature changes)
+  `SectionLabel.jsx`, `FieldCard.jsx`, `StickyFormFooter.jsx`,
+  `CategoryChips.jsx`, `gradients.js`, `Showcase.jsx` (`IconRow.jsx` was not built — see Approach table)
+- Edit: `client/src/pages/Expenses.jsx` (Add/Edit form body only; Bulk Edit modal untouched, still uses `CategorySelector`)
+- Edit: `client/src/components/DebtForm.jsx` (container + body; hand-rolled Dialog + heroicons removed)
 - Edit: `client/src/pages/Categories.jsx` (inline form → `Modal`)
-- Edit: `client/src/App.jsx` (dev showcase route)
+- Edit: `client/src/App.jsx` (dev showcase route, `import.meta.env.DEV`-guarded)
+- Not edited: `client/src/pages/Debts.jsx` and `client/src/components/DebtList.jsx` — both already pass only props the rewritten `DebtForm` still supports (`isOpen`/`onClose`/`type`/`editDebt`).

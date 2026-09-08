@@ -4,6 +4,10 @@ import { Plus, Edit, Trash2, GripVertical, Tag } from 'lucide-react'
 import EmptyState from '../components/EmptyState'
 import toast from 'react-hot-toast'
 import { useAuth } from '../context/AuthContext'
+import Modal from '../components/Modal'
+import SectionLabel from '../components/form/SectionLabel'
+import FieldCard from '../components/form/FieldCard'
+import StickyFormFooter from '../components/form/StickyFormFooter'
 
 const currencySymbols = {
   USD: '$',
@@ -111,7 +115,6 @@ const Categories = () => {
     }
     setEditingCategory(category)
     setShowForm(true)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleCancel = () => {
@@ -256,31 +259,40 @@ const Categories = () => {
       </div>
 
       {/* Add/Edit Category Form */}
-      {showForm && (
-        <div className="glass-card p-6">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-            {editingCategory ? 'Edit Category' : 'Add New Category'}
-          </h3>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Category Name
-              </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="glass-input w-full py-3"
-                placeholder="Enter category name"
-                maxLength={30}
-              />
+      <Modal
+        isOpen={showForm}
+        onClose={handleCancel}
+        title={editingCategory ? 'Edit Category' : 'Add New Category'}
+        maxWidth="max-w-md"
+      >
+        <form onSubmit={handleSubmit} className="flex flex-col max-h-[80vh]">
+          <div className="flex-1 overflow-y-auto p-5 space-y-5">
+            {/* Preview */}
+            <div className="flex justify-center">
+              <div
+                className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl"
+                style={{ backgroundColor: (formData.color || '#6366f1') + '20' }}
+              >
+                {formData.icon}
+              </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Icon
-              </label>
+              <SectionLabel>Category Name</SectionLabel>
+              <FieldCard className="p-4">
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full bg-transparent border-0 outline-none text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-slate-500"
+                  placeholder="Enter category name"
+                  maxLength={30}
+                />
+              </FieldCard>
+            </div>
+
+            <div>
+              <SectionLabel>Icon</SectionLabel>
               <div className="grid grid-cols-6 sm:grid-cols-11 gap-2">
                 {iconOptions.map((icon) => (
                   <button
@@ -300,10 +312,8 @@ const Categories = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Color
-              </label>
-              <div className="grid grid-cols-8 sm:grid-cols-8 gap-2">
+              <SectionLabel>Color</SectionLabel>
+              <div className="grid grid-cols-8 gap-2">
                 {colorOptions.map((color) => (
                   <button
                     key={color}
@@ -320,34 +330,17 @@ const Categories = () => {
                 ))}
               </div>
             </div>
+          </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              <button
-                type="submit"
-                disabled={formLoading}
-                className="btn-primary btn-md w-full sm:w-auto"
-              >
-                {formLoading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    {editingCategory ? 'Updating...' : 'Adding...'}
-                  </>
-                ) : (
-                  editingCategory ? 'Update Category' : 'Add Category'
-                )}
-              </button>
-              <button
-                type="button"
-                onClick={handleCancel}
-                disabled={formLoading}
-                className="btn-secondary btn-md w-full sm:w-auto"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
+          <StickyFormFooter
+            variant="neutral"
+            loading={formLoading}
+            label={editingCategory ? 'Update Category' : 'Add Category'}
+            loadingLabel={editingCategory ? 'Updating…' : 'Adding…'}
+            onCancel={handleCancel}
+          />
+        </form>
+      </Modal>
 
       {/* All Categories */}
       <div className="glass-card overflow-hidden">
