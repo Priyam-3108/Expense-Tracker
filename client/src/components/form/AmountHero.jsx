@@ -16,7 +16,7 @@ export default function AmountHero({
     // collapse multiple dots
     const parts = cleaned.split('.')
     const normalized = parts.length > 2 ? `${parts[0]}.${parts.slice(1).join('')}` : cleaned
-    onChange(normalized)
+    onChange(normalized === '.' ? '' : normalized)
   }
 
   return (

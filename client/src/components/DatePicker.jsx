@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns'
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, X } from 'lucide-react'
 
-const DatePicker = ({ value, onChange, placeholder = "Select date", className = "" }) => {
+const DatePicker = ({ value, onChange, placeholder = "Select date", className = "", ariaLabel }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [currentMonth, setCurrentMonth] = useState(value ? new Date(value) : new Date())
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, ready: false })
@@ -121,6 +121,7 @@ const DatePicker = ({ value, onChange, placeholder = "Select date", className = 
           ref={buttonRef}
           type="button"
           onClick={handleToggle}
+          aria-label={ariaLabel || placeholder}
           className={`glass-input w-full flex items-center justify-between text-left ${value ? 'pr-10' : ''}`}
         >
           <div className="flex items-center gap-2">

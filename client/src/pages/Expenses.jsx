@@ -1081,6 +1081,7 @@ const Expenses = () => {
                   value={formData.date}
                   onChange={(date) => setFormData({ ...formData, date })}
                   placeholder="Select date"
+                  ariaLabel="Transaction date"
                 />
               </div>
             </AmountHero>
