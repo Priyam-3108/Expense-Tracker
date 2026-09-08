@@ -10,6 +10,12 @@ import ExportModal from '../components/ExportModal'
 import ImportModal from '../components/ImportModal'
 import MobileExpenseCard from '../components/MobileExpenseCard'
 import Modal from '../components/Modal'
+import AmountHero from '../components/form/AmountHero'
+import SegmentedToggle from '../components/form/SegmentedToggle'
+import SectionLabel from '../components/form/SectionLabel'
+import FieldCard from '../components/form/FieldCard'
+import CategoryChips from '../components/form/CategoryChips'
+import StickyFormFooter from '../components/form/StickyFormFooter'
 import { formatCurrency, formatDate, formatDateForInput, parseDateLocal, getTodayDate } from '../utils/helpers'
 import {
     Plus,
@@ -1057,183 +1063,128 @@ const Expenses = () => {
       <Modal
         isOpen={showForm}
         onClose={() => { setShowForm(false); resetForm() }}
-        title={editingExpense ? 'Edit Expense' : 'Add Expense'}
+        title={null}
         maxWidth="max-w-lg"
       >
-        <form onSubmit={handleSubmit} className="flex flex-col flex-1 h-[600px] max-h-full">
-          {/* Scrollable Content */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-4">
-            {/* Type Toggle */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Type</label>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setFormData({ ...formData, type: 'expense' })}
-                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 border-2 rounded-xl transition-all duration-200 min-h-[44px] ${formData.type === 'expense'
-                    ? 'border-rose-500/60 bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 shadow-[0_0_12px_rgba(251,113,133,0.1)]'
-                    : 'border-gray-300 dark:border-white/[0.08] text-gray-700 dark:text-slate-400 hover:border-gray-400 dark:hover:border-white/[0.15]'
-                    }`}
-                >
-                  <ArrowDownCircle size={18} />
-                  Expense
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setFormData({ ...formData, type: 'income' })}
-                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 border-2 rounded-xl transition-all duration-200 min-h-[44px] ${formData.type === 'income'
-                    ? 'border-emerald-500/60 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 shadow-[0_0_12px_rgba(52,211,153,0.1)]'
-                    : 'border-gray-300 dark:border-white/[0.08] text-gray-700 dark:text-slate-400 hover:border-gray-400 dark:hover:border-white/[0.15]'
-                    }`}
-                >
-                  <ArrowUpCircle size={18} />
-                  Income
-                </button>
-              </div>
-            </div>
-
-            {/* Date and Category */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="relative z-20">
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
-                  Date *
-                </label>
+        <form onSubmit={handleSubmit} className="flex flex-col h-[600px] max-h-[85vh]">
+          {/* Scrollable content */}
+          <div className="flex-1 overflow-y-auto p-5 space-y-5">
+            <AmountHero
+              value={formData.amount}
+              onChange={(v) => setFormData({ ...formData, amount: v })}
+              variant={formData.type}
+              currencySymbol={currencySymbols[currency] || '$'}
+              label={`Amount (${currencySymbols[currency] || '$'})`}
+            >
+              <div className="flex items-center gap-2">
                 <DatePicker
                   value={formData.date}
                   onChange={(date) => setFormData({ ...formData, date })}
                   placeholder="Select date"
                 />
               </div>
+            </AmountHero>
 
-              <div className="relative z-10">
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
-                  Category *
-                </label>
-                <CategorySelector
-                  categories={categories}
-                  value={formData.category}
-                  onChange={(categoryId) => setFormData({ ...formData, category: categoryId })}
-                  placeholder="Select category"
-                />
-              </div>
-            </div>
+            <SegmentedToggle
+              value={formData.type}
+              onChange={(t) => setFormData({ ...formData, type: t })}
+              options={[
+                { value: 'expense', label: 'Expense', icon: <ArrowDownCircle size={18} />, activeColor: 'text-rose-600 dark:text-rose-400' },
+                { value: 'income', label: 'Income', icon: <ArrowUpCircle size={18} />, activeColor: 'text-emerald-600 dark:text-emerald-400' },
+              ]}
+            />
 
-            {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Description
-              </label>
-              <input
-                type="text"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-white/[0.07] rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-slate-500 min-h-[44px] transition-all duration-200"
-                placeholder="e.g., Groceries, Salary..."
+              <SectionLabel>Category *</SectionLabel>
+              <CategoryChips
+                categories={categories}
+                value={formData.category}
+                onChange={(id) => setFormData({ ...formData, category: id })}
               />
             </div>
 
-            {/* Amount */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Amount *
-              </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 font-medium">
-                  {currencySymbols[currency] || '$'}
-                </span>
+              <SectionLabel>Notes (optional)</SectionLabel>
+              <FieldCard className="p-4">
                 <input
-                  type="number"
-                  step="1"
-                  min="1"
-                  value={formData.amount}
-                  onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-white/[0.07] rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-slate-500 min-h-[44px] transition-all duration-200"
-                  placeholder="0.00"
-                  required
+                  type="text"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  className="w-full bg-transparent border-0 outline-none text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-slate-500"
+                  placeholder="e.g. Grocery run, monthly salary…"
                 />
-              </div>
+              </FieldCard>
             </div>
 
-            {/* Recurring Expense */}
             <div>
-              <label className="flex items-center gap-2 cursor-pointer min-h-[44px]">
-                <input
-                  type="checkbox"
-                  checked={formData.isRecurring}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      isRecurring: e.target.checked,
-                      recurringEndDate: e.target.checked ? formData.recurringEndDate : ''
-                    })
-                  }
-                  className="w-5 h-5 text-indigo-600 border-gray-300 dark:border-white/[0.15] rounded focus:ring-indigo-500"
-                />
-                <div className="flex items-center gap-2">
-                  <Repeat size={18} className="text-gray-600 dark:text-gray-400" />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Recurring {formData.type}</span>
-                </div>
-              </label>
-              {formData.isRecurring && (
-                <div className="mt-3 ml-6 space-y-3 p-4 bg-gray-50 dark:bg-white/[0.03] rounded-xl border border-gray-100 dark:border-white/[0.05]" style={{ overflow: 'visible' }}>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Frequency *
-                    </label>
-                    <select
-                      value={formData.recurringPeriod}
-                      onChange={(e) => setFormData({ ...formData, recurringPeriod: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-white/[0.07] rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white min-h-[44px] transition-all duration-200"
-                    >
-                      <option value="weekly">Weekly</option>
-                      <option value="monthly">Monthly</option>
-                      <option value="yearly">Yearly</option>
-                    </select>
-                  </div>
+              <FieldCard className="p-4">
+                <label className="flex items-center justify-between gap-3 cursor-pointer">
+                  <span className="flex items-center gap-2">
+                    <Repeat size={18} className="text-gray-600 dark:text-gray-400" />
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">Recurring {formData.type}</span>
+                  </span>
+                  <input
+                    type="checkbox"
+                    checked={formData.isRecurring}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        isRecurring: e.target.checked,
+                        recurringEndDate: e.target.checked ? formData.recurringEndDate : '',
+                      })
+                    }
+                    className="w-5 h-5 text-indigo-600 border-gray-300 dark:border-white/[0.15] rounded focus:ring-indigo-500"
+                  />
+                </label>
 
-                  <div className="relative" style={{ zIndex: 1000 }}>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      End Date *
-                    </label>
-                    <DatePicker
-                      value={formData.recurringEndDate}
-                      onChange={(date) => setFormData({ ...formData, recurringEndDate: date })}
-                      placeholder="Select end date"
-                    />
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Recurring entries will be created from the start date through this end date.
-                    </p>
+                {formData.isRecurring && (
+                  <div className="mt-4 space-y-3">
+                    <div>
+                      <SectionLabel>Frequency *</SectionLabel>
+                      <div className="flex flex-wrap gap-2">
+                        {['weekly', 'monthly', 'yearly'].map((p) => {
+                          const active = formData.recurringPeriod === p
+                          return (
+                            <button
+                              key={p}
+                              type="button"
+                              onClick={() => setFormData({ ...formData, recurringPeriod: p })}
+                              className={`px-3.5 py-2 rounded-full text-sm font-medium capitalize min-h-[40px] border transition-all duration-200
+                                ${active
+                                  ? 'bg-indigo-600 border-indigo-600 text-white'
+                                  : 'bg-transparent border-gray-300 dark:border-white/[0.15] text-gray-700 dark:text-slate-300'
+                                }`}
+                            >
+                              {p}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                    <div className="relative" style={{ zIndex: 1000 }}>
+                      <SectionLabel>End Date *</SectionLabel>
+                      <DatePicker
+                        value={formData.recurringEndDate}
+                        onChange={(date) => setFormData({ ...formData, recurringEndDate: date })}
+                        placeholder="Select end date"
+                      />
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        Recurring entries will be created from the start date through this end date.
+                      </p>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </FieldCard>
             </div>
           </div>
 
-          {/* Form Actions */}
-          <div className="flex gap-3 p-6 border-t border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.02] mt-auto flex-shrink-0">
-            <button
-              type="submit"
-              disabled={formLoading}
-              className="btn-primary btn-md flex-1"
-            >
-              {formLoading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                  {editingExpense ? 'Updating...' : 'Adding...'}
-                </span>
-              ) : (
-                editingExpense ? 'Update' : 'Add'
-              )}
-            </button>
-            <button
-              type="button"
-              onClick={() => { setShowForm(false); resetForm() }}
-              disabled={formLoading}
-              className="btn-secondary btn-md flex-1"
-            >
-              Cancel
-            </button>
-          </div>
+          <StickyFormFooter
+            variant={formData.type}
+            loading={formLoading}
+            label={editingExpense ? 'Update' : 'Add'}
+            loadingLabel={editingExpense ? 'Updating…' : 'Adding…'}
+            onCancel={() => { setShowForm(false); resetForm() }}
+          />
         </form>
       </Modal>
 
