@@ -19,6 +19,7 @@ import FAQ from './pages/FAQ'
 import Support from './pages/Support'
 import Documentation from './pages/Documentation'
 import SharedAnalytics from './pages/SharedAnalytics'
+import FormKitShowcase from './components/form/Showcase'
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -71,6 +72,10 @@ function AppRoutes() {
         <Route path="debts" element={<Debts />} />
         <Route path="profile" element={<Profile />} />
       </Route>
+
+      {import.meta.env.DEV && (
+        <Route path="/dev/form-kit" element={<FormKitShowcase />} />
+      )}
 
       {/* Catch all route */}
       <Route path="*" element={<Navigate to="/" replace />} />
