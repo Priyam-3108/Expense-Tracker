@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { PAYMENT_MODES, DEFAULT_PAYMENT_MODE } from '../../constants/paymentModes.js';
 
 const expenseSchema = new mongoose.Schema({
   description: {
@@ -42,6 +43,11 @@ const expenseSchema = new mongoose.Schema({
     type: String,
     trim: true,
     maxlength: [500, 'Notes cannot exceed 500 characters']
+  },
+  paymentMode: {
+    type: String,
+    enum: PAYMENT_MODES,
+    default: DEFAULT_PAYMENT_MODE
   },
   isRecurring: {
     type: Boolean,
