@@ -46,15 +46,36 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` merged
 Spec: `specs/2026-09-10-payment-mode-design.md`
 
 ### 1A · API — `plans/2026-09-10-payment-mode-1a-api.md`
-- [ ] Task 1: Add `paymentMode` to `Expense` schema (enum, default `other`)
-- [ ] Task 2: Add `paymentMode` to `expenseSchema` Zod validator
-- [ ] Task 3: Persist `paymentMode` in `createExpense` (single + recurring + bulk)
-- [ ] Task 4: Persist `paymentMode` in `updateExpense`
-- [ ] Task 5: `getPaymentModeBreakdown` controller + aggregation
-- [ ] Task 6: `GET /api/analytics/payment-modes` route (auth)
-- [ ] Task 7: Verify `syncExpenses` passes `paymentMode` through
-- [ ] Task 8: Manual smoke + regression check on existing expense endpoints
-- [ ] **1A merged**
+- [x] Task 1: Add `paymentMode` to `Expense` schema (enum, default `other`)
+- [x] Task 2: Add `paymentMode` to `expenseSchema` Zod validator
+- [x] Task 3: Persist `paymentMode` in `createExpense` (single + recurring + bulk)
+- [x] Task 4: Persist `paymentMode` in `updateExpense`
+- [x] Task 5: `getPaymentModeBreakdown` controller + aggregation
+- [x] Task 6: `GET /api/analytics/payment-modes` route (auth)
+- [x] Task 7: Verify `syncExpenses` passes `paymentMode` through
+- [x] Task 8: Manual smoke + regression check on existing expense endpoints
+- [x] **1A merged** (committed directly to `enhancement/expense-manager-parity`,
+  commits `63c9fdc`..`c47f023`)
+
+> **1A notes (2026-09-10):**
+> - Server had no test runner. Added `node:test` (built-in, zero deps) + `npm test`.
+>   `server/test/*.test.mjs` — 6 files, all green.
+> - **Node 16 on the build machine:** top-level `node:test` hooks don't run (need
+>   Node 18+). DB test files use top-level `await connectTestDb()` + a final
+>   `zz cleanup` test instead. Also added `server/test/run-serial.mjs` — Node 16's
+>   `node --test <dir>` runs files concurrently on one mongoose connection and the
+>   per-file teardown raced; the runner runs each file sequentially. `npm test`
+>   points at it.
+> - Task 8 live smoke (`server/scripts/smoke-payment-mode.mjs` steps 3–4) is
+>   **deferred to a manual pass** — needs a running dev server + a user JWT +
+>   category id. The automated suite is the merge gate and is green.
+> - **Known follow-up (not blocking 1A):** `bulkUpdateExpenses` /
+>   `bulkUpdateList` allowlists omit `paymentMode`, so bulk-edit silently no-ops it.
+>   The F1 spec's API surface only names `POST /expenses`, `PUT /:id`, sync — bulk
+>   update was out of scope. Add in 1B if wanted (2 lines/site + `runValidators`).
+> - **For 1B/1C:** `PUT /api/expenses/:id` validates the FULL body (`amount` +
+>   `category` required) — the edit form must send the whole expense, not just the
+>   changed field.
 
 ### 1B · Web — `plans/2026-09-10-payment-mode-1b-web.md`
 - [ ] Task 1: `PAYMENT_MODES` constant module (values, labels, icons)
