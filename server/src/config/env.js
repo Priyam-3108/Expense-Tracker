@@ -13,4 +13,13 @@ export const env = {
         .map((origin) => origin.trim())
         .filter(Boolean),
     nodeEnv: process.env.NODE_ENV || 'development',
+    frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
+    email: {
+        service: process.env.EMAIL_SERVICE, // e.g. 'gmail' - lets nodemailer skip manual host/port
+        host: process.env.EMAIL_HOST,
+        port: Number(process.env.EMAIL_PORT) || 587,
+        user: process.env.EMAIL_USER,
+        password: process.env.EMAIL_PASSWORD,
+        from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+    },
 };

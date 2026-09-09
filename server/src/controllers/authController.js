@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { User, Category } from '../config/models/index.js';
 import { env } from '../config/env.js';
+import { sendPasswordResetEmail } from '../utils/mailer.js';
 
 // Generate JWT token
 const generateToken = (userId) => {
@@ -266,15 +267,19 @@ export const requestPasswordReset = async (req, res) => {
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
     await user.save();
 
-    // In production, send email with reset link
-    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password/${resetToken}`;
-    console.log(`Password reset link: ${resetUrl}`);
+    const resetUrl = `${env.frontendUrl}/reset-password/${resetToken}`;
+    const emailSent = await sendPasswordResetEmail(user.email, resetUrl);
+
+    if (!emailSent) {
+      // SMTP not configured (e.g. local dev) - fall back to logging the link
+      console.log(`EMAIL_* not configured - password reset link: ${resetUrl}`);
+    }
 
     res.json({
       success: true,
-      message: 'Password reset link sent to email',
-      // For development only, remove in production
-      ...(env.nodeEnv === 'development' && { resetToken })
+      message: 'If email exists, password reset link has been sent',
+      // For development only (and only when no real email was sent), remove in production
+      ...(env.nodeEnv === 'development' && !emailSent && { resetToken })
     });
   } catch (error) {
     console.error('Request password reset error:', error);
