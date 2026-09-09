@@ -1,5 +1,6 @@
 import crypto from 'crypto';
-import { User } from '../config/models/index.js';
+import mongoose from 'mongoose';
+import { User, Expense } from '../config/models/index.js';
 
 // Generate or retrieve share token
 export const getShareToken = async (req, res) => {
@@ -96,4 +97,57 @@ export const getSharedCategories = async (req, res) => {
             error: error.message
         });
     }
+};
+
+// Spending grouped by payment method for a date range (expense-only).
+export const getPaymentModeBreakdown = async (req, res) => {
+  try {
+    let { from, to } = req.query;
+
+    if (!from || !to) {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const lastDay = new Date(year, now.getMonth() + 1, 0).getDate();
+      from = `${year}-${month}-01`;
+      to = `${year}-${month}-${String(lastDay).padStart(2, '0')}`;
+    }
+
+    const rows = await Expense.aggregate([
+      {
+        $match: {
+          user: new mongoose.Types.ObjectId(req.user._id),
+          type: 'expense',
+          date: { $gte: from, $lte: to },
+        },
+      },
+      {
+        $group: {
+          _id: { $ifNull: ['$paymentMode', 'other'] },
+          total: { $sum: '$amount' },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { total: -1 } },
+    ]);
+
+    const breakdown = rows.map((r) => ({
+      paymentMode: r._id,
+      total: r.total,
+      count: r.count,
+    }));
+    const totalSpent = breakdown.reduce((s, b) => s + b.total, 0);
+
+    res.json({
+      success: true,
+      data: { from, to, breakdown, totalSpent },
+    });
+  } catch (error) {
+    console.error('Get payment-mode breakdown error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to compute payment-mode breakdown',
+      error: error.message,
+    });
+  }
 };
