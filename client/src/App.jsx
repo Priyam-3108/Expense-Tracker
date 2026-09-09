@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import { ExpenseProvider } from './context/ExpenseContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { DebtProvider } from './context/DebtContext'
+import { BudgetProvider } from './context/BudgetContext'
 import Layout from './components/Layout'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
@@ -15,6 +16,7 @@ import Categories from './pages/Categories'
 import Analytics from './pages/Analytics'
 import Profile from './pages/Profile'
 import Debts from './pages/Debts'
+import Budgets from './pages/Budgets'
 import TermsOfService from './pages/TermsOfService'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import FAQ from './pages/FAQ'
@@ -74,6 +76,7 @@ function AppRoutes() {
         <Route path="categories" element={<Categories />} />
         <Route path="analytics" element={<Analytics />} />
         <Route path="debts" element={<Debts />} />
+        <Route path="budgets" element={<Budgets />} />
         <Route path="profile" element={<Profile />} />
       </Route>
 
@@ -93,7 +96,9 @@ function App() {
       <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
         <ExpenseProvider>
           <DebtProvider>
-            <AppRoutes />
+            <BudgetProvider>
+              <AppRoutes />
+            </BudgetProvider>
           </DebtProvider>
         </ExpenseProvider>
       </ThemeProvider>

@@ -10,7 +10,8 @@ import {
   Menu,
   X,
   ChevronDown,
-  Wallet
+  Wallet,
+  PiggyBank
 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { cn } from '../utils/cn'
@@ -44,6 +45,7 @@ const Layout = () => {
     { name: 'Dashboard', href: '/app/dashboard', icon: Home },
     { name: 'Expenses', href: '/app/expenses', icon: CreditCard },
     { name: 'Debts', href: '/app/debts', icon: Wallet },
+    { name: 'Budgets', href: '/app/budgets', icon: PiggyBank },
     { name: 'Categories', href: '/app/categories', icon: Tag },
     { name: 'Analytics', href: '/app/analytics', icon: BarChart3 },
     { name: 'Profile', href: '/app/profile', icon: User },

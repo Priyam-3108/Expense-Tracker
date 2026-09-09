@@ -1,16 +1,60 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, StatusBar, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, TextInput, StyleSheet, StatusBar, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
+import { budgetService } from '../services/budgetService';
+import ProgressBar from '../components/ProgressBar';
 import hapticFeedback from '../utils/haptics';
 
 function BudgetSettingsScreen({ navigation }) {
     const { colors, isDark } = useTheme();
-    const [monthlyBudget, setMonthlyBudget] = useState('50000');
+    const [budget, setBudget] = useState(null); // the overall budget record from the server, or null if none set
+    const [monthlyBudget, setMonthlyBudget] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
 
-    const handleSave = () => {
+    const fetchBudget = async () => {
+        try {
+            const res = await budgetService.getBudgets();
+            if (res.data?.success) {
+                const overall = (res.data.data.budgets || []).find(b => !b.category);
+                setBudget(overall || null);
+                if (overall) setMonthlyBudget(String(overall.amount));
+            }
+        } catch (e) {
+            console.error('Budget fetch error:', e);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useFocusEffect(useCallback(() => { fetchBudget(); }, []));
+
+    const handleSave = async () => {
+        const amount = Number(monthlyBudget);
+        if (!amount || amount <= 0) {
+            Alert.alert('Invalid Amount', 'Please enter a valid budget amount.');
+            return;
+        }
+
         hapticFeedback.medium();
-        Alert.alert('Budget Saved', `Monthly budget updated to ₹${monthlyBudget}`);
+        setSaving(true);
+        try {
+            if (budget) {
+                await budgetService.updateBudget(budget._id, { amount });
+            } else {
+                await budgetService.createBudget({ amount, category: null });
+            }
+            hapticFeedback.success();
+            Alert.alert('Budget Saved', `Monthly budget updated to ₹${amount}`);
+            fetchBudget();
+        } catch (e) {
+            hapticFeedback.error();
+            Alert.alert('Error', e.response?.data?.message || 'Failed to save budget.');
+        } finally {
+            setSaving(false);
+        }
     };
 
     const styles = StyleSheet.create({
@@ -82,6 +126,9 @@ function BudgetSettingsScreen({ navigation }) {
             alignItems: 'center',
             marginTop: 10,
         },
+        saveButtonDisabled: {
+            opacity: 0.6,
+        },
         saveButtonText: {
             color: '#ffffff',
             fontSize: 15,
@@ -100,24 +147,45 @@ function BudgetSettingsScreen({ navigation }) {
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false}>
-                <View style={styles.card}>
-                    <Text style={styles.label}>Monthly Overall Budget (₹)</Text>
-                    <TextInput
-                        style={styles.input}
-                        value={monthlyBudget}
-                        onChangeText={setMonthlyBudget}
-                        keyboardType="numeric"
-                        placeholder="Enter monthly budget"
-                        placeholderTextColor={colors.subText}
-                    />
-                    <Text style={styles.hint}>
-                        Set a spending limit to trigger budget alert warnings when your expenses reach 80% and 100% of your threshold.
-                    </Text>
-                </View>
+                {loading ? (
+                    <ActivityIndicator color={colors.primary} style={{ marginTop: 40 }} />
+                ) : (
+                    <>
+                        {budget && budget.amount > 0 && (
+                            <View style={styles.card}>
+                                <ProgressBar
+                                    label="This month"
+                                    amount={budget.spent}
+                                    budget={budget.amount}
+                                    progress={budget.amount > 0 ? Math.min(budget.spent / budget.amount, 1) : 0}
+                                />
+                            </View>
+                        )}
 
-                <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-                    <Text style={styles.saveButtonText}>Save Budget Settings</Text>
-                </TouchableOpacity>
+                        <View style={styles.card}>
+                            <Text style={styles.label}>Monthly Overall Budget (₹)</Text>
+                            <TextInput
+                                style={styles.input}
+                                value={monthlyBudget}
+                                onChangeText={setMonthlyBudget}
+                                keyboardType="numeric"
+                                placeholder="Enter monthly budget"
+                                placeholderTextColor={colors.subText}
+                            />
+                            <Text style={styles.hint}>
+                                Set a spending limit to track how close you are to it. It resets automatically each new month.
+                            </Text>
+                        </View>
+
+                        <TouchableOpacity
+                            style={[styles.saveButton, saving && styles.saveButtonDisabled]}
+                            onPress={handleSave}
+                            disabled={saving}
+                        >
+                            <Text style={styles.saveButtonText}>{saving ? 'Saving...' : 'Save Budget Settings'}</Text>
+                        </TouchableOpacity>
+                    </>
+                )}
             </ScrollView>
         </View>
     );
