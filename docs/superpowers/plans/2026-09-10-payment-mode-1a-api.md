@@ -900,8 +900,8 @@ console.assert(r.data.data.expense.paymentMode === 'upi', 'created paymentMode u
 r = await j('POST', '/expenses', { amount: 45, date: today, category: CATEGORY });
 console.assert(r.data.data.expense.paymentMode === 'other', 'default other', r.data.data.expense.paymentMode);
 
-// 3. update it
-r = await j('PUT', `/expenses/${id}`, { paymentMode: 'cash' });
+// 3. update it (PUT /:id runs full-body validation — send the whole expense)
+r = await j('PUT', `/expenses/${id}`, { amount: 123, date: today, category: CATEGORY, paymentMode: 'cash' });
 console.assert(r.data.data.expense.paymentMode === 'cash', 'updated to cash', r.data.data.expense.paymentMode);
 
 // 4. reject invalid
@@ -917,6 +917,11 @@ console.log('breakdown:', JSON.stringify(r.data.data, null, 2));
 
 console.log('\nSMOKE OK');
 ```
+
+> **Note (post-review):** `PUT /api/expenses/:id` runs `validate(expenseSchema)` on the
+> full body — `amount` and `category` are required, not optional. Any client (smoke
+> script, web form in 1B, mobile form in 1C) editing an expense must send the WHOLE
+> expense, not just the changed field. Step 3 above sends a full body for this reason.
 
 - [ ] **Step 2: Run the automated suite once more**
 
