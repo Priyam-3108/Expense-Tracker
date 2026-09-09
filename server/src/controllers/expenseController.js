@@ -668,6 +668,7 @@ export const updateExpense = async (req, res) => {
       type,
       tags,
       notes,
+      paymentMode,
       isRecurring,
       recurringPeriod,
       recurringEndDate
@@ -720,6 +721,7 @@ export const updateExpense = async (req, res) => {
     if (type) updates.type = type;
     if (tags) updates.tags = tags;
     if (notes !== undefined) updates.notes = notes ? notes.trim() : '';
+    if (paymentMode !== undefined) updates.paymentMode = paymentMode;
     if (isRecurring !== undefined) updates.isRecurring = isRecurring;
     if (isRecurring !== undefined && !isRecurring) {
       unset.recurringPeriod = '';
