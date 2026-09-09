@@ -22,6 +22,22 @@ const CategorySelector = ({
   const buttonRef = useRef(null)
   const dropdownRef = useRef(null)
 
+  // Touch devices (incl. phones with "Desktop site" enabled, where innerWidth reports ~980px)
+  // must use the bottom-sheet: the desktop popover relies on getBoundingClientRect math and a
+  // scroll-to-close listener that both misbehave under a coarse pointer / zoomed viewport.
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' &&
+    (window.innerWidth < 768 || window.matchMedia?.('(pointer: coarse)').matches)
+  )
+
+  useEffect(() => {
+    const update = () => setIsMobile(
+      window.innerWidth < 768 || window.matchMedia?.('(pointer: coarse)').matches
+    )
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
+
   const selectedCategory = categories?.find(cat => cat._id === value)
 
   const filteredCategories = categories?.filter(cat =>
@@ -42,31 +58,54 @@ const CategorySelector = ({
     }
 
     if (isOpen) {
-      const handleScroll = (event) => {
-        // Ignore scroll if it's inside the dropdown
-        if (dropdownRef.current && dropdownRef.current.contains(event.target)) {
-          return
-        }
-        setIsOpen(false)
-      }
-
       document.addEventListener('mousedown', handleClickOutside)
-      window.addEventListener('resize', () => setIsOpen(false))
-      window.addEventListener('scroll', handleScroll, true)
+
+      // Desktop popover only: it's anchored to the button, so page scroll/resize
+      // must dismiss it. The mobile bottom sheet is fixed to the viewport and
+      // must survive scrolling within the sheet or behind the backdrop.
+      if (!isMobile) {
+        const handleScroll = (event) => {
+          if (dropdownRef.current && dropdownRef.current.contains(event.target)) {
+            return
+          }
+          setIsOpen(false)
+        }
+        const handleResize = () => setIsOpen(false)
+
+        window.addEventListener('resize', handleResize)
+        window.addEventListener('scroll', handleScroll, true)
+
+        return () => {
+          document.removeEventListener('mousedown', handleClickOutside)
+          window.removeEventListener('resize', handleResize)
+          window.removeEventListener('scroll', handleScroll, true)
+        }
+      }
 
       return () => {
         document.removeEventListener('mousedown', handleClickOutside)
-        window.removeEventListener('resize', () => setIsOpen(false))
-        window.removeEventListener('scroll', handleScroll, true)
       }
     }
-  }, [isOpen])
+  }, [isOpen, isMobile])
 
   const handleToggle = (e) => {
     e.preventDefault()
     e.stopPropagation()
 
-    if (!isOpen && buttonRef.current && !disabled) {
+    if (isOpen || disabled) {
+      setIsOpen(false)
+      setSearchTerm('')
+      setDropdownPosition({ top: 0, left: 0, ready: false, width: 0 })
+      return
+    }
+
+    if (isMobile) {
+      // Bottom sheet: no position math needed
+      setIsOpen(true)
+      return
+    }
+
+    if (buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect()
       const viewportHeight = window.innerHeight
       const dropdownHeight = 320 // max height of dropdown
@@ -94,10 +133,6 @@ const CategorySelector = ({
       setTimeout(() => {
         setIsOpen(true)
       }, 0)
-    } else {
-      setIsOpen(false)
-      setSearchTerm('')
-      setDropdownPosition({ top: 0, left: 0, ready: false, width: 0 })
     }
   }
 
@@ -119,26 +154,30 @@ const CategorySelector = ({
 
   const dropdownContent = (
     <div
-      className="w-full flex flex-col h-full md:h-auto"
+      className={`w-full flex flex-col ${isMobile ? 'h-full' : 'h-auto'}`}
       onClick={(e) => e.stopPropagation()}
     >
-      {/* Mobile drag handle */}
-      <div className="flex justify-center pt-3 pb-1 md:hidden flex-shrink-0">
-        <div className="w-12 h-1.5 bg-gray-300 dark:bg-white/[0.15] rounded-full" />
-      </div>
+      {isMobile && (
+        <>
+          {/* Mobile drag handle */}
+          <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
+            <div className="w-12 h-1.5 bg-gray-300 dark:bg-white/[0.15] rounded-full" />
+          </div>
 
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-white/[0.06] md:hidden flex-shrink-0">
-        <h3 className="font-medium text-gray-900 dark:text-white">Select Category</h3>
-        <button
-          onClick={() => {
-            setIsOpen(false)
-            setSearchTerm('')
-          }}
-          className="text-gray-500 dark:text-slate-400 min-h-[44px] min-w-[44px] flex items-center justify-center p-2 mb-[-8px] mt-[-8px] hover:text-gray-700 dark:hover:text-white transition-colors"
-        >
-          <X size={20} />
-        </button>
-      </div>
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-white/[0.06] flex-shrink-0">
+            <h3 className="font-medium text-gray-900 dark:text-white">Select Category</h3>
+            <button
+              onClick={() => {
+                setIsOpen(false)
+                setSearchTerm('')
+              }}
+              className="text-gray-500 dark:text-slate-400 min-h-[44px] min-w-[44px] flex items-center justify-center p-2 mb-[-8px] mt-[-8px] hover:text-gray-700 dark:hover:text-white transition-colors"
+            >
+              <X size={20} />
+            </button>
+          </div>
+        </>
+      )}
 
       {/* Search Input */}
       <div className="p-4 md:p-2 border-b border-gray-200 dark:border-white/[0.06] flex-shrink-0">
@@ -148,12 +187,12 @@ const CategorySelector = ({
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search categories..."
           className="glass-input w-full min-h-[44px]"
-          autoFocus={window.innerWidth >= 768} // Only autofocus on desktop to prevent mobile keyboard pushing sheet
+          autoFocus={!isMobile} // Only autofocus on desktop to prevent mobile keyboard pushing sheet
         />
       </div>
 
       {/* Categories List */}
-      <div className="flex-1 overflow-y-auto min-h-0 md:max-h-60 custom-scrollbar overscroll-contain">
+      <div className={`flex-1 overflow-y-auto min-h-0 custom-scrollbar overscroll-contain ${isMobile ? '' : 'max-h-60'}`}>
         {filteredCategories.length === 0 ? (
           <div className="px-4 py-6 md:px-3 md:py-2 text-sm text-gray-500 dark:text-slate-500 text-center">
             {searchTerm ? 'No categories found' : 'No categories available'}
@@ -201,35 +240,35 @@ const CategorySelector = ({
   const portalContent = typeof window !== 'undefined' ? (
     <>
       {/* Mobile backdrop */}
-      <div
-        className="fixed inset-0 z-[9998] md:hidden transition-opacity glass-modal-backdrop"
-        style={{ opacity: isOpen ? 1 : 0 }}
-        onClick={() => {
-          setIsOpen(false)
-          setSearchTerm('')
-        }}
-      />
+      {isMobile && (
+        <div
+          className="fixed inset-0 z-[9998] transition-opacity glass-modal-backdrop"
+          style={{ opacity: isOpen ? 1 : 0 }}
+          onClick={() => {
+            setIsOpen(false)
+            setSearchTerm('')
+          }}
+        />
+      )}
 
       {/* Dropdown Container */}
       <div
         ref={dropdownRef}
         className={`
           fixed z-[9999] overflow-hidden glass-dropdown
-          ${/* Mobile: Bottom sheet */ ''}
-          bottom-0 left-0 right-0 rounded-t-2xl md:rounded-xl transition-transform duration-300 ease-out origin-bottom
-          ${isOpen ? 'translate-y-0 h-[65vh] max-h-[85vh]' : 'translate-y-full'}
-
-          ${/* Desktop: Absolute popover */ ''}
-          md:bottom-auto md:left-auto md:right-auto md:transition-none md:translate-y-0 md:h-auto
+          ${isMobile
+            ? `bottom-0 left-0 right-0 rounded-t-2xl transition-transform duration-300 ease-out origin-bottom ${isOpen ? 'translate-y-0 h-[65vh] max-h-[85vh]' : 'translate-y-full'}`
+            : 'rounded-xl h-auto'
+          }
         `}
-        style={window.innerWidth >= 768 ? {
+        style={isMobile ? {
+          height: '65vh' // Mobile explicitly height
+        } : {
           top: dropdownPosition.ready ? `${dropdownPosition.top}px` : '-9999px',
           left: dropdownPosition.ready ? `${dropdownPosition.left}px` : '-9999px',
           width: dropdownPosition.ready ? `${dropdownPosition.width}px` : 'auto',
           visibility: dropdownPosition.ready && isOpen ? 'visible' : 'hidden',
           opacity: dropdownPosition.ready && isOpen ? 1 : 0
-        } : {
-          height: '65vh' // Mobile explicitly height
         }}
         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
       >
