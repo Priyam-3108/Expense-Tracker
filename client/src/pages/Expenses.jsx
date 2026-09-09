@@ -1076,12 +1076,13 @@ const Expenses = () => {
               currencySymbol={currencySymbols[currency] || '$'}
               label={`Amount (${currencySymbols[currency] || '$'})`}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex justify-center">
                 <DatePicker
                   value={formData.date}
                   onChange={(date) => setFormData({ ...formData, date })}
-                  placeholder="Select date"
+                  placeholder="Add date"
                   ariaLabel="Transaction date"
+                  variant="hero"
                 />
               </div>
             </AmountHero>
