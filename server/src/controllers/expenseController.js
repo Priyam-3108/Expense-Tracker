@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { Expense, Category } from '../config/models/index.js';
+import { DEFAULT_PAYMENT_MODE } from '../constants/paymentModes.js';
 
 // Validate and return date string in YYYY-MM-DD format
 const validateDateString = (dateStr) => {
@@ -259,6 +260,7 @@ export const bulkCreateExpenses = async (req, res) => {
         date: expenseDate,
         category: expense.category,
         type: expense.type || 'expense', // Allow type override too
+        paymentMode: expense.paymentMode || DEFAULT_PAYMENT_MODE,
         user: req.user._id
       });
     }
@@ -525,6 +527,7 @@ export const createExpense = async (req, res) => {
       type = 'expense',
       tags,
       notes,
+      paymentMode = DEFAULT_PAYMENT_MODE,
       isRecurring,
       recurringPeriod,
       recurringEndDate
@@ -591,6 +594,7 @@ export const createExpense = async (req, res) => {
           type,
           tags: tags || [],
           notes: notes ? notes.trim() : '',
+          paymentMode,
           isRecurring: true,
           recurringPeriod: period,
           recurringEndDate: endDateStr,
@@ -625,6 +629,7 @@ export const createExpense = async (req, res) => {
       type,
       tags: tags || [],
       notes: notes ? notes.trim() : '',
+      paymentMode,
       isRecurring: false,
       user: req.user._id
     });
