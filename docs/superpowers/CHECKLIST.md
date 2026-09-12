@@ -78,15 +78,47 @@ Spec: `specs/2026-09-10-payment-mode-design.md`
 >   changed field.
 
 ### 1B · Web — `plans/2026-09-10-payment-mode-1b-web.md`
-- [ ] Task 1: `PAYMENT_MODES` constant module (values, labels, icons)
-- [ ] Task 2: `PaymentModeChips` form-kit component
-- [ ] Task 3: Wire `paymentMode` into the Expense add/edit form
-- [ ] Task 4: `paymentMode` in `expenseService` create/update payloads (pass-through check)
-- [ ] Task 5: Payment-mode badge on expense list rows + `MobileExpenseCard`
-- [ ] Task 6: `analyticsService.getPaymentModeBreakdown()`
-- [ ] Task 7: "Spending by payment method" chart in `AnalyticsDashboard`
-- [ ] Task 8: Build + manual checklist
-- [ ] **1B merged**
+- [x] Task 1: `PAYMENT_MODES` constant module (values, labels, icons)
+- [x] Task 2: `PaymentModeChips` form-kit component
+- [x] Task 3: Wire `paymentMode` into the Expense add/edit form
+- [x] Task 4: `paymentMode` in `expenseService` create/update payloads (pass-through check) — confirmed no-op, both layers forward verbatim
+- [x] Task 5: Payment-mode badge on expense list rows + `MobileExpenseCard`
+- [x] Task 6: `analyticsService.getPaymentModeBreakdown()`
+- [x] Task 7: "Spending by payment method" chart in `AnalyticsDashboard`
+- [x] Task 8: Build + grep gates pass; manual browser checklist handed to human partner (no Playwright/chromium-cli in this environment, would violate zero-new-deps)
+- [x] **1B merged** (committed directly to `enhancement/expense-manager-parity`,
+  commits `031e6f8`..`04049f2`)
+
+> **1B notes (2026-09-12):**
+> - Executed via `superpowers:subagent-driven-development` — 8 tasks, 7 fresh
+>   implementer+reviewer subagent pairs, all approved clean on first pass
+>   (2 minor deferred findings in Task 5, both plan-mandated code).
+> - Final whole-branch review (`/code-review high`) surfaced 3 real
+>   pre-existing Phase 1A server bugs alongside 3 new 1B client issues.
+>   Fixed all 6 in one consolidated commit (`04049f2`), re-reviewed clean:
+>   - `GET /api/analytics/payment-modes` had a dead `validateDateRange`
+>     middleware (checks `startDate`/`endDate`; controller reads `from`/`to`)
+>     — added inline date validation in the controller instead of renaming
+>     the spec-documented `from`/`to` contract.
+>   - `POST /expenses/bulk` let an invalid `paymentMode` throw inside
+>     `insertMany` and fail the whole batch with a 500 — added a per-row
+>     check to the existing validation loop (errors[] pattern).
+>   - CSV/Excel export were missing the `paymentMode` column — added to
+>     both. PDF export left untouched (fixed-width layout, no spare room —
+>     deferred, not a regression).
+>   - Client: chart didn't clear stale data on a failed refetch, fixed;
+>     `getPaymentMode`/`PAYMENT_MODE_MAP` had duplicate lookup logic,
+>     consolidated; `PaymentModeBadge`'s dead-code guard removed.
+> - **Deferred, not bugs:** `syncController.js`'s per-item try/catch
+>   (partial-success inside 200) is intentional sync-contract behavior, left
+>   as-is. Chart not respecting Analytics' category/type filters, and
+>   `hideOther` merging legacy-undefined with explicit-`other`, both match
+>   the spec's documented v1 scope/non-goals — not defects.
+> - **Manual browser walkthrough not run by an agent** — no
+>   Playwright/chromium-cli available and installing one would violate the
+>   zero-new-deps constraint; handed the plan's Task 8 manual checklist to
+>   the human partner to run themselves against the already-running dev
+>   servers (localhost:5000 API + localhost:5173 client).
 
 ### 1C · Mobile — `plans/2026-09-10-payment-mode-1c-mobile.md`
 - [ ] Task 1: `PAYMENT_MODES` constant (mobile copy)
