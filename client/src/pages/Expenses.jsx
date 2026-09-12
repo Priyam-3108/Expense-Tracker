@@ -9,6 +9,7 @@ import BulkEditList from '../components/BulkEditList'
 import ExportModal from '../components/ExportModal'
 import ImportModal from '../components/ImportModal'
 import MobileExpenseCard from '../components/MobileExpenseCard'
+import PaymentModeBadge from '../components/PaymentModeBadge'
 import Modal from '../components/Modal'
 import AmountHero from '../components/form/AmountHero'
 import SegmentedToggle from '../components/form/SegmentedToggle'
@@ -605,7 +606,12 @@ const Expenses = () => {
     {
       accessorKey: 'description',
       header: 'Description',
-      cell: info => <span className="text-gray-600 dark:text-gray-300">{info.getValue() || '-'}</span>
+      cell: ({ row }) => (
+        <span className="inline-flex items-center flex-wrap gap-1">
+          <span className="text-gray-600 dark:text-gray-300">{row.original.description || '-'}</span>
+          <PaymentModeBadge value={row.original.paymentMode} hideOther />
+        </span>
+      )
     },
     {
       accessorKey: 'amount',

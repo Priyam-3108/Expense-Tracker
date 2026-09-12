@@ -1,5 +1,6 @@
 import { Edit, Trash2 } from 'lucide-react'
 import { formatCurrency, formatDate } from '../utils/helpers'
+import PaymentModeBadge from './PaymentModeBadge'
 
 /**
  * Mobile-optimised card view for a single expense row.
@@ -39,6 +40,9 @@ const MobileExpenseCard = ({ expense, currency, onEdit, onDelete }) => {
             <p className="text-xs text-gray-500 dark:text-slate-500 mt-0.5">
               {category?.name || 'Uncategorized'}
             </p>
+            <div className="mt-1">
+              <PaymentModeBadge value={expense.paymentMode} hideOther />
+            </div>
             <p className="text-xs text-gray-400 dark:text-slate-600 mt-1">
               {formatDate(expense.date, 'MMM dd, yyyy')}
             </p>
