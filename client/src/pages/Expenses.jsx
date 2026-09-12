@@ -16,6 +16,7 @@ import SectionLabel from '../components/form/SectionLabel'
 import FieldCard from '../components/form/FieldCard'
 import CategoryChips from '../components/form/CategoryChips'
 import StickyFormFooter from '../components/form/StickyFormFooter'
+import PaymentModeChips from '../components/form/PaymentModeChips'
 import { formatCurrency, formatDate, formatDateForInput, parseDateLocal, getTodayDate } from '../utils/helpers'
 import {
     Plus,
@@ -114,6 +115,7 @@ const Expenses = () => {
     amount: '',
     date: todayDate,
     category: '',
+    paymentMode: 'other',
     type: 'expense',
     isRecurring: false,
     recurringPeriod: 'monthly',
@@ -247,6 +249,7 @@ const Expenses = () => {
         amount: editingExpense.amount?.toString() || '',
         date: expenseDate,
         category: editingExpense.category?._id || editingExpense.category || '',
+        paymentMode: editingExpense.paymentMode || 'other',
         type: editingExpense.type || 'expense',
         isRecurring: editingExpense.isRecurring || false,
         recurringPeriod: editingExpense.recurringPeriod || 'monthly',
@@ -264,6 +267,7 @@ const Expenses = () => {
       amount: '',
       date: getTodayDate(),
       category: '',
+      paymentMode: 'other',
       type: 'expense',
       isRecurring: false,
       recurringPeriod: 'monthly',
@@ -318,6 +322,7 @@ const Expenses = () => {
         amount: parseFloat(formData.amount),
         date: formData.date,
         category: formData.category,
+        paymentMode: formData.paymentMode,
         type: formData.type,
         isRecurring: formData.isRecurring,
         recurringPeriod: formData.isRecurring ? formData.recurringPeriod : undefined,
@@ -1101,6 +1106,14 @@ const Expenses = () => {
                 categories={categories}
                 value={formData.category}
                 onChange={(id) => setFormData({ ...formData, category: id })}
+              />
+            </div>
+
+            <div>
+              <SectionLabel>Payment method</SectionLabel>
+              <PaymentModeChips
+                value={formData.paymentMode}
+                onChange={(mode) => setFormData({ ...formData, paymentMode: mode })}
               />
             </div>
 
