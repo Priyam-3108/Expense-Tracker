@@ -1,8 +1,10 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useTheme } from '../context/ThemeContext'
 import DateRangePicker from './DateRangePicker'
 import CategorySelector from './CategorySelector'
 import { formatCurrency, formatDateForInput, calculatePercentage, getCurrentMonthRange, getLast30DaysRange } from '../utils/helpers'
+import { analyticsService } from '../services/analyticsService'
+import { PAYMENT_MODE_MAP } from '../constants/paymentModes'
 import {
     LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area
 } from 'recharts'
@@ -47,6 +49,33 @@ const AnalyticsDashboard = ({
 }) => {
     const { theme } = useTheme()
     const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+
+    const [paymentModeData, setPaymentModeData] = useState([])
+    const [paymentModeError, setPaymentModeError] = useState(false)
+
+    useEffect(() => {
+        if (isSharedView) return
+        let cancelled = false
+        const from = dateRange?.startDate
+        const to = dateRange?.endDate
+        analyticsService
+            .getPaymentModeBreakdown({ from, to })
+            .then((res) => {
+                if (cancelled) return
+                const rows = res.data?.data?.breakdown || []
+                setPaymentModeData(
+                    rows.map((r) => ({
+                        ...r,
+                        label: (PAYMENT_MODE_MAP[r.paymentMode] || PAYMENT_MODE_MAP.other).label,
+                    }))
+                )
+                setPaymentModeError(false)
+            })
+            .catch(() => {
+                if (!cancelled) setPaymentModeError(true)
+            })
+        return () => { cancelled = true }
+    }, [isSharedView, dateRange?.startDate, dateRange?.endDate])
 
     // Quick filter presets
     const applyQuickFilter = (preset) => {
@@ -653,6 +682,55 @@ const AnalyticsDashboard = ({
                         </div>
                     )}
                 </div>
+
+                {!isSharedView && (
+                    <div className="glass-card p-4 sm:p-6">
+                        <div className="flex items-center justify-between mb-3 sm:mb-4">
+                            <h3 className="text-sm sm:text-lg font-semibold text-gray-900 dark:text-white">
+                                Spending by payment method
+                            </h3>
+                            <BarChart3 size={18} className="text-gray-400 dark:text-gray-500" />
+                        </div>
+                        {paymentModeError ? (
+                            <p className="text-sm text-gray-500 dark:text-slate-500 py-8 text-center">
+                                Couldn't load payment-method data.
+                            </p>
+                        ) : paymentModeData.length === 0 ? (
+                            <p className="text-sm text-gray-500 dark:text-slate-500 py-8 text-center">
+                                No spending in this range.
+                            </p>
+                        ) : (
+                            <div style={{ width: '100%', height: Math.max(160, paymentModeData.length * 44) }}>
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart
+                                        data={paymentModeData}
+                                        layout="vertical"
+                                        margin={{ top: 4, right: 16, bottom: 4, left: 8 }}
+                                    >
+                                        <XAxis type="number" hide />
+                                        <YAxis
+                                            type="category"
+                                            dataKey="label"
+                                            width={90}
+                                            tick={{ fontSize: 12 }}
+                                            axisLine={false}
+                                            tickLine={false}
+                                        />
+                                        <Tooltip
+                                            formatter={(v) => formatCurrency(v, currency)}
+                                            cursor={{ fill: 'transparent' }}
+                                        />
+                                        <Bar dataKey="total" radius={[0, 6, 6, 0]}>
+                                            {paymentModeData.map((_, i) => (
+                                                <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                                            ))}
+                                        </Bar>
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 {/* Monthly Comparison Bar Chart */}
                 <div className="glass-card p-4 sm:p-6 lg:col-span-2">
