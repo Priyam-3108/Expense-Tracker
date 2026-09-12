@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { Expense, Category } from '../config/models/index.js';
-import { DEFAULT_PAYMENT_MODE } from '../constants/paymentModes.js';
+import { DEFAULT_PAYMENT_MODE, PAYMENT_MODES } from '../constants/paymentModes.js';
 
 // Validate and return date string in YYYY-MM-DD format
 const validateDateString = (dateStr) => {
@@ -239,6 +239,11 @@ export const bulkCreateExpenses = async (req, res) => {
 
       if (!categoryExists) {
         errors.push(`Expense ${i + 1}: Invalid category`);
+        continue;
+      }
+
+      if (expense.paymentMode !== undefined && !PAYMENT_MODES.includes(expense.paymentMode)) {
+        errors.push(`Expense ${i + 1}: Invalid payment mode`);
         continue;
       }
 

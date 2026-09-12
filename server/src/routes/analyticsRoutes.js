@@ -3,14 +3,13 @@ import { authenticateToken } from '../middleware/auth.js';
 import { sharedAuth } from '../middleware/sharedAuth.js';
 import { getShareToken, revokeShareToken, getSharedProfile, getSharedCategories, getPaymentModeBreakdown } from '../controllers/analyticsController.js';
 import { getDetailedAnalytics, getExpenseTrends, getExpenses, getExpenseStats } from '../controllers/expenseController.js';
-import { validateDateRange } from '../middleware/validation.js';
 
 const router = express.Router();
 
 // Management routes (Protected)
 router.post('/share', authenticateToken, getShareToken);
 router.delete('/share', authenticateToken, revokeShareToken);
-router.get('/payment-modes', authenticateToken, validateDateRange, getPaymentModeBreakdown);
+router.get('/payment-modes', authenticateToken, getPaymentModeBreakdown);
 
 // Shared View Routes (Public with Token)
 // These routes reuse the expense controller logic but authenticate via the share token

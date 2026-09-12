@@ -77,6 +77,26 @@ test('bulkCreateExpenses persists per-row paymentMode', async () => {
   assert.equal(rows[1].paymentMode, 'other');
 });
 
+test('bulkCreateExpenses reports invalid paymentMode as a per-row error without failing the batch', async () => {
+  const userId = new mongoose.Types.ObjectId();
+  const cat = await seedCategory(userId);
+  const req = { user: { _id: userId }, body: {
+    date: '2026-09-10',
+    expenses: [
+      { amount: 5, category: String(cat._id), paymentMode: 'bogus' },
+      { amount: 7, category: String(cat._id), paymentMode: 'cash' },
+    ],
+  } };
+  const res = mockRes();
+  await bulkCreateExpenses(req, res);
+  assert.equal(res.statusCode, 201);
+  assert.ok(res.body.data.errors.some((e) => e.includes('Invalid payment mode')));
+  const rows = await Expense.find({ user: userId });
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].amount, 7);
+  assert.equal(rows[0].paymentMode, 'cash');
+});
+
 test('zz cleanup', async () => {
   await clearCollections();
   await disconnectTestDb();

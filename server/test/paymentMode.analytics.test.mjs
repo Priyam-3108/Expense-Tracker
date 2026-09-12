@@ -63,6 +63,22 @@ test('breakdown returns empty result for a range with no expenses', async () => 
   assert.equal(res.body.data.totalSpent, 0);
 });
 
+test('breakdown returns 400 for malformed/inverted from-to instead of a silent wrong result', async () => {
+  const userId = new mongoose.Types.ObjectId();
+
+  const badFormat = { user: { _id: userId }, query: { from: 'not-a-date', to: '2026-09-30' } };
+  const res1 = mockRes();
+  await getPaymentModeBreakdown(badFormat, res1);
+  assert.equal(res1.statusCode, 400);
+  assert.equal(res1.body.message, 'Invalid date format. Use YYYY-MM-DD');
+
+  const inverted = { user: { _id: userId }, query: { from: '2026-09-30', to: '2026-09-01' } };
+  const res2 = mockRes();
+  await getPaymentModeBreakdown(inverted, res2);
+  assert.equal(res2.statusCode, 400);
+  assert.equal(res2.body.message, 'Start date cannot be after end date');
+});
+
 test('zz cleanup', async () => {
   await clearCollections();
   await disconnectTestDb();

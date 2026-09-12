@@ -2,7 +2,6 @@ import { getPaymentMode } from '../constants/paymentModes'
 
 export default function PaymentModeBadge({ value, hideOther = false, className = '' }) {
   const mode = getPaymentMode(value)
-  if (!mode) return null
   if (hideOther && mode.value === 'other') return null
   const { label, Icon } = mode
   return (

@@ -15,6 +15,7 @@ export const PAYMENT_MODE_MAP = PAYMENT_MODES.reduce((m, e) => {
 }, {})
 
 export function getPaymentMode(value) {
-  return PAYMENT_MODES.find((e) => e.value === value)
-    || PAYMENT_MODES.find((e) => e.value === 'other')
+  return PAYMENT_MODE_MAP[value]
+    ? { value, ...PAYMENT_MODE_MAP[value] }
+    : { value: 'other', ...PAYMENT_MODE_MAP.other }
 }

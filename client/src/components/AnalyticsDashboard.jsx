@@ -72,7 +72,10 @@ const AnalyticsDashboard = ({
                 setPaymentModeError(false)
             })
             .catch(() => {
-                if (!cancelled) setPaymentModeError(true)
+                if (!cancelled) {
+                    setPaymentModeError(true)
+                    setPaymentModeData([])
+                }
             })
         return () => { cancelled = true }
     }, [isSharedView, dateRange?.startDate, dateRange?.endDate])

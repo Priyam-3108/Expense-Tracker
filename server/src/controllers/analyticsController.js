@@ -104,6 +104,20 @@ export const getPaymentModeBreakdown = async (req, res) => {
   try {
     let { from, to } = req.query;
 
+    if ((from && isNaN(new Date(from).getTime())) || (to && isNaN(new Date(to).getTime()))) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid date format. Use YYYY-MM-DD',
+      });
+    }
+
+    if (from && to && from > to) {
+      return res.status(400).json({
+        success: false,
+        message: 'Start date cannot be after end date',
+      });
+    }
+
     if (!from || !to) {
       const now = new Date();
       const year = now.getFullYear();
