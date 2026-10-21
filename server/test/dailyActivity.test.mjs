@@ -103,6 +103,15 @@ test('getDailyActivity returns empty days for a user with no expenses', async ()
   assert.deepEqual(res.body.data.days, []);
 });
 
+import analyticsRoutes from '../src/routes/analyticsRoutes.js';
+
+test('analyticsRoutes registers GET /daily-activity', () => {
+  const layer = analyticsRoutes.stack.find(
+    (l) => l.route && l.route.path === '/daily-activity' && l.route.methods.get
+  );
+  assert.ok(layer, 'expected GET /daily-activity on the analytics router');
+});
+
 test('zz cleanup', async () => {
   await clearCollections();
   await disconnectTestDb();
