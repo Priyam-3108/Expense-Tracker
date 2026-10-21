@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import hapticFeedback from '../utils/haptics';
+import { getPaymentMode } from '../constants/paymentModes';
 
 function TransactionItem({ item, onPress, onEdit, onDelete }) {
     const { colors, spacing, borderRadius, shadows } = useTheme();
@@ -57,6 +58,8 @@ function TransactionItem({ item, onPress, onEdit, onDelete }) {
 
     const isIncome = item.type === 'income';
     const catName = item.category?.name || item.category || 'Uncategorized';
+    const pm = getPaymentMode(item.paymentMode);
+    const showPm = pm && pm.value !== 'other';
     const categoryColor = getCategoryColor(catName);
     const categoryIcon = getCategoryIcon(catName);
     const amountColor = isIncome ? colors.income : colors.expense;
@@ -98,6 +101,12 @@ function TransactionItem({ item, onPress, onEdit, onDelete }) {
                     {formatDate(item.date)}
                     {item.notes ? ` · ${item.notes.substring(0, 20)}${item.notes.length > 20 ? '…' : ''}` : ''}
                 </Text>
+                {showPm && (
+                    <View style={styles.pmRow}>
+                        <Ionicons name={pm.icon} size={11} color={colors.subText} />
+                        <Text style={[styles.pmText, { color: colors.subText }]}>{pm.label}</Text>
+                    </View>
+                )}
             </View>
 
             {/* Right side: amount + sync status */}
@@ -182,6 +191,16 @@ const styles = StyleSheet.create({
     },
     actionBtn: {
         padding: 2,
+    },
+    pmRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 3,
+        marginTop: 2,
+    },
+    pmText: {
+        fontSize: 11,
+        fontWeight: '400',
     },
 });
 
