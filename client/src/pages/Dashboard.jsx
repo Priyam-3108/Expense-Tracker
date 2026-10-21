@@ -251,7 +251,7 @@ const Dashboard = () => {
             <Calendar className="h-5 w-5 mr-2 text-indigo-500 dark:text-indigo-400" />
             Activity
           </h2>
-          <span className="text-xs text-gray-400 dark:text-slate-600">Last 16 weeks</span>
+          <span className="text-xs text-gray-400 dark:text-slate-600">Last ~16 weeks</span>
         </div>
         <ActivityHeatmap
           grid={activity.grid}

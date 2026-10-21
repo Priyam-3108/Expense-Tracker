@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useExpense } from '../context/ExpenseContext'
 import { useAuth } from '../context/AuthContext'
 import CategorySelector from '../components/CategorySelector'
@@ -153,6 +153,7 @@ const Expenses = () => {
   const [selectedDate, setSelectedDate] = useState(null) // For calendar date selection
 
   const location = useLocation()
+  const navigate = useNavigate()
 
   // Seed dateRange from heatmap click on mount
   useEffect(() => {
@@ -160,6 +161,7 @@ const Expenses = () => {
     if (d && /^\d{4}-\d{2}-\d{2}$/.test(d)) {
       setDateRange({ startDate: d, endDate: d })
       setPage(1)
+      navigate(location.pathname, { replace: true, state: null })
     }
     // run once on mount only
     // eslint-disable-next-line react-hooks/exhaustive-deps

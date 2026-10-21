@@ -9,6 +9,7 @@ const DARK = ['rgba(255,255,255,0.04)', 'rgba(129,140,248,0.25)', 'rgba(129,140,
 
 const CELL = 12
 const GAP = 3
+const LABEL_COL_WIDTH = 28 // width reserved for the fixed weekday-label column
 
 export default function ActivityHeatmap({
   grid = [],
@@ -40,24 +41,12 @@ export default function ActivityHeatmap({
 
   return (
     <div className="relative">
-      {/* Month labels */}
-      <div className="flex pl-8 mb-1 overflow-hidden" style={{ height: 14 }}>
-        <div className="relative" style={{ width: numCols * colStride }}>
-          {monthLabels.map(({ colIndex, label }) => (
-            <span
-              key={colIndex}
-              className="absolute text-[10px] text-gray-400 dark:text-slate-500"
-              style={{ left: colIndex * colStride }}
-            >
-              {label}
-            </span>
-          ))}
-        </div>
-      </div>
-
       <div className="flex">
         {/* Fixed weekday labels */}
-        <div className="flex flex-col justify-between pr-1" style={{ height: 7 * colStride - GAP }}>
+        <div
+          className="flex flex-col justify-between shrink-0"
+          style={{ width: LABEL_COL_WIDTH, height: 7 * colStride - GAP, marginTop: 14 + 4 }}
+        >
           {weekdayLabels.map((l, i) => (
             <span key={i} className="text-[10px] leading-none text-gray-400 dark:text-slate-500" style={{ height: CELL }}>
               {l}
@@ -65,8 +54,21 @@ export default function ActivityHeatmap({
           ))}
         </div>
 
-        {/* Scrollable grid */}
+        {/* Scrollable: month labels + grid together, so they scroll in sync */}
         <div className="overflow-x-auto pb-1 [scrollbar-width:thin]">
+          {/* Month labels */}
+          <div className="relative mb-1" style={{ width: numCols * colStride, height: 14 }}>
+            {monthLabels.map(({ colIndex, label }) => (
+              <span
+                key={colIndex}
+                className="absolute text-[10px] text-gray-400 dark:text-slate-500"
+                style={{ left: colIndex * colStride }}
+              >
+                {label}
+              </span>
+            ))}
+          </div>
+
           <div className="flex" style={{ gap: GAP }}>
             {grid.map((week, col) => (
               <div key={col} className="flex flex-col" style={{ gap: GAP }}>
@@ -99,7 +101,7 @@ export default function ActivityHeatmap({
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-1 mt-2 pl-8 text-[10px] text-gray-400 dark:text-slate-500">
+      <div className="flex items-center gap-1 mt-2 text-[10px] text-gray-400 dark:text-slate-500" style={{ paddingLeft: LABEL_COL_WIDTH }}>
         <span>Less</span>
         {palette.map((c, i) => (
           <span key={i} className="rounded-[2px]" style={{ width: CELL, height: CELL, backgroundColor: c }} />
@@ -108,7 +110,7 @@ export default function ActivityHeatmap({
       </div>
 
       {!hasAny && (
-        <p className="text-xs text-gray-400 dark:text-slate-600 mt-2 pl-8">No activity in this window yet.</p>
+        <p className="text-xs text-gray-400 dark:text-slate-600 mt-2" style={{ paddingLeft: LABEL_COL_WIDTH }}>No activity in this window yet.</p>
       )}
 
       {/* Tooltip */}
