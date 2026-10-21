@@ -204,13 +204,49 @@ Spec: `specs/2026-09-10-activity-heatmap-design.md`
 >   and mobile phases.
 
 ### 2B · Web — `plans/2026-09-10-activity-heatmap-2b-web.md`
-- [ ] Task 1: `analyticsService.getDailyActivity()`
-- [ ] Task 2: `useDailyActivity` hook (fetch + gap-fill to a dense 7×N grid)
-- [ ] Task 3: `ActivityHeatmap` component (grid, 5-step scale, tooltip, dark palette)
-- [ ] Task 4: Place on `Dashboard`, cell click → filtered Expenses for that day
-- [ ] Task 5: Empty state + narrow-screen horizontal scroll
-- [ ] Task 6: Build + manual checklist
-- [ ] **2B merged**
+- [x] Task 1: `analyticsService.getDailyActivity()`
+- [x] Task 2: `useDailyActivity` hook (fetch + gap-fill to a dense 7×N grid)
+- [x] Task 3: `ActivityHeatmap` component (grid, 5-step scale, tooltip, dark palette)
+- [x] Task 4: Place on `Dashboard`, cell click → filtered Expenses for that day
+  (full-width row, placement ruling — see notes)
+- [x] Task 5: Seed Expenses date filter from a heatmap cell click (executed, not
+  skipped — plan marked it optional, reconciliation found no blocker)
+- [x] Task 6: Build + grep gate (manual browser checklist handed to human partner)
+- [x] **2B merged** (committed directly to `enhancement/expense-manager-parity`,
+  commits `2fb0e53`..`6fa2ab3`)
+
+> **2B notes (2026-10-22):**
+> - Executed via `superpowers:subagent-driven-development` — 6 tasks, all
+>   approved clean on first per-task review pass.
+> - **Plan defect found and ruled before execution:** the plan's Task 4 said to
+>   insert the heatmap card "immediately before Recent Activity," which lives in
+>   a narrow `xl:col-span-1` sidebar column. A 16+ week horizontally-scrolling
+>   grid in a 1/3-width column would always be scrolling and look broken.
+>   Surfaced to human partner, who chose full-width instead: the card now sits
+>   as its own full-width row above the `xl:grid-cols-3` two-column section
+>   (Financial Overview chart + Quick Actions/Recent Activity sidebar).
+>   Independently verified correct by the per-task and final reviewers.
+> - **Task 5 executed despite being marked optional** — the plan said skip if
+>   touching `Expenses.jsx` seemed out of scope; reconciliation found no
+>   blocking drift, so it was built: clicking a heatmap cell now actually
+>   filters the Expenses list to that day.
+> - **Parked by ruling, not fixed:** Task 2's `bucketFor` boundary classifies a
+>   day exactly AT a quantile threshold (p25/p50/p75) into the lower bucket,
+>   while the spec's prose says "at/above p75 is bucket 4" (implies rounding
+>   up). This is verbatim plan code, not an implementer deviation — surfaced to
+>   the human partner, who chose to leave it as-is (self-consistent across all
+>   3 thresholds; negligible real-world impact with continuous currency totals).
+> - Final whole-phase review (Opus) found 4 Minor issues (no Critical/Important):
+>   month-label alignment/scroll-sync, an overstated "16 weeks" caption, and a
+>   stale-filter bug where clicking a heatmap cell then manually clearing the
+>   filter then pressing Back would silently re-seed the old date filter. Human
+>   partner chose to fix all 4 before merging; fixed in one consolidated commit
+>   (`6fa2ab3`), scoped re-review confirmed all 4 ADDRESSED, no new breakage,
+>   re-reviewer independently re-ran `npx vite build` (green).
+> - **No browser available in this environment** for any task — manual visual
+>   checks (tooltip content/position, click-through, light/dark, responsive
+>   resize, API-down state) were not run and are handed to the human partner,
+>   same precedent as every prior web/mobile phase.
 
 ### 2C · Mobile — `plans/2026-09-10-activity-heatmap-2c-mobile.md`
 - [ ] Task 1: `healthService`-style `analyticsService` call (or extend existing) for daily activity
