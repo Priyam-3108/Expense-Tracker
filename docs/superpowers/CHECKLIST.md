@@ -172,11 +172,36 @@ Spec: `specs/2026-09-10-payment-mode-design.md`
 Spec: `specs/2026-09-10-activity-heatmap-design.md`
 
 ### 2A · API — `plans/2026-09-10-activity-heatmap-2a-api.md`
-- [ ] Task 1: `getDailyActivity` controller (reuse `dailyPattern` aggregation, param `weeks`)
-- [ ] Task 2: `GET /api/analytics/daily-activity` route (auth)
-- [ ] Task 3: `weeks` param clamp (1–53) + default 16
-- [ ] Task 4: Manual smoke + shape check
-- [ ] **2A merged**
+- [x] Task 1: `dateWindow` util (`clampWeeks`, `trailingWindow`)
+- [x] Task 2: `getDailyActivity` controller + aggregation
+- [x] Task 3: `GET /api/analytics/daily-activity` route (auth)
+- [x] Task 4: Manual smoke + shape check (live run against real server+DB — SMOKE OK)
+- [x] **2A merged** (committed directly to `enhancement/expense-manager-parity`,
+  commits `b833300`..`703fad3`)
+
+> **2A notes (2026-10-22):**
+> - Executed via `superpowers:subagent-driven-development` — 4 tasks, TDD
+>   throughout (write failing test → confirm fails → implement → confirm passes),
+>   all approved clean on first per-task review pass.
+> - DB-backed tests used the Node-16 workaround established in Phase 1A (top-level
+>   `await connectTestDb()` + a final `'zz cleanup'` test, instead of the plan's
+>   literal `test.before`/`afterEach`/`after` hooks, which silently don't run on
+>   Node 16). Verified by reviewers to preserve real test isolation via per-test
+>   unique ObjectId partitioning.
+> - Task 4's live smoke script was actually run against a real dev server + real
+>   MongoDB (not just written): registered a scratch user, created real expenses,
+>   hit the endpoint, got `SMOKE OK` with a 111-day window matching the 16-week
+>   default exactly; scratch data cleaned up afterward.
+> - Final whole-phase review (Opus) found **zero findings** — no fix wave needed.
+>   Reviewer independently re-verified the aggregation pipeline clause-by-clause,
+>   probed 53+ adversarial `weeks` inputs (confirmed never 400/500), and ran a
+>   cross-user data-isolation probe with same-date fixtures to confirm the `user`
+>   filter can't leak another user's data (the shipped tests never used
+>   same-date, cross-user fixtures, so this was a genuinely new check).
+> - Non-finding carried forward for 2B/2C awareness: `to` is server-local "today"
+>   per the spec's explicit choice — a client in a different timezone can be up to
+>   a day ahead of the grid's last cell. Not a defect, just a heads-up for the web
+>   and mobile phases.
 
 ### 2B · Web — `plans/2026-09-10-activity-heatmap-2b-web.md`
 - [ ] Task 1: `analyticsService.getDailyActivity()`
