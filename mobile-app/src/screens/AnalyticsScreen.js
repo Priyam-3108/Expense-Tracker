@@ -181,6 +181,7 @@ function AnalyticsScreen() {
         } catch (error) {
             console.error('Error fetching analytics:', error);
             setAnalyticsData(generateSampleData());
+            setPmData({ labels: [], values: [] });
         } finally {
             setLoading(false);
             setRefreshing(false);

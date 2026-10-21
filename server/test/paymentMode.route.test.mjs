@@ -44,6 +44,47 @@ test('syncExpenses persists paymentMode from the synced payload', async () => {
   assert.equal(saved.paymentMode, 'upi');
 });
 
+test('syncExpenses updates an existing expense in place when payload carries its _id', async () => {
+  const userId = new mongoose.Types.ObjectId();
+  const cat = new mongoose.Types.ObjectId();
+  const expense = await Expense.create({
+    amount: 12, date: '2026-09-10', category: cat, user: userId,
+    type: 'expense', paymentMode: 'upi', client_uuid: 'uuid-original',
+  });
+
+  const req = {
+    user: { _id: userId },
+    body: {
+      expenses: [
+        {
+          client_uuid: 'uuid-edit-new',
+          _id: String(expense._id),
+          id: String(expense._id),
+          amount: 99,
+          date: '2026-09-10',
+          category: String(cat),
+          type: 'expense',
+          paymentMode: 'cash',
+        },
+      ],
+    },
+  };
+  const res = mockRes();
+  await syncExpenses(req, res);
+
+  assert.equal(res.statusCode, 200);
+  const [result] = res.body.results;
+  assert.equal(result.action, 'UPDATED');
+  assert.equal(result.status, 'SYNCED');
+
+  const fresh = await Expense.findById(expense._id);
+  assert.equal(fresh.amount, 99);
+  assert.equal(fresh.paymentMode, 'cash');
+
+  const all = await Expense.find({ user: userId });
+  assert.equal(all.length, 1, 'edit sync must not create a duplicate expense');
+});
+
 test('zz cleanup', async () => {
   await clearCollections();
   await disconnectTestDb();

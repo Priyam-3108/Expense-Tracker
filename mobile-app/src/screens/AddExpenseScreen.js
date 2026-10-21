@@ -425,7 +425,7 @@ export default function AddExpenseScreen({ navigation, route }) {
                                     size={13}
                                     color={isSelected ? colors.primary : colors.subText}
                                 />
-                                <Text style={[s.chipText, { color: isSelected ? colors.primary : colors.text, marginLeft: 4 }]}>
+                                <Text style={[s.chipText, { color: isSelected ? colors.primary : colors.text }]}>
                                     {pm.label}
                                 </Text>
                             </TouchableOpacity>
