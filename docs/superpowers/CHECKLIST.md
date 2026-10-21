@@ -121,14 +121,49 @@ Spec: `specs/2026-09-10-payment-mode-design.md`
 >   servers (localhost:5000 API + localhost:5173 client).
 
 ### 1C · Mobile — `plans/2026-09-10-payment-mode-1c-mobile.md`
-- [ ] Task 1: `PAYMENT_MODES` constant (mobile copy)
-- [ ] Task 2: Payment-mode chip row in `AddExpenseScreen`
-- [ ] Task 3: `paymentMode` in `offlineService.saveExpenseLocally` payload
-- [ ] Task 4: `paymentMode` in `syncEngine` sync payload
-- [ ] Task 5: Payment-mode badge on `TransactionItem`
-- [ ] Task 6: `paymentMode` chart in `AnalyticsScreen` (online-only)
-- [ ] Task 7: Manual device/emulator smoke (add online, add offline+sync, edit)
-- [ ] **1C merged**
+- [x] Task 1: `PAYMENT_MODES` constant (mobile copy)
+- [x] Task 2: Payment-mode chip row in `AddExpenseScreen`
+- [x] Task 3: `paymentMode` in `offlineService.saveExpenseLocally` payload
+- [x] Task 4: `paymentMode` in `syncEngine` sync payload
+- [x] Task 5: Payment-mode badge on `TransactionItem`
+- [x] Task 6: `paymentMode` chart in `AnalyticsScreen` (online-only)
+- [x] Task 7: Manual device/emulator smoke (grep gate + cross-file babel parse run by
+  agents; live device sweep deferred to human partner — no emulator in this
+  environment)
+- [x] **1C merged** (committed directly to `enhancement/expense-manager-parity`,
+  commits `5f97c15`..`4e75063`)
+
+> **1C notes (2026-10-22):**
+> - Executed via `superpowers:subagent-driven-development` — 7 tasks, all approved
+>   clean on first per-task review pass. Task 3 was a no-op (both `offlineService`
+>   and `syncEngine` already spread the payload verbatim — confirmed, no commit).
+> - Final whole-phase review (Opus) surfaced 2 Important + 1 Minor finding, fixed in
+>   one consolidated commit (`4e75063`), scoped re-review confirmed all addressed:
+>   - **Pre-existing bug, newly load-bearing:** mobile edit sync always minted a
+>     fresh `client_uuid`, so `syncExpenses`'s client_uuid-only lookup never matched
+>     an edited row and fell through to `Expense.create` with the edit's stale
+>     `_id`, throwing a duplicate-key error on every edit sync (silent permanent
+>     failure). Not introduced by this phase, but 1C's plan promised edit works —
+>     surfaced to human partner via AskUserQuestion, who chose "fix now, same PR".
+>     Fixed by routing `_id`/`id`-bearing payloads through `findOneAndUpdate`
+>     scoped to `{_id, user}` with `runValidators: true`. New test added
+>     (`server/test/paymentMode.route.test.mjs`): create → sync-edit with new
+>     client_uuid → assert `action: 'UPDATED'`, persisted change, no duplicate doc.
+>   - `AnalyticsScreen`'s payment-mode chart kept stale data when the main
+>     analytics fetch failed (e.g. offline) because its own try/catch was never
+>     reached — contradicted the spec's "hidden offline" requirement. Fixed by
+>     resetting `pmData` in the outer catch too.
+>   - Minor: redundant `marginLeft: 4` on the payment chip label, double-spacing
+>     vs. the Category chips above (brief-mandated code, cosmetic) — removed.
+> - **No emulator/device available in this environment** for any task, consistent
+>   across all 7 tasks' verification steps. Substituted babel/AST parse of every
+>   touched file (individually per task, then all 5 together at Task 7) — all
+>   clean, no syntax errors. The plan's Task 7 Step 3 live cross-flow sweep (add
+>   online/offline+sync, edit-mode-changes, recurring propagation, badge dark/light,
+>   chart online-only/refetch/hidden-offline) was **not run** — handed to the human
+>   partner, same precedent as Phase 1B's manual browser checklist.
+> - `server npm test`: 6/6 files green (13 cases), independently re-run by the
+>   scoped re-reviewer (not just the implementer).
 
 ---
 
