@@ -38,6 +38,9 @@ export const expenseService = {
     getDetailedAnalytics: (filters = {}) => {
         return api.get('/expenses/analytics', { params: filters });
     },
+    getPaymentModeBreakdown: (params = {}) => {
+        return api.get('/analytics/payment-modes', { params });
+    },
     exportExpenses: (format, filters = {}) => {
         const params = { format, ...filters };
         return api.get('/expenses/export', {
