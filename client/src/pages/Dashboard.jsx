@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useExpense } from '../context/ExpenseContext'
 import { useDebt } from '../context/DebtContext'
+import { useDailyActivity } from '../hooks/useDailyActivity'
+import ActivityHeatmap from '../components/ActivityHeatmap'
 import { expenseService } from '../services/expenseService'
 import { formatCurrency } from '../utils/helpers'
 import { format } from 'date-fns'
@@ -45,6 +47,7 @@ const Dashboard = () => {
   const [loadingRecent, setLoadingRecent] = useState(true)
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
   const navigate = useNavigate()
+  const activity = useDailyActivity(16)
 
   useEffect(() => {
     loadStats()
@@ -239,6 +242,26 @@ const Dashboard = () => {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Activity Heatmap */}
+      <div className="glass-card p-5 md:p-6">
+        <div className="flex items-center justify-between mb-4 md:mb-5">
+          <h2 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+            <Calendar className="h-5 w-5 mr-2 text-indigo-500 dark:text-indigo-400" />
+            Activity
+          </h2>
+          <span className="text-xs text-gray-400 dark:text-slate-600">Last 16 weeks</span>
+        </div>
+        <ActivityHeatmap
+          grid={activity.grid}
+          weekdayLabels={activity.weekdayLabels}
+          monthLabels={activity.monthLabels}
+          loading={activity.loading}
+          error={activity.error}
+          currency={currency}
+          onCellClick={(date) => navigate('/app/expenses', { state: { date } })}
+        />
       </div>
 
       {/* ============ MAIN CONTENT GRID ============ */}
