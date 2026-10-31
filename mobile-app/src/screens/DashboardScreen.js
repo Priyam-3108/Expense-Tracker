@@ -17,6 +17,9 @@ import hapticFeedback from '../utils/haptics';
 import { offlineService } from '../services/offlineService';
 import { syncEngine } from '../services/syncEngine';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
+import { buildHeatmapGrid } from '../utils/heatmapGrid';
+import ActivityHeatmap from '../components/ActivityHeatmap';
 
 export default function DashboardScreen({ navigation }) {
   const { signOut, user } = useContext(AuthContext);
@@ -25,12 +28,15 @@ export default function DashboardScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [summary, setSummary] = useState({ income: 0, expense: 0, balance: 0 });
+  const [heatmap, setHeatmap] = useState(null);
 
   // Action Sheet & Alert States
   const [showActionSheet, setShowActionSheet] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const [deleteExpenseId, setDeleteExpenseId] = useState(null);
+  const [showHeatmapAlert, setShowHeatmapAlert] = useState(false);
+  const [heatmapAlertInfo, setHeatmapAlertInfo] = useState(null); // { date, count }
 
   const fetchData = async () => {
     try {
@@ -162,6 +168,22 @@ export default function DashboardScreen({ navigation }) {
         AsyncStorage.setItem('dashboard_server_cache', JSON.stringify(fetchedExpenses));
       }
 
+      // Activity heatmap — online only
+      try {
+        const net = await NetInfo.fetch();
+        if (net.isConnected) {
+          const res = await expenseService.getDailyActivity(16);
+          const d = res.data?.data;
+          if (d) {
+            setHeatmap(buildHeatmapGrid(d.days, d.from, d.to));
+          }
+        } else {
+          setHeatmap(null);
+        }
+      } catch (e) {
+        setHeatmap(null);
+      }
+
     } catch (error) {
       console.error(error);
     } finally {
@@ -250,6 +272,20 @@ export default function DashboardScreen({ navigation }) {
         <View style={{ width: 12 }} />
         <SummaryCard title="Expenses" amount={summary.expense} type="expense" icon="trending-down" />
       </View>
+
+      {heatmap?.grid?.length > 0 && heatmap.grid.some((w) => w.some((c) => c.count > 0)) && (
+        <View style={[styles.activityCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <Text style={[styles.activityCardTitle, { color: colors.text }]}>Activity · last 16 weeks</Text>
+          <ActivityHeatmap
+            grid={heatmap.grid}
+            monthLabels={heatmap.monthLabels}
+            onCellPress={(cell) => {
+              setHeatmapAlertInfo({ date: cell.date, count: cell.count });
+              setShowHeatmapAlert(true);
+            }}
+          />
+        </View>
+      )}
 
       {/* Recent Transactions Header */}
       <View style={styles.sectionHeader}>
@@ -415,6 +451,16 @@ export default function DashboardScreen({ navigation }) {
           setDeleteExpenseId(null);
         }}
       />
+
+      {/* Activity Heatmap Cell Info Alert */}
+      <CustomAlert
+        visible={showHeatmapAlert}
+        type="default"
+        title={heatmapAlertInfo?.date}
+        message={`${heatmapAlertInfo?.count ?? 0} transaction${heatmapAlertInfo?.count === 1 ? '' : 's'}`}
+        buttons={[{ text: 'OK', style: 'primary', onPress: () => setShowHeatmapAlert(false) }]}
+        onClose={() => setShowHeatmapAlert(false)}
+      />
     </View>
   );
 }
@@ -503,5 +549,16 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 15,
     fontWeight: '400',
+  },
+  activityCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 16,
+    marginBottom: 22,
+  },
+  activityCardTitle: {
+    fontSize: 15,
+    fontWeight: '500',
+    marginBottom: 12,
   },
 });
