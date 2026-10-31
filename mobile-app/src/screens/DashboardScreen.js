@@ -17,7 +17,6 @@ import hapticFeedback from '../utils/haptics';
 import { offlineService } from '../services/offlineService';
 import { syncEngine } from '../services/syncEngine';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import NetInfo from '@react-native-community/netinfo';
 import { buildHeatmapGrid } from '../utils/heatmapGrid';
 import ActivityHeatmap from '../components/ActivityHeatmap';
 
@@ -170,12 +169,13 @@ export default function DashboardScreen({ navigation }) {
 
       // Activity heatmap — online only
       try {
-        const net = await NetInfo.fetch();
-        if (net.isConnected) {
+        if (!isOfflineMode) {
           const res = await expenseService.getDailyActivity(16);
           const d = res.data?.data;
           if (d) {
             setHeatmap(buildHeatmapGrid(d.days, d.from, d.to));
+          } else {
+            setHeatmap(null);
           }
         } else {
           setHeatmap(null);
@@ -275,7 +275,7 @@ export default function DashboardScreen({ navigation }) {
 
       {heatmap?.grid?.length > 0 && heatmap.grid.some((w) => w.some((c) => c.count > 0)) && (
         <View style={[styles.activityCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <Text style={[styles.activityCardTitle, { color: colors.text }]}>Activity · last 16 weeks</Text>
+          <Text style={[styles.activityCardTitle, { color: colors.text }]}>Activity · last ~16 weeks</Text>
           <ActivityHeatmap
             grid={heatmap.grid}
             monthLabels={heatmap.monthLabels}

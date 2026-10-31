@@ -5,6 +5,7 @@ import { useTheme } from '../context/ThemeContext';
 
 const CELL = 12;
 const GAP = 3;
+const LABEL_COL = 18;
 const WEEKDAYS = ['M', '', 'W', '', 'F', '', ''];
 
 // Blend two hex colours (#rrggbb) by t in [0,1]
@@ -29,7 +30,7 @@ export default function ActivityHeatmap({ grid = [], monthLabels = [], onCellPre
     <View>
       <View style={{ flexDirection: 'row' }}>
         {/* Fixed weekday labels */}
-        <View style={{ justifyContent: 'space-between', height: 7 * colStride - GAP, marginRight: 4, marginTop: 12 + 2 }}>
+        <View style={{ width: LABEL_COL, justifyContent: 'space-between', height: 7 * colStride - GAP, marginRight: 4, marginTop: 12 + 2 }}>
           {WEEKDAYS.map((d, i) => (
             <Text key={i} style={[styles.weekdayLabel, { color: colors.subText, height: CELL }]}>{d}</Text>
           ))}
@@ -73,7 +74,7 @@ export default function ActivityHeatmap({ grid = [], monthLabels = [], onCellPre
       </View>
 
       {/* Legend */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 6, marginLeft: 18 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 6, marginLeft: LABEL_COL }}>
         <Text style={[styles.legendText, { color: colors.subText }]}>Less</Text>
         {palette.map((c, i) => (
           <View key={i} style={{ width: CELL, height: CELL, borderRadius: 2, backgroundColor: c }} />
