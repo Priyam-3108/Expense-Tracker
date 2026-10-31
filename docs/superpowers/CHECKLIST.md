@@ -249,12 +249,65 @@ Spec: `specs/2026-09-10-activity-heatmap-design.md`
 >   same precedent as every prior web/mobile phase.
 
 ### 2C · Mobile — `plans/2026-09-10-activity-heatmap-2c-mobile.md`
-- [ ] Task 1: `healthService`-style `analyticsService` call (or extend existing) for daily activity
-- [ ] Task 2: `ActivityHeatmap` RN component (same data contract, `Pressable` cells)
-- [ ] Task 3: Place on `DashboardScreen`; hidden when offline with no cached data
-- [ ] Task 4: Cell tap → navigate to filtered transactions
-- [ ] Task 5: Manual smoke (online, offline, tap-through, dark mode)
-- [ ] **2C merged**
+- [x] Task 1: `getDailyActivity` in mobile `expenseService`
+- [x] Task 2: `heatmapGrid` util (dense grid + quantile buckets, plain-`Date`)
+- [x] Task 3: `ActivityHeatmap` RN component (`Pressable` cells, theme-derived palette)
+- [x] Task 4: Place on `DashboardScreen` (3 placement/style/alert rulings — see notes)
+- [x] Task 5: Manual smoke (grep gate + cross-file babel parse run by agents;
+  live device sweep deferred to human partner — no emulator in this environment)
+- [x] **2C merged** (committed directly to `enhancement/expense-manager-parity`,
+  commits `53193b3`..`e59eabd`)
+
+> **2C notes (2026-10-31):**
+> - Executed via `superpowers:subagent-driven-development` — 5 tasks, all
+>   approved clean on first per-task review pass except Task 3 (1 fix round).
+> - **date-fns confirmed NOT a mobile dependency** — Task 2's plain-`Date`
+>   fallback (the plan's own default "works regardless" implementation) used
+>   as written, no decision needed.
+> - **Mid-task fix (Task 3):** the newly-created `ActivityHeatmap.js` rendered
+>   its month-label row as a sibling OUTSIDE the grid's `ScrollView` (the
+>   plan's own required code, not an implementer deviation) — so it didn't
+>   scroll in sync with the grid, the same bug class already found and fixed on
+>   web in Phase 2B. Fixed immediately via the same restructuring pattern 2B
+>   used (month-label row moved inside the scroll container), rather than
+>   deferring to final review, since the fix was already well-understood.
+> - **3 controller rulings for Task 4**, all found during reconciliation before
+>   dispatch: the plan assumed a plain `ScrollView` (`DashboardScreen.js`
+>   actually uses `FlatList` + `ListHeaderComponent={renderHeader}` — card
+>   placed inside `renderHeader()`); assumed a pre-existing `styles.card`/
+>   `cardTitle` (none existed — added new `activityCard`/`activityCardTitle`
+>   styles instead); assumed `SearchScreen` accepts a date param (it doesn't —
+>   a cell tap shows a second, independent `CustomAlert` instance instead of
+>   navigating). All three independently verified correctly implemented.
+> - Final whole-phase review (Opus) found 1 Important + 4 Minor:
+>   - **Important, re-introduced bug:** the card's "Activity · last 16 weeks"
+>     caption overstates the window — the grid renders 17 columns ~86% of the
+>     time (verified: 343/400 consecutive "today" dates). This is the exact
+>     same bug Phase 2B's final review already fixed on web ("Last 16 weeks" →
+>     "Last ~16 weeks"); the mobile Task 4 brief predated that fix. Fixed to
+>     match web's wording exactly.
+>   - Minor: heatmap fetch had no `else` branch for a malformed-but-200
+>     response, leaving stale data on screen indefinitely — fixed.
+>   - Minor: heatmap block used its own `NetInfo.fetch().isConnected` check
+>     instead of reusing `isOfflineMode` (a more accurate "server reachable"
+>     signal the same function already computes) — fixed, also removed the
+>     now-unused `NetInfo` import.
+>   - Minor: legend's hardcoded `marginLeft: 18` didn't match the weekday
+>     column's actual (unset) width — fixed with a shared `LABEL_COL` constant.
+>   - Minor (ruling, no code change): the spec's "render the empty grid online,
+>     hide only when offline" parenthetical conflicts with the plan's explicit,
+>     consistently-reviewed hide-when-empty behavior. Accepted the plan's
+>     behavior as the resolution — simpler, avoids a confusing empty grid for a
+>     brand-new user on a small screen, and it was already in every per-task
+>     review's scope.
+>   - Fixed in one consolidated commit (`e59eabd`), scoped re-review confirmed
+>     all 4 code-change findings ADDRESSED, no new breakage.
+> - **No emulator/device available in this environment** for any task — same
+>   limitation as every mobile phase in this program. Substituted babel/AST
+>   parse of every touched file. The live device sweep (online render/shading/
+>   scroll, tap-to-alert, offline hide, empty-account hide, dark/light,
+>   rotation/small-screen) was **not run** — handed to the human partner.
+> - **Feature 2 (Activity Heatmap) is now complete across API + Web + Mobile.**
 
 ---
 
