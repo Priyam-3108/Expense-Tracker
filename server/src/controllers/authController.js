@@ -161,12 +161,13 @@ export const getProfile = async (req, res) => {
 // Update user profile
 export const updateProfile = async (req, res) => {
   try {
-    const { name, email, currency } = req.body;
+    const { name, email, currency, privacyModeDefault } = req.body;
     const updates = {};
 
     if (name) updates.name = name;
     if (email) updates.email = email;
     if (currency) updates.currency = currency;
+    if (typeof privacyModeDefault === 'boolean') updates.privacyModeDefault = privacyModeDefault;
 
     // Check if email is being changed and if it's already taken
     if (email && email !== req.user.email) {
