@@ -36,6 +36,10 @@ const userSchema = new mongoose.Schema({
     default: 'USD',
     required: true
   },
+  privacyModeDefault: {
+    type: Boolean,
+    default: false
+  },
   categoryOrder: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Category'
