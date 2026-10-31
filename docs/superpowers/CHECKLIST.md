@@ -316,11 +316,46 @@ Spec: `specs/2026-09-10-activity-heatmap-design.md`
 Spec: `specs/2026-09-10-privacy-mode-design.md`
 
 ### 3A · API — `plans/2026-09-10-privacy-mode-3a-api.md`
-- [ ] Task 1: Add `privacyModeDefault: Boolean` (default `false`) to `User`
-- [ ] Task 2: Accept `privacyModeDefault` in the profile-update endpoint + Zod
-- [ ] Task 3: Include `privacyModeDefault` in the `/auth/me` + login user payloads
-- [ ] Task 4: Manual smoke (toggle default, re-login, verify persisted)
-- [ ] **3A merged**
+- [x] Task 1: Add `privacyModeDefault: Boolean` (default `false`) to `User`
+- [x] Task 2: `PUT /api/auth/profile` sets `privacyModeDefault` (boolean-only,
+  not coerced — a non-boolean is silently ignored)
+- [x] Task 3: Manual smoke + regression check (live run against the real dev
+  server — SMOKE OK; profile update + login round-trip confirmed)
+- [x] **3A merged** (committed directly to `enhancement/expense-manager-parity`,
+  commits `aca6e12`..`1e81389`)
+
+> **3A notes (2026-10-31):**
+> - Executed via `superpowers:subagent-driven-development` — 3 tasks, TDD
+>   throughout, all approved clean on first per-task review pass. This is the
+>   smallest phase in the program so far: 8 lines of production code (4 schema,
+>   2 controller, 2 import/destructure) plus tests.
+> - No route 2 ("`/auth/me`") exists separately in this codebase — the spec's
+>   "login + /auth/me" language maps onto this app's actual `login`/`register`/
+>   `getProfile`/`updateProfile` endpoints, all of which already call
+>   `user.toJSON()`. No change was needed to any of them beyond `updateProfile`'s
+>   write path — `privacyModeDefault` rides along automatically once added to
+>   the schema, exactly as the spec predicted and the plan assumed. Verified by
+>   the final reviewer reading all four controller functions directly, not by
+>   trusting the claim.
+> - Task 3's live smoke script was actually run against the real dev server
+>   (not just written): registered a scratch user, hit `GET`/`PUT
+>   /api/auth/profile`, confirmed the field's presence, the toggle, and the
+>   non-boolean-ignored behavior; also ran the Step 4 regression check (profile
+>   name/currency update still works, login response carries the field).
+>   Scratch user cleaned up afterward; verified via `ps aux` that no server
+>   process was leaked.
+> - Final whole-phase review (Opus) found **zero findings** — no fix wave
+>   needed. Reviewer specifically probed the mass-assignment question (can
+>   `privacyModeDefault` be set through any path other than `updateProfile`'s
+>   guard?) and confirmed negative on three independent layers: `register`
+>   constructs `User` from an explicit field list (no `req.body` spread), Zod's
+>   `registerSchema` strips unknown keys before `register` even runs, and the
+>   only other `User`-write path in the server (`categoryController.js`) is a
+>   hardcoded single-field literal unrelated to this feature.
+> - Non-blocking note carried forward: Task 2's "ignores non-boolean" test
+>   starts from `privacyModeDefault: true` rather than `false` as its control
+>   value — still correctly satisfies the requirement, just a slightly weaker
+>   test than it could be. Not worth a fix.
 
 ### 3B · Web — `plans/2026-09-10-privacy-mode-3b-web.md`
 - [ ] Task 1: `PrivacyContext` (`isPrivate`, `toggle`, localStorage + user default seed)
