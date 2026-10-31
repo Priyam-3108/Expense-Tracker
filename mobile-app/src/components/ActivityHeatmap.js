@@ -27,47 +27,47 @@ export default function ActivityHeatmap({ grid = [], monthLabels = [], onCellPre
 
   return (
     <View>
-      {/* Month labels */}
-      <View style={{ flexDirection: 'row', marginLeft: 18, height: 12, marginBottom: 2 }}>
-        <View style={{ width: numCols * colStride }}>
-          {monthLabels.map(({ colIndex, label }) => (
-            <Text
-              key={colIndex}
-              style={[styles.monthLabel, { color: colors.subText, position: 'absolute', left: colIndex * colStride }]}
-            >
-              {label}
-            </Text>
-          ))}
-        </View>
-      </View>
-
       <View style={{ flexDirection: 'row' }}>
         {/* Fixed weekday labels */}
-        <View style={{ justifyContent: 'space-between', height: 7 * colStride - GAP, marginRight: 4 }}>
+        <View style={{ justifyContent: 'space-between', height: 7 * colStride - GAP, marginRight: 4, marginTop: 12 + 2 }}>
           {WEEKDAYS.map((d, i) => (
             <Text key={i} style={[styles.weekdayLabel, { color: colors.subText, height: CELL }]}>{d}</Text>
           ))}
         </View>
 
-        {/* Scrollable grid */}
+        {/* Scrollable: month labels + grid together, so they scroll in sync */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <View style={{ flexDirection: 'row', gap: GAP }}>
-            {grid.map((week, col) => (
-              <View key={col} style={{ gap: GAP }}>
-                {week.map((cell, row) => (
-                  <Pressable
-                    key={row}
-                    onPress={() => cell.date && cell.count > 0 && onCellPress && onCellPress(cell)}
-                    style={{
-                      width: CELL,
-                      height: CELL,
-                      borderRadius: 2,
-                      backgroundColor: cell.inWindow ? palette[cell.bucket] : 'transparent',
-                    }}
-                  />
-                ))}
-              </View>
-            ))}
+          <View>
+            {/* Month labels */}
+            <View style={{ height: 12, marginBottom: 2, width: numCols * colStride }}>
+              {monthLabels.map(({ colIndex, label }) => (
+                <Text
+                  key={colIndex}
+                  style={[styles.monthLabel, { color: colors.subText, position: 'absolute', left: colIndex * colStride }]}
+                >
+                  {label}
+                </Text>
+              ))}
+            </View>
+
+            <View style={{ flexDirection: 'row', gap: GAP }}>
+              {grid.map((week, col) => (
+                <View key={col} style={{ gap: GAP }}>
+                  {week.map((cell, row) => (
+                    <Pressable
+                      key={row}
+                      onPress={() => cell.date && cell.count > 0 && onCellPress && onCellPress(cell)}
+                      style={{
+                        width: CELL,
+                        height: CELL,
+                        borderRadius: 2,
+                        backgroundColor: cell.inWindow ? palette[cell.bucket] : 'transparent',
+                      }}
+                    />
+                  ))}
+                </View>
+              ))}
+            </View>
           </View>
         </ScrollView>
       </View>
