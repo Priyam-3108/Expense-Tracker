@@ -13,8 +13,6 @@ import hapticFeedback from '../utils/haptics';
 import { usePrivacy } from '../context/PrivacyContext';
 import Amount from '../components/Amount';
 
-const fmt = (n) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(n || 0);
-
 function DebtScreen({ navigation }) {
     const { colors, isDark, shadows, borderRadius } = useTheme();
     const { isPrivate, toggle: togglePrivacy } = usePrivacy();
@@ -232,7 +230,7 @@ function DebtScreen({ navigation }) {
                     <View style={s.cardRight}>
                         <Amount value={debt.currentAmount} currency="INR" style={[s.debtAmount, { color: typeColor }]} />
                         {debt.currentAmount !== debt.amount && (
-                            <Text style={s.debtOriginal}>of <Amount value={debt.amount} currency="INR" style={s.debtOriginal} /></Text>
+                            <Text style={s.debtOriginal}>of <Amount value={debt.amount} currency="INR" /></Text>
                         )}
                     </View>
                 </View>
@@ -292,13 +290,15 @@ function DebtScreen({ navigation }) {
             <View style={s.header}>
                 <View style={s.headerRow}>
                     <Text style={s.title}>Debts</Text>
-                    <TouchableOpacity onPress={togglePrivacy} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} style={{ marginRight: 12 }}>
-                        <Ionicons name={isPrivate ? 'eye-off-outline' : 'eye-outline'} size={20} color={colors.text} />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={s.addBtn} onPress={() => { hapticFeedback.medium(); navigation.navigate('AddDebt', { mode: 'add' }); }}>
-                        <Ionicons name="add" size={18} color="#ffffff" />
-                        <Text style={s.addBtnText}>New</Text>
-                    </TouchableOpacity>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                        <TouchableOpacity onPress={togglePrivacy} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                            <Ionicons name={isPrivate ? 'eye-off-outline' : 'eye-outline'} size={20} color={colors.text} />
+                        </TouchableOpacity>
+                        <TouchableOpacity style={s.addBtn} onPress={() => { hapticFeedback.medium(); navigation.navigate('AddDebt', { mode: 'add' }); }}>
+                            <Ionicons name="add" size={18} color="#ffffff" />
+                            <Text style={s.addBtnText}>New</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </View>
 

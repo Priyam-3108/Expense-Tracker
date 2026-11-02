@@ -553,7 +553,7 @@ function AnalyticsScreen() {
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                         <Text style={styles.title}>Analytics</Text>
                         <TouchableOpacity onPress={togglePrivacy} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                            <Ionicons name={isPrivate ? 'eye-off-outline' : 'eye-outline'} size={20} color={colors.primary} />
+                            <Ionicons name={isPrivate ? 'eye-off-outline' : 'eye-outline'} size={20} color={colors.text} />
                         </TouchableOpacity>
                     </View>
 

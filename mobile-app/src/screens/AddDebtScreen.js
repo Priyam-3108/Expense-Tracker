@@ -233,7 +233,7 @@ export default function AddDebtScreen({ navigation, route }) {
                             editable={!isEdit} // amount not editable in edit mode
                         />
                         {isRepay && debt && (
-                            <Text style={s.heroMeta}>Remaining: <Amount value={debt.currentAmount} currency="INR" style={s.heroMeta} /></Text>
+                            <Text style={s.heroMeta}>Remaining: <Amount value={debt.currentAmount} currency="INR" /></Text>
                         )}
                     </LinearGradient>
                 </View>
@@ -244,7 +244,7 @@ export default function AddDebtScreen({ navigation, route }) {
                         <Ionicons name="information-circle-outline" size={20} color={colors.success} />
                         <Text style={s.repayInfoText}>
                             Recording payment for <Text style={{ fontWeight: '600' }}>{debt.personName}</Text>.
-                            Original: <Amount value={debt.amount} currency="INR" style={s.repayInfoText} /> · Paid: <Amount value={debt.amount - debt.currentAmount} currency="INR" style={s.repayInfoText} />.
+                            Original: <Amount value={debt.amount} currency="INR" /> · Paid: <Amount value={debt.amount - debt.currentAmount} currency="INR" />.
                         </Text>
                     </View>
                 )}
