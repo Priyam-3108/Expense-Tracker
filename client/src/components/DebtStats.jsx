@@ -1,6 +1,6 @@
 import { ArrowTrendingUpIcon, ArrowTrendingDownIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../context/AuthContext';
-import { formatCurrency } from '../utils/helpers';
+import Amount from './Amount';
 
 export default function DebtStats({ debts }) {
     const { currency } = useAuth();
@@ -17,7 +17,7 @@ export default function DebtStats({ debts }) {
                     <div>
                         <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Total Payable</p>
                         <p className="text-2xl font-bold text-rose-600 dark:text-rose-400 mt-1">
-                            {formatCurrency(totalPayable, currency)}
+                            <Amount value={totalPayable} currency={currency} />
                         </p>
                         <p className="text-xs text-gray-500 dark:text-slate-500 mt-1">{borrowed.filter(d => d.status !== 'paid').length} active debts</p>
                     </div>
@@ -32,7 +32,7 @@ export default function DebtStats({ debts }) {
                     <div>
                         <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Total Receivable</p>
                         <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">
-                            {formatCurrency(totalReceivable, currency)}
+                            <Amount value={totalReceivable} currency={currency} />
                         </p>
                         <p className="text-xs text-gray-500 dark:text-slate-500 mt-1">{lent.filter(d => d.status !== 'paid').length} active loans</p>
                     </div>

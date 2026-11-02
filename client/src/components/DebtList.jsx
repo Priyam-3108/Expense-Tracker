@@ -3,7 +3,7 @@ import { PencilIcon, TrashIcon, BanknotesIcon } from '@heroicons/react/24/outlin
 import { Wallet } from 'lucide-react';
 import { useDebt } from '../context/DebtContext';
 import { useAuth } from '../context/AuthContext';
-import { formatCurrency } from '../utils/helpers';
+import Amount from './Amount';
 import DebtForm from './DebtForm';
 import RepaymentModal from './RepaymentModal';
 import EmptyState from './EmptyState';
@@ -65,12 +65,12 @@ export default function DebtList({ debts, type }) {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                                 <div className="text-sm text-gray-900 dark:text-white">
-                                    {formatCurrency(debt.amount, currency)}
+                                    <Amount value={debt.amount} currency={currency} />
                                 </div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                                 <div className="text-sm font-bold text-gray-900 dark:text-white">
-                                    {formatCurrency(debt.currentAmount, currency)}
+                                    <Amount value={debt.currentAmount} currency={currency} />
                                 </div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">

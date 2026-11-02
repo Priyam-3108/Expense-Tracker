@@ -3,7 +3,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon, BanknotesIcon, CalendarIcon, DocumentTextIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import { useDebt } from '../context/DebtContext';
 import { useAuth } from '../context/AuthContext';
-import { formatCurrency } from '../utils/helpers';
+import Amount from './Amount';
 import DatePicker from './DatePicker';
 
 export default function RepaymentModal({ isOpen, onClose, debt }) {
@@ -102,13 +102,13 @@ export default function RepaymentModal({ isOpen, onClose, debt }) {
                                         <div>
                                             <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Total Amount</p>
                                             <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">
-                                                {formatCurrency(debt.amount, currency)}
+                                                <Amount value={debt.amount} currency={currency} />
                                             </p>
                                         </div>
                                         <div>
                                             <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Remaining</p>
                                             <p className="text-lg font-bold text-green-600 dark:text-green-400 mt-1">
-                                                {formatCurrency(debt.currentAmount, currency)}
+                                                <Amount value={debt.currentAmount} currency={currency} />
                                             </p>
                                         </div>
                                     </div>
@@ -151,7 +151,7 @@ export default function RepaymentModal({ isOpen, onClose, debt }) {
                                             />
                                         </div>
                                         <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-                                            Maximum: {formatCurrency(debt.currentAmount, currency)}
+                                            Maximum: <Amount value={debt.currentAmount} currency={currency} />
                                         </p>
                                     </div>
 
