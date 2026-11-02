@@ -6,7 +6,7 @@ import { useTheme } from '../../context/ThemeContext';
 
 const screenWidth = Dimensions.get('window').width;
 
-function LineChart({ data, labels, height = 220, width }) {
+function LineChart({ data, labels, height = 220, width, hideValues = false }) {
     const { colors, isDark } = useTheme();
 
     // Validate data
@@ -62,7 +62,7 @@ function LineChart({ data, labels, height = 220, width }) {
                     chartConfig={chartConfig}
                     bezier
                     style={styles.chart}
-                    yAxisLabel="₹"
+                    yAxisLabel={hideValues ? '' : '₹'}
                     yAxisSuffix=""
                     fromZero
                 />

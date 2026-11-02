@@ -6,7 +6,7 @@ import { useTheme } from '../../context/ThemeContext';
 
 const screenWidth = Dimensions.get('window').width;
 
-function BarChart({ data, labels, height = 220, width }) {
+function BarChart({ data, labels, height = 220, width, hideValues = false }) {
     const { colors, isDark } = useTheme();
 
     // Validate data
@@ -54,9 +54,9 @@ function BarChart({ data, labels, height = 220, width }) {
                     height={height}
                     chartConfig={chartConfig}
                     style={styles.chart}
-                    showValuesOnTopOfBars
+                    showValuesOnTopOfBars={!hideValues}
                     fromZero
-                    yAxisLabel="₹"
+                    yAxisLabel={hideValues ? '' : '₹'}
                     yAxisSuffix=""
                 />
             </View>
