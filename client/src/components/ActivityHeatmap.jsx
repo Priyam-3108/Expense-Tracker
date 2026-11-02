@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { format, parseISO } from 'date-fns'
 import { useTheme } from '../context/ThemeContext'
+import { usePrivacy } from '../context/PrivacyContext'
 import { formatCurrency } from '../utils/helpers'
 
 const LIGHT = ['#F1F5F9', '#E0E7FF', '#A5B4FC', '#818CF8', '#6366F1']
@@ -21,6 +22,7 @@ export default function ActivityHeatmap({
   onCellClick,
 }) {
   const { theme } = useTheme()
+  const { isPrivate } = usePrivacy()
   const isDark =
     theme === 'dark' ||
     (theme === 'system' && typeof window !== 'undefined' &&
@@ -120,7 +122,7 @@ export default function ActivityHeatmap({
           style={{ left: hover.x + 28, top: hover.y - 4 }}
         >
           <div className="font-medium">{format(parseISO(hover.cell.date), 'EEE, MMM d, yyyy')}</div>
-          <div>{hover.cell.count} txn · {formatCurrency(hover.cell.expenseTotal, currency)}</div>
+          <div>{hover.cell.count} txn · {isPrivate ? '••••' : formatCurrency(hover.cell.expenseTotal, currency)}</div>
         </div>
       )}
     </div>
