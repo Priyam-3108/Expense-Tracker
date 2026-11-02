@@ -1,6 +1,7 @@
 import { Edit, Trash2 } from 'lucide-react'
-import { formatCurrency, formatDate } from '../utils/helpers'
+import { formatDate } from '../utils/helpers'
 import PaymentModeBadge from './PaymentModeBadge'
+import Amount from './Amount'
 
 /**
  * Mobile-optimised card view for a single expense row.
@@ -57,8 +58,7 @@ const MobileExpenseCard = ({ expense, currency, onEdit, onDelete }) => {
                   : 'text-rose-600 dark:text-rose-400'
               }`}
             >
-              {isIncome ? '+' : '-'}
-              {formatCurrency(expense.amount, currency)}
+              <Amount value={expense.amount} currency={currency} sign={isIncome ? '+' : '-'} />
             </span>
             <span
               className={`block mt-1 text-xs font-medium px-2 py-0.5 rounded-full ${

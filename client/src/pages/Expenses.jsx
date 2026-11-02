@@ -11,6 +11,8 @@ import ExportModal from '../components/ExportModal'
 import ImportModal from '../components/ImportModal'
 import MobileExpenseCard from '../components/MobileExpenseCard'
 import PaymentModeBadge from '../components/PaymentModeBadge'
+import Amount from '../components/Amount'
+import { usePrivacy } from '../context/PrivacyContext'
 import Modal from '../components/Modal'
 import AmountHero from '../components/form/AmountHero'
 import SegmentedToggle from '../components/form/SegmentedToggle'
@@ -80,6 +82,7 @@ function IndeterminateCheckbox({
 
 const Expenses = () => {
   const { user, currency } = useAuth()
+  const { isPrivate } = usePrivacy()
   const {
     expenses,
     categories,
@@ -637,7 +640,7 @@ const Expenses = () => {
         const isIncome = row.original.type === 'income'
         return (
           <span className={`font-medium ${isIncome ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
-            {isIncome ? '+' : '-'}{formatCurrency(amount, currency)}
+            <Amount value={amount} currency={currency} sign={isIncome ? '+' : '-'} />
           </span>
         )
       }
@@ -756,7 +759,7 @@ const Expenses = () => {
             <div>
               <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Total Expenses</p>
               <p className="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
-                {formatCurrency(totalExpenseAmount, currency)}
+                <Amount value={totalExpenseAmount} currency={currency} />
               </p>
             </div>
             <div className="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-500/10">
@@ -770,7 +773,7 @@ const Expenses = () => {
             <div>
               <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Total Income</p>
               <p className="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
-                {formatCurrency(totalIncomeAmount, currency)}
+                <Amount value={totalIncomeAmount} currency={currency} />
               </p>
             </div>
             <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-500/10">
@@ -787,7 +790,7 @@ const Expenses = () => {
                 className={`mt-1 text-2xl font-semibold ${netAmount >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
                   }`}
               >
-                {formatCurrency(Math.abs(netAmount), currency)}
+                <Amount value={Math.abs(netAmount)} currency={currency} />
               </p>
             </div>
           </div>
@@ -1057,10 +1060,10 @@ const Expenses = () => {
                               ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900/50'
                               : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300 hover:bg-rose-200 dark:hover:bg-rose-900/50'
                               }`}
-                            title={`${category?.name || 'Uncategorized'}: ${formatCurrency(expense.amount, currency)}`}
+                            title={`${category?.name || 'Uncategorized'}: ${isPrivate ? '••••••' : formatCurrency(expense.amount, currency)}`}
                           >
                             <span>{isIncome ? '+' : '-'}</span>
-                            {formatCurrency(expense.amount, currency)}
+                            <Amount value={expense.amount} currency={currency} />
                           </div>
                         )
                       })}
@@ -1075,7 +1078,7 @@ const Expenses = () => {
                     {dayExpenses.length > 0 && (
                       <div className={`hidden sm:block text-xs font-semibold mt-1 ${totalAmount >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
                         }`}>
-                        {totalAmount >= 0 ? '+' : ''}{formatCurrency(Math.abs(totalAmount), currency)}
+                        <Amount value={Math.abs(totalAmount)} currency={currency} sign={totalAmount >= 0 ? '+' : ''} />
                       </div>
                     )}
                   </div>
