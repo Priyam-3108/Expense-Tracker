@@ -1,5 +1,6 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { usePrivacy } from '../context/PrivacyContext'
 import {
   Home,
   CreditCard,
@@ -10,7 +11,9 @@ import {
   Menu,
   X,
   ChevronDown,
-  Wallet
+  Wallet,
+  Eye,
+  EyeOff
 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { cn } from '../utils/cn'
@@ -30,6 +33,7 @@ const currencySymbols = {
 
 const Layout = () => {
   const { user, logout, currency } = useAuth()
+  const { isPrivate, toggle: togglePrivacy } = usePrivacy()
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false)
@@ -193,6 +197,14 @@ const Layout = () => {
 
               {/* Right side - Theme, Profile */}
               <div className="flex items-center space-x-2 sm:space-x-3">
+                <button
+                  onClick={togglePrivacy}
+                  aria-label={isPrivate ? 'Show amounts' : 'Hide amounts'}
+                  title={isPrivate ? 'Show amounts' : 'Hide amounts'}
+                  className="p-2 rounded-xl text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-white/[0.06] hover:text-gray-700 dark:hover:text-white transition-all duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                >
+                  {isPrivate ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
                 <ThemeToggle />
 
                 {/* Profile Dropdown */}
