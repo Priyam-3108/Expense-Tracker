@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { usePrivacy } from '../context/PrivacyContext';
 import { toast } from 'react-hot-toast';
 
 const Profile = () => {
   const { user, updateProfile, changePassword } = useAuth();
+  const { setPrivate } = usePrivacy();
   const [activeTab, setActiveTab] = useState('profile');
   const [loading, setLoading] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
+  const [savingPrivacy, setSavingPrivacy] = useState(false);
+  const privacyDefault = !!user?.privacyModeDefault;
 
   const [profileForm, setProfileForm] = useState({ name: '', email: '', currency: 'USD' });
   const [passwordForm, setPasswordForm] = useState({
@@ -34,6 +38,16 @@ const Profile = () => {
       setLoading(false);
     }
   };
+
+  const handlePrivacyDefaultChange = async (next) => {
+    setSavingPrivacy(true)
+    setPrivate(next) // immediate effect this session
+    const result = await updateProfile({ privacyModeDefault: next })
+    if (!result.success) {
+      setPrivate(!next) // revert session — updateProfile already toasted the error
+    }
+    setSavingPrivacy(false)
+  }
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
@@ -152,6 +166,31 @@ const Profile = () => {
                 </button>
               </div>
             </form>
+
+            <div className="flex items-center justify-between py-3">
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">Hide amounts by default</p>
+                <p className="text-xs text-gray-500 dark:text-slate-500">
+                  Masks all monetary values across the app until you reveal them.
+                </p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={privacyDefault}
+                disabled={savingPrivacy}
+                onClick={() => handlePrivacyDefaultChange(!privacyDefault)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  privacyDefault ? 'bg-indigo-600' : 'bg-gray-300 dark:bg-white/[0.15]'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    privacyDefault ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
           </div>
         )}
 
