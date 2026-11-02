@@ -3,18 +3,10 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
+import Amount from './Amount';
 
 function SummaryCard({ title, amount = 0, icon, type = 'income', onPress }) {
     const { colors, borderRadius, shadows } = useTheme();
-
-    const formatAmount = (amt) => {
-        return new Intl.NumberFormat('en-IN', {
-            style: 'currency',
-            currency: 'INR',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-        }).format(amt);
-    };
 
     const isIncome = type === 'income';
     const iconName = icon || (isIncome ? 'trending-up' : 'trending-down');
@@ -61,9 +53,7 @@ function SummaryCard({ title, amount = 0, icon, type = 'income', onPress }) {
             {/* Bottom: label + amount */}
             <View style={styles.bottom}>
                 <Text style={[styles.title, { color: colors.subText }]}>{title}</Text>
-                <Text style={[styles.amount, { color: colors.text }]}>
-                    {formatAmount(amount)}
-                </Text>
+                <Amount value={amount} currency="INR" style={[styles.amount, { color: colors.text }]} />
             </View>
         </TouchableOpacity>
     );
