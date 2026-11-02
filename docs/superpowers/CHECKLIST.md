@@ -358,17 +358,73 @@ Spec: `specs/2026-09-10-privacy-mode-design.md`
 >   test than it could be. Not worth a fix.
 
 ### 3B · Web — `plans/2026-09-10-privacy-mode-3b-web.md`
-- [ ] Task 1: `PrivacyContext` (`isPrivate`, `toggle`, localStorage + user default seed)
-- [ ] Task 2: `<Amount>` component (mask vs formatted currency)
-- [ ] Task 3: Provider mounted in `App.jsx`
-- [ ] Task 4: Header eye/eye-off toggle
-- [ ] Task 5: Settings/Profile row (persists `privacyModeDefault` via API)
-- [ ] Task 6: Sweep `Dashboard` amount renders → `<Amount>`
-- [ ] Task 7: Sweep `Expenses` (list, cards, summary) → `<Amount>`
-- [ ] Task 8: Sweep `AnalyticsDashboard` (numbers + chart axis/tooltip suppression)
-- [ ] Task 9: Sweep `Debts` + `Budgets` → `<Amount>`
-- [ ] Task 10: Build + manual checklist (grep proves no raw renders remain)
-- [ ] **3B merged**
+- [x] Task 1: `PrivacyContext` (`isPrivate`, `toggle`, localStorage + user default seed)
+- [x] Task 2: `<Amount>` component (mask vs formatted currency)
+- [x] Task 3: Provider mounted in `App.jsx`
+- [x] Task 4: Header eye/eye-off toggle
+- [x] Task 5: Settings/Profile row (persists `privacyModeDefault` via API — 2
+  controller rulings, see notes)
+- [x] Task 6: Sweep `Dashboard` amount renders → `<Amount>`
+- [x] Task 7: Sweep `Expenses` + `MobileExpenseCard` → `<Amount>` (1 title=
+  attribute carve-out, see notes)
+- [x] Task 8: Sweep `AnalyticsDashboard` (numbers + chart axis/tooltip
+  suppression — 5 controller rulings, see notes)
+- [x] Task 9: Sweep `DebtList`/`DebtStats`/`RepaymentModal` (Budgets confirmed
+  absent on this branch, skipped)
+- [x] Task 10: Build + grep gates (found + fixed a real gap, see notes)
+- [x] **3B merged** (committed directly to `enhancement/expense-manager-parity`,
+  commits `a26e466`..`dbb8c08`)
+
+> **3B notes (2026-11-02):**
+> - Executed via `superpowers:subagent-driven-development` — 10 tasks, all
+>   approved clean on first per-task review pass. The largest and most
+>   complex phase in this program so far (10 tasks, ~11 files swept).
+> - **Reconciliation delegated to an Explore subagent given the breadth**,
+>   then independently spot-checked by the controller — found 6 real drift
+>   issues against the 2026-09-10 plan, resolved before dispatch:
+>   - Task 5: `AuthContext.updateProfile` never actually rejects (always
+>     resolves `{success, error?}`, already toasts internally on both paths)
+>     — the plan's try/catch handler would never catch a failure. Rewrote the
+>     handler to branch on `result.success`, dropped the plan's own toast
+>     calls (would have double-toasted).
+>   - Task 5: the currency `<select>` sits inside an unrelated form — moved
+>     the switch to a sibling after that form closes, not inside it.
+>   - Task 7: `Expenses.jsx`'s calendar day-cell `title={...}` attribute is a
+>     native string, not JSX — `<Amount>` (a React component) can't go there.
+>     Carved out as the one site using an inline `isPrivate`-guarded ternary
+>     instead; amended the grep gate's expected output accordingly.
+>   - Task 8 (`AnalyticsDashboard.jsx`, highest-risk task): two `YAxis`
+>     tickFormatters post-process with `.replace(/[^\d.-]/g, '')` to strip the
+>     currency symbol for compact axis labels — the guard had to preserve
+>     that, not just blank-or-format. One Tooltip formatter returns an array
+>     `[value, label]` for a 3-series chart — the guard had to wrap only the
+>     value expression, not replace the whole function (which would have
+>     broken 2 of 3 series' labels). Phase 1B's "Spending by payment method"
+>     chart (added after this plan was written) needed only its Tooltip
+>     guarded — its axes are non-currency and were left untouched. All five
+>     rulings independently verified character-for-character correct.
+> - **Task 10's own grep gate caught a real, unplanned gap**: `ActivityHeatmap.jsx`
+>   (created in Phase 2B, never in this plan's file list) had an unguarded
+>   `formatCurrency` in its hover-tooltip amount render — would have leaked
+>   real amounts under privacy mode. Fixed directly (3 lines), reviewed before
+>   committing, confirmed correct.
+> - **Final whole-phase review (Opus) found one more gap of the same shape**:
+>   `Categories.jsx` (also never in this plan's file list) hand-formats
+>   currency via a local `currencySymbols` map + `.toFixed(2)` instead of
+>   `formatCurrency` — invisible to both of this phase's grep gates. Routed
+>   through `<Amount>`. Also fixed a Minor mask-presentation inconsistency in
+>   `Expenses.jsx`'s calendar view. A follow-up `currencySymbols[` sanity grep
+>   across the whole codebase found no further leaks (5 hits, all decorative
+>   glyphs or input-field affixes) — independently spot-checked by the scoped
+>   re-reviewer.
+> - **Lesson carried forward for F4 (Accounts+Transfers)**: this plan's own
+>   grep-based "exhaustive" site list was derived the same way
+>   (`grep -rn "formatCurrency("`), which is why it missed two files that
+>   format currency by hand. Any future money-masking or money-formatting
+>   sweep should grep more broadly than one helper function name.
+> - No browser was available in this environment for any task — manual visual
+>   checks were not run and are handed to the human partner, same precedent as
+>   every prior web phase.
 
 ### 3C · Mobile — `plans/2026-09-10-privacy-mode-3c-mobile.md`
 - [ ] Task 1: `PrivacyContext` (AsyncStorage + user default seed)
