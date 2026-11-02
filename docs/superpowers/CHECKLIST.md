@@ -427,16 +427,97 @@ Spec: `specs/2026-09-10-privacy-mode-design.md`
 >   every prior web phase.
 
 ### 3C · Mobile — `plans/2026-09-10-privacy-mode-3c-mobile.md`
-- [ ] Task 1: `PrivacyContext` (AsyncStorage + user default seed)
-- [ ] Task 2: `<Amount>` RN component
-- [ ] Task 3: Provider in the app root
-- [ ] Task 4: Header toggle (icon) on main screens
-- [ ] Task 5: Sweep `DashboardScreen` + `BalanceCard`/`SummaryCard`
-- [ ] Task 6: Sweep transactions list + `TransactionItem`
-- [ ] Task 7: Sweep `AnalyticsScreen` + charts
-- [ ] Task 8: Sweep `DebtScreen` + `BudgetSettingsScreen`
-- [ ] Task 9: Manual smoke (toggle, kill+relaunch persists, dark mode)
-- [ ] **3C merged**
+- [x] Task 1: `PrivacyContext` (AsyncStorage + user default seed)
+- [x] Task 2: `<Amount>` RN component
+- [x] Task 3: Provider in the app root
+- [x] Task 4: Chart wrappers gain `hideValues` (Bar/Line/Pie)
+- [x] Task 5: Sweep `BalanceCard`/`SummaryCard`/`TransactionItem`/`ProgressBar` (1
+  controller ruling — removed a pre-existing dual-mask conflict, see notes)
+- [x] Task 6: Sweep `DashboardScreen`/`AnalyticsScreen`/`DebtScreen`/
+  `BudgetSettingsScreen` + header eye toggles (1 fix round — reactive masking +
+  regex bug, see notes)
+- [x] Task 7: "Hide amounts by default" Profile switch (1 implementer-caught
+  response-shape correction, see notes)
+- [x] Task 8: Grep gates + manual sweep (found + fixed a real gap, see notes)
+- [x] **3C merged** (committed directly to `enhancement/expense-manager-parity`,
+  commits `9a7522b`..`165d7fd`)
+
+> **3C notes (2026-11-02):**
+> - Executed via `superpowers:subagent-driven-development` — 8 tasks, all approved on
+>   first or second review pass. This phase's own plan file lists 8 tasks (not 9 —
+>   the final task is the manual-smoke/grep-gate verification step, same shape as 1C's
+>   and 2C's final tasks).
+> - **Reconciliation delegated to an Explore subagent given the breadth (13 files)**,
+>   then independently spot-checked by the controller on the two highest-stakes
+>   items — found 10 real drift issues against the 2026-09-10 plan, resolved before
+>   dispatch:
+>   - Task 5: `BalanceCard.js` already had its OWN local, independent privacy
+>     toggle (`isBalanceVisible` state + its own eye-icon button) predating this
+>     phase — blindly adding `<Amount>` would have created two competing mask
+>     mechanisms. Ruling: removed the local mechanism entirely, consolidated onto
+>     the global `PrivacyContext`.
+>   - Task 6 (`DashboardScreen.js`/`AnalyticsScreen.js`, highest-risk task): the
+>     plan's cited line numbers and site counts were stale (e.g. a `₹${...}`
+>     interpolation was at line 406, not ~370; Analytics had 5 message-construction
+>     sites, not 4). Controller delegated a second, narrower Explore pass to extract
+>     exact verbatim current code before dispatching, rather than trusting the
+>     plan's snippets directly — same discipline Phase 1B/2B used for drifted plans.
+>   - Task 7 (`ProfileScreen.js`): the plan invented styles
+>     (`settingRow`/`settingLabel`/`settingHint`) that don't exist in this file —
+>     reused the existing `menuItem`/`toggle`/`toggleThumb` pattern already used by
+>     the Theme toggle instead.
+> - **A controller ruling about `authService.updateProfile`'s response shape was
+>   itself wrong, and the Task 7 implementer caught it.** The controller's dispatch
+>   instructed `res.data?.data?.user`; the implementer independently traced the
+>   actual call chain (`authService.updateProfile` already does `return
+>   response.data`, unwrapping the axios envelope once before the caller ever sees
+>   it) and used `res.data?.user` instead, with a Node-script simulation to prove
+>   it. The task reviewer and, independently, the final whole-phase reviewer both
+>   re-verified this by reading the server controller and `authService.js`
+>   directly — the implementer's correction was right. Had it shipped as
+>   originally instructed, the Profile privacy-default switch would have silently
+>   failed to sync `AuthContext`/AsyncStorage on every successful save. A genuine
+>   example of a subagent correctly overriding a controller instruction with
+>   verified evidence.
+> - **Task 6's own fix loop (round 1/5)**: the first-pass `AnalyticsScreen.js`
+>   insight-message masking was applied at message-CONSTRUCTION time (frozen into
+>   state), not reactive to the privacy toggle — turning privacy ON didn't re-mask
+>   already-loaded insight strings until the next refetch, a real leak on the exact
+>   screen the task instruments. Fixed by moving the mask to the render site. Same
+>   round also fixed a regex bug (`\s` in the character class ate the trailing
+>   space after every masked amount).
+> - **Task 8's own grep gate (run directly by the controller, not delegated)
+>   caught a real, unplanned gap**: `AddDebtScreen.js` (never in this plan's
+>   13-file scope) had 3 genuinely unmasked debt-amount displays (an `Alert`, a
+>   "Remaining:" meta line, an "Original/Paid" info line) — found by running a
+>   broader-than-planned `grep -rln "₹"` sweep, the same lesson Phase 3B's notes
+>   explicitly carried forward. Fixed directly, reviewed before committing.
+> - **Final whole-phase review (Opus) found one more real, mergeable issue**: 3
+>   nested `<Amount>` calls had been given their parent `<Text>`'s FULL style
+>   object, including layout props (`flex: 1`, `marginTop`) that RN mishandles on
+>   an inline nested child. Fixed in a consolidated fix wave alongside 2 bundled
+>   Minor triage items (DebtScreen's new eye icon landing mid-header instead of
+>   grouped with the add button; a trivial icon-color consistency fix on
+>   Analytics) and one free cleanup (DebtScreen's dead `fmt` helper, 0 callers).
+>   Reviewer explicitly triaged 4 other Minor findings as ship-as-is (a dead
+>   `ProgressBar.js` file nobody calls; a missing haptic tap; a cosmetic
+>   `BudgetSettingsScreen` header margin; `BalanceCard`'s rupee glyph rendering
+>   larger as the direct, intended consequence of the Task 5 ruling) and
+>   re-affirmed Task 1's hydration-race ruling from the per-task review.
+> - **Lesson reconfirmed from Phase 3B, now proven twice**: grep gates scoped to
+>   specific helper names (`formatAmount`/`Intl.NumberFormat`) missed a real gap
+>   (`AddDebtScreen.js`) both times a phase ran a broader `₹`-literal sweep as a
+>   second pass. Recommend this broader-net second pass become a standing step for
+>   F4's money-related work, not just a one-off lesson.
+> - **No emulator/device available in this environment** for any task — every
+>   verification was static (babel/AST parse checks, grep, direct code reading),
+>   consistent with every prior mobile phase in this program. The plan's Task 8
+>   manual on-device sweep was **not run** — handed to the human partner. The final
+>   reviewer specifically flagged that no layout change in this phase has been
+>   seen on a real screen, and recommended the human partner's first device pass
+>   prioritize `BalanceCard`, the `DebtScreen` header, and `AddDebtScreen`'s repay
+>   mode.
+> - **Feature 3 (Privacy Mode) is now complete across API + Web + Mobile.**
 
 ---
 
