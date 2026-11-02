@@ -1,5 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useTheme } from '../context/ThemeContext'
+import { usePrivacy } from '../context/PrivacyContext'
+import Amount from './Amount'
 import DateRangePicker from './DateRangePicker'
 import CategorySelector from './CategorySelector'
 import { formatCurrency, formatDateForInput, calculatePercentage, getCurrentMonthRange, getLast30DaysRange } from '../utils/helpers'
@@ -48,6 +50,7 @@ const AnalyticsDashboard = ({
     shareEnabled = false
 }) => {
     const { theme } = useTheme()
+    const { isPrivate } = usePrivacy()
     const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
 
     const [paymentModeData, setPaymentModeData] = useState([])
@@ -471,7 +474,7 @@ const AnalyticsDashboard = ({
                         <div>
                             <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-slate-400">Total Expenses</p>
                             <p className="mt-1 text-lg sm:text-2xl font-bold text-gray-900 dark:text-white leading-tight">
-                                {formatCurrency(summary.totalExpenses, currency)}
+                                <Amount value={summary.totalExpenses} currency={currency} />
                             </p>
                             <p className="mt-1 text-xs text-gray-500 dark:text-slate-500">
                                 {summary.expenseCount} transaction{summary.expenseCount !== 1 ? 's' : ''}
@@ -488,7 +491,7 @@ const AnalyticsDashboard = ({
                         <div>
                             <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-slate-400">Total Income</p>
                             <p className="mt-1 text-lg sm:text-2xl font-bold text-gray-900 dark:text-white leading-tight">
-                                {formatCurrency(summary.totalIncome, currency)}
+                                <Amount value={summary.totalIncome} currency={currency} />
                             </p>
                             <p className="mt-1 text-xs text-gray-500 dark:text-slate-500">
                                 {summary.incomeCount} transaction{summary.incomeCount !== 1 ? 's' : ''}
@@ -512,7 +515,7 @@ const AnalyticsDashboard = ({
                             </p>
                             <p className={`mt-1 text-lg sm:text-2xl font-bold leading-tight ${summary.netAmount >= 0 ? 'text-emerald-900 dark:text-emerald-100' : 'text-rose-900 dark:text-rose-100'
                                 }`}>
-                                {formatCurrency(Math.abs(summary.netAmount), currency)}
+                                <Amount value={Math.abs(summary.netAmount)} currency={currency} />
                             </p>
                             <div className="mt-1 flex items-center gap-1">
                                 {summary.netAmount >= 0 ? (
@@ -538,7 +541,7 @@ const AnalyticsDashboard = ({
                         <div>
                             <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Avg Daily Spending</p>
                             <p className="mt-1 text-lg sm:text-2xl font-bold text-gray-900 dark:text-white leading-tight">
-                                {formatCurrency(summary.avgDailyExpense, currency)}
+                                <Amount value={summary.avgDailyExpense} currency={currency} />
                             </p>
                             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                                 Over {summary.daysDiff} day{summary.daysDiff !== 1 ? 's' : ''}
@@ -588,7 +591,7 @@ const AnalyticsDashboard = ({
                                 <YAxis
                                     stroke="#6B7280"
                                     tick={{ fontSize: 12 }}
-                                    tickFormatter={(value) => formatCurrency(value, currency).replace(/[^\d.-]/g, '')}
+                                    tickFormatter={(value) => (isPrivate ? '' : formatCurrency(value, currency).replace(/[^\d.-]/g, ''))}
                                 />
                                 <Tooltip
                                     contentStyle={{
@@ -601,7 +604,7 @@ const AnalyticsDashboard = ({
                                     }}
                                     itemStyle={{ color: '#F3F4F6' }}
                                     formatter={(value, name) => [
-                                        formatCurrency(value, currency),
+                                        isPrivate ? '••••' : formatCurrency(value, currency),
                                         name === 'expenses' ? 'Expenses' : name === 'income' ? 'Income' : 'Net'
                                     ]}
                                 />
@@ -674,7 +677,7 @@ const AnalyticsDashboard = ({
                                         boxShadow: '0 12px 40px rgba(0,0,0,0.4)'
                                     }}
                                     itemStyle={{ color: '#F3F4F6' }}
-                                    formatter={(value) => formatCurrency(value, currency)}
+                                    formatter={(value) => (isPrivate ? '••••' : formatCurrency(value, currency))}
                                 />
                             </PieChart>
                         </ResponsiveContainer>
@@ -720,7 +723,7 @@ const AnalyticsDashboard = ({
                                             tickLine={false}
                                         />
                                         <Tooltip
-                                            formatter={(v) => formatCurrency(v, currency)}
+                                            formatter={(v) => (isPrivate ? '••••' : formatCurrency(v, currency))}
                                             cursor={{ fill: 'transparent' }}
                                         />
                                         <Bar dataKey="total" radius={[0, 6, 6, 0]}>
@@ -757,7 +760,7 @@ const AnalyticsDashboard = ({
                                 <YAxis
                                     stroke={isDark ? '#9CA3AF' : '#4B5563'}
                                     tick={{ fontSize: 12, fill: isDark ? '#9CA3AF' : '#4B5563' }}
-                                    tickFormatter={(value) => formatCurrency(value, currency).replace(/[^\d.-]/g, '')}
+                                    tickFormatter={(value) => (isPrivate ? '' : formatCurrency(value, currency).replace(/[^\d.-]/g, ''))}
                                 />
                                 <Tooltip
                                     contentStyle={{
@@ -769,7 +772,7 @@ const AnalyticsDashboard = ({
                                         color: '#F3F4F6'
                                     }}
                                     itemStyle={{ color: '#F3F4F6' }}
-                                    formatter={(value) => formatCurrency(value, currency)}
+                                    formatter={(value) => (isPrivate ? '••••' : formatCurrency(value, currency))}
                                     cursor={{ fill: isDark ? '#374151' : '#F3F4F6', opacity: 0.4 }}
                                 />
                                 <Legend
@@ -826,7 +829,7 @@ const AnalyticsDashboard = ({
                                                 </div>
                                             </div>
                                             <div className="text-right">
-                                                <p className="font-semibold text-gray-900 dark:text-white">{formatCurrency(category.value, currency)}</p>
+                                                <p className="font-semibold text-gray-900 dark:text-white"><Amount value={category.value} currency={currency} /></p>
                                                 <p className="text-xs text-gray-500 dark:text-gray-400">{percentage}%</p>
                                             </div>
                                         </div>
@@ -876,7 +879,7 @@ const AnalyticsDashboard = ({
                                 <div className="min-w-0">
                                     <p className="text-xs sm:text-sm font-semibold text-emerald-900 dark:text-emerald-100">Avg Daily Spending</p>
                                     <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-0.5 leading-snug">
-                                        {formatCurrency(summary.avgDailyExpense, currency)} per day
+                                        <Amount value={summary.avgDailyExpense} currency={currency} /> per day
                                     </p>
                                 </div>
                             </div>
@@ -890,7 +893,7 @@ const AnalyticsDashboard = ({
                                 <div className="min-w-0">
                                     <p className="text-xs sm:text-sm font-semibold text-purple-900 dark:text-purple-100">Top Category</p>
                                     <p className="text-xs text-purple-700 dark:text-purple-300 mt-0.5 leading-snug">
-                                        <span className="font-medium">{topCategories[0]?.name}</span> — {formatCurrency(topCategories[0]?.value || 0, currency)}
+                                        <span className="font-medium">{topCategories[0]?.name}</span> — <Amount value={topCategories[0]?.value || 0} currency={currency} />
                                     </p>
                                 </div>
                             </div>
@@ -904,7 +907,7 @@ const AnalyticsDashboard = ({
                                 <div className="min-w-0">
                                     <p className="text-xs sm:text-sm font-semibold text-rose-900 dark:text-rose-100">Spending Alert</p>
                                     <p className="text-xs text-rose-700 dark:text-rose-300 mt-0.5 leading-snug">
-                                        Expenses exceed income by {formatCurrency(Math.abs(summary.netAmount), currency)}
+                                        Expenses exceed income by <Amount value={Math.abs(summary.netAmount)} currency={currency} />
                                     </p>
                                 </div>
                             </div>
@@ -918,7 +921,7 @@ const AnalyticsDashboard = ({
                                 <div className="min-w-0">
                                     <p className="text-xs sm:text-sm font-semibold text-emerald-900 dark:text-emerald-100">Positive Balance</p>
                                     <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-0.5 leading-snug">
-                                        Net balance of {formatCurrency(summary.netAmount, currency)} 🎉
+                                        Net balance of <Amount value={summary.netAmount} currency={currency} /> 🎉
                                     </p>
                                 </div>
                             </div>
