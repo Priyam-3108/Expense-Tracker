@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import { ExpenseProvider } from './context/ExpenseContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { DebtProvider } from './context/DebtContext'
+import { PrivacyProvider } from './context/PrivacyContext'
 import Layout from './components/Layout'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
@@ -91,11 +92,13 @@ function App() {
   return (
     <AuthProvider>
       <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-        <ExpenseProvider>
-          <DebtProvider>
-            <AppRoutes />
-          </DebtProvider>
-        </ExpenseProvider>
+        <PrivacyProvider>
+          <ExpenseProvider>
+            <DebtProvider>
+              <AppRoutes />
+            </DebtProvider>
+          </ExpenseProvider>
+        </PrivacyProvider>
       </ThemeProvider>
     </AuthProvider>
   )
