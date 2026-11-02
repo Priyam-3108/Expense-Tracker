@@ -8,6 +8,7 @@ import Modal from '../components/Modal'
 import SectionLabel from '../components/form/SectionLabel'
 import FieldCard from '../components/form/FieldCard'
 import StickyFormFooter from '../components/form/StickyFormFooter'
+import Amount from '../components/Amount'
 
 const currencySymbols = {
   USD: '$',
@@ -474,7 +475,7 @@ const Categories = () => {
                     </div>
                     <div className="text-right ml-2 flex-shrink-0">
                       <div className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
-                        {currencySymbols[currency] || '$'} {stat.totalAmount.toFixed(2)}
+                        <Amount value={stat.totalAmount} currency={currency} />
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400">
                         {((stat.totalAmount / categoryStats.reduce((sum, s) => sum + s.totalAmount, 0)) * 100).toFixed(1)}%

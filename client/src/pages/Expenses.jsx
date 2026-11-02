@@ -1062,8 +1062,7 @@ const Expenses = () => {
                               }`}
                             title={`${category?.name || 'Uncategorized'}: ${isPrivate ? '••••••' : formatCurrency(expense.amount, currency)}`}
                           >
-                            <span>{isIncome ? '+' : '-'}</span>
-                            <Amount value={expense.amount} currency={currency} />
+                            <Amount value={expense.amount} currency={currency} sign={isIncome ? '+' : '-'} />
                           </div>
                         )
                       })}
