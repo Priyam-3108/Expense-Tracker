@@ -18,7 +18,7 @@ import { usePrivacy } from '../context/PrivacyContext';
 function AnalyticsScreen() {
     const { colors, isDark, spacing, borderRadius, shadows } = useTheme();
     const { isPrivate, toggle: togglePrivacy } = usePrivacy();
-    const maskMoney = (msg) => isPrivate ? msg.replace(/₹[\d,.\s]+/g, '₹••••') : msg;
+    const maskMoney = (msg) => isPrivate ? msg.replace(/₹[\d,.]+/g, '₹••••') : msg;
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [selectedPeriod, setSelectedPeriod] = useState('month'); // 'week', 'month', '3months', '6months', 'year', 'custom'
@@ -228,7 +228,7 @@ function AnalyticsScreen() {
                 {
                     icon: 'restaurant',
                     title: 'Top Category: Food',
-                    message: maskMoney('You spent ₹8,000 on food this month, 36% of total expenses'),
+                    message: 'You spent ₹8,000 on food this month, 36% of total expenses',
                     type: 'info',
                 },
                 {
@@ -255,7 +255,7 @@ function AnalyticsScreen() {
             insights.push({
                 icon: 'star',
                 title: `Top Category: ${topCategory.category?.name || 'Unknown'}`,
-                message: maskMoney(`You spent ₹${topCategory.totalAmount?.toFixed(0) || 0} on ${topCategory.category?.name || 'this category'} (${percentage}% of total)`),
+                message: `You spent ₹${topCategory.totalAmount?.toFixed(0) || 0} on ${topCategory.category?.name || 'this category'} (${percentage}% of total)`,
                 type: 'info',
             });
         }
@@ -267,7 +267,7 @@ function AnalyticsScreen() {
                 insights.push({
                     icon: 'wallet',
                     title: 'Total Spending',
-                    message: maskMoney(`₹${totalExpenses.toFixed(0)} across ${expenseCount} transactions (Avg: ₹${avgExpenseAmount?.toFixed(0) || 0})`),
+                    message: `₹${totalExpenses.toFixed(0)} across ${expenseCount} transactions (Avg: ₹${avgExpenseAmount?.toFixed(0) || 0})`,
                     type: 'info',
                 });
             }
@@ -293,7 +293,7 @@ function AnalyticsScreen() {
             insights.push({
                 icon: 'calendar',
                 title: 'Daily Average',
-                message: maskMoney(`You spend an average of ₹${data.summary.avgDailyExpense.toFixed(0)} per day`),
+                message: `You spend an average of ₹${data.summary.avgDailyExpense.toFixed(0)} per day`,
                 type: 'info',
             });
         }
@@ -715,7 +715,7 @@ function AnalyticsScreen() {
                                     key={index}
                                     icon={insight.icon}
                                     title={insight.title}
-                                    message={insight.message}
+                                    message={maskMoney(insight.message)}
                                     type={insight.type}
                                     trend={insight.trend}
                                 />
