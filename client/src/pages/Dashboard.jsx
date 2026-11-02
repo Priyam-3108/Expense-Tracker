@@ -6,7 +6,7 @@ import { useDebt } from '../context/DebtContext'
 import { useDailyActivity } from '../hooks/useDailyActivity'
 import ActivityHeatmap from '../components/ActivityHeatmap'
 import { expenseService } from '../services/expenseService'
-import { formatCurrency } from '../utils/helpers'
+import Amount from '../components/Amount'
 import { format } from 'date-fns'
 import {
   TrendingUp,
@@ -109,7 +109,7 @@ const Dashboard = () => {
               />
               <span className="text-slate-400">{entry.name}:</span>
               <span className="font-medium text-white">
-                {formatCurrency(entry.value, currency)}
+                <Amount value={entry.value} currency={currency} />
               </span>
             </p>
           ))}
@@ -162,7 +162,7 @@ const Dashboard = () => {
               <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mt-1 md:mt-2">
                 {loading ? (
                   <span className="inline-block w-24 h-8 rounded-lg animate-pulse bg-gray-100 dark:bg-white/[0.06]" />
-                ) : formatCurrency(totalExpenses, currency)}
+                ) : <Amount value={totalExpenses} currency={currency} />}
               </p>
             </div>
             <div className="p-2.5 md:p-3 rounded-xl bg-rose-50 dark:bg-rose-500/10 group-hover:shadow-glow-rose transition-all duration-300">
@@ -179,7 +179,7 @@ const Dashboard = () => {
               <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mt-1 md:mt-2">
                 {loading ? (
                   <span className="inline-block w-24 h-8 rounded-lg animate-pulse bg-gray-100 dark:bg-white/[0.06]" />
-                ) : formatCurrency(totalIncome, currency)}
+                ) : <Amount value={totalIncome} currency={currency} />}
               </p>
             </div>
             <div className="p-2.5 md:p-3 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 group-hover:shadow-glow-emerald transition-all duration-300">
@@ -200,7 +200,7 @@ const Dashboard = () => {
               }`}>
                 {loading ? (
                   <span className="inline-block w-24 h-8 rounded-lg animate-pulse bg-gray-100 dark:bg-white/[0.06]" />
-                ) : formatCurrency(netAmount, currency)}
+                ) : <Amount value={netAmount} currency={currency} />}
               </p>
             </div>
             <div className="p-2.5 md:p-3 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 group-hover:shadow-glow-indigo transition-all duration-300">
@@ -216,7 +216,7 @@ const Dashboard = () => {
               <div>
                 <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Outstanding Payable</p>
                 <p className="text-2xl md:text-3xl font-bold text-rose-600 dark:text-rose-400 mt-1 md:mt-2">
-                  {formatCurrency(totalPayable, currency)}
+                  <Amount value={totalPayable} currency={currency} />
                 </p>
               </div>
               <div className="p-2.5 md:p-3 rounded-xl bg-amber-50 dark:bg-amber-500/10 group-hover:shadow-[0_0_20px_rgba(251,191,36,0.12)] transition-all duration-300">
@@ -233,7 +233,7 @@ const Dashboard = () => {
               <div>
                 <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Outstanding Receivable</p>
                 <p className="text-2xl md:text-3xl font-bold text-emerald-600 dark:text-emerald-400 mt-1 md:mt-2">
-                  {formatCurrency(totalReceivable, currency)}
+                  <Amount value={totalReceivable} currency={currency} />
                 </p>
               </div>
               <div className="p-2.5 md:p-3 rounded-xl bg-teal-50 dark:bg-teal-500/10 group-hover:shadow-glow-emerald transition-all duration-300">
@@ -464,7 +464,7 @@ const Dashboard = () => {
                         ? 'text-emerald-600 dark:text-emerald-400'
                         : 'text-rose-600 dark:text-rose-400'
                     }`}>
-                      {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount, currency)}
+                      <Amount value={transaction.amount} currency={currency} sign={transaction.type === 'income' ? '+' : '-'} />
                     </span>
                   </div>
                 ))
