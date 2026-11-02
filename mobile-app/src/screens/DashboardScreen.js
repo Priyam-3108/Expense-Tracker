@@ -19,10 +19,12 @@ import { syncEngine } from '../services/syncEngine';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { buildHeatmapGrid } from '../utils/heatmapGrid';
 import ActivityHeatmap from '../components/ActivityHeatmap';
+import { usePrivacy } from '../context/PrivacyContext';
 
 export default function DashboardScreen({ navigation }) {
   const { signOut, user } = useContext(AuthContext);
   const { toggleTheme, isDark, colors, spacing } = useTheme();
+  const { isPrivate, toggle: togglePrivacy } = usePrivacy();
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -246,6 +248,12 @@ export default function DashboardScreen({ navigation }) {
         </View>
         <View style={styles.headerActions}>
           <TouchableOpacity
+            onPress={() => { hapticFeedback.light(); togglePrivacy(); }}
+            style={[styles.iconButton, { backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1 }]}
+          >
+            <Ionicons name={isPrivate ? 'eye-off-outline' : 'eye-outline'} size={18} color={colors.text} />
+          </TouchableOpacity>
+          <TouchableOpacity
             onPress={() => {
               hapticFeedback.light();
               toggleTheme(isDark ? 'light' : 'dark');
@@ -403,7 +411,7 @@ export default function DashboardScreen({ navigation }) {
         visible={showActionSheet}
         onClose={() => setShowActionSheet(false)}
         title="Transaction Options"
-        subtitle={selectedExpense ? `${selectedExpense.category?.name || 'Uncategorized'} - ₹${selectedExpense.amount}` : ''}
+        subtitle={selectedExpense ? `${selectedExpense.category?.name || 'Uncategorized'} - ${isPrivate ? '••••••' : '₹' + selectedExpense.amount}` : ''}
         options={[
           {
             text: 'Edit Transaction',

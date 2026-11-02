@@ -10,12 +10,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { debtService } from '../services/debtService';
 import hapticFeedback from '../utils/haptics';
+import { usePrivacy } from '../context/PrivacyContext';
+import Amount from '../components/Amount';
 
 const fmt = (n) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(n || 0);
-const fmtShort = (n) => new Intl.NumberFormat('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(n || 0);
 
 function DebtScreen({ navigation }) {
     const { colors, isDark, shadows, borderRadius } = useTheme();
+    const { isPrivate, toggle: togglePrivacy } = usePrivacy();
     const insets = useSafeAreaInsets();
     const [debts, setDebts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -228,9 +230,9 @@ function DebtScreen({ navigation }) {
 
                     {/* Right: Amount */}
                     <View style={s.cardRight}>
-                        <Text style={[s.debtAmount, { color: typeColor }]}>₹{fmtShort(debt.currentAmount)}</Text>
+                        <Amount value={debt.currentAmount} currency="INR" style={[s.debtAmount, { color: typeColor }]} />
                         {debt.currentAmount !== debt.amount && (
-                            <Text style={s.debtOriginal}>of ₹{fmtShort(debt.amount)}</Text>
+                            <Text style={s.debtOriginal}>of <Amount value={debt.amount} currency="INR" style={s.debtOriginal} /></Text>
                         )}
                     </View>
                 </View>
@@ -290,6 +292,9 @@ function DebtScreen({ navigation }) {
             <View style={s.header}>
                 <View style={s.headerRow}>
                     <Text style={s.title}>Debts</Text>
+                    <TouchableOpacity onPress={togglePrivacy} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} style={{ marginRight: 12 }}>
+                        <Ionicons name={isPrivate ? 'eye-off-outline' : 'eye-outline'} size={20} color={colors.text} />
+                    </TouchableOpacity>
                     <TouchableOpacity style={s.addBtn} onPress={() => { hapticFeedback.medium(); navigation.navigate('AddDebt', { mode: 'add' }); }}>
                         <Ionicons name="add" size={18} color="#ffffff" />
                         <Text style={s.addBtnText}>New</Text>
@@ -302,14 +307,14 @@ function DebtScreen({ navigation }) {
                 <View style={s.summaryCard}>
                     <LinearGradient colors={['#c71852', '#ea2261']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.summaryGradient}>
                         <Text style={s.summaryLabel}>You Owe</Text>
-                        <Text style={s.summaryAmount}>₹{fmtShort(totalBorrowed)}</Text>
+                        <Amount value={totalBorrowed} currency="INR" style={s.summaryAmount} />
                         <Text style={s.summaryMeta}>{debts.filter(d => d.type === 'borrowed' && d.status !== 'paid').length} active</Text>
                     </LinearGradient>
                 </View>
                 <View style={s.summaryCard}>
                     <LinearGradient colors={['#059669', '#10b981']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.summaryGradient}>
                         <Text style={s.summaryLabel}>Owed To You</Text>
-                        <Text style={s.summaryAmount}>₹{fmtShort(totalLent)}</Text>
+                        <Amount value={totalLent} currency="INR" style={s.summaryAmount} />
                         <Text style={s.summaryMeta}>{debts.filter(d => d.type === 'lent' && d.status !== 'paid').length} active</Text>
                     </LinearGradient>
                 </View>

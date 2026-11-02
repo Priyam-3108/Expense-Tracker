@@ -13,9 +13,12 @@ import InsightCard from '../components/InsightCard';
 import { SkeletonCard } from '../components/SkeletonLoader';
 import hapticFeedback from '../utils/haptics';
 import { PAYMENT_MODES } from '../constants/paymentModes';
+import { usePrivacy } from '../context/PrivacyContext';
 
 function AnalyticsScreen() {
     const { colors, isDark, spacing, borderRadius, shadows } = useTheme();
+    const { isPrivate, toggle: togglePrivacy } = usePrivacy();
+    const maskMoney = (msg) => isPrivate ? msg.replace(/₹[\d,.\s]+/g, '₹••••') : msg;
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [selectedPeriod, setSelectedPeriod] = useState('month'); // 'week', 'month', '3months', '6months', 'year', 'custom'
@@ -225,7 +228,7 @@ function AnalyticsScreen() {
                 {
                     icon: 'restaurant',
                     title: 'Top Category: Food',
-                    message: 'You spent ₹8,000 on food this month, 36% of total expenses',
+                    message: maskMoney('You spent ₹8,000 on food this month, 36% of total expenses'),
                     type: 'info',
                 },
                 {
@@ -252,7 +255,7 @@ function AnalyticsScreen() {
             insights.push({
                 icon: 'star',
                 title: `Top Category: ${topCategory.category?.name || 'Unknown'}`,
-                message: `You spent ₹${topCategory.totalAmount?.toFixed(0) || 0} on ${topCategory.category?.name || 'this category'} (${percentage}% of total)`,
+                message: maskMoney(`You spent ₹${topCategory.totalAmount?.toFixed(0) || 0} on ${topCategory.category?.name || 'this category'} (${percentage}% of total)`),
                 type: 'info',
             });
         }
@@ -264,7 +267,7 @@ function AnalyticsScreen() {
                 insights.push({
                     icon: 'wallet',
                     title: 'Total Spending',
-                    message: `₹${totalExpenses.toFixed(0)} across ${expenseCount} transactions (Avg: ₹${avgExpenseAmount?.toFixed(0) || 0})`,
+                    message: maskMoney(`₹${totalExpenses.toFixed(0)} across ${expenseCount} transactions (Avg: ₹${avgExpenseAmount?.toFixed(0) || 0})`),
                     type: 'info',
                 });
             }
@@ -290,7 +293,7 @@ function AnalyticsScreen() {
             insights.push({
                 icon: 'calendar',
                 title: 'Daily Average',
-                message: `You spend an average of ₹${data.summary.avgDailyExpense.toFixed(0)} per day`,
+                message: maskMoney(`You spend an average of ₹${data.summary.avgDailyExpense.toFixed(0)} per day`),
                 type: 'info',
             });
         }
@@ -468,12 +471,12 @@ function AnalyticsScreen() {
             const minWidth = Math.max(labels.length * 60, 320);
             return (
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                    <BarChart data={data} labels={labels} width={minWidth} />
+                    <BarChart data={data} labels={labels} width={minWidth} hideValues={isPrivate} />
                 </ScrollView>
             );
         } else if (chartType === 'pie') {
             // Fixed size pie chart without horizontal scroll
-            return <PieChart data={analyticsData.categoryBreakdown} height={175} />;
+            return <PieChart data={analyticsData.categoryBreakdown} height={175} hideValues={isPrivate} />;
         } else {
             // For line chart, aggregate daily data into weekly data for better visualization
             const dailyData = analyticsData.spendingTrend;
@@ -509,7 +512,7 @@ function AnalyticsScreen() {
             const minWidth = Math.max(aggregatedLabels.length * 50, 320);
             return (
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                    <LineChart data={aggregatedData} labels={aggregatedLabels} width={minWidth} />
+                    <LineChart data={aggregatedData} labels={aggregatedLabels} width={minWidth} hideValues={isPrivate} />
                 </ScrollView>
             );
         }
@@ -547,7 +550,12 @@ function AnalyticsScreen() {
                 }
             >
                 <View style={styles.header}>
-                    <Text style={styles.title}>Analytics</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Text style={styles.title}>Analytics</Text>
+                        <TouchableOpacity onPress={togglePrivacy} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                            <Ionicons name={isPrivate ? 'eye-off-outline' : 'eye-outline'} size={20} color={colors.primary} />
+                        </TouchableOpacity>
+                    </View>
 
                     {/* Period Selector */}
                     <View style={styles.periodSelector}>
@@ -691,6 +699,7 @@ function AnalyticsScreen() {
                                         data={pmData.values}
                                         labels={pmData.labels}
                                         width={Math.max(pmData.labels.length * 60, Dimensions.get('window').width - 48)}
+                                        hideValues={isPrivate}
                                     />
                                 </ScrollView>
                             </View>

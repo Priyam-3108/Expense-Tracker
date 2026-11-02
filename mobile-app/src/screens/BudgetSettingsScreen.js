@@ -3,14 +3,16 @@ import { View, Text, TextInput, StyleSheet, StatusBar, TouchableOpacity, ScrollV
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import hapticFeedback from '../utils/haptics';
+import { usePrivacy } from '../context/PrivacyContext';
 
 function BudgetSettingsScreen({ navigation }) {
     const { colors, isDark } = useTheme();
+    const { isPrivate, toggle: togglePrivacy } = usePrivacy();
     const [monthlyBudget, setMonthlyBudget] = useState('50000');
 
     const handleSave = () => {
         hapticFeedback.medium();
-        Alert.alert('Budget Saved', `Monthly budget updated to ₹${monthlyBudget}`);
+        Alert.alert('Budget Saved', `Monthly budget updated to ${isPrivate ? '••••••' : '₹' + monthlyBudget}`);
     };
 
     const styles = StyleSheet.create({
@@ -23,6 +25,7 @@ function BudgetSettingsScreen({ navigation }) {
         header: {
             flexDirection: 'row',
             alignItems: 'center',
+            justifyContent: 'space-between',
             marginBottom: 24,
         },
         backButton: {
@@ -97,6 +100,9 @@ function BudgetSettingsScreen({ navigation }) {
                     <Ionicons name="arrow-back" size={20} color={colors.text} />
                 </TouchableOpacity>
                 <Text style={styles.title}>Budget Settings</Text>
+                <TouchableOpacity onPress={togglePrivacy} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                    <Ionicons name={isPrivate ? 'eye-off-outline' : 'eye-outline'} size={20} color={colors.text} />
+                </TouchableOpacity>
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false}>
