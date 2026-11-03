@@ -94,6 +94,42 @@ test('syncExpenses edit without account field leaves existing account untouched'
   assert.equal(unchanged.amount, 15);
 });
 
+test('syncExpenses edit rejects account: null instead of wiping it', async () => {
+  const u = new mongoose.Types.ObjectId();
+  const cat = await Category.create({ name: 'Food', user: u });
+  const acc = await Account.create({ user: u, name: 'Mine' });
+  const existing = await Expense.create({ user: u, amount: 10, date: '2026-09-10', category: cat._id, type: 'expense', account: acc._id, client_uuid: 'sa-6' });
+
+  const req = { user: { _id: u }, body: { expenses: [
+    { client_uuid: 'edit-sa-6', _id: String(existing._id), amount: 10, date: '2026-09-10', category: String(cat._id), type: 'expense', account: null },
+  ] } };
+  const res = mockRes();
+  await syncExpenses(req, res);
+  assert.equal(res.body.results[0].status, 'FAILED');
+  assert.equal(res.body.results[0].error, 'Invalid account');
+
+  const unchanged = await Expense.findById(existing._id);
+  assert.equal(String(unchanged.account), String(acc._id));
+});
+
+test('syncExpenses edit rejects account: "" instead of wiping it', async () => {
+  const u = new mongoose.Types.ObjectId();
+  const cat = await Category.create({ name: 'Food', user: u });
+  const acc = await Account.create({ user: u, name: 'Mine' });
+  const existing = await Expense.create({ user: u, amount: 10, date: '2026-09-10', category: cat._id, type: 'expense', account: acc._id, client_uuid: 'sa-7' });
+
+  const req = { user: { _id: u }, body: { expenses: [
+    { client_uuid: 'edit-sa-7', _id: String(existing._id), amount: 10, date: '2026-09-10', category: String(cat._id), type: 'expense', account: '' },
+  ] } };
+  const res = mockRes();
+  await syncExpenses(req, res);
+  assert.equal(res.body.results[0].status, 'FAILED');
+  assert.equal(res.body.results[0].error, 'Invalid account');
+
+  const unchanged = await Expense.findById(existing._id);
+  assert.equal(String(unchanged.account), String(acc._id));
+});
+
 test('zz cleanup', async () => {
   await clearCollections();
   await disconnectTestDb();

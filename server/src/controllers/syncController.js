@@ -38,8 +38,13 @@ export const syncExpenses = async (req, res) => {
                 if (editId) {
                     const { _id, id, ...updateData } = data;
 
-                    if (updateData.account) {
-                        if (!mongoose.isValidObjectId(updateData.account) || !ownedAccountIds.has(String(updateData.account))) {
+                    // Distinguish "account not sent" (leave untouched) from "sent
+                    // but falsy" (null/'') which would otherwise silently wipe the
+                    // expense's account on update — same invisible-money class as
+                    // the create-path guard above. There's no legitimate use case
+                    // for unsetting an expense's account, so reject it outright.
+                    if ('account' in updateData) {
+                        if (!updateData.account || !mongoose.isValidObjectId(updateData.account) || !ownedAccountIds.has(String(updateData.account))) {
                             return { client_uuid, status: 'FAILED', error: 'Invalid account' };
                         }
                     }

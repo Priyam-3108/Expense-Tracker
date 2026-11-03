@@ -67,7 +67,8 @@ export const validate = (schema) => {
       next();
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errors = error.errors.map(err => ({
+        // Zod v4 renamed ZodError.errors to .issues; fall back to .errors for v3.
+        const errors = (error.issues ?? error.errors).map(err => ({
           field: err.path.join('.'),
           message: err.message
         }));

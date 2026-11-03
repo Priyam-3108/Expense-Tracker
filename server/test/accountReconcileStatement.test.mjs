@@ -71,9 +71,13 @@ test('statement does not crash when a transfer counterpart account was deleted',
   assert.equal(res.statusCode, 200);
   const entries = res.body.data.entries;
   assert.equal(entries.length, 1);
-  // fromAccount still populates to the (now-deleted) id since populate()
-  // can't resolve it to a doc; the fallback `t.fromAccount?._id ?? t.fromAccount`
-  // reads the raw id, which still matches account A, so this is "outgoing".
+  // fromAccount (account A) still exists, so it populates fine and the
+  // outgoing check (`t.fromAccount?._id ?? t.fromAccount` === account A's id)
+  // matches normally, giving 'transfer-out'. It's toAccount (account B) that
+  // is the dangling ref here; populate() resolves it to null, so
+  // counterparty (`t.toAccount?.name`) is undefined below rather than
+  // throwing — that's the crash this test actually guards against, not a
+  // fallback on fromAccount's own id.
   assert.equal(entries[0].kind, 'transfer-out');
   assert.equal(entries[0].counterparty, undefined);
 });
