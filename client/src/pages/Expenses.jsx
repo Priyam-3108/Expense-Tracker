@@ -13,6 +13,10 @@ import MobileExpenseCard from '../components/MobileExpenseCard'
 import PaymentModeBadge from '../components/PaymentModeBadge'
 import Amount from '../components/Amount'
 import { usePrivacy } from '../context/PrivacyContext'
+import { useAccounts } from '../context/AccountContext'
+import AccountPicker from '../components/AccountPicker'
+import TransferForm from '../components/TransferForm'
+import { transferService } from '../services/transferService'
 import Modal from '../components/Modal'
 import AmountHero from '../components/form/AmountHero'
 import SegmentedToggle from '../components/form/SegmentedToggle'
@@ -40,7 +44,8 @@ import {
     ArrowUpCircle,
     Repeat,
     Edit,
-    Trash2
+    Trash2,
+    ArrowRightLeft
 } from 'lucide-react'
 import EmptyState from '../components/EmptyState'
 import { startOfMonth, endOfMonth, eachDayOfInterval, format, isSameMonth, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns'
@@ -83,6 +88,7 @@ function IndeterminateCheckbox({
 const Expenses = () => {
   const { user, currency } = useAuth()
   const { isPrivate } = usePrivacy()
+  const { accounts, defaultAccountId, loadAccounts } = useAccounts()
   const {
     expenses,
     categories,
@@ -124,9 +130,18 @@ const Expenses = () => {
     type: 'expense',
     isRecurring: false,
     recurringPeriod: 'monthly',
-    recurringEndDate: ''
+    recurringEndDate: '',
+    account: defaultAccountId || ''
   })
   const [formLoading, setFormLoading] = useState(false)
+
+  // Seed formData.account once accounts load (defaultAccountId is null on first render)
+  useEffect(() => {
+    if (!formData.account && defaultAccountId) {
+      setFormData((prev) => ({ ...prev, account: defaultAccountId }))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultAccountId])
 
   // Bulk form state
   const [showBulkForm, setShowBulkForm] = useState(false)
@@ -154,6 +169,11 @@ const Expenses = () => {
   const [calendarExpenses, setCalendarExpenses] = useState([])
   const [calendarLoading, setCalendarLoading] = useState(false)
   const [selectedDate, setSelectedDate] = useState(null) // For calendar date selection
+
+  // Transfers view state
+  const [showTransfers, setShowTransfers] = useState(false)
+  const [transfers, setTransfers] = useState([])
+  const [transferFormOpen, setTransferFormOpen] = useState(false)
 
   const location = useLocation()
   const navigate = useNavigate()
@@ -226,6 +246,13 @@ const Expenses = () => {
     }
   }, [viewMode, calendarDate, filterType, debouncedSearchTerm, expenses])
 
+  // Load transfers when the Transfers panel is shown
+  useEffect(() => {
+    if (showTransfers) {
+      transferService.list().then((res) => setTransfers(res.data?.data?.transfers || [])).catch(() => setTransfers([]))
+    }
+  }, [showTransfers])
+
   const summary = useMemo(() => {
     // Current filter or overall stats
     const expenseTotal = stats?.totalStats?.expenses || 0
@@ -273,7 +300,8 @@ const Expenses = () => {
         type: editingExpense.type || 'expense',
         isRecurring: editingExpense.isRecurring || false,
         recurringPeriod: editingExpense.recurringPeriod || 'monthly',
-        recurringEndDate: recurringEndDate
+        recurringEndDate: recurringEndDate,
+        account: editingExpense.account?._id || editingExpense.account || ''
       })
       setShowForm(true)
     } else {
@@ -291,7 +319,8 @@ const Expenses = () => {
       type: 'expense',
       isRecurring: false,
       recurringPeriod: 'monthly',
-      recurringEndDate: ''
+      recurringEndDate: '',
+      account: defaultAccountId || ''
     })
     setEditingExpense(null)
   }
@@ -346,7 +375,8 @@ const Expenses = () => {
         type: formData.type,
         isRecurring: formData.isRecurring,
         recurringPeriod: formData.isRecurring ? formData.recurringPeriod : undefined,
-        recurringEndDate: formData.isRecurring ? formData.recurringEndDate : undefined
+        recurringEndDate: formData.isRecurring ? formData.recurringEndDate : undefined,
+        account: formData.account || undefined
       }
 
       if (editingExpense) {
@@ -629,6 +659,11 @@ const Expenses = () => {
         <span className="inline-flex items-center flex-wrap gap-1">
           <span className="text-gray-600 dark:text-gray-300">{row.original.description || '-'}</span>
           <PaymentModeBadge value={row.original.paymentMode} hideOther />
+          {(() => {
+            const accId = row.original.account?._id || row.original.account
+            const acc = accounts.find((a) => a._id === accId)
+            return acc ? <span className="text-xs text-gray-400 dark:text-slate-500 ml-1">· {acc.name}</span> : null
+          })()}
         </span>
       )
     },
@@ -667,7 +702,7 @@ const Expenses = () => {
         </div>
       )
     }
-  ], [categories, currency])
+  ], [categories, currency, accounts])
 
   // Calendar month view
   const monthStart = startOfMonth(calendarDate)
@@ -690,8 +725,8 @@ const Expenses = () => {
           {/* View Toggle */}
           <div className="inline-flex gap-1 rounded-xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.03] p-1">
             <button
-              onClick={() => setViewMode('list')}
-              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${viewMode === 'list'
+              onClick={() => { setViewMode('list'); setShowTransfers(false) }}
+              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${!showTransfers && viewMode === 'list'
                 ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(99,102,241,0.2)]'
                 : 'text-gray-600 dark:text-slate-400 hover:bg-white dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white'
                 }`}
@@ -700,14 +735,21 @@ const Expenses = () => {
               List
             </button>
             <button
-              onClick={() => setViewMode('calendar')}
-              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${viewMode === 'calendar'
+              onClick={() => { setViewMode('calendar'); setShowTransfers(false) }}
+              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${!showTransfers && viewMode === 'calendar'
                 ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(99,102,241,0.2)]'
                 : 'text-gray-600 dark:text-slate-400 hover:bg-white dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white'
                 }`}
             >
               <CalendarIcon size={16} />
               Calendar
+            </button>
+            <button
+              onClick={() => setShowTransfers(true)}
+              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${showTransfers ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(99,102,241,0.2)]' : 'text-gray-600 dark:text-slate-400 hover:bg-white dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white'}`}
+            >
+              <ArrowRightLeft size={16} />
+              Transfers
             </button>
           </div>
 
@@ -798,7 +840,7 @@ const Expenses = () => {
       </div>
 
       {/* Expenses list - desktop table (hidden on mobile) */}
-      {viewMode === 'list' && (
+      {!showTransfers && viewMode === 'list' && (
         <>
           {/* Desktop table */}
           <div className="hidden md:block">
@@ -891,7 +933,7 @@ const Expenses = () => {
         </>
       )}
       {/* Calendar View */}
-      {viewMode === 'calendar' && (
+      {!showTransfers && viewMode === 'calendar' && (
         <>
           {/* Filters for Calendar View */}
           <div className="glass-card p-4 mb-4">
@@ -1088,6 +1130,33 @@ const Expenses = () => {
         </>
       )}
 
+      {/* Transfers View */}
+      {showTransfers && (
+        <div className="glass-card p-4 md:p-6 space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-semibold text-gray-900 dark:text-white">Transfers</h2>
+            <button onClick={() => setTransferFormOpen(true)} className="btn-primary btn-sm">New transfer</button>
+          </div>
+          {transfers.length === 0 ? (
+            <p className="text-sm text-gray-400 dark:text-slate-600 py-4">No transfers yet.</p>
+          ) : (
+            <div className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+              {transfers.map((t) => (
+                <div key={t._id} className="flex items-center justify-between py-2.5 text-sm">
+                  <span className="text-gray-900 dark:text-white">
+                    {t.fromAccount?.name} → {t.toAccount?.name}
+                    {t.note ? <span className="text-gray-400 dark:text-slate-600"> · {t.note}</span> : null}
+                  </span>
+                  <span className="text-gray-500 dark:text-slate-400">
+                    {t.date} · <Amount value={t.amount} currency={currency} />
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Add/Edit Form Modal */}
       <Modal
         isOpen={showForm}
@@ -1138,6 +1207,15 @@ const Expenses = () => {
               <PaymentModeChips
                 value={formData.paymentMode}
                 onChange={(mode) => setFormData({ ...formData, paymentMode: mode })}
+              />
+            </div>
+
+            <div>
+              <SectionLabel>Account</SectionLabel>
+              <AccountPicker
+                value={formData.account}
+                onChange={(id) => setFormData({ ...formData, account: id })}
+                accounts={accounts}
               />
             </div>
 
@@ -1438,6 +1516,16 @@ const Expenses = () => {
         onImportSuccess={() => {
           loadExpenses()
           // Optionally refresh categories if new ones were added
+        }}
+      />
+
+      {/* Transfer Form Modal */}
+      <TransferForm
+        isOpen={transferFormOpen}
+        onClose={() => setTransferFormOpen(false)}
+        onCreated={() => {
+          transferService.list().then((res) => setTransfers(res.data?.data?.transfers || []))
+          loadAccounts()
         }}
       />
     </div>
