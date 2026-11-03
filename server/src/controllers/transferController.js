@@ -48,6 +48,7 @@ export const createTransfer = async (req, res) => {
 
 export const updateTransfer = async (req, res) => {
   try {
+    if (!mongoose.isValidObjectId(req.params.id)) return res.status(400).json({ success: false, message: 'Invalid transfer id' });
     const transfer = await Transfer.findOne({ _id: req.params.id, user: req.user._id });
     if (!transfer) return res.status(404).json({ success: false, message: 'Transfer not found' });
     const { date, note } = req.body;
@@ -63,6 +64,7 @@ export const updateTransfer = async (req, res) => {
 
 export const deleteTransfer = async (req, res) => {
   try {
+    if (!mongoose.isValidObjectId(req.params.id)) return res.status(400).json({ success: false, message: 'Invalid transfer id' });
     const t = await Transfer.findOneAndDelete({ _id: req.params.id, user: req.user._id });
     if (!t) return res.status(404).json({ success: false, message: 'Transfer not found' });
     res.json({ success: true, message: 'Transfer deleted' });

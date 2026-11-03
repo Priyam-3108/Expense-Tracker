@@ -1,4 +1,6 @@
+import mongoose from 'mongoose';
 import { Expense } from '../config/models/Expense.js';
+import { Account } from '../config/models/Account.js';
 
 export const syncExpenses = async (req, res) => {
     try {
@@ -10,6 +12,11 @@ export const syncExpenses = async (req, res) => {
                 message: 'Invalid data format. Expected an array of expenses.'
             });
         }
+
+        const defaultAccount = await Account.findOne({ user: req.user._id, isDefault: true });
+        const ownedAccountIds = new Set(
+            (await Account.find({ user: req.user._id }).select('_id').lean()).map((a) => String(a._id))
+        );
 
         const results = await Promise.all(expenses.map(async (expenseData) => {
             try {
@@ -30,6 +37,13 @@ export const syncExpenses = async (req, res) => {
                 const editId = data._id || data.id;
                 if (editId) {
                     const { _id, id, ...updateData } = data;
+
+                    if (updateData.account) {
+                        if (!mongoose.isValidObjectId(updateData.account) || !ownedAccountIds.has(String(updateData.account))) {
+                            return { client_uuid, status: 'FAILED', error: 'Invalid account' };
+                        }
+                    }
+
                     const updated = await Expense.findOneAndUpdate(
                         { _id: editId, user: req.user._id },
                         { ...updateData, client_uuid },
@@ -65,8 +79,17 @@ export const syncExpenses = async (req, res) => {
                 }
 
                 // Create new
+                let resolvedAccount = defaultAccount ? defaultAccount._id : null;
+                if (data.account) {
+                    if (!mongoose.isValidObjectId(data.account) || !ownedAccountIds.has(String(data.account))) {
+                        return { client_uuid, status: 'FAILED', error: 'Invalid account' };
+                    }
+                    resolvedAccount = data.account;
+                }
+
                 expense = await Expense.create({
                     ...data,
+                    account: resolvedAccount,
                     client_uuid,
                     user: req.user._id
                 });

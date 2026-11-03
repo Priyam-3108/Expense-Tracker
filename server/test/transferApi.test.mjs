@@ -4,7 +4,8 @@ import mongoose from 'mongoose';
 import { connectTestDb, clearCollections, disconnectTestDb } from './setup.mjs';
 import { Account } from '../src/config/models/Account.js';
 import { Transfer } from '../src/config/models/Transfer.js';
-import { createTransfer, listTransfers, syncTransfers } from '../src/controllers/transferController.js';
+import { createTransfer, listTransfers, syncTransfers, updateTransfer, deleteTransfer } from '../src/controllers/transferController.js';
+import { transferUpdateSchema } from '../src/middleware/validation.js';
 import transferRoutes from '../src/routes/transfers.js';
 
 // Node 16: top-level test hooks don't run — use top-level await for setup
@@ -73,6 +74,25 @@ test('transferRoutes registers verbs', () => {
   assert.ok(has('post', '/'));
   assert.ok(has('post', '/sync'));
   assert.ok(has('delete', '/:id'));
+});
+
+test('updateTransfer and deleteTransfer 400 on malformed id', async () => {
+  const u = new mongoose.Types.ObjectId();
+  const res1 = mockRes();
+  await updateTransfer({ user: { _id: u }, params: { id: 'not-an-id' }, body: { note: 'x' } }, res1);
+  assert.equal(res1.statusCode, 400);
+
+  const res2 = mockRes();
+  await deleteTransfer({ user: { _id: u }, params: { id: 'not-an-id' } }, res2);
+  assert.equal(res2.statusCode, 400);
+});
+
+test('transferUpdateSchema rejects an invalid date and does not require fromAccount/toAccount/amount', () => {
+  const bad = transferUpdateSchema.safeParse({ date: 'not-a-date' });
+  assert.equal(bad.success, false);
+
+  const ok = transferUpdateSchema.safeParse({ note: 'adjusted' });
+  assert.equal(ok.success, true);
 });
 
 test('zz cleanup', async () => {

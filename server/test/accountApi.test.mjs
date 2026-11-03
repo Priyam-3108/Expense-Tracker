@@ -4,7 +4,9 @@ import mongoose from 'mongoose';
 import { connectTestDb, clearCollections, disconnectTestDb } from './setup.mjs';
 import { Account } from '../src/config/models/Account.js';
 import { Expense } from '../src/config/models/Expense.js';
-import { listAccounts, createAccount, updateAccount, deleteAccount } from '../src/controllers/accountController.js';
+import { Transfer } from '../src/config/models/Transfer.js';
+import { listAccounts, createAccount, updateAccount, deleteAccount, reconcileAccount, accountStatement } from '../src/controllers/accountController.js';
+import { accountSchema } from '../src/middleware/validation.js';
 import accountRoutes from '../src/routes/accounts.js';
 
 // Node 16: top-level test hooks don't run — use top-level await for setup
@@ -77,6 +79,62 @@ test('accountRoutes registers the CRUD verbs', () => {
   assert.ok(paths.includes('POST /'));
   assert.ok(paths.includes('PUT /:id'));
   assert.ok(paths.includes('DELETE /:id'));
+});
+
+test('updateAccount, deleteAccount, reconcileAccount, accountStatement 400 on malformed id', async () => {
+  const u = user();
+  const res1 = mockRes();
+  await updateAccount({ user: { _id: u }, params: { id: 'not-an-id' }, body: { name: 'X' } }, res1);
+  assert.equal(res1.statusCode, 400);
+
+  const res2 = mockRes();
+  await deleteAccount({ user: { _id: u }, params: { id: 'not-an-id' } }, res2);
+  assert.equal(res2.statusCode, 400);
+
+  const res3 = mockRes();
+  await reconcileAccount({ user: { _id: u }, params: { id: 'not-an-id' }, body: { targetBalance: 10 } }, res3);
+  assert.equal(res3.statusCode, 400);
+
+  const res4 = mockRes();
+  await accountStatement({ user: { _id: u }, params: { id: 'not-an-id' }, query: {} }, res4);
+  assert.equal(res4.statusCode, 400);
+});
+
+test('accountSchema.partial() rejects an invalid type enum', () => {
+  const result = accountSchema.partial().safeParse({ type: 'crypto' });
+  assert.equal(result.success, false);
+});
+
+test('updateAccount 400 when changing currency on an account with existing transfers', async () => {
+  const u = user();
+  const a = await Account.create({ user: u, name: 'A', currency: 'INR' });
+  const b = await Account.create({ user: u, name: 'B', currency: 'INR' });
+  await Transfer.create({ user: u, fromAccount: a._id, toAccount: b._id, amount: 20, date: '2026-09-10' });
+
+  const res = mockRes();
+  await updateAccount({ user: { _id: u }, params: { id: String(a._id) }, body: { currency: 'USD' } }, res);
+  assert.equal(res.statusCode, 400);
+});
+
+test('updateAccount allows setting currency to the same value even with transfers', async () => {
+  const u = user();
+  const a = await Account.create({ user: u, name: 'A', currency: 'INR' });
+  const b = await Account.create({ user: u, name: 'B', currency: 'INR' });
+  await Transfer.create({ user: u, fromAccount: a._id, toAccount: b._id, amount: 20, date: '2026-09-10' });
+
+  const res = mockRes();
+  await updateAccount({ user: { _id: u }, params: { id: String(a._id) }, body: { currency: 'INR' } }, res);
+  assert.equal(res.statusCode, 200);
+});
+
+test('updateAccount allows changing currency when the account has no transfers', async () => {
+  const u = user();
+  const a = await Account.create({ user: u, name: 'Lonely', currency: 'INR' });
+
+  const res = mockRes();
+  await updateAccount({ user: { _id: u }, params: { id: String(a._id) }, body: { currency: 'USD' } }, res);
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.body.data.account.currency, 'USD');
 });
 
 test('zz cleanup', async () => {

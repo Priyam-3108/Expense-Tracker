@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { Account, Expense, Transfer, Category } from '../config/models/index.js';
 import { computeAccountBalances } from '../utils/accountBalances.js';
 
@@ -43,6 +44,7 @@ export const createAccount = async (req, res) => {
 
 export const updateAccount = async (req, res) => {
   try {
+    if (!mongoose.isValidObjectId(req.params.id)) return res.status(400).json({ success: false, message: 'Invalid account id' });
     const account = await Account.findOne({ _id: req.params.id, user: req.user._id });
     if (!account) return res.status(404).json({ success: false, message: 'Account not found' });
 
@@ -50,7 +52,18 @@ export const updateAccount = async (req, res) => {
     if (name !== undefined) account.name = name;
     if (type !== undefined) account.type = type;
     if (openingBalance !== undefined) account.openingBalance = openingBalance;
-    if (currency !== undefined) account.currency = currency;
+    if (currency !== undefined && currency !== account.currency) {
+      const hasTransfers = await Transfer.countDocuments({
+        user: req.user._id,
+        $or: [{ fromAccount: account._id }, { toAccount: account._id }],
+      });
+      if (hasTransfers > 0) {
+        return res.status(400).json({ success: false, message: 'Cannot change currency: this account has existing transfers' });
+      }
+      account.currency = currency;
+    } else if (currency !== undefined) {
+      account.currency = currency; // no-op case: setting to the same currency is harmless
+    }
 
     if (archived === true) {
       if (account.isDefault) {
@@ -71,6 +84,7 @@ export const updateAccount = async (req, res) => {
 
 export const deleteAccount = async (req, res) => {
   try {
+    if (!mongoose.isValidObjectId(req.params.id)) return res.status(400).json({ success: false, message: 'Invalid account id' });
     const account = await Account.findOne({ _id: req.params.id, user: req.user._id });
     if (!account) return res.status(404).json({ success: false, message: 'Account not found' });
     if (account.isDefault) {
@@ -96,6 +110,7 @@ export const deleteAccount = async (req, res) => {
 
 export const reconcileAccount = async (req, res) => {
   try {
+    if (!mongoose.isValidObjectId(req.params.id)) return res.status(400).json({ success: false, message: 'Invalid account id' });
     const account = await Account.findOne({ _id: req.params.id, user: req.user._id });
     if (!account) return res.status(404).json({ success: false, message: 'Account not found' });
 
@@ -138,6 +153,7 @@ export const reconcileAccount = async (req, res) => {
 
 export const accountStatement = async (req, res) => {
   try {
+    if (!mongoose.isValidObjectId(req.params.id)) return res.status(400).json({ success: false, message: 'Invalid account id' });
     const account = await Account.findOne({ _id: req.params.id, user: req.user._id });
     if (!account) return res.status(404).json({ success: false, message: 'Account not found' });
 
@@ -164,7 +180,7 @@ export const accountStatement = async (req, res) => {
         createdAt: e.createdAt,
       })),
       ...transfers.map((t) => {
-        const outgoing = String(t.fromAccount._id) === String(account._id);
+        const outgoing = String(t.fromAccount?._id ?? t.fromAccount) === String(account._id);
         return {
           kind: outgoing ? 'transfer-out' : 'transfer-in',
           date: t.date,

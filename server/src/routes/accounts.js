@@ -8,7 +8,7 @@ router.use(authenticateToken);
 
 router.get('/', listAccounts);
 router.post('/', validate(accountSchema), createAccount);
-router.put('/:id', updateAccount);
+router.put('/:id', validate(accountSchema.partial()), updateAccount);
 router.delete('/:id', deleteAccount);
 router.post('/:id/reconcile', reconcileAccount);
 router.get('/:id/statement', accountStatement);

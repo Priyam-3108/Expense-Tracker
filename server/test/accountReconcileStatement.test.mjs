@@ -55,6 +55,29 @@ test('statement merges expenses and transfers for the account, sorted by date', 
   assert.deepEqual(entries.map((e) => e.kind), ['transfer-out', 'expense', 'transfer-in']);
 });
 
+test('statement does not crash when a transfer counterpart account was deleted', async () => {
+  const u = new mongoose.Types.ObjectId();
+  const a = await Account.create({ user: u, name: 'A' });
+  const b = await Account.create({ user: u, name: 'B' });
+  await Transfer.create({ user: u, fromAccount: a._id, toAccount: b._id, amount: 50, date: '2026-09-05' });
+
+  // Simulate an orphaned ref: delete the counterpart account directly,
+  // bypassing deleteAccount's guard (which would normally refuse this
+  // because the account has transfer history).
+  await Account.deleteOne({ _id: b._id });
+
+  const res = mockRes();
+  await accountStatement({ user: { _id: u }, params: { id: String(a._id) }, query: {} }, res);
+  assert.equal(res.statusCode, 200);
+  const entries = res.body.data.entries;
+  assert.equal(entries.length, 1);
+  // fromAccount still populates to the (now-deleted) id since populate()
+  // can't resolve it to a doc; the fallback `t.fromAccount?._id ?? t.fromAccount`
+  // reads the raw id, which still matches account A, so this is "outgoing".
+  assert.equal(entries[0].kind, 'transfer-out');
+  assert.equal(entries[0].counterparty, undefined);
+});
+
 test('zz cleanup', async () => {
   await clearCollections();
   await disconnectTestDb();

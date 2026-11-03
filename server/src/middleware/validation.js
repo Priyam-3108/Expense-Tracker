@@ -50,6 +50,14 @@ export const transferSchema = z.object({
   note: z.string().max(300).optional(),
 });
 
+// updateTransfer only reads date/note from the body (amount/accounts aren't
+// editable via PUT) — a narrower schema than transferSchema so PUT doesn't
+// require fields the controller never uses.
+export const transferUpdateSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD').optional(),
+  note: z.string().max(300).optional(),
+});
+
 // Validation middleware factory
 export const validate = (schema) => {
   return (req, res, next) => {
