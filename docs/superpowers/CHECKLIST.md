@@ -526,20 +526,125 @@ Spec: `specs/2026-09-10-privacy-mode-design.md`
 Spec: `specs/2026-09-10-accounts-transfers-design.md`
 
 ### 4A · API — `plans/2026-09-10-accounts-transfers-4a-api.md`
-- [ ] Task 1: `Account` model
-- [ ] Task 2: `Transfer` model
-- [ ] Task 3: `account` field on `Expense` (optional ref) + Zod
-- [ ] Task 4: Seed default account on registration
-- [ ] Task 5: Migration script — default account per existing user, backfill `account` on expenses
-- [ ] Task 6: Account CRUD controller + routes
-- [ ] Task 7: Balance computation helper (`computeAccountBalances`)
-- [ ] Task 8: Transfer CRUD controller + routes
-- [ ] Task 9: Reconcile endpoint (compensating `Adjustment`-category expense)
-- [ ] Task 10: Per-account statement endpoint (merged expenses + transfers)
-- [ ] Task 11: `account` filter on expense list + analytics
-- [ ] Task 12: `syncExpenses` accepts `account`; new `POST /api/transfers/sync`
-- [ ] Task 13: Manual smoke + regression sweep
-- [ ] **4A merged**
+- [x] Task 1: `Account` model (types, currency, default/archived, one-default index)
+- [x] Task 2: `Transfer` model (distinct-account validation, sync uuid)
+- [x] Task 3: `account`/`isAdjustment` on `Expense`; `accountSchema`/`transferSchema` Zod
+- [x] Task 4: `seedDefaults` util + registration seed (Cash account + Adjustment category)
+- [x] Task 5: `computeAccountBalances` util (money-math, independently re-derived twice)
+- [x] Task 6: Account CRUD (list-with-balance, create, archive, guarded delete)
+- [x] Task 7: `account` on expense create/recurring/bulk/update + account filter (1 fix
+  round — malformed-id 500s, bulk foreign-account acceptance)
+- [x] Task 8: Transfer CRUD + offline sync (proactively hardened before any review found
+  the gap, carrying Task 7's own lesson forward)
+- [x] Task 9: Account reconcile (adjustment expense) + statement endpoints
+- [x] Task 10: Sync pass-through assertion for `account` (no code change needed, confirmed)
+- [x] Task 11: Idempotent accounts migration script (1 Windows-guard caveat found, carried
+  to Task 12, not fixed — pre-existing codebase precedent, see notes)
+- [x] Task 12: Live smoke + regression sweep + ran the real migration twice against the
+  local dev DB
+- [x] **4A merged** (committed directly to `enhancement/expense-manager-parity`, commits
+  `e1f32b6`..`0677254`)
+
+> **4A notes (2026-11-04):**
+> - Executed via `superpowers:subagent-driven-development` — 12 tasks, the largest and
+>   most structurally significant API phase in the program (2 new models, money-math
+>   balance computation, full CRUD + reconcile + statement + offline sync, a shared
+>   seed util, an idempotent migration). All per-task reviews passed clean or closed in
+>   one fix round each.
+> - **Reconciliation delegated to an Explore subagent given the breadth** (plan touches
+>   8+ files already modified by F1/F3), then independently spot-checked by the
+>   controller — found 6 real drift issues, all confirmatory/corrective, resolved before
+>   dispatch. **Highest-leverage finding**: this server runs Node 16.20.2, where
+>   `node:test`'s top-level `test.before`/`test.afterEach`/`test.after` hooks silently
+>   no-op — every one of this phase's ~20 new test files had to use the real pattern
+>   already established by every other test file in the repo (top-level `await
+>   connectTestDb()`, no `afterEach`, a final `'zz cleanup'` test), not the plan's own
+>   (broken-on-this-Node-version) snippets. Carried into every single task's dispatch as
+>   a standing instruction.
+> - **Task 7's fix loop** (the riskiest single task — 5 functions in a shared
+>   ~1000-line file) found 2 real gaps via an Opus reviewer who empirically probed edge
+>   cases (mutation-tested the test file, wrote throwaway repro scripts): malformed
+>   account ids 500'd instead of 400'ing (Account.findOne throwing a CastError before
+>   the `!owned` branch could fire), and `bulkCreateExpenses` silently accepted another
+>   user's account id with zero ownership check — a cross-user data-attribution gap on
+>   the money-math path, repro'd live. Both fixed same-session.
+> - **Task 8 proactively applied Task 7's lesson** to `Transfer`'s `validatePair` helper
+>   before any reviewer found the same gap there — the first time in this program a task
+>   carried a sibling task's fix forward pre-emptively rather than waiting to be told.
+> - **Final whole-phase review (Opus) found 1 Critical + 4 Important** via empirical
+>   probing against the real test DB (not just reading the diff):
+>   - Critical: `accountStatement` crashed with an uncaught 500 if a transfer's
+>     counterpart account had been deleted (a populated ref resolving to `null`,
+>     dereferenced without `?.` on the one line that decides transfer direction, while
+>     the adjacent display fields on the same lines already used `?.`).
+>   - Important: `syncExpenses` had no default-account fallback (unlike `createExpense`),
+>     meaning synced expenses with no `account` persisted as `account: null` and were
+>     **permanently invisible to every balance calculation forever** — a real,
+>     reachable money-invisibility bug with no cleanup path (the one-time migration only
+>     fixes pre-existing nulls, not future ones).
+>   - Important: `syncExpenses` also had zero ownership check on a synced expense's
+>     `account` field — the exact gap Task 7's fix loop had just closed in
+>     `bulkCreateExpenses`, but the same ruling was never extended to the sync path.
+>   - Important: 8 endpoints across `accountController.js`/`transferController.js`
+>     returned 500 instead of 400 on malformed ids or invalid enums — the exact
+>     CastError-vs-400 defect class this phase had already fixed TWICE (Task 7, Task 8)
+>     but missed on these 8. Root cause: the PUT routes also had zero Zod validation
+>     middleware, unlike every other PUT route in the app.
+>   - Important: `updateAccount` let `currency` change retroactively with no guard,
+>     bypassing `createTransfer`'s create-time cross-currency guard entirely.
+> - **Fixed all 5 in one consolidated wave** (commit `fa5e5e8`) — all were real,
+>   well-understood, and either matched a pattern already fixed twice in this phase or
+>   extended a ruling the human partner had already approved mid-phase. The scoped
+>   re-review of that wave then found **I-3's fix didn't actually work**: the
+>   `validate` middleware's own error-handling code read `error.errors`, but the
+>   installed Zod is v4, which renamed `ZodError.errors` to `.issues` — so the
+>   middleware's own catch block threw trying to `.map(undefined)`, meaning the intended
+>   400 was NEVER sent and fell through to a generic 500 anyway. This is a **pre-existing,
+>   app-wide bug** affecting all 10 routes using `validate(...)`, not introduced by this
+>   phase but exposed by it — the first fix wave's own tests missed it because they
+>   called `schema.safeParse()` directly instead of driving the real middleware/Express
+>   stack, the exact gap a second fix round and a second, more rigorous re-review (one
+>   that genuinely started a dev server and sent real HTTP requests) were needed to catch
+>   and close. Fixed the root cause (`error.issues`, one word) rather than the symptom,
+>   per the program's standing "root cause, not symptom" discipline — this was a
+>   deliberate choice since the symptom-only fix (reverting the 2 new PUT validations)
+>   would have left the same landmine for the very next route anyone adds.
+> - **Lesson for F4B/F4C and any future phase**: when a reviewer's own tests only call
+>   a library function directly (`schema.safeParse`, `schema.parse`) instead of
+>   exercising it through the actual middleware/route/Express stack, a real breakage in
+>   the glue code between them can hide in plain sight. The fix: at least one test per
+>   validation middleware should invoke it AS Express would (`middleware(req, res,
+>   next)`), not just test the underlying schema.
+> - **Operational hygiene miss, self-caught**: Task 12's own report claimed its live-
+>   smoke dev server had been "killed cleanly" — the controller independently verified
+>   port 5000 after the task completed and found it still listening (confirmed via
+>   process inspection: same PID, same start time as the task). Stopped it after
+>   confirming with the human partner it wasn't something they were using themselves.
+>   This happened again in miniature during the fix-wave rounds' own manual verification
+>   steps — a recurring pattern worth remembering: an implementer's self-reported
+>   cleanup claim for anything that starts a long-lived background process should be
+>   spot-checked, not trusted blindly.
+> - **Known, documented, NOT fixed in this phase** (both are pre-existing properties of
+>   the migration script, carried forward as operational caveats for whoever runs it
+>   against a real production/target DB in the future): (1) the migration's direct-run
+>   guard (`import.meta.url === file://${process.argv[1]}`) doesn't match on Windows
+>   (works on POSIX) — an existing, unrelated script in this codebase already has the
+>   identical pattern, so this wasn't introduced by 4A; (2) the script's internal
+>   fallback `MONGO_URI` uses `expense_tracker` (underscore) while the real `.env` value
+>   is `expense-tracker` (hyphen) — would silently target an empty/wrong DB if run with
+>   no env var set.
+> - **The real migration was run twice against the actual local dev database** (not
+>   just the automated test suite), confirming idempotency outside the test harness too:
+>   first run `{users:2, seeded:2, backfilled:1246}`, second run `{users:2, seeded:2,
+>   backfilled:0}`.
+> - 5 Minor findings remain deferred across the ledger (totalBalance correctly excludes
+>   archived accounts per spec but may surprise a 4B UI; the spec's "block archiving an
+>   account with a future-dated transfer" edge case was silently dropped by the plan
+>   itself, never recorded as a ruling until now; float accumulation ships unrounded to
+>   clients from `listAccounts`/`statement`; `accountSchema`'s Zod `archived` field is
+>   accepted on POST but silently dropped; `createAccount` coerces a non-number
+>   `openingBalance` to 0 instead of rejecting, inconsistent with `updateAccount`'s
+>   Mongoose-level string coercion) — none urgent, all recorded here for 4B/4C awareness.
 
 ### 4B · Web — `plans/2026-09-10-accounts-transfers-4b-web.md`
 - [ ] Task 1: `accountService` + `transferService`
