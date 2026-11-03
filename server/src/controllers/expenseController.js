@@ -229,6 +229,9 @@ export const bulkCreateExpenses = async (req, res) => {
     const validExpenses = [];
     const errors = [];
     const defaultAccount = await Account.findOne({ user: req.user._id, isDefault: true });
+    const ownedAccountIds = new Set(
+      (await Account.find({ user: req.user._id }).select('_id').lean()).map(a => String(a._id))
+    );
 
     for (let i = 0; i < expenses.length; i++) {
       const expense = expenses[i];
@@ -271,12 +274,22 @@ export const bulkCreateExpenses = async (req, res) => {
         }
       }
 
+      let rowAccount = defaultAccount ? defaultAccount._id : null;
+      if (expense.account) {
+        if (mongoose.isValidObjectId(expense.account) && ownedAccountIds.has(String(expense.account))) {
+          rowAccount = expense.account;
+        } else {
+          errors.push(`Expense ${i + 1}: Invalid account`);
+          continue;
+        }
+      }
+
       validExpenses.push({
         description: expense.description ? expense.description.trim() : '',
         amount: parseFloat(expense.amount),
         date: expenseDate,
         category: expense.category,
-        account: expense.account || (defaultAccount ? defaultAccount._id : null),
+        account: rowAccount,
         type: expense.type || 'expense', // Allow type override too
         paymentMode: expense.paymentMode || DEFAULT_PAYMENT_MODE,
         user: req.user._id
@@ -567,6 +580,9 @@ export const createExpense = async (req, res) => {
 
     let accountId = account || null;
     if (accountId) {
+      if (!mongoose.isValidObjectId(accountId)) {
+        return res.status(400).json({ success: false, message: 'Invalid account' });
+      }
       const owned = await Account.findOne({ _id: accountId, user: req.user._id });
       if (!owned) {
         return res.status(400).json({ success: false, message: 'Invalid account' });
@@ -753,6 +769,9 @@ export const updateExpense = async (req, res) => {
     if (category) updates.category = category;
     if (account !== undefined) {
       if (account) {
+        if (!mongoose.isValidObjectId(account)) {
+          return res.status(400).json({ success: false, message: 'Invalid account' });
+        }
         const owned = await Account.findOne({ _id: account, user: req.user._id });
         if (!owned) return res.status(400).json({ success: false, message: 'Invalid account' });
       }

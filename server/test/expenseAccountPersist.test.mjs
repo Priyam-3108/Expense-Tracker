@@ -5,7 +5,7 @@ import { connectTestDb, clearCollections, disconnectTestDb } from './setup.mjs';
 import { Expense } from '../src/config/models/Expense.js';
 import { Category } from '../src/config/models/Category.js';
 import { Account } from '../src/config/models/Account.js';
-import { createExpense, getExpenses } from '../src/controllers/expenseController.js';
+import { createExpense, getExpenses, bulkCreateExpenses } from '../src/controllers/expenseController.js';
 
 // Node 16: top-level test hooks don't run — use top-level await for setup
 // and a final test for teardown.
@@ -60,6 +60,33 @@ test('getExpenses filters by account', async () => {
   const list = res.body.data.expenses;
   assert.equal(list.length, 1);
   assert.equal(list[0].amount, 2);
+});
+
+test('rejects malformed account id with 400', async () => {
+  const u = new mongoose.Types.ObjectId();
+  const { cat } = await seed(u);
+  const res = mockRes();
+  await createExpense({ user: { _id: u }, body: { amount: 10, date: '2026-09-10', category: String(cat._id), account: 'not-an-object-id' } }, res);
+  assert.equal(res.statusCode, 400);
+  assert.equal(res.body.message, 'Invalid account');
+});
+
+test('bulkCreate rejects a foreign account id', async () => {
+  const u = new mongoose.Types.ObjectId();
+  const { cat } = await seed(u);
+  const foreign = await Account.create({ user: new mongoose.Types.ObjectId(), name: 'Someone else' });
+  const res = mockRes();
+  await bulkCreateExpenses({
+    user: { _id: u },
+    body: {
+      date: '2026-09-10',
+      expenses: [{ amount: 10, category: String(cat._id), account: String(foreign._id) }]
+    }
+  }, res);
+  assert.equal(res.statusCode, 400);
+  assert.ok(res.body.errors.some(e => e.includes('Invalid account')));
+  const saved = await Expense.findOne({ user: u, amount: 10 });
+  assert.equal(saved, null);
 });
 
 test('zz cleanup', async () => {
