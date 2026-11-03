@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useExpense } from '../context/ExpenseContext'
 import { useDebt } from '../context/DebtContext'
+import { useAccounts } from '../context/AccountContext'
+import { getAccountType } from '../constants/accountTypes'
 import { useDailyActivity } from '../hooks/useDailyActivity'
 import ActivityHeatmap from '../components/ActivityHeatmap'
 import { expenseService } from '../services/expenseService'
@@ -43,6 +45,7 @@ const Dashboard = () => {
   const { user, currency } = useAuth()
   const { stats, trends, loading, loadStats, loadTrends } = useExpense()
   const { debts, loadDebts } = useDebt()
+  const { accounts, totalBalance } = useAccounts()
   const [recentTransactions, setRecentTransactions] = useState([])
   const [loadingRecent, setLoadingRecent] = useState(true)
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
@@ -242,6 +245,35 @@ const Dashboard = () => {
             </div>
           </div>
         )}
+      </div>
+
+      <div className="glass-card p-5 md:p-6">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white">Balances</h2>
+          <button onClick={() => navigate('/app/accounts')} className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
+            Manage
+          </button>
+        </div>
+        <p className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+          <Amount value={totalBalance} currency={currency} />
+        </p>
+        <div className="space-y-1.5">
+          {accounts.map((a) => {
+            const { Icon } = getAccountType(a.type)
+            return (
+              <button
+                key={a._id}
+                onClick={() => navigate('/app/accounts')}
+                className="w-full flex items-center justify-between py-1.5 text-sm hover:bg-gray-50 dark:hover:bg-white/[0.04] rounded-lg px-2"
+              >
+                <span className="flex items-center gap-2 text-gray-700 dark:text-slate-300">
+                  <Icon size={14} /> {a.name}
+                </span>
+                <Amount value={a.balance} currency={a.currency || currency} className="text-gray-900 dark:text-white" />
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       {/* Activity Heatmap */}
