@@ -12,6 +12,7 @@ import expenseRoutes from './routes/expenses.js';
 import debtRoutes from './routes/debts.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
 import accountRoutes from './routes/accounts.js';
+import transferRoutes from './routes/transfers.js';
 
 const app = express();
 
@@ -74,6 +75,7 @@ app.use('/api/expenses', expenseRoutes);
 app.use('/api/debts', debtRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/accounts', accountRoutes);
+app.use('/api/transfers', transferRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {
