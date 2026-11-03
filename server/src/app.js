@@ -11,6 +11,7 @@ import categoryRoutes from './routes/categories.js';
 import expenseRoutes from './routes/expenses.js';
 import debtRoutes from './routes/debts.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
+import accountRoutes from './routes/accounts.js';
 
 const app = express();
 
@@ -72,6 +73,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/debts', debtRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/accounts', accountRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {
