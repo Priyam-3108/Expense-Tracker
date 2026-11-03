@@ -4,6 +4,7 @@ import { ExpenseProvider } from './context/ExpenseContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { DebtProvider } from './context/DebtContext'
 import { PrivacyProvider } from './context/PrivacyContext'
+import { AccountProvider } from './context/AccountContext'
 import Layout from './components/Layout'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
@@ -16,6 +17,7 @@ import Categories from './pages/Categories'
 import Analytics from './pages/Analytics'
 import Profile from './pages/Profile'
 import Debts from './pages/Debts'
+import Accounts from './pages/Accounts'
 import TermsOfService from './pages/TermsOfService'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import FAQ from './pages/FAQ'
@@ -75,6 +77,7 @@ function AppRoutes() {
         <Route path="categories" element={<Categories />} />
         <Route path="analytics" element={<Analytics />} />
         <Route path="debts" element={<Debts />} />
+        <Route path="accounts" element={<Accounts />} />
         <Route path="profile" element={<Profile />} />
       </Route>
 
@@ -95,7 +98,9 @@ function App() {
         <PrivacyProvider>
           <ExpenseProvider>
             <DebtProvider>
-              <AppRoutes />
+              <AccountProvider>
+                <AppRoutes />
+              </AccountProvider>
             </DebtProvider>
           </ExpenseProvider>
         </PrivacyProvider>

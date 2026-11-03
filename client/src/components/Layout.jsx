@@ -13,7 +13,8 @@ import {
   ChevronDown,
   Wallet,
   Eye,
-  EyeOff
+  EyeOff,
+  Landmark
 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { cn } from '../utils/cn'
@@ -48,6 +49,7 @@ const Layout = () => {
     { name: 'Dashboard', href: '/app/dashboard', icon: Home },
     { name: 'Expenses', href: '/app/expenses', icon: CreditCard },
     { name: 'Debts', href: '/app/debts', icon: Wallet },
+    { name: 'Accounts', href: '/app/accounts', icon: Landmark },
     { name: 'Categories', href: '/app/categories', icon: Tag },
     { name: 'Analytics', href: '/app/analytics', icon: BarChart3 },
     { name: 'Profile', href: '/app/profile', icon: User },
