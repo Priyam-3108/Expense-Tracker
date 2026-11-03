@@ -56,6 +56,11 @@ const AnalyticsDashboard = ({
     const { theme } = useTheme()
     const { isPrivate } = usePrivacy()
     const { accounts } = useAccounts()
+    // Note: AccountProvider only fetches when a user is logged in, so an
+    // anonymous shared-link visitor gets accounts=[] harmlessly. The guards
+    // below exist for the other case: a LOGGED-IN user viewing someone
+    // else's shared link, who must never see their own accounts rendered
+    // as if they belonged to the link owner.
     const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
 
     const [paymentModeData, setPaymentModeData] = useState([])
@@ -280,11 +285,11 @@ const AnalyticsDashboard = ({
             endDate: formatDateForInput(endOfMonth(new Date()))
         })
         setSelectedCategory('')
-        setAccountFilter('')
+        setAccountFilter?.('')
         setFilterType('all')
     }
 
-    const hasActiveFilters = selectedCategory || accountFilter || filterType !== 'all' ||
+    const hasActiveFilters = selectedCategory || (!isSharedView && accountFilter) || filterType !== 'all' ||
         dateRange.startDate !== formatDateForInput(startOfMonth(new Date())) ||
         dateRange.endDate !== formatDateForInput(endOfMonth(new Date()))
 
@@ -405,18 +410,20 @@ const AnalyticsDashboard = ({
                         </div>
 
                         {/* Account Filter */}
-                        <div className="space-y-2">
-                            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                <Wallet size={16} className="text-gray-500 dark:text-gray-400" />
-                                Account
-                            </label>
-                            <AccountPicker
-                                value={accountFilter}
-                                onChange={setAccountFilter}
-                                accounts={accounts}
-                                allowAll
-                            />
-                        </div>
+                        {!isSharedView && (
+                            <div className="space-y-2">
+                                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                    <Wallet size={16} className="text-gray-500 dark:text-gray-400" />
+                                    Account
+                                </label>
+                                <AccountPicker
+                                    value={accountFilter}
+                                    onChange={setAccountFilter}
+                                    accounts={accounts}
+                                    allowAll
+                                />
+                            </div>
+                        )}
 
                         {/* Type Filter */}
                         <div className="space-y-2">

@@ -88,7 +88,7 @@ function IndeterminateCheckbox({
 const Expenses = () => {
   const { user, currency } = useAuth()
   const { isPrivate } = usePrivacy()
-  const { accounts, defaultAccountId, loadAccounts } = useAccounts()
+  const { accounts, archivedAccounts, defaultAccountId, loadAccounts } = useAccounts()
   const {
     expenses,
     categories,
@@ -177,6 +177,14 @@ const Expenses = () => {
 
   const location = useLocation()
   const navigate = useNavigate()
+
+  // Fetch archived accounts too (once) so archived account names still
+  // resolve in historical expense rows; AccountContext splits the fetched
+  // list back into accounts/archivedAccounts for us.
+  useEffect(() => {
+    loadAccounts(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Seed dateRange from heatmap click on mount
   useEffect(() => {
@@ -384,12 +392,14 @@ const Expenses = () => {
         if (result.success) {
           setShowForm(false)
           resetForm()
+          loadAccounts()
         }
       } else {
         const result = await addExpense(expenseData)
         if (result.success) {
           setShowForm(false)
           resetForm()
+          loadAccounts()
         }
       }
     } catch (error) {
@@ -407,6 +417,7 @@ const Expenses = () => {
     if (window.confirm(`Are you sure you want to delete "${expense.description}"? This action cannot be undone.`)) {
       try {
         await deleteExpense(expense._id)
+        loadAccounts()
       } catch (error) {
         console.error('Error deleting expense:', error)
       }
@@ -474,6 +485,7 @@ const Expenses = () => {
       if (response.data?.success) {
         // Reload expenses
         await loadExpenses()
+        loadAccounts()
 
         setShowBulkForm(false)
         resetBulkForm()
@@ -528,6 +540,7 @@ const Expenses = () => {
         toast.success('Expenses deleted successfully')
         setShowBulkDelete(false)
         loadExpenses()
+        loadAccounts()
       }
     } catch (error) {
       console.error('Error deleting expenses:', error)
@@ -554,6 +567,7 @@ const Expenses = () => {
       const result = await bulkUpdateList(editableExpenses)
       if (result.success) {
         setShowBulkEdit(false)
+        loadAccounts()
       }
     } catch (error) {
       console.error('Error updating expenses:', error)
@@ -661,7 +675,7 @@ const Expenses = () => {
           <PaymentModeBadge value={row.original.paymentMode} hideOther />
           {(() => {
             const accId = row.original.account?._id || row.original.account
-            const acc = accounts.find((a) => a._id === accId)
+            const acc = accounts.find((a) => a._id === accId) || archivedAccounts.find((a) => a._id === accId)
             return acc ? <span className="text-xs text-gray-400 dark:text-slate-500 ml-1">· {acc.name}</span> : null
           })()}
         </span>
@@ -702,7 +716,7 @@ const Expenses = () => {
         </div>
       )
     }
-  ], [categories, currency, accounts])
+  ], [categories, currency, accounts, archivedAccounts])
 
   // Calendar month view
   const monthStart = startOfMonth(calendarDate)
@@ -1148,7 +1162,7 @@ const Expenses = () => {
                     {t.note ? <span className="text-gray-400 dark:text-slate-600"> · {t.note}</span> : null}
                   </span>
                   <span className="text-gray-500 dark:text-slate-400">
-                    {t.date} · <Amount value={t.amount} currency={currency} />
+                    {t.date} · <Amount value={t.amount} currency={t.fromAccount?.currency || currency} />
                   </span>
                 </div>
               ))}
@@ -1515,6 +1529,7 @@ const Expenses = () => {
         onClose={() => setShowImportModal(false)}
         onImportSuccess={() => {
           loadExpenses()
+          loadAccounts()
           // Optionally refresh categories if new ones were added
         }}
       />
