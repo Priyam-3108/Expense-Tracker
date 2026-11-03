@@ -1,9 +1,11 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useTheme } from '../context/ThemeContext'
 import { usePrivacy } from '../context/PrivacyContext'
+import { useAccounts } from '../context/AccountContext'
 import Amount from './Amount'
 import DateRangePicker from './DateRangePicker'
 import CategorySelector from './CategorySelector'
+import AccountPicker from './AccountPicker'
 import { formatCurrency, formatDateForInput, calculatePercentage, getCurrentMonthRange, getLast30DaysRange } from '../utils/helpers'
 import { analyticsService } from '../services/analyticsService'
 import { PAYMENT_MODE_MAP } from '../constants/paymentModes'
@@ -12,7 +14,7 @@ import {
 } from 'recharts'
 import {
     TrendingUp, TrendingDown, Calendar, Filter, X,
-    ArrowUpCircle, ArrowDownCircle, PieChart as PieChartIcon, BarChart3, Activity, Share2, SearchX
+    ArrowUpCircle, ArrowDownCircle, PieChart as PieChartIcon, BarChart3, Activity, Share2, SearchX, Wallet
 } from 'lucide-react'
 import EmptyState from './EmptyState'
 import { startOfYear, endOfYear, format, parseISO, eachDayOfInterval, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachMonthOfInterval } from 'date-fns'
@@ -43,6 +45,8 @@ const AnalyticsDashboard = ({
     setDateRange,
     selectedCategory,
     setSelectedCategory,
+    accountFilter,
+    setAccountFilter,
     filterType,
     setFilterType,
     onShare,
@@ -51,6 +55,7 @@ const AnalyticsDashboard = ({
 }) => {
     const { theme } = useTheme()
     const { isPrivate } = usePrivacy()
+    const { accounts } = useAccounts()
     const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
 
     const [paymentModeData, setPaymentModeData] = useState([])
@@ -275,10 +280,11 @@ const AnalyticsDashboard = ({
             endDate: formatDateForInput(endOfMonth(new Date()))
         })
         setSelectedCategory('')
+        setAccountFilter('')
         setFilterType('all')
     }
 
-    const hasActiveFilters = selectedCategory || filterType !== 'all' ||
+    const hasActiveFilters = selectedCategory || accountFilter || filterType !== 'all' ||
         dateRange.startDate !== formatDateForInput(startOfMonth(new Date())) ||
         dateRange.endDate !== formatDateForInput(endOfMonth(new Date()))
 
@@ -396,6 +402,20 @@ const AnalyticsDashboard = ({
                                     </button>
                                 )}
                             </div>
+                        </div>
+
+                        {/* Account Filter */}
+                        <div className="space-y-2">
+                            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                <Wallet size={16} className="text-gray-500 dark:text-gray-400" />
+                                Account
+                            </label>
+                            <AccountPicker
+                                value={accountFilter}
+                                onChange={setAccountFilter}
+                                accounts={accounts}
+                                allowAll
+                            />
                         </div>
 
                         {/* Type Filter */}

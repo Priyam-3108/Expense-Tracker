@@ -29,6 +29,7 @@ const Analytics = () => {
     endDate: formatDateForInput(endOfMonth(new Date()))
   })
   const [selectedCategory, setSelectedCategory] = useState('')
+  const [accountFilter, setAccountFilter] = useState('')
   const [filterType, setFilterType] = useState('all') // 'all', 'expense', 'income'
   const [categoryStats, setCategoryStats] = useState([])
   const [loadingStats, setLoadingStats] = useState(false)
@@ -41,7 +42,7 @@ const Analytics = () => {
 
   // Ref to prevent concurrent API calls
   const isLoadingRef = useRef(false)
-  const lastFiltersRef = useRef({ startDate: '', endDate: '', category: '', type: '' })
+  const lastFiltersRef = useRef({ startDate: '', endDate: '', category: '', type: '', account: '' })
 
   // Load data when filters change
   useEffect(() => {
@@ -51,15 +52,17 @@ const Analytics = () => {
     const startDate = dateRange.startDate || ''
     const endDate = dateRange.endDate || ''
     const category = selectedCategory || ''
+    const account = accountFilter || ''
     const type = filterType || 'all'
 
     // Check if filters actually changed
-    const currentFilters = { startDate, endDate, category, type }
+    const currentFilters = { startDate, endDate, category, type, account }
     const filtersChanged =
       lastFiltersRef.current.startDate !== startDate ||
       lastFiltersRef.current.endDate !== endDate ||
       lastFiltersRef.current.category !== category ||
-      lastFiltersRef.current.type !== type
+      lastFiltersRef.current.type !== type ||
+      lastFiltersRef.current.account !== account
 
     // Prevent concurrent calls and unnecessary calls
     if (isLoadingRef.current || !filtersChanged) {
@@ -77,6 +80,7 @@ const Analytics = () => {
             startDate: startDate || undefined,
             endDate: endDate || undefined,
             category: category || undefined,
+            account: account || undefined,
             type: type !== 'all' ? type : undefined
           }),
           loadStats({ startDate, endDate }),
@@ -101,7 +105,7 @@ const Analytics = () => {
     }
 
     loadData()
-  }, [user, dateRange.startDate, dateRange.endDate, selectedCategory, filterType])
+  }, [user, dateRange.startDate, dateRange.endDate, selectedCategory, filterType, accountFilter])
 
   // Check share status on mount
   useEffect(() => {
@@ -177,6 +181,8 @@ const Analytics = () => {
         setDateRange={setDateRange}
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
+        accountFilter={accountFilter}
+        setAccountFilter={setAccountFilter}
         filterType={filterType}
         setFilterType={setFilterType}
         onShare={handleShare}
