@@ -647,19 +647,116 @@ Spec: `specs/2026-09-10-accounts-transfers-design.md`
 >   Mongoose-level string coercion) — none urgent, all recorded here for 4B/4C awareness.
 
 ### 4B · Web — `plans/2026-09-10-accounts-transfers-4b-web.md`
-- [ ] Task 1: `accountService` + `transferService`
-- [ ] Task 2: `AccountContext`
-- [ ] Task 3: `Accounts` page (list + computed balances)
-- [ ] Task 4: Account add/edit/archive modal (form-kit)
-- [ ] Task 5: Nav entry + route
-- [ ] Task 6: Account picker in the Expense add/edit form
-- [ ] Task 7: `TransferForm` (new) + Transfers tab/section
-- [ ] Task 8: Account filter in Expenses + Analytics
-- [ ] Task 9: Reconcile UI on an account
-- [ ] Task 10: Dashboard total-balance + per-account cards
-- [ ] Task 11: Per-account statement view
-- [ ] Task 12: Build + manual checklist
-- [ ] **4B merged**
+- [x] Task 1: `accountService` + `transferService` + `accountTypes` constant
+- [x] Task 2: `AccountContext` (list, CRUD, reconcile, default resolution)
+- [x] Task 3: Mount `AccountProvider` + `/app/accounts` route + nav entry
+- [x] Task 4: `AccountPicker` chip row + `AccountForm` modal (add/edit/archive)
+- [x] Task 5: `TransferForm` + `AccountStatement` components
+- [x] Task 6: `Accounts` page (balances, statement, reconcile, archive, delete)
+- [x] Task 7: Expense form account picker + account badge + Transfers tab
+- [x] Task 8: Dashboard total-balance + per-account "Balances" card
+- [x] Task 9: Account filter on Analytics
+- [x] Task 10: Full build + grep gate + manual regression sweep (code-read
+      verification only — no live backend/browser available this session)
+- [x] **4B merged**
+
+> **4B notes (2026-11-04):** The plan's actual final task list (10 tasks) was
+> reorganized from this checklist's older 12-task outline written before the
+> plan's last revision — mapped 1:1 above by what was actually built, not by
+> task number. Full execution detail, every reconciliation finding, and the
+> final-review findings/fix-wave are in the (now-deleted) SDD ledger; the
+> commit range `bd3e69e..79550db` on `enhancement/expense-manager-parity` is
+> the authoritative record.
+>
+> **Reconciliation (pre-flight, 6 findings, all resolved before dispatch):**
+> `Amount.jsx` already existed (3B merged) — no shim needed, the plan's
+> fallback note was moot. `App.jsx`'s real provider nesting and `Layout.jsx`'s
+> real nav array both differed from the plan's illustrative snippets (no
+> `BudgetProvider`; Debts already used the `Wallet` icon) — real structures
+> used instead. `StickyFormFooter` has NO `disabled` prop at all — confirmed
+> via direct read, not just trusted from the plan's own uncertainty note; the
+> `invalid` early-return guard already in `TransferForm`'s `submit()` is
+> sufficient on its own, nothing else needed. The biggest real plan/code gap:
+> the spec's text describes `getDetailedAnalytics` accepting an `account`
+> param, but `Analytics.jsx` never calls any such endpoint — it only calls
+> `loadExpenses`/`loadStats`/`loadTrends`/`getCategoryStats`, and the
+> pre-existing `category` filter only reaches `loadExpenses` too. Ruling:
+> thread the new `accountFilter` the same (limited) way — consistent with the
+> already-established reach of the sibling filter, not a regression.
+>
+> **Execution:** all 10 tasks passed their own task-level review clean on the
+> first pass — no per-task fix loop was needed anywhere in this phase (unlike
+> 4A's Task 7). Task 3's placeholder `Accounts.jsx` (created only so the new
+> route's import would resolve before Task 6 landed) was confirmed fully
+> replaced by Task 6 with no leftover artifacts. Task 7 (the largest,
+> touching the ~1450-line `Expenses.jsx`) was dispatched with 7 explicit
+> flagged risk points (functional-setState effect to seed `defaultAccountId`
+> without an infinite-loop risk, dual view-mode guards, a `useMemo` dependency
+> array extension, exact edit-prefill/payload expressions, confirmation that
+> `MobileExpenseCard.jsx` stayed untouched, badge scoped to desktop only) —
+> all 7 independently reconfirmed correct by its reviewer. Task 10
+> (build+grep+manual-sweep) hit one genuine process hiccup: its first
+> dispatch got confused mid-run and silently never wrote its report (no
+> commits, no harm) — discarded and re-dispatched fresh, which completed
+> cleanly. No live backend or browser was available in this environment for
+> any task in this phase (a live user-owned dev server on port 5173 was
+> correctly identified and left untouched throughout) — every task relied on
+> `npx vite build` passing plus careful code-reading as the verification
+> gate, consistent end to end; this is a real, acknowledged limitation for
+> 4C/future phases to account for if a live environment becomes available.
+>
+> **Final whole-phase review (1 round) found 2 Critical + 2 Important,** all
+> genuinely cross-task gaps invisible to any single task's own diff:
+> (1) *Critical* — `AnalyticsDashboard.jsx`'s new Account filter cell (Task 9)
+> had a third consumer no per-task diff ever touched: `SharedAnalytics.jsx`,
+> rendered at the PUBLIC route `/analytics/shared/:token`. Unguarded, this
+> would crash that public page on first interaction (`setAccountFilter` is
+> `undefined` there) AND render a logged-in viewer's own account names inside
+> someone else's shared analytics page — a direct violation of the spec's own
+> explicit non-goal, "No shared-analytics exposure of accounts." (2) *Critical*
+> — no expense create/update/delete/bulk/import success path called
+> `loadAccounts()` anywhere; only the Transfers tab's own creation flow did.
+> Since balances are computed from expense data, the single most common user
+> action in the whole app silently desynced every displayed balance until a
+> hard reload — undermining this phase's headline feature. (3) *Important* —
+> the Transfers panel rendered every transfer's amount in the user's PROFILE
+> currency rather than the transfer's own (same-currency-by-construction)
+> account currency, inconsistent with `Accounts.jsx`/`Dashboard.jsx`'s correct
+> `acc.currency || currency` pattern elsewhere. (4) *Important* — the
+> Expenses-page account-name lookup depended entirely on the non-archived
+> `accounts` list (the server never populates `expense.account`), so
+> archiving an account silently erased its name from every historical expense
+> row that referenced it, with no visual distinction from "no account" —
+> contradicting the spec's explicit intent that archiving keeps history
+> visible. **Ruling: fix all 4 now, one consolidated wave** (per this
+> program's established pattern from 4A) — none of the four stop-conditions
+> applied (nothing irreversible, no security-sensitive action beyond what the
+> fix itself resolved, no external side effect needing prior agreement, plan
+> not broken). Fixed in commit `79550db`: the Account filter cell now follows
+> the file's own pre-existing `isSharedView` guard convention exactly;
+> `loadAccounts()` added after all 5 expense-mutation success paths plus
+> `ImportModal`'s success callback; the Transfers panel now reads
+> `t.fromAccount?.currency || currency`; the archived-account lookup now
+> falls back to `archivedAccounts`, backed by a new one-time
+> `loadAccounts(true)` mount effect in `Expenses.jsx` — the full fix was
+> achievable as a one-line addition, so the best-effort fallback option was
+> not needed. A scoped re-review independently confirmed all 4 ADDRESSED with
+> no new breakage, paying particular attention to whether the new
+> `loadAccounts(true)` mount call could leak archived accounts into
+> `AccountPicker` anywhere (it cannot — `AccountContext`'s `accounts`/
+> `archivedAccounts` split is derived fresh from whichever fetch last ran,
+> and every picker consumes the filtered, non-archived `accounts` export
+> regardless of which fetch populated the underlying state).
+>
+> **Deferred, lower-severity items** (parked, not blocking, for 4C/future
+> awareness): `AccountContext`'s mutation actions always call
+> `loadAccounts(false)`, so archived accounts can silently drop out of a
+> "Show archived" view on the Accounts page itself until the toggle is
+> flipped again — inherited from the plan's own prescribed code, not an
+> implementer deviation. `AccountStatement`'s merged-entry React key
+> (`e._id`) could theoretically collide between an Expense and a Transfer
+> document from different Mongo collections — astronomically unlikely, not
+> fixed. No new npm dependency was added anywhere in this phase.
 
 ### 4C · Mobile — `plans/2026-09-10-accounts-transfers-4c-mobile.md`
 - [ ] Task 1: `accountService` + `transferService` (mobile)
