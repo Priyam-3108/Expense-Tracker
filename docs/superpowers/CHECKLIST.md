@@ -759,17 +759,121 @@ Spec: `specs/2026-09-10-accounts-transfers-design.md`
 > fixed. No new npm dependency was added anywhere in this phase.
 
 ### 4C · Mobile — `plans/2026-09-10-accounts-transfers-4c-mobile.md`
-- [ ] Task 1: `accountService` + `transferService` (mobile)
-- [ ] Task 2: `AccountContext`
-- [ ] Task 3: Account picker in `AddExpenseScreen`
-- [ ] Task 4: `local_transfers` SQLite table + `offlineService` transfer methods
-- [ ] Task 5: `syncEngine` transfer sync path
-- [ ] Task 6: `AccountsScreen` (list + balances)
-- [ ] Task 7: Transfer flow screen
-- [ ] Task 8: Reconcile flow
-- [ ] Task 9: `account` in local expense payload + sync
-- [ ] Task 10: Manual smoke (online, offline expense+transfer queue, sync, reconcile)
-- [ ] **4C merged**
+- [x] Task 1: `accountService` + `transferService` (mobile) + `accountTypes` constant
+- [x] Task 2: `AccountContext` with offline AsyncStorage cache
+- [x] Task 3: Mount `AccountProvider` + register Accounts/Transfer nav routes + Profile entry point
+- [x] Task 4: `local_transfers` SQLite table + `offlineService` transfer methods
+- [x] Task 5: `AccountsScreen` (balances, statement, reconcile, archive, delete)
+- [x] Task 6: `TransferScreen` (online create + offline queue)
+- [x] Task 7: `syncEngine` transfer sync pass + account chip row in `AddExpenseScreen`
+- [x] Task 8: Full verification sweep (parse-check + grep gate + code-read manual sweep —
+      no Metro/emulator/device available this session)
+- [x] **4C merged**
+
+> **4C notes (2026-11-23):** The plan's actual final task list (8 tasks) was
+> reorganized from this checklist's older 10-task outline written before the
+> plan's last revision — mapped 1:1 above by what was actually built. Full
+> execution detail is in the (now-deleted) SDD ledger; the commit range
+> `1a315ef..3cffb94` on `enhancement/expense-manager-parity` is the
+> authoritative record.
+>
+> **Reconciliation (pre-flight):** the real mobile nav is a bottom-tab
+> navigator (`AppNavigator.js`) with `Dashboard` and `Profile` as their own
+> nested stacks — the plan's "find the navigator file" instruction resolved
+> to `ProfileStack`, not a flat top-level stack, since that's where the
+> plan's own "entry point" (a Profile settings row) naturally reaches both
+> new screens. `db.js`'s real `initDB` wraps each `CREATE TABLE` in its own
+> nested try/catch (log, not throw) inside one outer IIFE — the new
+> `local_transfers` DDL was added as a second such block, not a new export.
+> `offlineService.js`'s real sibling methods use parameterized SQL
+> placeholders and each has its own individually-matched error-handling
+> style (`saveExpenseLocally` throws, `getPendingExpenses` logs+returns `[]`,
+> `markAsSynced`/`markAsFailed` log with no throw) — the 4 new transfer
+> methods were matched to their real siblings individually, not written
+> from the plan's rougher prose. `AddExpenseScreen.js`'s real `handleSubmit`
+> has NO online/offline branch at all (always local-then-sync, unlike the
+> new `TransferScreen`'s explicit `NetInfo` branch) — simpler than the plan
+> assumed, no restructuring needed for the account field.
+>
+> **Execution:** all 8 tasks passed their own task-level review clean on the
+> first pass — no per-task fix loop needed anywhere in this phase. Tasks 3,
+> 5, and 6 each replaced a placeholder file created by an earlier task
+> (mirroring the exact precedent set in the web phase, 4B) — each confirmed
+> by its reviewer to be a genuine replacement (diff shows a modification of
+> the tracked path, not `new file mode`), not a merge or leftover artifact.
+> Task 7's `syncEngine.syncNow()` restructure (removing an early-return that
+> would have skipped a transfer-only sync entirely) was independently
+> traced through all 4 pending-expense/pending-transfer combinations by its
+> reviewer and confirmed correct. No Metro bundler, Expo CLI, emulator, or
+> device was available anywhere in this phase's execution — every task
+> relied on careful file read-back, and Tasks 6/7/8 additionally used a real
+> `@babel/core` + `babel-preset-expo` parse as a stronger syntax-check
+> substitute. This is a real, acknowledged limitation — a human device pass
+> is still needed before shipping, see the sweep list below.
+>
+> **Final whole-phase review (1 round) found 4 Important findings,** all
+> genuinely cross-task gaps invisible to any single task's own diff:
+> (1) *Important* — `AuthContext.js`'s `signOut()` (a file no task in this
+> phase owned) never cleared the new `accounts_cache`/`default_account_id`
+> AsyncStorage keys or the `local_transfers` table, risking a shared-device
+> cross-user data leak and a transfer that queues offline under one user
+> silently retrying forever under a different user's session after logout.
+> (2) *Important* — mobile never refreshed account balances after an
+> expense save, the same bug class Phase 4B's own final review caught and
+> fixed in 8 places on web — lower severity here since `AccountsScreen`'s
+> own focus-refresh self-heals on next visit, but a real staleness race
+> existed. (3) *Important* — the combination of Task 7's unconditional
+> `account` payload field and Task 2's non-archived-only `accounts` list
+> created two bugs: editing an expense on an already-archived account
+> showed no selected chip and no way to tell which account it was on (web
+> already hit and fixed this exact bug in its own 4B final-review wave);
+> and a null/unmigrated `account` value got sent as an empty string, which
+> the server's sync guard hard-rejects as FAILED while the UI had already
+> shown a success toast — silently discarding the edit. (4) *Important* —
+> the final reviewer independently REVERSED Task 5's own parking decision on
+> mobile `AccountContext` lacking an `archivedAccounts` export: ruled it
+> load-bearing for finding (3)'s archived-account-identity half, not merely
+> cosmetic, and fixed it in the same wave. Separately, the reviewer
+> confirmed the ledger's own stated worry (that the vestigial
+> `default_account_id` AsyncStorage key might cache a since-archived id) was
+> unfounded — that key is written once and read nowhere in the codebase; the
+> real default-resolution path always recomputes fresh from the in-memory
+> non-archived list. **Ruling: fix all 4 now, one consolidated wave** (same
+> established pattern as 4A/4B's own final-review fix waves) — none of the
+> four stop-conditions applied. Fixed in commit `3cffb94`: a new
+> `offlineService.clearLocalTransfers()` plus 3 new clear operations in
+> `signOut()`; `loadAccounts()` added after the expense-save and
+> expense-delete success paths; the edit payload changed to
+> `account: account || undefined`; a non-interactive "archived account" note
+> added to the edit form, gated on a 3-part condition (set, not in
+> non-archived list, IS in the archived list) that correctly distinguishes
+> "archived but valid" from "truly unset"; mobile's `loadAccounts` gained an
+> `includeArchived` parameter (default `false`, preserving every existing
+> caller's behavior) and an `archivedAccounts` export derived from the FULL
+> fetched list, not from the already-filtered non-archived list (the subtle
+> always-empty filter-order bug the re-reviewer specifically checked for and
+> confirmed absent). A scoped re-review independently confirmed all 4
+> ADDRESSED with no new breakage.
+>
+> **Deferred, lower-severity item** (parked, not blocking): `AccountsScreen`'s
+> headline total balance is hardcoded to INR formatting while every
+> per-account row correctly uses the account's own currency — consistent
+> with mobile having no user-currency context anywhere else in the app
+> (pre-existing app-wide limitation, not a 4C regression), deferred rather
+> than fixed. The known, plan-documented Android `Alert.prompt` gap
+> (Reconcile and Add-account fall back to an informational alert on Android
+> instead of real text input) remains a v1 stopgap, unchanged.
+>
+> **Human-pass-needed before shipping** (handed to the user, since no
+> Metro/emulator/device was reachable this session): `npx expo start -c`
+> across all screens for a live "no red-box" check; the full manual sweep on
+> both a real iOS device/sim (`Alert.prompt` path) and a real Android
+> device/emulator (guard-message fallback); live online + offline
+> (airplane-mode) expense and transfer sync verified against the web app;
+> offline `AccountsScreen`'s cached-vs-never-cached visual display; live
+> confirmation that archiving hides an account from the Add Expense /
+> Transfer pickers; a visual (not just token-presence) dark/light contrast
+> check on the two new screens.
 
 ---
 
