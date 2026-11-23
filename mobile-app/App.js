@@ -4,6 +4,7 @@ import { AuthProvider, AuthContext } from './src/context/AuthContext';
 import { ThemeProvider } from './src/context/ThemeContext';
 import { SecurityProvider, SecurityContext } from './src/context/SecurityContext';
 import { PrivacyProvider } from './src/context/PrivacyContext';
+import { AccountProvider } from './src/context/AccountContext';
 import { ActivityIndicator, View, AppState } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import LockScreen from './src/screens/LockScreen';
@@ -78,7 +79,9 @@ export default function App() {
         <AuthProvider>
           <SecurityProvider>
             <PrivacyProvider>
-              <RootNavigator />
+              <AccountProvider>
+                <RootNavigator />
+              </AccountProvider>
             </PrivacyProvider>
           </SecurityProvider>
         </AuthProvider>

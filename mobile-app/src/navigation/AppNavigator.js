@@ -19,6 +19,8 @@ import BudgetSettingsScreen from '../screens/BudgetSettingsScreen';
 import ExportDataScreen from '../screens/ExportDataScreen';
 import AppLockScreen from '../screens/AppLockScreen';
 import SearchScreen from '../screens/SearchScreen';
+import AccountsScreen from '../screens/AccountsScreen';
+import TransferScreen from '../screens/TransferScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -54,6 +56,8 @@ function ProfileStack() {
             <Stack.Screen name="AppLock" component={AppLockScreen} />
             <Stack.Screen name="CategoriesList" component={CategoriesScreen} />
             <Stack.Screen name="AddEditCategory" component={AddEditCategoryScreen} />
+            <Stack.Screen name="Accounts" component={AccountsScreen} />
+            <Stack.Screen name="Transfer" component={TransferScreen} />
         </Stack.Navigator>
     );
 }
