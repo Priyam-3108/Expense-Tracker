@@ -157,5 +157,15 @@ export const offlineService = {
         } catch (error) {
             console.error('Error clearing local expenses:', error);
         }
+    },
+
+    async clearLocalTransfers() {
+        const db = await getDB();
+        if (!db) return;
+        try {
+            await db.runAsync('DELETE FROM local_transfers');
+        } catch (error) {
+            console.error('Error clearing local transfers:', error);
+        }
     }
 };

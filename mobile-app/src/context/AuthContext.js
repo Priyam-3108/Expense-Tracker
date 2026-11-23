@@ -46,7 +46,9 @@ export const AuthProvider = ({ children }) => {
     await AsyncStorage.removeItem('user');
     await AsyncStorage.removeItem('dashboard_server_cache');
     await AsyncStorage.removeItem('categories_cache');
+    await AsyncStorage.multiRemove(['accounts_cache', 'default_account_id']);
     await offlineService.clearLocalExpenses();
+    await offlineService.clearLocalTransfers();
   };
 
   return (

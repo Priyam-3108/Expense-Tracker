@@ -16,12 +16,12 @@ export const AccountProvider = ({ children }) => {
   const [stale, setStale] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const loadAccounts = useCallback(async () => {
+  const loadAccounts = useCallback(async (includeArchived = false) => {
     setLoading(true);
     try {
       const net = await NetInfo.fetch();
       if (net.isConnected) {
-        const res = await accountService.list(false);
+        const res = await accountService.list(includeArchived);
         const list = res.data?.data?.accounts || [];
         setAccounts(list);
         setTotalBalance(res.data?.data?.totalBalance ?? 0);
@@ -82,11 +82,12 @@ export const AccountProvider = ({ children }) => {
   }, [loadAccounts]);
 
   const visible = accounts.filter((a) => !a.archived);
+  const archivedAccounts = accounts.filter((a) => a.archived);
   const defaultAccountId = visible.find((a) => a.isDefault)?._id || visible[0]?._id || null;
 
   return (
     <AccountContext.Provider
-      value={{ accounts: visible, defaultAccountId, totalBalance, stale, loading, loadAccounts, createAccount, updateAccount, deleteAccount, reconcile }}
+      value={{ accounts: visible, archivedAccounts, defaultAccountId, totalBalance, stale, loading, loadAccounts, createAccount, updateAccount, deleteAccount, reconcile }}
     >
       {children}
     </AccountContext.Provider>

@@ -19,7 +19,7 @@ import { useAccounts } from '../context/AccountContext';
 
 export default function AddExpenseScreen({ navigation, route }) {
     const { colors, isDark, shadows, borderRadius } = useTheme();
-    const { accounts, defaultAccountId } = useAccounts();
+    const { accounts, archivedAccounts, defaultAccountId, loadAccounts } = useAccounts();
     const [description, setDescription] = useState('');
     const [amount, setAmount] = useState('');
     const [type, setType] = useState('expense');
@@ -124,13 +124,15 @@ export default function AddExpenseScreen({ navigation, route }) {
             };
             const payload = {
                 ...(isEditing && editId && { _id: editId, id: editId }),
-                description, amount: parseFloat(amount), type, category, paymentMode, account,
+                description, amount: parseFloat(amount), type, category, paymentMode,
+                account: account || undefined,
                 date: fmt(date), isRecurring,
                 ...(isRecurring && { recurringPeriod, recurringEndDate: fmt(recurringEndDate) }),
             };
 
             await offlineService.saveExpenseLocally(payload);
             syncEngine.syncNow();
+            loadAccounts();
 
             hapticFeedback.success();
             setAlertConfig({
@@ -444,6 +446,11 @@ export default function AddExpenseScreen({ navigation, route }) {
 
                 {/* ── Account ── */}
                 <Text style={s.sectionLabel}>Account</Text>
+                {!!account && !accounts.some((a) => a._id === account) && archivedAccounts.some((a) => a._id === account) && (
+                    <Text style={[s.recurringSubtitle, { marginHorizontal: 20, marginBottom: 8 }]}>
+                        This expense is on an archived account ({archivedAccounts.find((a) => a._id === account)?.name}).
+                    </Text>
+                )}
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.chipsScroll} style={{ marginBottom: 16 }}>
                     {accounts.map((a) => {
                         const isSel = account === a._id;
