@@ -86,6 +86,69 @@ export const offlineService = {
         }
     },
 
+    async saveTransferLocally(data) {
+        const db = await getDB();
+        if (!db) return { success: false };
+        const uuid = uuidv4();
+
+        const payload = {
+            ...data,
+            client_uuid: uuid,
+        };
+
+        try {
+            await db.runAsync(
+                'INSERT INTO local_transfers (uuid, sync_status, payload, created_at) VALUES (?, ?, ?, ?)',
+                [uuid, 'PENDING', JSON.stringify(payload), new Date().toISOString()]
+            );
+            return { success: true, uuid, ...payload };
+        } catch (error) {
+            console.error('Error saving transfer locally:', error);
+            throw error;
+        }
+    },
+
+    async getPendingTransfers() {
+        const db = await getDB();
+        if (!db) return [];
+        try {
+            const results = await db.getAllAsync('SELECT * FROM local_transfers WHERE sync_status IN (?, ?)', ['PENDING', 'FAILED']);
+            return results.map(row => ({
+                ...row,
+                payload: JSON.parse(row.payload)
+            }));
+        } catch (error) {
+            console.error('Error fetching pending transfers:', error);
+            return [];
+        }
+    },
+
+    async markTransferSynced(localRowId, serverId) {
+        const db = await getDB();
+        if (!db) return;
+        try {
+            await db.runAsync(
+                'UPDATE local_transfers SET sync_status = ?, server_id = ? WHERE id = ?',
+                ['SYNCED', serverId, localRowId]
+            );
+        } catch (error) {
+            console.error('Error marking transfer synced:', error);
+        }
+    },
+
+    async markTransferFailed(localRowId) {
+        const db = await getDB();
+        if (!db) return;
+        try {
+            await db.runAsync(
+                'UPDATE local_transfers SET sync_status = ? WHERE id = ?',
+                ['FAILED', localRowId]
+            );
+        } catch (error) {
+            console.error('Error marking transfer failed:', error);
+        }
+    },
+
     async clearLocalExpenses() {
         const db = await getDB();
         if (!db) return;

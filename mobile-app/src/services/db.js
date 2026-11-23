@@ -28,6 +28,21 @@ export const initDB = async () => {
                 console.log('RunAsync table creation notice:', sqlErr);
             }
 
+            try {
+                await db.runAsync(`
+                    CREATE TABLE IF NOT EXISTS local_transfers (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        uuid TEXT UNIQUE NOT NULL,
+                        server_id TEXT,
+                        sync_status TEXT DEFAULT 'PENDING',
+                        payload TEXT NOT NULL,
+                        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+                    );
+                `);
+            } catch (sqlErr) {
+                console.log('RunAsync table creation notice:', sqlErr);
+            }
+
             dbInstance = db;
             console.log('SQLite DB initialized');
             return db;
