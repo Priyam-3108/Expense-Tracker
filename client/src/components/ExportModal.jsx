@@ -64,8 +64,7 @@ const ExportModal = ({ isOpen, onClose, onExport, loading }) => {
                     <DateRangePicker
                         startDate={dateRange.startDate}
                         endDate={dateRange.endDate}
-                        onStartDateChange={(date) => setDateRange({ ...dateRange, startDate: date })}
-                        onEndDateChange={(date) => setDateRange({ ...dateRange, endDate: date })}
+                        onChange={(startDate, endDate) => setDateRange((r) => ({ ...r, startDate, endDate }))}
                     />
                 </div>
             </div>

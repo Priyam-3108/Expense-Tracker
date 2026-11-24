@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useExpense } from '../context/ExpenseContext'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
@@ -39,10 +39,6 @@ const Analytics = () => {
   const [shareEnabled, setShareEnabled] = useState(false)
   const [copying, setCopying] = useState(false)
 
-  // Ref to prevent concurrent API calls
-  const isLoadingRef = useRef(false)
-  const lastFiltersRef = useRef({ startDate: '', endDate: '', category: '', type: '' })
-
   // Load data when filters change
   useEffect(() => {
     if (!user) return
@@ -53,22 +49,13 @@ const Analytics = () => {
     const category = selectedCategory || ''
     const type = filterType || 'all'
 
-    // Check if filters actually changed
-    const currentFilters = { startDate, endDate, category, type }
-    const filtersChanged =
-      lastFiltersRef.current.startDate !== startDate ||
-      lastFiltersRef.current.endDate !== endDate ||
-      lastFiltersRef.current.category !== category ||
-      lastFiltersRef.current.type !== type
+    // Wait until the range is complete (or fully cleared) - a lone start date is mid-selection
+    if (!startDate !== !endDate) return
 
-    // Prevent concurrent calls and unnecessary calls
-    if (isLoadingRef.current || !filtersChanged) {
-      return
-    }
+    // A newer filter change cancels this run, so the latest selection always wins
+    let cancelled = false
 
     const loadData = async () => {
-      isLoadingRef.current = true
-      lastFiltersRef.current = currentFilters
       setLoadingStats(true)
 
       try {
@@ -84,23 +71,25 @@ const Analytics = () => {
         ])
 
         // Store in local state so context overwrites can't clobber analytics data
+        if (cancelled) return
         if (expenseResult?.expenses) {
           setAnalyticsExpenses(expenseResult.expenses)
         }
 
         // Load category stats
         const stats = await getCategoryStats({ startDate, endDate })
-        setCategoryStats(stats || [])
+        if (!cancelled) setCategoryStats(stats || [])
       } catch (error) {
+        if (cancelled) return
         console.error('Error loading analytics data:', error)
         toast.error('Failed to load analytics data')
       } finally {
-        setLoadingStats(false)
-        isLoadingRef.current = false
+        if (!cancelled) setLoadingStats(false)
       }
     }
 
     loadData()
+    return () => { cancelled = true }
   }, [user, dateRange.startDate, dateRange.endDate, selectedCategory, filterType])
 
   // Check share status on mount

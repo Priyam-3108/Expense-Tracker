@@ -113,7 +113,7 @@ const Dashboard = () => {
   const textLink = 'inline-flex items-center gap-1 text-sm text-[#533afd] dark:text-[#8b7ffe] hover:text-[#4434d4] dark:hover:text-[#a59bff] transition-colors'
 
   return (
-    <div className="max-w-[1440px] space-y-8">
+    <div className="max-w-[1440px] space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-2xl md:text-[28px] leading-tight font-medium text-gray-900 dark:text-[#ededed]">Overview</h1>
@@ -121,7 +121,7 @@ const Dashboard = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-4">
         {statCards.map(({ label, value, tone }) => (
           <div key={label} className="glass-card p-5">
             <p className="text-sm text-gray-600 dark:text-[#a1a1a6]">{label}</p>
@@ -163,7 +163,7 @@ const Dashboard = () => {
                 ))}
               </select>
             </div>
-            <div className="h-[240px] md:h-[320px] w-full">
+            <div className="h-[240px] md:h-[320px] xl:h-[360px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                   <defs>
@@ -213,6 +213,22 @@ const Dashboard = () => {
             </div>
           </div>
 
+          {/* Activity */}
+          <div className="glass-card p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className={sectionTitle}>Activity</h2>
+              <span className={meta}>Last 16 weeks</span>
+            </div>
+            <ActivityHeatmap
+              grid={activity.grid}
+              weekdayLabels={activity.weekdayLabels}
+              monthLabels={activity.monthLabels}
+              loading={activity.loading}
+              error={activity.error}
+              currency={currency}
+              onCellClick={(date) => navigate('/app/expenses', { state: { date } })}
+            />
+          </div>
         </div>
 
         <div className="space-y-6">
@@ -297,23 +313,6 @@ const Dashboard = () => {
                 Debts
               </button>
             </div>
-          </div>
-
-          {/* Activity */}
-          <div className="glass-card p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className={sectionTitle}>Activity</h2>
-              <span className={meta}>Last 16 weeks</span>
-            </div>
-            <ActivityHeatmap
-              grid={activity.grid}
-              weekdayLabels={activity.weekdayLabels}
-              monthLabels={activity.monthLabels}
-              loading={activity.loading}
-              error={activity.error}
-              currency={currency}
-              onCellClick={(date) => navigate('/app/expenses', { state: { date } })}
-            />
           </div>
         </div>
       </div>

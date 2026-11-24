@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { useTheme } from '../context/ThemeContext'
 import { usePrivacy } from '../context/PrivacyContext'
 import Amount from './Amount'
@@ -280,7 +280,10 @@ const AnalyticsDashboard = ({
         }))
     }
 
-    if (loading) {
+    // Full-page spinner only for the first load; later refetches keep the page (and the date picker) mounted
+    const loadedOnce = useRef(false)
+    if (!loading) loadedOnce.current = true
+    if (loading && !loadedOnce.current) {
         return (
             <div className="flex items-center justify-center min-h-[400px]">
                 <div className="text-center">
@@ -292,7 +295,7 @@ const AnalyticsDashboard = ({
     }
 
     return (
-        <div className="space-y-6">
+        <div className={`space-y-6 transition-opacity ${loading ? 'opacity-60' : ''}`} aria-busy={loading}>
             {/* Header */}
             <div className="flex flex-row items-start justify-between gap-3">
                 <div>
@@ -347,8 +350,7 @@ const AnalyticsDashboard = ({
                                 <DateRangePicker
                                     startDate={dateRange.startDate}
                                     endDate={dateRange.endDate}
-                                    onStartDateChange={(date) => setDateRange({ ...dateRange, startDate: date })}
-                                    onEndDateChange={(date) => setDateRange({ ...dateRange, endDate: date })}
+                                    onChange={(startDate, endDate) => setDateRange((r) => ({ ...r, startDate, endDate }))}
                                 />
                             </div>
                         </div>

@@ -3,7 +3,18 @@ import { createPortal } from 'react-dom';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek, isAfter, isBefore } from 'date-fns';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, X } from 'lucide-react';
 
-const DateRangePicker = ({ startDate, endDate, onStartDateChange, onEndDateChange, className = '' }) => {
+// Pure range-selection step: returns the next { startDate, endDate } after clicking `date`.
+export const nextRange = (startDate, endDate, date) => {
+  const clicked = format(date, 'yyyy-MM-dd');
+  if (!startDate || endDate) return { startDate: clicked, endDate: '' };
+  const start = new Date(startDate);
+  return isAfter(date, start)
+    ? { startDate, endDate: clicked }
+    : { startDate: clicked, endDate: format(start, 'yyyy-MM-dd') };
+};
+
+// onChange(startDate, endDate) fires once per interaction so parents never apply two stale partial updates.
+const DateRangePicker = ({ startDate, endDate, onChange, className = '' }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(startDate ? new Date(startDate) : new Date());
   const [hoverDate, setHoverDate] = useState(null);
@@ -78,18 +89,8 @@ const DateRangePicker = ({ startDate, endDate, onStartDateChange, onEndDateChang
   };
 
   const handleDateSelect = (date) => {
-    if (!startDate || (startDate && endDate)) {
-      onStartDateChange(format(date, 'yyyy-MM-dd'));
-      onEndDateChange('');
-    } else if (startDate && !endDate) {
-      const start = new Date(startDate);
-      if (isAfter(date, start)) {
-        onEndDateChange(format(date, 'yyyy-MM-dd'));
-      } else {
-        onEndDateChange(format(start, 'yyyy-MM-dd'));
-        onStartDateChange(format(date, 'yyyy-MM-dd'));
-      }
-    }
+    const r = nextRange(startDate, endDate, date);
+    onChange(r.startDate, r.endDate);
   };
 
   const isInRange = (day) => {
@@ -138,8 +139,7 @@ const DateRangePicker = ({ startDate, endDate, onStartDateChange, onEndDateChang
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              onStartDateChange('');
-              onEndDateChange('');
+              onChange('', '');
             }}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#a1a1a6] hover:text-gray-600 dark:hover:text-gray-100 p-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
@@ -244,9 +244,7 @@ const DateRangePicker = ({ startDate, endDate, onStartDateChange, onEndDateChang
               <button
                 type="button"
                 onClick={() => {
-                  const today = new Date();
-                  onStartDateChange(format(today, 'yyyy-MM-dd'));
-                  onEndDateChange('');
+                  onChange(format(new Date(), 'yyyy-MM-dd'), '');
                 }}
                 className="flex-1 px-3 py-2 text-sm text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-xl transition-colors"
               >
