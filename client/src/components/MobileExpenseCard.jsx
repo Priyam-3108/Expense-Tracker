@@ -1,6 +1,5 @@
 import { Edit, Trash2 } from 'lucide-react'
 import { formatDate } from '../utils/helpers'
-import PaymentModeBadge from './PaymentModeBadge'
 import Amount from './Amount'
 
 /**
@@ -41,9 +40,6 @@ const MobileExpenseCard = ({ expense, currency, onEdit, onDelete }) => {
             <p className="text-xs text-gray-500 dark:text-[#85858b] mt-0.5">
               {category?.name || 'Uncategorized'}
             </p>
-            <div className="mt-1">
-              <PaymentModeBadge value={expense.paymentMode} hideOther />
-            </div>
             <p className="text-xs text-gray-400 dark:text-[#85858b] mt-1">
               {formatDate(expense.date, 'MMM dd, yyyy')}
             </p>

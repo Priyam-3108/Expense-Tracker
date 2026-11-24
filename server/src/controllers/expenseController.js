@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 import { Expense, Category } from '../config/models/index.js';
-import { DEFAULT_PAYMENT_MODE, PAYMENT_MODES } from '../constants/paymentModes.js';
 
 // Validate and return date string in YYYY-MM-DD format
 const validateDateString = (dateStr) => {
@@ -242,11 +241,6 @@ export const bulkCreateExpenses = async (req, res) => {
         continue;
       }
 
-      if (expense.paymentMode !== undefined && !PAYMENT_MODES.includes(expense.paymentMode)) {
-        errors.push(`Expense ${i + 1}: Invalid payment mode`);
-        continue;
-      }
-
       // Use individual date if provided, otherwise use base date
       let expenseDate = baseDate;
       if (expense.date) {
@@ -265,7 +259,6 @@ export const bulkCreateExpenses = async (req, res) => {
         date: expenseDate,
         category: expense.category,
         type: expense.type || 'expense', // Allow type override too
-        paymentMode: expense.paymentMode || DEFAULT_PAYMENT_MODE,
         user: req.user._id
       });
     }
@@ -532,7 +525,6 @@ export const createExpense = async (req, res) => {
       type = 'expense',
       tags,
       notes,
-      paymentMode = DEFAULT_PAYMENT_MODE,
       isRecurring,
       recurringPeriod,
       recurringEndDate
@@ -599,7 +591,6 @@ export const createExpense = async (req, res) => {
           type,
           tags: tags || [],
           notes: notes ? notes.trim() : '',
-          paymentMode,
           isRecurring: true,
           recurringPeriod: period,
           recurringEndDate: endDateStr,
@@ -634,7 +625,6 @@ export const createExpense = async (req, res) => {
       type,
       tags: tags || [],
       notes: notes ? notes.trim() : '',
-      paymentMode,
       isRecurring: false,
       user: req.user._id
     });
@@ -673,7 +663,6 @@ export const updateExpense = async (req, res) => {
       type,
       tags,
       notes,
-      paymentMode,
       isRecurring,
       recurringPeriod,
       recurringEndDate
@@ -726,7 +715,6 @@ export const updateExpense = async (req, res) => {
     if (type) updates.type = type;
     if (tags) updates.tags = tags;
     if (notes !== undefined) updates.notes = notes ? notes.trim() : '';
-    if (paymentMode !== undefined) updates.paymentMode = paymentMode;
     if (isRecurring !== undefined) updates.isRecurring = isRecurring;
     if (isRecurring !== undefined && !isRecurring) {
       unset.recurringPeriod = '';

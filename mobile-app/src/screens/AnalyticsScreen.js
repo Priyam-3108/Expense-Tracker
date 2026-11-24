@@ -12,7 +12,6 @@ import LineChart from '../components/charts/LineChart';
 import InsightCard from '../components/InsightCard';
 import { SkeletonCard } from '../components/SkeletonLoader';
 import hapticFeedback from '../utils/haptics';
-import { PAYMENT_MODES } from '../constants/paymentModes';
 import { usePrivacy } from '../context/PrivacyContext';
 
 function AnalyticsScreen() {
@@ -37,7 +36,6 @@ function AnalyticsScreen() {
         insights: [],
     });
 
-    const [pmData, setPmData] = useState({ labels: [], values: [] });
 
     const getDateRange = useCallback(() => {
         const end = new Date();
@@ -160,31 +158,9 @@ function AnalyticsScreen() {
                 setAnalyticsData(generateSampleData());
             }
 
-            // Payment-mode breakdown — online only
-            try {
-                const net = await NetInfo.fetch();
-                if (net.isConnected) {
-                    const pmRes = await expenseService.getPaymentModeBreakdown({
-                        from: startDateStr,
-                        to: endDateStr,
-                    });
-                    const rows = pmRes.data?.data?.breakdown || [];
-                    const labelFor = (v) =>
-                        (PAYMENT_MODES.find((m) => m.value === v) || { label: 'Other' }).label;
-                    setPmData({
-                        labels: rows.map((r) => labelFor(r.paymentMode)),
-                        values: rows.map((r) => r.total),
-                    });
-                } else {
-                    setPmData({ labels: [], values: [] });
-                }
-            } catch (e) {
-                setPmData({ labels: [], values: [] });
-            }
         } catch (error) {
             console.error('Error fetching analytics:', error);
             setAnalyticsData(generateSampleData());
-            setPmData({ labels: [], values: [] });
         } finally {
             setLoading(false);
             setRefreshing(false);
@@ -688,23 +664,6 @@ function AnalyticsScreen() {
                             )}
                         </View>
                     </View>
-
-                    {/* Payment Method Breakdown — online only, hidden if no data */}
-                    {pmData.values.length > 0 && (
-                        <View style={styles.section}>
-                            <Text style={styles.sectionTitle}>By Payment Method</Text>
-                            <View style={styles.chartCard}>
-                                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                                    <BarChart
-                                        data={pmData.values}
-                                        labels={pmData.labels}
-                                        width={Math.max(pmData.labels.length * 60, Dimensions.get('window').width - 48)}
-                                        hideValues={isPrivate}
-                                    />
-                                </ScrollView>
-                            </View>
-                        </View>
-                    )}
 
                     {/* Insights */}
                     <View style={styles.insightsSection}>

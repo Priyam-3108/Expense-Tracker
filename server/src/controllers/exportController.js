@@ -62,7 +62,6 @@ export const exportExpenses = async (req, res) => {
                 { label: 'description', value: 'description' },
                 { label: 'amount', value: 'amount' },
                 { label: 'type', value: 'type' },
-                { label: 'paymentMode', value: 'paymentMode' },
                 { label: 'notes', value: 'notes' }
             ];
             const opts = { fields };
@@ -83,7 +82,6 @@ export const exportExpenses = async (req, res) => {
                 { header: 'Description', key: 'description', width: 30 },
                 { header: 'Amount', key: 'amount', width: 15 },
                 { header: 'Type', key: 'type', width: 10 },
-                { header: 'Payment Mode', key: 'paymentMode', width: 15 },
                 { header: 'Notes', key: 'notes', width: 30 }
             ];
 
@@ -94,7 +92,6 @@ export const exportExpenses = async (req, res) => {
                     description: expense.description,
                     amount: expense.amount,
                     type: expense.type,
-                    paymentMode: expense.paymentMode,
                     notes: expense.notes
                 });
             });

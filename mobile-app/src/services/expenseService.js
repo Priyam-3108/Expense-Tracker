@@ -38,9 +38,6 @@ export const expenseService = {
     getDetailedAnalytics: (filters = {}) => {
         return api.get('/expenses/analytics', { params: filters });
     },
-    getPaymentModeBreakdown: (params = {}) => {
-        return api.get('/analytics/payment-modes', { params });
-    },
     getDailyActivity: (weeks = 16) => {
         return api.get('/analytics/daily-activity', { params: { weeks } });
     },

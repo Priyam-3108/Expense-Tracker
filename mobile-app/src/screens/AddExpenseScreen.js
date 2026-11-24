@@ -14,7 +14,6 @@ import { offlineService } from '../services/offlineService';
 import { syncEngine } from '../services/syncEngine';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import hapticFeedback from '../utils/haptics';
-import { PAYMENT_MODES } from '../constants/paymentModes';
 
 export default function AddExpenseScreen({ navigation, route }) {
     const { colors, isDark, shadows, borderRadius } = useTheme();
@@ -22,7 +21,6 @@ export default function AddExpenseScreen({ navigation, route }) {
     const [amount, setAmount] = useState('');
     const [type, setType] = useState('expense');
     const [category, setCategory] = useState('');
-    const [paymentMode, setPaymentMode] = useState('other');
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
     const [pickerVisible, setPickerVisible] = useState(false);
@@ -49,7 +47,6 @@ export default function AddExpenseScreen({ navigation, route }) {
             setAmount(exp.amount ? exp.amount.toString() : '');
             setType(exp.type || 'expense');
             setCategory(exp.category?._id || exp.category || '');
-            setPaymentMode(exp.paymentMode || 'other');
             setDate(new Date(exp.date));
             setIsRecurring(exp.isRecurring || false);
             if (exp.recurringPeriod) setRecurringPeriod(exp.recurringPeriod);
@@ -61,7 +58,7 @@ export default function AddExpenseScreen({ navigation, route }) {
 
     const resetForm = () => {
         setIsEditing(false); setEditId(null); setDescription(''); setAmount('');
-        setType('expense'); setCategory(''); setPaymentMode('other'); setDate(new Date());
+        setType('expense'); setCategory(''); setDate(new Date());
         setIsRecurring(false); setRecurringPeriod('monthly'); setRecurringEndDate(new Date());
     };
 
@@ -115,7 +112,7 @@ export default function AddExpenseScreen({ navigation, route }) {
             };
             const payload = {
                 ...(isEditing && editId && { _id: editId, id: editId }),
-                description, amount: parseFloat(amount), type, category, paymentMode,
+                description, amount: parseFloat(amount), type, category,
                 date: fmt(date), isRecurring,
                 ...(isRecurring && { recurringPeriod, recurringEndDate: fmt(recurringEndDate) }),
             };
@@ -401,33 +398,6 @@ export default function AddExpenseScreen({ navigation, route }) {
                                 <View style={[s.chipDot, { backgroundColor: catColor }]} />
                                 <Text style={[s.chipText, { color: isSelected ? catColor : colors.text }]}>{cat.name}</Text>
                                 {isSelected && <Ionicons name="checkmark" size={13} color={catColor} />}
-                            </TouchableOpacity>
-                        );
-                    })}
-                </ScrollView>
-
-                {/* ── Payment Method ── */}
-                <Text style={s.sectionLabel}>Payment Method</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.chipsScroll} style={{ marginBottom: 16 }}>
-                    {PAYMENT_MODES.map(pm => {
-                        const isSelected = paymentMode === pm.value;
-                        return (
-                            <TouchableOpacity
-                                key={pm.value}
-                                style={[s.chip, {
-                                    backgroundColor: isSelected ? colors.primary + '20' : colors.card,
-                                    borderColor: isSelected ? colors.primary : colors.border,
-                                }]}
-                                onPress={() => { hapticFeedback.light(); setPaymentMode(pm.value); }}
-                            >
-                                <Ionicons
-                                    name={pm.icon}
-                                    size={13}
-                                    color={isSelected ? colors.primary : colors.subText}
-                                />
-                                <Text style={[s.chipText, { color: isSelected ? colors.primary : colors.text }]}>
-                                    {pm.label}
-                                </Text>
                             </TouchableOpacity>
                         );
                     })}

@@ -58,15 +58,6 @@ export const analyticsService = {
         return api.get(`/analytics/shared/${token}/expenses?${params.toString()}`)
     },
 
-    // Spending grouped by payment method for a date range
-    getPaymentModeBreakdown: ({ from, to } = {}) => {
-        const params = new URLSearchParams()
-        if (from) params.append('from', from)
-        if (to) params.append('to', to)
-        const qs = params.toString()
-        return api.get(`/analytics/payment-modes${qs ? `?${qs}` : ''}`)
-    },
-
     // GitHub-style daily activity for the trailing `weeks`
     getDailyActivity: (weeks = 16) => {
         return api.get(`/analytics/daily-activity?weeks=${weeks}`)

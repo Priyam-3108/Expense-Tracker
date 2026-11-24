@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { PAYMENT_MODES } from '../constants/paymentModes.js';
 
 // Validation schemas
 export const registerSchema = z.object({
@@ -27,7 +26,6 @@ export const expenseSchema = z.object({
   type: z.enum(['expense', 'income']).default('expense'),
   tags: z.array(z.string().max(20)).optional(),
   notes: z.string().max(500, 'Notes cannot exceed 500 characters').optional(),
-  paymentMode: z.enum(PAYMENT_MODES).optional(),
   isRecurring: z.boolean().optional(),
   recurringPeriod: z.enum(['weekly', 'monthly', 'yearly']).optional(),
   recurringEndDate: z.string().optional()
