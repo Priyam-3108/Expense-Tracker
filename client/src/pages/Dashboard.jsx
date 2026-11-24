@@ -113,7 +113,7 @@ const Dashboard = () => {
   const textLink = 'inline-flex items-center gap-1 text-sm text-[#533afd] dark:text-[#8b7ffe] hover:text-[#4434d4] dark:hover:text-[#a59bff] transition-colors'
 
   return (
-    <div className="max-w-[1440px] space-y-6">
+    <div className="space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-2xl md:text-[28px] leading-tight font-medium text-gray-900 dark:text-[#ededed]">Overview</h1>

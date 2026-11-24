@@ -96,7 +96,7 @@ export default function Debts() {
     }
 
     return (
-        <div className="space-y-6 max-w-[1100px]">
+        <div className="space-y-6">
             <div className="flex flex-wrap items-end justify-between gap-3">
                 <div>
                     <h1 className="text-2xl md:text-[28px] leading-tight font-medium text-gray-900 dark:text-[#ededed]">Debts</h1>
