@@ -29,7 +29,7 @@ const Dashboard = () => {
   const [loadingRecent, setLoadingRecent] = useState(true)
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
   const navigate = useNavigate()
-  const activity = useDailyActivity(16)
+  const activity = useDailyActivity(52)
   const { theme } = useTheme()
   const isDark = theme === 'dark' ||
     (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
@@ -217,7 +217,7 @@ const Dashboard = () => {
           <div className="glass-card p-5">
             <div className="flex items-center justify-between mb-4">
               <h2 className={sectionTitle}>Activity</h2>
-              <span className={meta}>Last 16 weeks</span>
+              <span className={meta}>Last 12 months</span>
             </div>
             <ActivityHeatmap
               grid={activity.grid}
