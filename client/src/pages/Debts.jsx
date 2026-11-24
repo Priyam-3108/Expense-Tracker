@@ -29,13 +29,13 @@ export default function Debts() {
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Debt Management</h1>
+                <h1 className="text-2xl md:text-[28px] leading-tight font-medium text-gray-900 dark:text-[#ededed]">Debts</h1>
                 <button
                     onClick={() => setIsFormOpen(true)}
                     className="btn-primary btn-md inline-flex items-center"
                 >
                     <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-                    Add Record
+                    Add record
                 </button>
             </div>
 
@@ -51,11 +51,11 @@ export default function Debts() {
                                     'focus:outline-none',
                                     selected
                                         ? 'bg-white dark:bg-white/[0.08] text-indigo-700 dark:text-indigo-300 shadow-sm border border-gray-200 dark:border-white/[0.10]'
-                                        : 'text-gray-600 dark:text-slate-400 hover:bg-white/[0.12] hover:text-gray-800 dark:hover:text-white'
+                                        : 'text-gray-600 dark:text-[#a1a1a6] hover:bg-white/[0.12] hover:text-gray-800 dark:hover:text-white'
                                 )
                             }
                         >
-                            Borrowed (Payable)
+                            Borrowed
                         </Tab>
                         <Tab
                             className={({ selected }) =>
@@ -64,11 +64,11 @@ export default function Debts() {
                                     'focus:outline-none',
                                     selected
                                         ? 'bg-white dark:bg-white/[0.08] text-indigo-700 dark:text-indigo-300 shadow-sm border border-gray-200 dark:border-white/[0.10]'
-                                        : 'text-gray-600 dark:text-slate-400 hover:bg-white/[0.12] hover:text-gray-800 dark:hover:text-white'
+                                        : 'text-gray-600 dark:text-[#a1a1a6] hover:bg-white/[0.12] hover:text-gray-800 dark:hover:text-white'
                                 )
                             }
                         >
-                            Lent (Receivable)
+                            Lent
                         </Tab>
                     </TabList>
                     <TabPanels>

@@ -10,7 +10,7 @@ import CategoryChips from './CategoryChips'
 import StickyFormFooter from './StickyFormFooter'
 
 const demoCategories = [
-  { _id: '1', name: 'Food', color: '#ea2261' },
+  { _id: '1', name: 'Food', color: '#dc2626' },
   { _id: '2', name: 'Transport', color: '#059669' },
   { _id: '3', name: 'Rent', color: '#6366f1' },
   { _id: '4', name: 'Shopping', color: '#f59e0b' },
@@ -23,7 +23,7 @@ export default function Showcase() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0b0e17] p-6 space-y-8">
-      <h1 className="text-lg font-bold text-gray-900 dark:text-white">Form Kit Showcase</h1>
+      <h1 className="text-lg font-medium text-gray-900 dark:text-white">Form Kit Showcase</h1>
 
       <section className="space-y-3 max-w-md">
         <SectionLabel>Amount hero — expense</SectionLabel>

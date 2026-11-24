@@ -2,7 +2,6 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { User, Category } from '../config/models/index.js';
 import { env } from '../config/env.js';
-import { seedDefaultAccountAndAdjustmentCategory } from '../utils/seedDefaults.js';
 
 // Generate JWT token
 const generateToken = (userId) => {
@@ -56,8 +55,6 @@ export const register = async (req, res) => {
       });
       await category.save();
     }
-
-    await seedDefaultAccountAndAdjustmentCategory(user._id, user.currency);
 
     // Generate token
     const token = generateToken(user._id);

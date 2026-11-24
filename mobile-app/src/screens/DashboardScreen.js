@@ -20,13 +20,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { buildHeatmapGrid } from '../utils/heatmapGrid';
 import ActivityHeatmap from '../components/ActivityHeatmap';
 import { usePrivacy } from '../context/PrivacyContext';
-import { useAccounts } from '../context/AccountContext';
 
 export default function DashboardScreen({ navigation }) {
   const { signOut, user } = useContext(AuthContext);
   const { toggleTheme, isDark, colors, spacing } = useTheme();
   const { isPrivate, toggle: togglePrivacy } = usePrivacy();
-  const { loadAccounts } = useAccounts();
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -214,7 +212,6 @@ export default function DashboardScreen({ navigation }) {
       setShowDeleteAlert(false);
       setDeleteExpenseId(null);
       fetchData();
-      loadAccounts();
     } catch (error) {
       setLoading(false);
       console.error('Failed to delete transaction:', error);

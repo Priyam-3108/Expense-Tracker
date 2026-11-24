@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { Expense, Category, Account } from '../config/models/index.js';
+import { Expense, Category } from '../config/models/index.js';
 import { DEFAULT_PAYMENT_MODE, PAYMENT_MODES } from '../constants/paymentModes.js';
 
 // Validate and return date string in YYYY-MM-DD format
@@ -65,7 +65,6 @@ export const getExpenses = async (req, res) => {
       page,
       limit,
       category,
-      account,
       type,
       startDate,
       endDate,
@@ -84,16 +83,6 @@ export const getExpenses = async (req, res) => {
         return res.status(400).json({
           success: false,
           message: 'Invalid category identifier'
-        });
-      }
-    }
-    if (account && account !== 'all') {
-      try {
-        filter.account = new mongoose.Types.ObjectId(account);
-      } catch (error) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid account identifier'
         });
       }
     }
@@ -228,10 +217,6 @@ export const bulkCreateExpenses = async (req, res) => {
     // Validate all expenses
     const validExpenses = [];
     const errors = [];
-    const defaultAccount = await Account.findOne({ user: req.user._id, isDefault: true });
-    const ownedAccountIds = new Set(
-      (await Account.find({ user: req.user._id }).select('_id').lean()).map(a => String(a._id))
-    );
 
     for (let i = 0; i < expenses.length; i++) {
       const expense = expenses[i];
@@ -274,22 +259,11 @@ export const bulkCreateExpenses = async (req, res) => {
         }
       }
 
-      let rowAccount = defaultAccount ? defaultAccount._id : null;
-      if (expense.account) {
-        if (mongoose.isValidObjectId(expense.account) && ownedAccountIds.has(String(expense.account))) {
-          rowAccount = expense.account;
-        } else {
-          errors.push(`Expense ${i + 1}: Invalid account`);
-          continue;
-        }
-      }
-
       validExpenses.push({
         description: expense.description ? expense.description.trim() : '',
         amount: parseFloat(expense.amount),
         date: expenseDate,
         category: expense.category,
-        account: rowAccount,
         type: expense.type || 'expense', // Allow type override too
         paymentMode: expense.paymentMode || DEFAULT_PAYMENT_MODE,
         user: req.user._id
@@ -555,7 +529,6 @@ export const createExpense = async (req, res) => {
       amount,
       date,
       category,
-      account,
       type = 'expense',
       tags,
       notes,
@@ -576,20 +549,6 @@ export const createExpense = async (req, res) => {
         success: false,
         message: 'Invalid category'
       });
-    }
-
-    let accountId = account || null;
-    if (accountId) {
-      if (!mongoose.isValidObjectId(accountId)) {
-        return res.status(400).json({ success: false, message: 'Invalid account' });
-      }
-      const owned = await Account.findOne({ _id: accountId, user: req.user._id });
-      if (!owned) {
-        return res.status(400).json({ success: false, message: 'Invalid account' });
-      }
-    } else {
-      const def = await Account.findOne({ user: req.user._id, isDefault: true });
-      accountId = def ? def._id : null;
     }
 
     const baseDate = validateDateString(date) || getTodayString();
@@ -637,7 +596,6 @@ export const createExpense = async (req, res) => {
           amount: parseFloat(amount),
           date: currentDateStr,
           category,
-          account: accountId,
           type,
           tags: tags || [],
           notes: notes ? notes.trim() : '',
@@ -673,7 +631,6 @@ export const createExpense = async (req, res) => {
       amount: parseFloat(amount),
       date: baseDate, // YYYY-MM-DD string
       category,
-      account: accountId,
       type,
       tags: tags || [],
       notes: notes ? notes.trim() : '',
@@ -713,7 +670,6 @@ export const updateExpense = async (req, res) => {
       amount,
       date,
       category,
-      account,
       type,
       tags,
       notes,
@@ -767,16 +723,6 @@ export const updateExpense = async (req, res) => {
       updates.date = dateStr;
     }
     if (category) updates.category = category;
-    if (account !== undefined) {
-      if (account) {
-        if (!mongoose.isValidObjectId(account)) {
-          return res.status(400).json({ success: false, message: 'Invalid account' });
-        }
-        const owned = await Account.findOne({ _id: account, user: req.user._id });
-        if (!owned) return res.status(400).json({ success: false, message: 'Invalid account' });
-      }
-      updates.account = account || null;
-    }
     if (type) updates.type = type;
     if (tags) updates.tags = tags;
     if (notes !== undefined) updates.notes = notes ? notes.trim() : '';
@@ -1060,7 +1006,7 @@ export const getExpenseTrends = async (req, res) => {
 // Get detailed analytics with comprehensive insights
 export const getDetailedAnalytics = async (req, res) => {
   try {
-    const { startDate, endDate, category, account, type } = req.query;
+    const { startDate, endDate, category, type } = req.query;
 
     // Build base filter
     const filter = { user: req.user._id };
@@ -1091,17 +1037,6 @@ export const getDetailedAnalytics = async (req, res) => {
     // Add type filter if provided
     if (type && type !== 'all') {
       filter.type = type;
-    }
-
-    if (account && account !== 'all') {
-      try {
-        filter.account = new mongoose.Types.ObjectId(account);
-      } catch (error) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid account identifier'
-        });
-      }
     }
 
     // 1. Get category-wise breakdown with detailed stats

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useEffect } from 'react'
-import { BookOpen, HelpCircle, Mail, Zap, Wrench, Lightbulb, Bug, Target, FileText, ShieldCheck, Scale, ArrowRight } from 'lucide-react'
+import { BookOpen, HelpCircle, Mail, ShieldCheck, Scale, ArrowRight } from 'lucide-react'
 import PublicNavbar from '../components/PublicNavbar'
 import PublicFooter from '../components/PublicFooter'
 import '../styles/StaticPages.css'
@@ -19,8 +19,8 @@ const Support = () => {
             <div className="static-content">
                 <div className="static-container">
                     <div className="page-header">
-                        <span className="page-badge">Help & Support</span>
-                        <h1 className="page-title">How Can We Help?</h1>
+                        <span className="page-badge">Help & support</span>
+                        <h1 className="page-title">How can we help?</h1>
                         <p className="page-subtitle">
                             Get the support you need to make the most of Expense Tracker
                         </p>
@@ -30,7 +30,7 @@ const Support = () => {
                     <div className="support-grid">
                         <div className="support-card">
                             <div className="support-icon">
-                                <BookOpen className="w-7 h-7 text-indigo-400" />
+                                <BookOpen />
                             </div>
                             <h3>Documentation</h3>
                             <p>
@@ -43,7 +43,7 @@ const Support = () => {
 
                         <div className="support-card">
                             <div className="support-icon">
-                                <HelpCircle className="w-7 h-7 text-indigo-400" />
+                                <HelpCircle />
                             </div>
                             <h3>FAQ</h3>
                             <p>
@@ -56,9 +56,9 @@ const Support = () => {
 
                         <div className="support-card">
                             <div className="support-icon">
-                                <Mail className="w-7 h-7 text-indigo-400" />
+                                <Mail />
                             </div>
-                            <h3>Email Support</h3>
+                            <h3>Email support</h3>
                             <p>
                                 Send us an email and our team will get back to you within 24-48 hours.
                             </p>
@@ -71,8 +71,7 @@ const Support = () => {
                     {/* Quick Help */}
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon"><Zap className="w-5 h-5 text-indigo-400" /></span>
-                            Quick Help
+                            Quick help
                         </h2>
                         <div className="section-content">
                             <p><strong>Before contacting support, try these quick solutions:</strong></p>
@@ -89,8 +88,7 @@ const Support = () => {
                     {/* Common Issues */}
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon"><Wrench className="w-5 h-5 text-indigo-400" /></span>
-                            Common Issues & Solutions
+                            Common issues & solutions
                         </h2>
                         <div className="section-content">
                             <p><strong>Charts not displaying correctly:</strong></p>
@@ -125,12 +123,11 @@ const Support = () => {
                     {/* Contact Form Info */}
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon"><Mail className="w-5 h-5 text-indigo-400" /></span>
-                            Contact Information
+                            Contact information
                         </h2>
                         <div className="section-content">
                             <p>
-                                <strong>Email:</strong> <a href="mailto:support@expensetracker.com" className="text-indigo-400 hover:text-indigo-300 underline font-medium">support@expensetracker.com</a>
+                                <strong>Email:</strong> <a href="mailto:support@expensetracker.com" className="text-[#533afd] hover:underline">support@expensetracker.com</a>
                             </p>
                             <p>
                                 <strong>Response Time:</strong> We typically respond within 24-48 hours during business days.
@@ -150,15 +147,14 @@ const Support = () => {
                     {/* Feature Requests */}
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon"><Lightbulb className="w-5 h-5 text-indigo-400" /></span>
-                            Feature Requests & Feedback
+                            Feature requests & feedback
                         </h2>
                         <div className="section-content">
                             <p>
                                 We love hearing from our users! If you have ideas for new features or improvements, we'd love to hear them.
                             </p>
                             <p>
-                                Send your suggestions to <a href="mailto:feedback@expensetracker.com" className="text-indigo-400 hover:text-indigo-300 underline font-medium">feedback@expensetracker.com</a>
+                                Send your suggestions to <a href="mailto:feedback@expensetracker.com" className="text-[#533afd] hover:underline">feedback@expensetracker.com</a>
                             </p>
                             <p>
                                 Your feedback helps us make Expense Tracker better for everyone!
@@ -169,8 +165,7 @@ const Support = () => {
                     {/* Bug Reports */}
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon"><Bug className="w-5 h-5 text-indigo-400" /></span>
-                            Report a Bug
+                            Report a bug
                         </h2>
                         <div className="section-content">
                             <p>
@@ -183,43 +178,40 @@ const Support = () => {
                                 <li>Can you reproduce the issue consistently?</li>
                             </ul>
                             <p>
-                                Report bugs to: <a href="mailto:bugs@expensetracker.com" className="text-indigo-400 hover:text-indigo-300 underline font-medium">bugs@expensetracker.com</a>
+                                Report bugs to: <a href="mailto:bugs@expensetracker.com" className="text-[#533afd] hover:underline">bugs@expensetracker.com</a>
                             </p>
                         </div>
                     </div>
 
                     {/* Additional Resources */}
-                    <div className="p-8 sm:p-10 rounded-2xl bg-white border border-[#e3e8ee] shadow-[0_8px_24px_rgba(0,55,112,0.08)]">
-                        <h2 className="text-2xl font-bold text-[#0d253d] mb-4 flex items-center gap-3">
-                            <span className="w-10 h-10 bg-[#f2f0ff] border border-[#e4e0ff] rounded-xl flex items-center justify-center">
-                                <Target className="w-5 h-5 text-[#4434d4]" />
-                            </span>
-                            Additional Resources
+                    <div className="content-section">
+                        <h2 className="text-2xl font-medium text-[#171717] mb-4 flex items-center gap-3">
+                            Additional resources
                         </h2>
-                        <div className="text-[#64748d]">
+                        <div className="text-[#737373]">
                             <p className="mb-6">
                                 Explore these resources to get the most out of Expense Tracker:
                             </p>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <Link to="/docs" className="bg-[#f6f9fc] border border-[#e3e8ee] p-4 rounded-xl flex items-center justify-between text-[#0d253d] hover:bg-[#eef2f6] transition-all">
+                                <Link to="/docs" className="bg-[#f5f5f5] border border-[#e5e5e5] p-4 rounded-xl flex items-center justify-between text-[#171717] hover:bg-[#eef2f6] transition-colors">
                                     <span className="font-medium flex items-center gap-2.5">
                                         <BookOpen className="w-4 h-4" /> User Documentation
                                     </span>
                                     <ArrowRight className="w-4 h-4" />
                                 </Link>
-                                <Link to="/faq" className="bg-[#f6f9fc] border border-[#e3e8ee] p-4 rounded-xl flex items-center justify-between text-[#0d253d] hover:bg-[#eef2f6] transition-all">
+                                <Link to="/faq" className="bg-[#f5f5f5] border border-[#e5e5e5] p-4 rounded-xl flex items-center justify-between text-[#171717] hover:bg-[#eef2f6] transition-colors">
                                     <span className="font-medium flex items-center gap-2.5">
                                         <HelpCircle className="w-4 h-4" /> Frequently Asked Questions
                                     </span>
                                     <ArrowRight className="w-4 h-4" />
                                 </Link>
-                                <Link to="/privacy" className="bg-[#f6f9fc] border border-[#e3e8ee] p-4 rounded-xl flex items-center justify-between text-[#0d253d] hover:bg-[#eef2f6] transition-all">
+                                <Link to="/privacy" className="bg-[#f5f5f5] border border-[#e5e5e5] p-4 rounded-xl flex items-center justify-between text-[#171717] hover:bg-[#eef2f6] transition-colors">
                                     <span className="font-medium flex items-center gap-2.5">
                                         <ShieldCheck className="w-4 h-4" /> Privacy Policy
                                     </span>
                                     <ArrowRight className="w-4 h-4" />
                                 </Link>
-                                <Link to="/terms" className="bg-[#f6f9fc] border border-[#e3e8ee] p-4 rounded-xl flex items-center justify-between text-[#0d253d] hover:bg-[#eef2f6] transition-all">
+                                <Link to="/terms" className="bg-[#f5f5f5] border border-[#e5e5e5] p-4 rounded-xl flex items-center justify-between text-[#171717] hover:bg-[#eef2f6] transition-colors">
                                     <span className="font-medium flex items-center gap-2.5">
                                         <Scale className="w-4 h-4" /> Terms of Service
                                     </span>

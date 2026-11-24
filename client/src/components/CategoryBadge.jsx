@@ -12,36 +12,22 @@ const CategoryBadge = ({
 
   if (!category) {
     return (
-      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-white/[0.06] text-gray-800 dark:text-slate-400 ${className}`}>
-        Unknown Category
+      <span className={`inline-flex items-center text-xs text-gray-500 dark:text-[#85858b] ${className}`}>
+        Unknown category
       </span>
     )
   }
 
   const sizeClasses = {
-    sm: 'px-2 py-1 text-xs',
-    md: 'px-2.5 py-1.5 text-sm',
-    lg: 'px-3 py-2 text-base'
-  }
-
-  const iconSizes = {
-    sm: 'w-4 h-4 text-xs',
-    md: 'w-5 h-5 text-sm',
-    lg: 'w-6 h-6 text-base'
+    sm: 'text-xs',
+    md: 'text-sm',
+    lg: 'text-base'
   }
 
   return (
-    <span 
-      className={`inline-flex items-center gap-1.5 rounded-full font-medium ${sizeClasses[size]} ${className}`}
-      style={{ 
-        backgroundColor: category.color + '20',
-        color: category.color 
-      }}
-    >
+    <span className={`inline-flex items-center gap-2 text-gray-700 dark:text-[#a1a1a6] ${sizeClasses[size]} ${className}`}>
       {showIcon && (
-        <span className={iconSizes[size]}>
-          {category.icon}
-        </span>
+        <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: category.color }} />
       )}
       {showName && (
         <span>{category.name}</span>

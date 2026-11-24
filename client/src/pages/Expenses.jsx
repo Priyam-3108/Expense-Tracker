@@ -13,10 +13,6 @@ import MobileExpenseCard from '../components/MobileExpenseCard'
 import PaymentModeBadge from '../components/PaymentModeBadge'
 import Amount from '../components/Amount'
 import { usePrivacy } from '../context/PrivacyContext'
-import { useAccounts } from '../context/AccountContext'
-import AccountPicker from '../components/AccountPicker'
-import TransferForm from '../components/TransferForm'
-import { transferService } from '../services/transferService'
 import Modal from '../components/Modal'
 import AmountHero from '../components/form/AmountHero'
 import SegmentedToggle from '../components/form/SegmentedToggle'
@@ -44,8 +40,7 @@ import {
     ArrowUpCircle,
     Repeat,
     Edit,
-    Trash2,
-    ArrowRightLeft
+    Trash2
 } from 'lucide-react'
 import EmptyState from '../components/EmptyState'
 import { startOfMonth, endOfMonth, eachDayOfInterval, format, isSameMonth, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns'
@@ -88,7 +83,6 @@ function IndeterminateCheckbox({
 const Expenses = () => {
   const { user, currency } = useAuth()
   const { isPrivate } = usePrivacy()
-  const { accounts, archivedAccounts, defaultAccountId, loadAccounts } = useAccounts()
   const {
     expenses,
     categories,
@@ -130,18 +124,9 @@ const Expenses = () => {
     type: 'expense',
     isRecurring: false,
     recurringPeriod: 'monthly',
-    recurringEndDate: '',
-    account: defaultAccountId || ''
+    recurringEndDate: ''
   })
   const [formLoading, setFormLoading] = useState(false)
-
-  // Seed formData.account once accounts load (defaultAccountId is null on first render)
-  useEffect(() => {
-    if (!formData.account && defaultAccountId) {
-      setFormData((prev) => ({ ...prev, account: defaultAccountId }))
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [defaultAccountId])
 
   // Bulk form state
   const [showBulkForm, setShowBulkForm] = useState(false)
@@ -170,21 +155,8 @@ const Expenses = () => {
   const [calendarLoading, setCalendarLoading] = useState(false)
   const [selectedDate, setSelectedDate] = useState(null) // For calendar date selection
 
-  // Transfers view state
-  const [showTransfers, setShowTransfers] = useState(false)
-  const [transfers, setTransfers] = useState([])
-  const [transferFormOpen, setTransferFormOpen] = useState(false)
-
   const location = useLocation()
   const navigate = useNavigate()
-
-  // Fetch archived accounts too (once) so archived account names still
-  // resolve in historical expense rows; AccountContext splits the fetched
-  // list back into accounts/archivedAccounts for us.
-  useEffect(() => {
-    loadAccounts(true)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   // Seed dateRange from heatmap click on mount
   useEffect(() => {
@@ -254,13 +226,6 @@ const Expenses = () => {
     }
   }, [viewMode, calendarDate, filterType, debouncedSearchTerm, expenses])
 
-  // Load transfers when the Transfers panel is shown
-  useEffect(() => {
-    if (showTransfers) {
-      transferService.list().then((res) => setTransfers(res.data?.data?.transfers || [])).catch(() => setTransfers([]))
-    }
-  }, [showTransfers])
-
   const summary = useMemo(() => {
     // Current filter or overall stats
     const expenseTotal = stats?.totalStats?.expenses || 0
@@ -308,8 +273,7 @@ const Expenses = () => {
         type: editingExpense.type || 'expense',
         isRecurring: editingExpense.isRecurring || false,
         recurringPeriod: editingExpense.recurringPeriod || 'monthly',
-        recurringEndDate: recurringEndDate,
-        account: editingExpense.account?._id || editingExpense.account || ''
+        recurringEndDate: recurringEndDate
       })
       setShowForm(true)
     } else {
@@ -327,8 +291,7 @@ const Expenses = () => {
       type: 'expense',
       isRecurring: false,
       recurringPeriod: 'monthly',
-      recurringEndDate: '',
-      account: defaultAccountId || ''
+      recurringEndDate: ''
     })
     setEditingExpense(null)
   }
@@ -383,8 +346,7 @@ const Expenses = () => {
         type: formData.type,
         isRecurring: formData.isRecurring,
         recurringPeriod: formData.isRecurring ? formData.recurringPeriod : undefined,
-        recurringEndDate: formData.isRecurring ? formData.recurringEndDate : undefined,
-        account: formData.account || undefined
+        recurringEndDate: formData.isRecurring ? formData.recurringEndDate : undefined
       }
 
       if (editingExpense) {
@@ -392,14 +354,12 @@ const Expenses = () => {
         if (result.success) {
           setShowForm(false)
           resetForm()
-          loadAccounts()
         }
       } else {
         const result = await addExpense(expenseData)
         if (result.success) {
           setShowForm(false)
           resetForm()
-          loadAccounts()
         }
       }
     } catch (error) {
@@ -417,7 +377,6 @@ const Expenses = () => {
     if (window.confirm(`Are you sure you want to delete "${expense.description}"? This action cannot be undone.`)) {
       try {
         await deleteExpense(expense._id)
-        loadAccounts()
       } catch (error) {
         console.error('Error deleting expense:', error)
       }
@@ -485,7 +444,6 @@ const Expenses = () => {
       if (response.data?.success) {
         // Reload expenses
         await loadExpenses()
-        loadAccounts()
 
         setShowBulkForm(false)
         resetBulkForm()
@@ -540,7 +498,6 @@ const Expenses = () => {
         toast.success('Expenses deleted successfully')
         setShowBulkDelete(false)
         loadExpenses()
-        loadAccounts()
       }
     } catch (error) {
       console.error('Error deleting expenses:', error)
@@ -567,7 +524,6 @@ const Expenses = () => {
       const result = await bulkUpdateList(editableExpenses)
       if (result.success) {
         setShowBulkEdit(false)
-        loadAccounts()
       }
     } catch (error) {
       console.error('Error updating expenses:', error)
@@ -643,7 +599,7 @@ const Expenses = () => {
     {
       accessorKey: 'date',
       header: 'Date',
-      cell: info => formatDate(info.getValue(), 'MMM dd, yyyy'),
+      cell: info => <span className="font-mono tabular-nums text-xs text-gray-500 dark:text-[#85858b]">{formatDate(info.getValue(), 'MMM dd, yyyy')}</span>,
     },
     {
       accessorKey: 'category',
@@ -652,15 +608,7 @@ const Expenses = () => {
         const category = row.original.category || categories?.find(c => c._id === row.original.category)
         return (
           <div className="flex items-center gap-2">
-            <div
-              className="flex h-6 w-6 items-center justify-center rounded text-xs"
-              style={{
-                backgroundColor: `${(category?.color || '#3B82F6')}20`,
-                color: category?.color || '#2563EB'
-              }}
-            >
-              {category?.icon || '•'}
-            </div>
+            <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: category?.color || '#a3a3a3' }} />
             <span>{category?.name || 'Uncategorized'}</span>
           </div>
         )
@@ -671,13 +619,8 @@ const Expenses = () => {
       header: 'Description',
       cell: ({ row }) => (
         <span className="inline-flex items-center flex-wrap gap-1">
-          <span className="text-gray-600 dark:text-gray-300">{row.original.description || '-'}</span>
+          <span className="text-gray-600 dark:text-[#a1a1a6]">{row.original.description || '-'}</span>
           <PaymentModeBadge value={row.original.paymentMode} hideOther />
-          {(() => {
-            const accId = row.original.account?._id || row.original.account
-            const acc = accounts.find((a) => a._id === accId) || archivedAccounts.find((a) => a._id === accId)
-            return acc ? <span className="text-xs text-gray-400 dark:text-slate-500 ml-1">· {acc.name}</span> : null
-          })()}
         </span>
       )
     },
@@ -688,8 +631,8 @@ const Expenses = () => {
         const amount = row.original.amount
         const isIncome = row.original.type === 'income'
         return (
-          <span className={`font-medium ${isIncome ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
-            <Amount value={amount} currency={currency} sign={isIncome ? '+' : '-'} />
+          <span className={`font-mono tabular-nums ${isIncome ? 'text-green-600 dark:text-[#4cc38a]' : 'text-gray-900 dark:text-[#ededed]'}`}>
+            <Amount value={amount} currency={currency} sign={isIncome ? '+' : '−'} />
           </span>
         )
       }
@@ -716,7 +659,7 @@ const Expenses = () => {
         </div>
       )
     }
-  ], [categories, currency, accounts, archivedAccounts])
+  ], [categories, currency])
 
   // Calendar month view
   const monthStart = startOfMonth(calendarDate)
@@ -730,8 +673,8 @@ const Expenses = () => {
       {/* Header */}
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between mb-6">
         <div>
-          <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white">Expenses</h1>
-          <p className="mt-1 text-sm text-gray-600 dark:text-slate-500">
+          <h1 className="text-2xl md:text-[28px] leading-tight font-medium text-gray-900 dark:text-[#ededed]">Expenses</h1>
+          <p className="mt-1 text-sm text-gray-600 dark:text-[#85858b]">
             Track your expenses and income
           </p>
         </div>
@@ -739,31 +682,24 @@ const Expenses = () => {
           {/* View Toggle */}
           <div className="inline-flex gap-1 rounded-xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.03] p-1">
             <button
-              onClick={() => { setViewMode('list'); setShowTransfers(false) }}
-              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${!showTransfers && viewMode === 'list'
-                ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(99,102,241,0.2)]'
-                : 'text-gray-600 dark:text-slate-400 hover:bg-white dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white'
+              onClick={() => { setViewMode('list') }}
+              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${viewMode === 'list'
+                ? 'bg-indigo-600 text-white'
+                : 'text-gray-600 dark:text-[#a1a1a6] hover:bg-white dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white'
                 }`}
             >
               <List size={16} />
               List
             </button>
             <button
-              onClick={() => { setViewMode('calendar'); setShowTransfers(false) }}
-              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${!showTransfers && viewMode === 'calendar'
-                ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(99,102,241,0.2)]'
-                : 'text-gray-600 dark:text-slate-400 hover:bg-white dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white'
+              onClick={() => { setViewMode('calendar') }}
+              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${viewMode === 'calendar'
+                ? 'bg-indigo-600 text-white'
+                : 'text-gray-600 dark:text-[#a1a1a6] hover:bg-white dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white'
                 }`}
             >
               <CalendarIcon size={16} />
               Calendar
-            </button>
-            <button
-              onClick={() => setShowTransfers(true)}
-              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${showTransfers ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(99,102,241,0.2)]' : 'text-gray-600 dark:text-slate-400 hover:bg-white dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white'}`}
-            >
-              <ArrowRightLeft size={16} />
-              Transfers
             </button>
           </div>
 
@@ -779,7 +715,7 @@ const Expenses = () => {
             className="glass-btn"
           >
             <Layers size={18} />
-            Bulk Add
+            Bulk add
           </button>
           <button
             onClick={() => setShowImportModal(true)}
@@ -803,58 +739,40 @@ const Expenses = () => {
             className="btn-primary btn-md"
           >
             <Plus size={18} />
-            Add Expense
+            Add expense
           </button>
         </div>
       </div>
 
       {/* Summary cards */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3 mt-4 mb-4">
-        <div className="glass-card p-5 border-l-2 border-l-rose-500/50">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Total Expenses</p>
-              <p className="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
-                <Amount value={totalExpenseAmount} currency={currency} />
-              </p>
-            </div>
-            <div className="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-500/10">
-              <ArrowDownCircle size={22} className="text-rose-500 dark:text-rose-400 drop-shadow-[0_0_6px_rgba(251,113,133,0.3)]" />
-            </div>
-          </div>
+        <div className="glass-card p-5">
+          <p className="text-sm text-gray-600 dark:text-[#a1a1a6]">Expenses</p>
+          <p className={"mt-2 text-xl md:text-2xl leading-none font-mono font-medium tabular-nums text-gray-900 dark:text-[#ededed]"}>
+            <Amount value={totalExpenseAmount} currency={currency} />
+          </p>
+          <p className="mt-2 text-xs text-gray-500 dark:text-[#85858b]">Selected dates</p>
         </div>
 
-        <div className="glass-card p-5 border-l-2 border-l-emerald-500/50">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Total Income</p>
-              <p className="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
-                <Amount value={totalIncomeAmount} currency={currency} />
-              </p>
-            </div>
-            <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-500/10">
-              <ArrowUpCircle size={22} className="text-emerald-500 dark:text-emerald-400 drop-shadow-[0_0_6px_rgba(52,211,153,0.3)]" />
-            </div>
-          </div>
+        <div className="glass-card p-5">
+          <p className="text-sm text-gray-600 dark:text-[#a1a1a6]">Income</p>
+          <p className={"mt-2 text-xl md:text-2xl leading-none font-mono font-medium tabular-nums text-gray-900 dark:text-[#ededed]"}>
+            <Amount value={totalIncomeAmount} currency={currency} />
+          </p>
+          <p className="mt-2 text-xs text-gray-500 dark:text-[#85858b]">Selected dates</p>
         </div>
 
-        <div className="glass-card p-5 border-l-2 border-l-indigo-500/50">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Net Balance</p>
-              <p
-                className={`mt-1 text-2xl font-semibold ${netAmount >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
-                  }`}
-              >
-                <Amount value={Math.abs(netAmount)} currency={currency} />
-              </p>
-            </div>
-          </div>
+        <div className="glass-card p-5">
+          <p className="text-sm text-gray-600 dark:text-[#a1a1a6]">Net</p>
+          <p className={`mt-2 text-xl md:text-2xl leading-none font-mono font-medium tabular-nums ${netAmount >= 0 ? 'text-green-600 dark:text-[#4cc38a]' : 'text-red-600 dark:text-[#e5484d]'}`}>
+            <Amount value={Math.abs(netAmount)} currency={currency} sign={netAmount < 0 ? '−' : undefined} />
+          </p>
+          <p className="mt-2 text-xs text-gray-500 dark:text-[#85858b]">Selected dates</p>
         </div>
       </div>
 
       {/* Expenses list - desktop table (hidden on mobile) */}
-      {!showTransfers && viewMode === 'list' && (
+      {viewMode === 'list' && (
         <>
           {/* Desktop table */}
           <div className="hidden md:block">
@@ -886,7 +804,7 @@ const Expenses = () => {
           <div className="md:hidden space-y-3">
             {/* Mobile search bar */}
             <div className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-slate-500" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-[#85858b]" />
               <input
                 type="text"
                 placeholder="Search expenses..."
@@ -922,21 +840,21 @@ const Expenses = () => {
             {/* Mobile pagination */}
             {pagination.totalPages > 1 && (
               <div className="flex items-center justify-between pt-2">
-                <span className="text-sm text-gray-500 dark:text-slate-500">
+                <span className="text-sm text-gray-500 dark:text-[#85858b]">
                   Page {pagination.currentPage} of {pagination.totalPages}
                 </span>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setPage(p => Math.max(1, p - 1))}
                     disabled={pagination.currentPage <= 1}
-                    className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 dark:border-white/[0.08] disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-white/[0.06] transition-all duration-200 min-h-[40px] text-gray-700 dark:text-slate-300"
+                    className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 dark:border-white/[0.08] disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-white/[0.06] transition-colors min-h-[40px] text-gray-700 dark:text-[#a1a1a6]"
                   >
                     Prev
                   </button>
                   <button
                     onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))}
                     disabled={pagination.currentPage >= pagination.totalPages}
-                    className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 dark:border-white/[0.08] disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-white/[0.06] transition-all duration-200 min-h-[40px] text-gray-700 dark:text-slate-300"
+                    className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 dark:border-white/[0.08] disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-white/[0.06] transition-colors min-h-[40px] text-gray-700 dark:text-[#a1a1a6]"
                   >
                     Next
                   </button>
@@ -947,20 +865,20 @@ const Expenses = () => {
         </>
       )}
       {/* Calendar View */}
-      {!showTransfers && viewMode === 'calendar' && (
+      {viewMode === 'calendar' && (
         <>
           {/* Filters for Calendar View */}
           <div className="glass-card p-4 mb-4">
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-4 md:flex-row md:items-center">
                 <div className="relative flex-1">
-                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-slate-500" />
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-[#85858b]" />
                   <input
                     type="text"
                     placeholder="Search expenses..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full rounded-xl border border-gray-300 dark:border-white/[0.07] px-10 py-2.5 text-sm focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200 bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-slate-500"
+                    className="w-full rounded-xl border border-gray-300 dark:border-white/[0.07] px-10 py-2.5 text-sm focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-colors bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-slate-500"
                   />
                 </div>
 
@@ -974,9 +892,9 @@ const Expenses = () => {
                       key={option.value}
                       type="button"
                       onClick={() => setFilterType(option.value)}
-                      className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-200 ${filterType === option.value
-                        ? 'border-indigo-500/50 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.1)]'
-                        : 'border-gray-300 dark:border-white/[0.08] text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white'
+                      className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors ${filterType === option.value
+                        ? 'border-indigo-500/50 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400'
+                        : 'border-gray-300 dark:border-white/[0.08] text-gray-600 dark:text-[#a1a1a6] hover:bg-gray-50 dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white'
                         }`}
                     >
                       {option.label}
@@ -987,7 +905,7 @@ const Expenses = () => {
                 {hasActiveFilters && (
                   <button
                     onClick={clearFilters}
-                    className="inline-flex items-center gap-2 rounded-xl border border-gray-300 dark:border-white/[0.08] px-4 py-2.5 text-sm text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white transition-all duration-200"
+                    className="inline-flex items-center gap-2 rounded-xl border border-gray-300 dark:border-white/[0.08] px-4 py-2.5 text-sm text-gray-600 dark:text-[#a1a1a6] hover:bg-gray-50 dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white transition-colors"
                   >
                     <X size={16} />
                     Clear
@@ -995,7 +913,7 @@ const Expenses = () => {
                 )}
               </div>
 
-              {/* Date Range Picker */}
+              {/* Date range Picker */}
               <div className="w-full md:w-auto">
                 <DateRangePicker
                   startDate={dateRange.startDate}
@@ -1012,7 +930,7 @@ const Expenses = () => {
             <div className="flex items-center justify-between gap-2 mb-4 sm:mb-6">
               <button
                 onClick={() => setCalendarDate(subMonths(calendarDate, 1))}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-white/[0.06] rounded-xl transition-all duration-200 text-gray-600 dark:text-slate-400 min-h-[40px] min-w-[40px] flex items-center justify-center"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-white/[0.06] rounded-xl transition-colors text-gray-600 dark:text-[#a1a1a6] min-h-[40px] min-w-[40px] flex items-center justify-center"
                 title="Previous month"
                 aria-label="Previous month"
               >
@@ -1021,7 +939,7 @@ const Expenses = () => {
 
               {/* Mobile: just Month Year + Today */}
               <div className="flex items-center gap-2 sm:gap-3 flex-1 justify-center">
-                <h2 className="text-base sm:text-xl font-semibold text-gray-900 dark:text-white">
+                <h2 className="text-base sm:text-xl font-medium text-gray-900 dark:text-white">
                   {format(calendarDate, 'MMM yyyy')}
                 </h2>
                 {/* Go-to date picker — desktop only */}
@@ -1038,7 +956,7 @@ const Expenses = () => {
                 </div>
                 <button
                   onClick={() => setCalendarDate(new Date())}
-                  className="px-2.5 py-1 text-xs sm:text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-xl transition-all duration-200 border border-indigo-200 dark:border-indigo-500/20"
+                  className="px-2.5 py-1 text-xs sm:text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-xl transition-colors border border-indigo-200 dark:border-indigo-500/20"
                 >
                   Today
                 </button>
@@ -1046,7 +964,7 @@ const Expenses = () => {
 
               <button
                 onClick={() => setCalendarDate(addMonths(calendarDate, 1))}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-white/[0.06] rounded-xl transition-all duration-200 text-gray-600 dark:text-slate-400 min-h-[40px] min-w-[40px] flex items-center justify-center"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-white/[0.06] rounded-xl transition-colors text-gray-600 dark:text-[#a1a1a6] min-h-[40px] min-w-[40px] flex items-center justify-center"
                 title="Next month"
                 aria-label="Next month"
               >
@@ -1058,7 +976,7 @@ const Expenses = () => {
             <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
               {/* Day headers */}
               {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
-                <div key={i} className="p-1 sm:p-2 text-center text-xs font-semibold text-gray-500 dark:text-slate-500">
+                <div key={i} className="p-1 sm:p-2 text-center text-xs font-medium text-gray-500 dark:text-[#85858b]">
                   <span className="sm:hidden">{day}</span>
                   <span className="hidden sm:inline">{['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][i]}</span>
                 </div>
@@ -1079,10 +997,10 @@ const Expenses = () => {
                   <div
                     key={idx}
                     onClick={() => handleDateClick(day)}
-                    className={`min-h-[52px] sm:min-h-[100px] p-1 sm:p-2 border border-gray-200 dark:border-white/[0.04] rounded-xl cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-white/[0.04] hover:border-indigo-300 dark:hover:border-indigo-500/30 ${!isCurrentMonth ? 'bg-gray-50 dark:bg-white/[0.01] opacity-40' : 'bg-white dark:bg-white/[0.02]'
+                    className={`min-h-[52px] sm:min-h-[100px] p-1 sm:p-2 border border-gray-200 dark:border-white/[0.04] rounded-xl cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-white/[0.04] hover:border-indigo-300 dark:hover:border-indigo-500/30 ${!isCurrentMonth ? 'bg-gray-50 dark:bg-white/[0.01] opacity-40' : 'bg-white dark:bg-white/[0.02]'
                       } ${isToday ? 'ring-2 ring-indigo-500/50' : ''}`}
                   >
-                    <div className={`text-xs sm:text-sm font-medium mb-1 ${isToday ? 'text-indigo-600 dark:text-indigo-400' : isCurrentMonth ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-slate-600'}`}>
+                    <div className={`text-xs sm:text-sm font-medium mb-1 ${isToday ? 'text-indigo-600 dark:text-indigo-400' : isCurrentMonth ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-[#85858b]'}`}>
                       {format(day, 'd')}
                     </div>
 
@@ -1096,7 +1014,7 @@ const Expenses = () => {
                           <span className="w-2 h-2 rounded-full bg-rose-500 flex-shrink-0" />
                         )}
                         {dayExpenses.length > 1 && (
-                          <span className="text-gray-400 dark:text-gray-500" style={{ fontSize: '8px', lineHeight: '8px', marginTop: '2px' }}>
+                          <span className="text-gray-400 dark:text-[#85858b]" style={{ fontSize: '8px', lineHeight: '8px', marginTop: '2px' }}>
                             ×{dayExpenses.length}
                           </span>
                         )}
@@ -1123,7 +1041,7 @@ const Expenses = () => {
                         )
                       })}
                       {dayExpenses.length > 3 && (
-                        <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                        <div className="text-xs text-gray-500 dark:text-[#a1a1a6] font-medium">
                           +{dayExpenses.length - 3} more
                         </div>
                       )}
@@ -1131,7 +1049,7 @@ const Expenses = () => {
 
                     {/* Desktop total */}
                     {dayExpenses.length > 0 && (
-                      <div className={`hidden sm:block text-xs font-semibold mt-1 ${totalAmount >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+                      <div className={`hidden sm:block text-xs font-medium mt-1 ${totalAmount >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
                         }`}>
                         <Amount value={Math.abs(totalAmount)} currency={currency} sign={totalAmount >= 0 ? '+' : ''} />
                       </div>
@@ -1142,33 +1060,6 @@ const Expenses = () => {
             </div>
           </div>
         </>
-      )}
-
-      {/* Transfers View */}
-      {showTransfers && (
-        <div className="glass-card p-4 md:p-6 space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold text-gray-900 dark:text-white">Transfers</h2>
-            <button onClick={() => setTransferFormOpen(true)} className="btn-primary btn-sm">New transfer</button>
-          </div>
-          {transfers.length === 0 ? (
-            <p className="text-sm text-gray-400 dark:text-slate-600 py-4">No transfers yet.</p>
-          ) : (
-            <div className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-              {transfers.map((t) => (
-                <div key={t._id} className="flex items-center justify-between py-2.5 text-sm">
-                  <span className="text-gray-900 dark:text-white">
-                    {t.fromAccount?.name} → {t.toAccount?.name}
-                    {t.note ? <span className="text-gray-400 dark:text-slate-600"> · {t.note}</span> : null}
-                  </span>
-                  <span className="text-gray-500 dark:text-slate-400">
-                    {t.date} · <Amount value={t.amount} currency={t.fromAccount?.currency || currency} />
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
       )}
 
       {/* Add/Edit Form Modal */}
@@ -1225,15 +1116,6 @@ const Expenses = () => {
             </div>
 
             <div>
-              <SectionLabel>Account</SectionLabel>
-              <AccountPicker
-                value={formData.account}
-                onChange={(id) => setFormData({ ...formData, account: id })}
-                accounts={accounts}
-              />
-            </div>
-
-            <div>
               <SectionLabel>Notes (optional)</SectionLabel>
               <FieldCard className="p-4">
                 <input
@@ -1250,7 +1132,7 @@ const Expenses = () => {
               <FieldCard className="p-4">
                 <label className="flex items-center justify-between gap-3 cursor-pointer">
                   <span className="flex items-center gap-2">
-                    <Repeat size={18} className="text-gray-600 dark:text-gray-400" />
+                    <Repeat size={18} className="text-gray-600 dark:text-[#a1a1a6]" />
                     <span className="text-sm font-medium text-gray-900 dark:text-white">Recurring {formData.type}</span>
                   </span>
                   <input
@@ -1279,10 +1161,10 @@ const Expenses = () => {
                               key={p}
                               type="button"
                               onClick={() => setFormData({ ...formData, recurringPeriod: p })}
-                              className={`px-3.5 py-2 rounded-full text-sm font-medium capitalize min-h-[40px] border transition-all duration-200
+                              className={`px-3.5 py-2 rounded-full text-sm font-medium capitalize min-h-[40px] border transition-colors
                                 ${active
                                   ? 'bg-indigo-600 border-indigo-600 text-white'
-                                  : 'bg-transparent border-gray-300 dark:border-white/[0.15] text-gray-700 dark:text-slate-300'
+                                  : 'bg-transparent border-gray-300 dark:border-white/[0.15] text-gray-700 dark:text-[#a1a1a6]'
                                 }`}
                             >
                               {p}
@@ -1298,7 +1180,7 @@ const Expenses = () => {
                         onChange={(date) => setFormData({ ...formData, recurringEndDate: date })}
                         placeholder="Select end date"
                       />
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      <p className="text-xs text-gray-500 dark:text-[#a1a1a6] mt-1">
                         Recurring entries will be created from the start date through this end date.
                       </p>
                     </div>
@@ -1327,7 +1209,7 @@ const Expenses = () => {
       >
         <form onSubmit={handleBulkUpdateSubmit} className="flex flex-col flex-1 h-[600px] max-h-full">
           <div className="p-6 overflow-y-auto flex-1">
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+            <p className="text-sm text-gray-500 dark:text-[#a1a1a6] mb-4">
               Update details for each selected expense below.
             </p>
 
@@ -1395,11 +1277,11 @@ const Expenses = () => {
         </div>
       </Modal>
 
-      {/* Bulk Add Form Modal */}
+      {/* Bulk add Form Modal */}
       <Modal
         isOpen={showBulkForm}
         onClose={() => { setShowBulkForm(false); resetBulkForm() }}
-        title="Bulk Add Expenses"
+        title="Bulk add Expenses"
         maxWidth="max-w-2xl"
       >
         <form onSubmit={handleBulkSubmit} className="flex flex-col flex-1 h-[600px] max-h-[85vh]">
@@ -1407,7 +1289,7 @@ const Expenses = () => {
           <div className="flex flex-col p-6 overflow-y-auto flex-1">
             {/* Date Selection - Fixed at top */}
             <div className="mb-4 flex-shrink-0 relative z-20">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-[#a1a1a6] mb-2">
                 Date for all expenses *
               </label>
               <DatePicker
@@ -1420,7 +1302,7 @@ const Expenses = () => {
             {/* Expense Rows Section */}
             <div className="flex flex-col z-10">
               <div className="flex items-center justify-between mb-3 flex-shrink-0">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="block text-sm font-medium text-gray-700 dark:text-[#a1a1a6]">
                   Expenses
                 </label>
                 <button
@@ -1441,7 +1323,7 @@ const Expenses = () => {
                 }}
               >
                 {bulkExpenses.map((expense, index) => (
-                  <div key={index} className="flex flex-col sm:grid sm:grid-cols-12 gap-2 items-start p-3 border border-gray-200 dark:border-gray-700 rounded-lg flex-shrink-0">
+                  <div key={index} className="flex flex-col sm:grid sm:grid-cols-12 gap-2 items-start p-3 border border-gray-200 dark:border-white/[0.08] rounded-lg flex-shrink-0">
                     <div className="col-span-12 sm:col-span-4 w-full">
                       <input
                         type="number"
@@ -1449,7 +1331,7 @@ const Expenses = () => {
                         min="1"
                         value={expense.amount}
                         onChange={(e) => updateBulkRow(index, 'amount', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 min-h-[44px]"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-white/[0.08] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-[#232325] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 min-h-[44px]"
                         placeholder="Amount"
                       />
                     </div>
@@ -1466,7 +1348,7 @@ const Expenses = () => {
                         type="text"
                         value={expense.description}
                         onChange={(e) => updateBulkRow(index, 'description', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 min-h-[44px]"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-white/[0.08] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-[#232325] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 min-h-[44px]"
                         placeholder="Description"
                       />
                     </div>
@@ -1529,18 +1411,7 @@ const Expenses = () => {
         onClose={() => setShowImportModal(false)}
         onImportSuccess={() => {
           loadExpenses()
-          loadAccounts()
           // Optionally refresh categories if new ones were added
-        }}
-      />
-
-      {/* Transfer Form Modal */}
-      <TransferForm
-        isOpen={transferFormOpen}
-        onClose={() => setTransferFormOpen(false)}
-        onCreated={() => {
-          transferService.list().then((res) => setTransfers(res.data?.data?.transfers || []))
-          loadAccounts()
         }}
       />
     </div>

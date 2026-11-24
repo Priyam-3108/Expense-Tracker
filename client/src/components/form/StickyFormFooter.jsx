@@ -9,7 +9,7 @@ export default function StickyFormFooter({
   onCancel,
 }) {
   return (
-    <div className="flex-shrink-0 flex gap-3 p-4 border-t border-gray-200 dark:border-white/[0.08] bg-white dark:bg-[#151828]">
+    <div className="flex-shrink-0 flex gap-3 p-4 border-t border-gray-200 dark:border-white/[0.08] bg-white dark:bg-[#19191b]">
       {onCancel && (
         <button
           type="button"
@@ -23,7 +23,7 @@ export default function StickyFormFooter({
       <button
         type="submit"
         disabled={loading}
-        className={`flex-1 min-h-[48px] rounded-2xl text-white text-base font-semibold flex items-center justify-center gap-2 shadow-md transition-opacity ${gradientR(variant)} ${loading ? 'opacity-70' : ''}`}
+        className={`flex-1 min-h-[48px] rounded-2xl text-white text-base font-medium flex items-center justify-center gap-2 shadow-md transition-opacity ${gradientR(variant)} ${loading ? 'opacity-70' : ''}`}
       >
         {loading ? (
           <>

@@ -63,8 +63,6 @@ Constraints that apply to every phase:
 - Follow the plan's literal test code and implementation code. If the plan is
   wrong or the code has drifted, stop and tell me what you found before
   improvising — don't silently deviate.
-- Commit messages end with:
-  Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>
 
 Tell me which phase you're starting, what reconciliation drift you found (if
 any), then begin Task 1.

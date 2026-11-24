@@ -15,17 +15,14 @@ import { syncEngine } from '../services/syncEngine';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import hapticFeedback from '../utils/haptics';
 import { PAYMENT_MODES } from '../constants/paymentModes';
-import { useAccounts } from '../context/AccountContext';
 
 export default function AddExpenseScreen({ navigation, route }) {
     const { colors, isDark, shadows, borderRadius } = useTheme();
-    const { accounts, archivedAccounts, defaultAccountId, loadAccounts } = useAccounts();
     const [description, setDescription] = useState('');
     const [amount, setAmount] = useState('');
     const [type, setType] = useState('expense');
     const [category, setCategory] = useState('');
     const [paymentMode, setPaymentMode] = useState('other');
-    const [account, setAccount] = useState('');
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
     const [pickerVisible, setPickerVisible] = useState(false);
@@ -53,7 +50,6 @@ export default function AddExpenseScreen({ navigation, route }) {
             setType(exp.type || 'expense');
             setCategory(exp.category?._id || exp.category || '');
             setPaymentMode(exp.paymentMode || 'other');
-            setAccount(exp.account?._id || exp.account || '');
             setDate(new Date(exp.date));
             setIsRecurring(exp.isRecurring || false);
             if (exp.recurringPeriod) setRecurringPeriod(exp.recurringPeriod);
@@ -63,15 +59,10 @@ export default function AddExpenseScreen({ navigation, route }) {
         }
     }, [route.params]);
 
-    useEffect(() => {
-        if (!account && defaultAccountId && !route.params?.expense) setAccount(defaultAccountId);
-    }, [account, defaultAccountId, route.params]);
-
     const resetForm = () => {
         setIsEditing(false); setEditId(null); setDescription(''); setAmount('');
         setType('expense'); setCategory(''); setPaymentMode('other'); setDate(new Date());
         setIsRecurring(false); setRecurringPeriod('monthly'); setRecurringEndDate(new Date());
-        setAccount(defaultAccountId || '');
     };
 
     const switchType = (t) => {
@@ -125,14 +116,12 @@ export default function AddExpenseScreen({ navigation, route }) {
             const payload = {
                 ...(isEditing && editId && { _id: editId, id: editId }),
                 description, amount: parseFloat(amount), type, category, paymentMode,
-                account: account || undefined,
                 date: fmt(date), isRecurring,
                 ...(isRecurring && { recurringPeriod, recurringEndDate: fmt(recurringEndDate) }),
             };
 
             await offlineService.saveExpenseLocally(payload);
             syncEngine.syncNow();
-            loadAccounts();
 
             hapticFeedback.success();
             setAlertConfig({
@@ -439,28 +428,6 @@ export default function AddExpenseScreen({ navigation, route }) {
                                 <Text style={[s.chipText, { color: isSelected ? colors.primary : colors.text }]}>
                                     {pm.label}
                                 </Text>
-                            </TouchableOpacity>
-                        );
-                    })}
-                </ScrollView>
-
-                {/* ── Account ── */}
-                <Text style={s.sectionLabel}>Account</Text>
-                {!!account && !accounts.some((a) => a._id === account) && archivedAccounts.some((a) => a._id === account) && (
-                    <Text style={[s.recurringSubtitle, { marginHorizontal: 20, marginBottom: 8 }]}>
-                        This expense is on an archived account ({archivedAccounts.find((a) => a._id === account)?.name}).
-                    </Text>
-                )}
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.chipsScroll} style={{ marginBottom: 16 }}>
-                    {accounts.map((a) => {
-                        const isSel = account === a._id;
-                        return (
-                            <TouchableOpacity
-                                key={a._id}
-                                style={[s.chip, { backgroundColor: isSel ? colors.primary + '20' : colors.card, borderColor: isSel ? colors.primary : colors.border }]}
-                                onPress={() => { hapticFeedback.light(); setAccount(a._id); }}
-                            >
-                                <Text style={[s.chipText, { color: isSel ? colors.primary : colors.text }]}>{a.name}</Text>
                             </TouchableOpacity>
                         );
                     })}

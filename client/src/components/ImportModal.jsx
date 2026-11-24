@@ -254,13 +254,13 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
     }
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Import Expenses" maxWidth="max-w-4xl">
+        <Modal isOpen={isOpen} onClose={onClose} title="Import expenses" maxWidth="max-w-4xl">
             <div className="flex flex-col h-full">
                 {/* Content */}
                 <div className="p-6 overflow-y-auto flex-1">
                     {step === 1 && (
                         <div
-                            className="border-2 border-dashed border-gray-300 dark:border-white/[0.10] rounded-xl p-6 sm:p-12 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-all duration-200"
+                            className="border-2 border-dashed border-gray-300 dark:border-white/[0.10] rounded-xl p-6 sm:p-12 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors"
                             onClick={() => fileInputRef.current?.click()}
                             onDragOver={(e) => e.preventDefault()}
                             onDrop={(e) => {
@@ -282,7 +282,7 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
                             <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                                 Click to upload or drag and drop
                             </h4>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                            <p className="text-sm text-gray-500 dark:text-[#a1a1a6]">
                                 Supports CSV and Excel files
                             </p>
                             <div className="mt-6 flex gap-4 text-xs text-gray-400">
@@ -309,7 +309,7 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {ALL_FIELDS.map(field => (
                                     <div key={field} className="space-y-2">
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 capitalize">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-[#a1a1a6] capitalize">
                                             {field} {REQUIRED_FIELDS.includes(field) && <span className="text-red-500">*</span>}
                                         </label>
                                         <select
@@ -333,7 +333,7 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
                                 <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Preview (First 3 rows)</h4>
                                 <div className="overflow-x-auto glass-table">
                                     <table className="w-full text-sm text-left">
-                                        <thead className="text-gray-500 dark:text-slate-400">
+                                        <thead className="text-gray-500 dark:text-[#a1a1a6]">
                                             <tr>
                                                 {Object.keys(mapping).filter(k => mapping[k]).map(field => (
                                                     <th key={field} className="px-4 py-2 font-medium capitalize">{field}</th>
@@ -344,7 +344,7 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
                                             {rawData.slice(0, 3).map((row, i) => (
                                                 <tr key={i}>
                                                     {Object.keys(mapping).filter(k => mapping[k]).map(field => (
-                                                        <td key={field} className="px-4 py-2 text-gray-900 dark:text-gray-300">
+                                                        <td key={field} className="px-4 py-2 text-gray-900 dark:text-[#a1a1a6]">
                                                             {row[mapping[field]]}
                                                         </td>
                                                     ))}
@@ -390,7 +390,7 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
                                 </>
                             ) : (
                                 <>
-                                    <span>Import Expenses</span>
+                                    <span>Import expenses</span>
                                     <ArrowRight size={18} />
                                 </>
                             )}

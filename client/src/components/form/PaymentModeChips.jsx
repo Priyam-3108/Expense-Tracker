@@ -10,10 +10,10 @@ export default function PaymentModeChips({ value, onChange }) {
             key={mode}
             type="button"
             onClick={() => onChange(mode)}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-full border-[1.5px] whitespace-nowrap text-sm font-medium min-h-[40px] transition-all duration-200
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-full border-[1.5px] whitespace-nowrap text-sm font-medium min-h-[40px] transition-colors
               ${selected
                 ? 'border-indigo-500 bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300 dark:border-indigo-400'
-                : 'border-gray-300 dark:border-white/[0.15] text-gray-700 dark:text-slate-300'
+                : 'border-gray-300 dark:border-white/[0.15] text-gray-700 dark:text-[#a1a1a6]'
               }`}
           >
             <Icon size={15} />

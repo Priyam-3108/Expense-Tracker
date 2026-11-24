@@ -257,15 +257,6 @@ function ProfileScreen({ navigation }) {
                         navigation.navigate('CategoriesList');
                     },
                 },
-                {
-                    icon: 'business-outline',
-                    title: 'Accounts',
-                    subtitle: 'Manage accounts & transfers',
-                    onPress: () => {
-                        hapticFeedback.light();
-                        navigation.navigate('Accounts');
-                    },
-                },
             ],
         },
         {

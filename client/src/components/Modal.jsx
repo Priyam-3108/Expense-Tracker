@@ -30,18 +30,18 @@ const Modal = ({ isOpen, onClose, title, children, maxWidth = 'max-w-lg' }) => {
             leaveTo="translate-y-full md:opacity-0 md:translate-y-4 md:scale-95"
           >
             <Dialog.Panel
-              className={`w-full ${maxWidth} transform overflow-hidden rounded-t-2xl md:rounded-2xl transition-all flex flex-col glass-modal-panel`}
+              className={`w-full ${maxWidth} transform overflow-hidden rounded-t-2xl md:rounded-2xl transition-[transform,opacity] flex flex-col glass-modal-panel`}
               style={{ maxHeight: '90vh' }}
             >
               <div className="flex flex-col h-full">
                 {title && (
                   <div className="flex items-center justify-between border-b border-gray-200 dark:border-white/[0.08] px-6 py-4 flex-shrink-0">
-                    <Dialog.Title className="text-lg font-semibold text-gray-900 dark:text-white">
+                    <Dialog.Title className="text-lg font-medium text-gray-900 dark:text-white">
                       {title}
                     </Dialog.Title>
                     <button
                       type="button"
-                      className="rounded-xl p-2 text-gray-400 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-white/[0.06] hover:text-gray-500 dark:hover:text-white min-h-[44px] min-w-[44px] flex items-center justify-center transition-all duration-200"
+                      className="rounded-xl p-2 text-gray-400 dark:text-[#a1a1a6] hover:bg-gray-100 dark:hover:bg-white/[0.06] hover:text-gray-500 dark:hover:text-white min-h-[44px] min-w-[44px] flex items-center justify-center transition-colors"
                       onClick={onClose}
                     >
                       <span className="sr-only">Close</span>

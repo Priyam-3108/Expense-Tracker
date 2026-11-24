@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { MessageSquare } from 'lucide-react'
 import PublicNavbar from '../components/PublicNavbar'
 import PublicFooter from '../components/PublicFooter'
 import '../styles/StaticPages.css'
@@ -18,7 +17,7 @@ const FAQ = () => {
 
     const faqs = [
         {
-            category: "Getting Started",
+            category: "Getting started",
             questions: [
                 {
                     q: "How do I create an account?",
@@ -56,7 +55,7 @@ const FAQ = () => {
             ]
         },
         {
-            category: "Account Management",
+            category: "Account management",
             questions: [
                 {
                     q: "How do I change my password?",
@@ -73,7 +72,7 @@ const FAQ = () => {
             ]
         },
         {
-            category: "Data & Privacy",
+            category: "Data and privacy",
             questions: [
                 {
                     q: "Is my financial data secure?",
@@ -125,8 +124,8 @@ const FAQ = () => {
             <div className="static-content">
                 <div className="static-container">
                     <div className="page-header">
-                        <span className="page-badge">Help Center</span>
-                        <h1 className="page-title">Frequently Asked Questions</h1>
+                        <span className="page-badge">Help center</span>
+                        <h1 className="page-title">Frequently asked questions</h1>
                         <p className="page-subtitle">
                             Find answers to common questions about Expense Tracker
                         </p>
@@ -134,8 +133,7 @@ const FAQ = () => {
 
                     {faqs.map((category, catIdx) => (
                         <div key={catIdx} className="mb-12">
-                            <h2 className="text-2xl font-bold text-[#0d253d] mb-6 flex items-center gap-3">
-                                <span className="w-2 h-8 bg-gradient-to-b from-[#533afd] to-[#ea2261] rounded-full inline-block"></span>
+                            <h2 className="text-lg font-medium text-[#171717] mb-2">
                                 {category.category}
                             </h2>
                             {category.questions.map((faq, qIdx) => {
@@ -154,7 +152,7 @@ const FAQ = () => {
                                             </div>
                                         </div>
                                         <div className="faq-answer">
-                                            <p className="pt-2 text-[#64748d] leading-relaxed">{faq.a}</p>
+                                            <p className="pt-2 text-[#737373] leading-relaxed">{faq.a}</p>
                                         </div>
                                     </div>
                                 )
@@ -163,17 +161,16 @@ const FAQ = () => {
                     ))}
 
                     {/* Still have questions */}
-                    <div className="content-section text-center my-16">
-                        <h2 className="section-title justify-center text-[#0d253d]">
-                            <span className="section-icon"><MessageSquare className="w-5 h-5 text-[#4434d4]" /></span>
+                    <div className="content-section mt-16">
+                        <h2 className="section-title text-[#171717]">
                             Still have questions?
                         </h2>
                         <div className="section-content">
-                            <p className="mb-6 text-[#64748d]">
-                                Can't find what you're looking for? Our support team is here to help!
+                            <p className="mb-6 text-[#737373]">
+                                Can't find what you're looking for? Our support team can help.
                             </p>
                             <Link to="/support" className="btn-primary btn-lg inline-flex">
-                                Contact Support
+                                Contact support
                             </Link>
                         </div>
                     </div>

@@ -7,7 +7,7 @@ export default function PaymentModeBadge({ value, hideOther = false, className =
   return (
     <span
       className={`inline-flex items-center gap-1 text-[11px] font-medium px-1.5 py-0.5 rounded-md
-        bg-gray-100 text-gray-600 dark:bg-white/[0.06] dark:text-slate-300 ${className}`}
+        bg-gray-100 text-gray-600 dark:bg-white/[0.06] dark:text-[#a1a1a6] ${className}`}
     >
       <Icon size={12} />
       {label}

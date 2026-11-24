@@ -109,9 +109,9 @@ const SharedAnalytics = () => {
             <div className="static-page min-h-screen flex flex-col">
                 <PublicNavbar />
                 <div className="flex-1 flex flex-col items-center justify-center px-4 py-24">
-                    <div className="bg-white border border-[#e3e8ee] rounded-2xl shadow-[0_8px_24px_rgba(0,55,112,0.08)] p-8 text-center max-w-md">
-                        <h2 className="text-xl font-bold text-[#ea2261] mb-2">Access Denied</h2>
-                        <p className="text-[#64748d]">{error}</p>
+                    <div className="bg-white border border-[#e5e5e5] rounded-2xl shadow-[0_8px_24px_rgba(0,0,0,0.08)] p-8 text-center max-w-md">
+                        <h2 className="text-xl font-medium text-red-600 dark:text-[#e5484d] mb-2">Access denied</h2>
+                        <p className="text-[#737373]">{error}</p>
                     </div>
                 </div>
                 <PublicFooter />
@@ -126,12 +126,12 @@ const SharedAnalytics = () => {
             <div className="flex-1 container mx-auto px-4 pt-28 pb-16 relative z-10">
                 {profile && (
                     <div className="mb-6 flex items-center gap-4 p-4 glass-card">
-                        <div className="h-12 w-12 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-xl font-bold text-indigo-400">
+                        <div className="h-12 w-12 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-xl font-medium text-indigo-400">
                             {profile.avatar || profile.name.charAt(0).toUpperCase()}
                         </div>
                         <div>
-                            <p className="text-xs text-[#64748d]">Shared by</p>
-                            <h2 className="text-lg font-bold text-[#0d253d]">{profile.name}</h2>
+                            <p className="text-xs text-[#737373]">Shared by</p>
+                            <h2 className="text-lg font-medium text-[#171717]">{profile.name}</h2>
                         </div>
                     </div>
                 )}

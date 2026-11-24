@@ -24,7 +24,6 @@ export const expenseSchema = z.object({
   amount: z.number().positive('Amount must be positive').max(999999.99, 'Amount cannot exceed 999,999.99'),
   date: z.string().optional(),
   category: z.string().min(1, 'Category is required'),
-  account: z.string().optional(),
   type: z.enum(['expense', 'income']).default('expense'),
   tags: z.array(z.string().max(20)).optional(),
   notes: z.string().max(500, 'Notes cannot exceed 500 characters').optional(),
@@ -32,30 +31,6 @@ export const expenseSchema = z.object({
   isRecurring: z.boolean().optional(),
   recurringPeriod: z.enum(['weekly', 'monthly', 'yearly']).optional(),
   recurringEndDate: z.string().optional()
-});
-
-export const accountSchema = z.object({
-  name: z.string().min(1, 'Account name is required').max(40, 'Name cannot exceed 40 characters'),
-  type: z.enum(['cash', 'bank', 'card', 'savings', 'other']).optional(),
-  openingBalance: z.number().optional(),
-  currency: z.enum(['USD', 'EUR', 'INR', 'GBP', 'JPY', 'CNY', 'CAD', 'AUD']).optional(),
-  archived: z.boolean().optional(),
-});
-
-export const transferSchema = z.object({
-  fromAccount: z.string().min(1, 'From account is required'),
-  toAccount: z.string().min(1, 'To account is required'),
-  amount: z.number().positive('Amount must be positive'),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD'),
-  note: z.string().max(300).optional(),
-});
-
-// updateTransfer only reads date/note from the body (amount/accounts aren't
-// editable via PUT) — a narrower schema than transferSchema so PUT doesn't
-// require fields the controller never uses.
-export const transferUpdateSchema = z.object({
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD').optional(),
-  note: z.string().max(300).optional(),
 });
 
 // Validation middleware factory
@@ -67,7 +42,6 @@ export const validate = (schema) => {
       next();
     } catch (error) {
       if (error instanceof z.ZodError) {
-        // Zod v4 renamed ZodError.errors to .issues; fall back to .errors for v3.
         const errors = (error.issues ?? error.errors).map(err => ({
           field: err.path.join('.'),
           message: err.message

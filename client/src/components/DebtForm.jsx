@@ -100,7 +100,7 @@ export default function DebtForm({ isOpen, onClose, editDebt = null, type = 'bor
           )}
 
           <div>
-            <SectionLabel>Person Name</SectionLabel>
+            <SectionLabel>Person name</SectionLabel>
             <FieldCard className="p-4">
               <input
                 type="text"
@@ -123,7 +123,7 @@ export default function DebtForm({ isOpen, onClose, editDebt = null, type = 'bor
               />
             </div>
             <div>
-              <SectionLabel>Due Date (optional)</SectionLabel>
+              <SectionLabel>Due date (optional)</SectionLabel>
               <DatePicker
                 value={formData.dueDate}
                 onChange={(date) => setFormData({ ...formData, dueDate: date })}

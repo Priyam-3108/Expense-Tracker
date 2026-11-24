@@ -12,7 +12,7 @@ export default function CategoryChips({ categories = [], value, onChange, onCrea
             key={cat._id}
             type="button"
             onClick={() => onChange(cat._id)}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-full border-[1.5px] whitespace-nowrap text-sm font-medium min-h-[40px] transition-all duration-200"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-full border-[1.5px] whitespace-nowrap text-sm font-medium min-h-[40px] transition-colors"
             style={{
               borderColor: selected ? color : undefined,
               backgroundColor: selected ? color + '20' : undefined,
@@ -23,7 +23,7 @@ export default function CategoryChips({ categories = [], value, onChange, onCrea
               className={`w-2 h-2 rounded-full ${selected ? '' : 'opacity-80'}`}
               style={{ backgroundColor: color }}
             />
-            <span className={selected ? '' : 'text-gray-700 dark:text-slate-300'}>{cat.name}</span>
+            <span className={selected ? '' : 'text-gray-700 dark:text-[#a1a1a6]'}>{cat.name}</span>
             {selected && <Check size={14} />}
           </button>
         )

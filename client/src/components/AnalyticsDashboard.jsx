@@ -1,11 +1,9 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useTheme } from '../context/ThemeContext'
 import { usePrivacy } from '../context/PrivacyContext'
-import { useAccounts } from '../context/AccountContext'
 import Amount from './Amount'
 import DateRangePicker from './DateRangePicker'
 import CategorySelector from './CategorySelector'
-import AccountPicker from './AccountPicker'
 import { formatCurrency, formatDateForInput, calculatePercentage, getCurrentMonthRange, getLast30DaysRange } from '../utils/helpers'
 import { analyticsService } from '../services/analyticsService'
 import { PAYMENT_MODE_MAP } from '../constants/paymentModes'
@@ -14,7 +12,7 @@ import {
 } from 'recharts'
 import {
     TrendingUp, TrendingDown, Calendar, Filter, X,
-    ArrowUpCircle, ArrowDownCircle, PieChart as PieChartIcon, BarChart3, Activity, Share2, SearchX, Wallet
+    ArrowUpCircle, ArrowDownCircle, PieChart as PieChartIcon, BarChart3, Activity, Share2, SearchX
 } from 'lucide-react'
 import EmptyState from './EmptyState'
 import { startOfYear, endOfYear, format, parseISO, eachDayOfInterval, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachMonthOfInterval } from 'date-fns'
@@ -45,8 +43,6 @@ const AnalyticsDashboard = ({
     setDateRange,
     selectedCategory,
     setSelectedCategory,
-    accountFilter,
-    setAccountFilter,
     filterType,
     setFilterType,
     onShare,
@@ -55,13 +51,21 @@ const AnalyticsDashboard = ({
 }) => {
     const { theme } = useTheme()
     const { isPrivate } = usePrivacy()
-    const { accounts } = useAccounts()
-    // Note: AccountProvider only fetches when a user is logged in, so an
-    // anonymous shared-link visitor gets accounts=[] harmlessly. The guards
-    // below exist for the other case: a LOGGED-IN user viewing someone
-    // else's shared link, who must never see their own accounts rendered
-    // as if they belonged to the link owner.
     const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    const chart = isDark
+        ? { expense: '#8b7ffe', income: '#85858b', grid: 'rgba(237,237,237,0.06)', tick: '#85858b', cursor: 'rgba(237,237,237,0.04)' }
+        : { expense: '#533afd', income: '#a3a3a3', grid: 'rgba(23,23,23,0.06)', tick: '#737373', cursor: 'rgba(23,23,23,0.03)' }
+    const tick = { fontSize: 12, fill: chart.tick, fontFamily: 'IBM Plex Mono, monospace' }
+    const tooltipStyle = {
+        backgroundColor: isDark ? '#19191b' : '#ffffff',
+        border: `1px solid ${isDark ? 'rgba(237,237,237,0.08)' : 'rgba(23,23,23,0.08)'}`,
+        borderRadius: '8px',
+        padding: '8px 12px',
+        fontSize: '12px',
+        color: isDark ? '#ededed' : '#171717',
+        boxShadow: '0 8px 24px rgba(0,0,0,0.06)'
+    }
+    const tooltipItem = { color: isDark ? '#ededed' : '#171717' }
 
     const [paymentModeData, setPaymentModeData] = useState([])
     const [paymentModeError, setPaymentModeError] = useState(false)
@@ -285,11 +289,10 @@ const AnalyticsDashboard = ({
             endDate: formatDateForInput(endOfMonth(new Date()))
         })
         setSelectedCategory('')
-        setAccountFilter?.('')
         setFilterType('all')
     }
 
-    const hasActiveFilters = selectedCategory || (!isSharedView && accountFilter) || filterType !== 'all' ||
+    const hasActiveFilters = selectedCategory || filterType !== 'all' ||
         dateRange.startDate !== formatDateForInput(startOfMonth(new Date())) ||
         dateRange.endDate !== formatDateForInput(endOfMonth(new Date()))
 
@@ -312,8 +315,8 @@ const AnalyticsDashboard = ({
         return (
             <div className="flex items-center justify-center min-h-[400px]">
                 <div className="text-center">
-                    <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 dark:border-slate-700 border-t-indigo-500 mx-auto mb-4" />
-                    <p className="text-gray-500 dark:text-slate-500">Loading analytics...</p>
+                    <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-200 dark:border-white/[0.08] border-t-[#533afd] mx-auto mb-4" />
+                    <p className="text-gray-500 dark:text-[#85858b]">Loading analytics</p>
                 </div>
             </div>
         )
@@ -324,10 +327,10 @@ const AnalyticsDashboard = ({
             {/* Header */}
             <div className="flex flex-row items-start justify-between gap-3">
                 <div>
-                    <h1 className="text-xl md:text-3xl font-bold text-gray-900 dark:text-white">
-                        {isSharedView ? 'Shared Analytics' : 'Analytics'}
+                    <h1 className="text-2xl md:text-[28px] leading-tight font-medium text-gray-900 dark:text-[#ededed]">
+                        {isSharedView ? 'Shared analytics' : 'Analytics'}
                     </h1>
-                    <p className="mt-1 text-sm text-gray-600 dark:text-slate-500">
+                    <p className="mt-1 text-sm text-gray-600 dark:text-[#85858b]">
                         {isSharedView ? 'Viewing shared expense analytics' : 'View your expense analytics and insights'}
                     </p>
                 </div>
@@ -341,7 +344,7 @@ const AnalyticsDashboard = ({
                         }`}
                     >
                         <Share2 size={16} />
-                        <span className="hidden sm:inline">{shareEnabled ? 'Sharing Enabled' : 'Share Analytics'}</span>
+                        <span className="hidden sm:inline">{shareEnabled ? 'Sharing Enabled' : 'Share analytics'}</span>
                         <span className="sm:hidden">{shareEnabled ? 'Shared' : 'Share'}</span>
                     </button>
                 )}
@@ -350,14 +353,14 @@ const AnalyticsDashboard = ({
             {/* Filters */}
             <div className="glass-card overflow-hidden">
                 {/* Filter Header */}
-                <div className="bg-gradient-to-r from-gray-50 to-white dark:from-white/[0.03] dark:to-transparent border-b border-gray-200 dark:border-white/[0.05] px-4 sm:px-6 py-3 sm:py-4">
+                <div className="bg-gray-50 dark:bg-white/[0.02] border-b border-gray-200 dark:border-white/[0.05] px-4 sm:px-6 py-3 sm:py-4">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-white dark:bg-white/[0.06] rounded-xl shadow-sm border border-gray-200 dark:border-white/[0.08]">
-                            <Filter size={20} className="text-gray-700 dark:text-slate-300" />
+                            <Filter size={20} className="text-gray-700 dark:text-[#a1a1a6]" />
                         </div>
                         <div>
-                            <h3 className="text-base font-semibold text-gray-900 dark:text-white">Filters</h3>
-                            <p className="text-xs text-gray-500 dark:text-slate-500 mt-0.5">Customize your analytics view</p>
+                            <h3 className="text-base font-medium text-gray-900 dark:text-white">Filters</h3>
+                            <p className="text-xs text-gray-500 dark:text-[#85858b] mt-0.5">Customize your analytics view</p>
                         </div>
                     </div>
                 </div>
@@ -365,11 +368,11 @@ const AnalyticsDashboard = ({
                 {/* Filter Content */}
                 <div className="p-4 sm:p-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        {/* Date Range */}
+                        {/* Date range */}
                         <div className="space-y-2">
-                            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                <Calendar size={16} className="text-gray-500 dark:text-gray-400" />
-                                Date Range
+                            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-[#a1a1a6]">
+                                <Calendar size={16} className="text-gray-500 dark:text-[#a1a1a6]" />
+                                Date range
                             </label>
                             <div className="relative">
                                 <DateRangePicker
@@ -383,8 +386,8 @@ const AnalyticsDashboard = ({
 
                         {/* Category Filter */}
                         <div className="space-y-2">
-                            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                <PieChartIcon size={16} className="text-gray-500 dark:text-gray-400" />
+                            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-[#a1a1a6]">
+                                <PieChartIcon size={16} className="text-gray-500 dark:text-[#a1a1a6]" />
                                 Category
                             </label>
                             <div className="relative flex gap-2">
@@ -392,7 +395,7 @@ const AnalyticsDashboard = ({
                                     <CategorySelector
                                         value={selectedCategory}
                                         onChange={(categoryId) => setSelectedCategory(categoryId)}
-                                        placeholder="All Categories"
+                                        placeholder="All categories"
                                         categories={categories} // Pass categories explicitly
                                         disabled={isSharedView && categories.length === 0}
                                     />
@@ -400,35 +403,19 @@ const AnalyticsDashboard = ({
                                 {selectedCategory && (
                                     <button
                                         onClick={() => setSelectedCategory('')}
-                                        className="p-2.5 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-200 flex items-center justify-center"
+                                        className="p-2.5 bg-gray-100 dark:bg-[#232325] border border-gray-300 dark:border-white/[0.08] rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 hover:border-gray-400 dark:hover:border-gray-500 transition-colors flex items-center justify-center"
                                         title="Clear category filter"
                                     >
-                                        <X size={16} className="text-gray-600 dark:text-gray-300" />
+                                        <X size={16} className="text-gray-600 dark:text-[#a1a1a6]" />
                                     </button>
                                 )}
                             </div>
                         </div>
 
-                        {/* Account Filter */}
-                        {!isSharedView && (
-                            <div className="space-y-2">
-                                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                    <Wallet size={16} className="text-gray-500 dark:text-gray-400" />
-                                    Account
-                                </label>
-                                <AccountPicker
-                                    value={accountFilter}
-                                    onChange={setAccountFilter}
-                                    accounts={accounts}
-                                    allowAll
-                                />
-                            </div>
-                        )}
-
                         {/* Type Filter */}
                         <div className="space-y-2">
-                            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                <BarChart3 size={16} className="text-gray-500 dark:text-gray-400" />
+                            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-[#a1a1a6]">
+                                <BarChart3 size={16} className="text-gray-500 dark:text-[#a1a1a6]" />
                                 Type
                             </label>
                             <div className="flex gap-2 p-1 bg-gray-100 dark:bg-white/[0.04] rounded-xl border border-gray-200 dark:border-white/[0.06]">
@@ -441,9 +428,9 @@ const AnalyticsDashboard = ({
                                         key={option.value}
                                         type="button"
                                         onClick={() => setFilterType(option.value)}
-                                        className={`flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${filterType === option.value
+                                        className={`flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${filterType === option.value
                                             ? 'bg-white dark:bg-white/[0.08] text-indigo-600 dark:text-indigo-400 shadow-sm border border-gray-200 dark:border-white/[0.10]'
-                                            : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white'
+                                            : 'text-gray-600 dark:text-[#a1a1a6] hover:text-gray-900 dark:hover:text-white'
                                             }`}
                                     >
                                         {option.label}
@@ -454,8 +441,8 @@ const AnalyticsDashboard = ({
 
                         {/* Quick Filters */}
                         <div className="space-y-2">
-                            <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                <Activity size={16} className="text-gray-500 dark:text-gray-400" />
+                            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-[#a1a1a6]">
+                                <Activity size={16} className="text-gray-500 dark:text-[#a1a1a6]" />
                                 Quick Filters
                             </label>
                             <div className="flex gap-2 flex-wrap">
@@ -470,7 +457,7 @@ const AnalyticsDashboard = ({
                                         key={preset.value}
                                         type="button"
                                         onClick={() => applyQuickFilter(preset.value)}
-                                        className="px-3 py-2 text-xs font-medium text-gray-700 dark:text-slate-300 bg-white dark:bg-white/[0.04] border border-gray-300 dark:border-white/[0.08] rounded-xl hover:bg-gray-50 dark:hover:bg-white/[0.08] hover:border-gray-400 dark:hover:border-white/[0.15] transition-all duration-200 min-h-[36px]"
+                                        className="px-3 py-2 text-xs font-medium text-gray-700 dark:text-[#a1a1a6] bg-white dark:bg-white/[0.04] border border-gray-300 dark:border-white/[0.08] rounded-xl hover:bg-gray-50 dark:hover:bg-white/[0.08] hover:border-gray-400 dark:hover:border-white/[0.15] transition-colors min-h-[36px]"
                                     >
                                         {preset.label}
                                     </button>
@@ -479,12 +466,12 @@ const AnalyticsDashboard = ({
                         </div>
                     </div>
 
-                    {/* Clear Filters Button */}
+                    {/* Clear filters Button */}
                     {hasActiveFilters && (
                         <div className="mt-6 pt-4 border-t border-gray-200 dark:border-white/[0.05] flex justify-end">
                             <button
                                 onClick={clearFilters}
-                                className="inline-flex items-center gap-2 rounded-xl bg-gray-100 dark:bg-white/[0.04] border border-gray-300 dark:border-white/[0.08] px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-white/[0.08] transition-all duration-200"
+                                className="inline-flex items-center gap-2 rounded-xl bg-gray-100 dark:bg-white/[0.04] border border-gray-300 dark:border-white/[0.08] px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-[#a1a1a6] hover:bg-gray-200 dark:hover:bg-white/[0.08] transition-colors"
                             >
                                 <X size={16} />
                                 Clear All Filters
@@ -495,89 +482,37 @@ const AnalyticsDashboard = ({
             </div>
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                <div className="glass-card p-4 sm:p-5 border-l-2 border-l-rose-500/50">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-slate-400">Total Expenses</p>
-                            <p className="mt-1 text-lg sm:text-2xl font-bold text-gray-900 dark:text-white leading-tight">
-                                <Amount value={summary.totalExpenses} currency={currency} />
-                            </p>
-                            <p className="mt-1 text-xs text-gray-500 dark:text-slate-500">
-                                {summary.expenseCount} transaction{summary.expenseCount !== 1 ? 's' : ''}
-                            </p>
-                        </div>
-                        <div className="p-2 sm:p-3 bg-rose-50 dark:bg-rose-500/10 rounded-xl flex-shrink-0">
-                            <ArrowDownCircle size={20} className="text-rose-500 dark:text-rose-400 drop-shadow-[0_0_6px_rgba(251,113,133,0.3)]" />
-                        </div>
-                    </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="glass-card p-5">
+                  <p className="text-sm text-gray-600 dark:text-[#a1a1a6]">Expenses</p>
+                  <p className={"mt-2 text-xl md:text-2xl leading-none font-mono font-medium tabular-nums text-gray-900 dark:text-[#ededed]"}>
+                    <Amount value={summary.totalExpenses} currency={currency} />
+                  </p>
+                  <p className="mt-2 text-xs text-gray-500 dark:text-[#85858b]">{summary.expenseCount} transaction{summary.expenseCount !== 1 ? 's' : ''}</p>
                 </div>
 
-                <div className="glass-card p-4 sm:p-5 border-l-2 border-l-emerald-500/50">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-slate-400">Total Income</p>
-                            <p className="mt-1 text-lg sm:text-2xl font-bold text-gray-900 dark:text-white leading-tight">
-                                <Amount value={summary.totalIncome} currency={currency} />
-                            </p>
-                            <p className="mt-1 text-xs text-gray-500 dark:text-slate-500">
-                                {summary.incomeCount} transaction{summary.incomeCount !== 1 ? 's' : ''}
-                            </p>
-                        </div>
-                        <div className="p-2 sm:p-3 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl flex-shrink-0">
-                            <ArrowUpCircle size={20} className="text-emerald-500 dark:text-emerald-400 drop-shadow-[0_0_6px_rgba(52,211,153,0.3)]" />
-                        </div>
-                    </div>
+                <div className="glass-card p-5">
+                  <p className="text-sm text-gray-600 dark:text-[#a1a1a6]">Income</p>
+                  <p className={"mt-2 text-xl md:text-2xl leading-none font-mono font-medium tabular-nums text-gray-900 dark:text-[#ededed]"}>
+                    <Amount value={summary.totalIncome} currency={currency} />
+                  </p>
+                  <p className="mt-2 text-xs text-gray-500 dark:text-[#85858b]">{summary.incomeCount} transaction{summary.incomeCount !== 1 ? 's' : ''}</p>
                 </div>
 
-                <div className={`glass-card p-4 sm:p-5 border-l-2 ${summary.netAmount >= 0
-                    ? 'border-l-emerald-500/50'
-                    : 'border-l-rose-500/50'
-                    }`}>
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className={`text-xs sm:text-sm font-medium ${summary.netAmount >= 0 ? 'text-emerald-700 dark:text-emerald-300' : 'text-rose-700 dark:text-rose-300'
-                                }`}>
-                                Net Balance
-                            </p>
-                            <p className={`mt-1 text-lg sm:text-2xl font-bold leading-tight ${summary.netAmount >= 0 ? 'text-emerald-900 dark:text-emerald-100' : 'text-rose-900 dark:text-rose-100'
-                                }`}>
-                                <Amount value={Math.abs(summary.netAmount)} currency={currency} />
-                            </p>
-                            <div className="mt-1 flex items-center gap-1">
-                                {summary.netAmount >= 0 ? (
-                                    <TrendingUp size={12} className="text-emerald-600 dark:text-emerald-400" />
-                                ) : (
-                                    <TrendingDown size={12} className="text-rose-600 dark:text-rose-400" />
-                                )}
-                                <p className={`text-xs ${summary.netAmount >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
-                                    }`}>
-                                    {summary.netAmount >= 0 ? 'Positive' : 'Negative'}
-                                </p>
-                            </div>
-                        </div>
-                        <div className={`p-3 rounded-lg ${summary.netAmount >= 0 ? 'bg-emerald-200 dark:bg-emerald-800/40' : 'bg-rose-200 dark:bg-rose-800/40'
-                            }`}>
-                            <span className="p-2 font-large text-gray-600 dark:text-gray-300">{currencySymbols[currency]}</span>
-                        </div>
-                    </div>
+                <div className="glass-card p-5">
+                  <p className="text-sm text-gray-600 dark:text-[#a1a1a6]">Net</p>
+                  <p className={`mt-2 text-xl md:text-2xl leading-none font-mono font-medium tabular-nums ${summary.netAmount >= 0 ? 'text-green-600 dark:text-[#4cc38a]' : 'text-red-600 dark:text-[#e5484d]'}`}>
+                    <Amount value={Math.abs(summary.netAmount)} currency={currency} sign={summary.netAmount < 0 ? '−' : undefined} />
+                  </p>
+                  <p className="mt-2 text-xs text-gray-500 dark:text-[#85858b]">Income minus expenses</p>
                 </div>
 
-                <div className="glass-card p-4 sm:p-5">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">Avg Daily Spending</p>
-                            <p className="mt-1 text-lg sm:text-2xl font-bold text-gray-900 dark:text-white leading-tight">
-                                <Amount value={summary.avgDailyExpense} currency={currency} />
-                            </p>
-                            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                                Over {summary.daysDiff} day{summary.daysDiff !== 1 ? 's' : ''}
-                            </p>
-                        </div>
-                        <div className="p-2 sm:p-3 bg-gray-100 dark:bg-gray-700 rounded-lg flex-shrink-0">
-                            <Activity size={20} className="text-gray-600 dark:text-gray-300" />
-                        </div>
-                    </div>
+                <div className="glass-card p-5">
+                  <p className="text-sm text-gray-600 dark:text-[#a1a1a6]">Average per day</p>
+                  <p className={"mt-2 text-xl md:text-2xl leading-none font-mono font-medium tabular-nums text-gray-900 dark:text-[#ededed]"}>
+                    <Amount value={summary.avgDailyExpense} currency={currency} />
+                  </p>
+                  <p className="mt-2 text-xs text-gray-500 dark:text-[#85858b]">Over {summary.daysDiff} day{summary.daysDiff !== 1 ? 's' : ''}</p>
                 </div>
             </div>
 
@@ -587,10 +522,9 @@ const AnalyticsDashboard = ({
                 <div className="glass-card p-4 sm:p-6">
                     <div className="flex items-center justify-between mb-3 sm:mb-4">
                         <div>
-                            <h3 className="text-sm sm:text-lg font-semibold text-gray-900 dark:text-white">Spending Trends</h3>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">Daily expenses and income over time</p>
+                            <h3 className="text-base font-medium text-gray-900 dark:text-[#ededed]">Spending over time</h3>
+                            <p className="text-xs text-gray-500 dark:text-[#a1a1a6] hidden sm:block">Daily expenses and income over time</p>
                         </div>
-                        <Activity size={18} className="text-gray-400 dark:text-gray-500" />
                     </div>
                     {trendData.length > 0 ? (
                         <div className="h-[200px] sm:h-[300px]">
@@ -598,38 +532,29 @@ const AnalyticsDashboard = ({
                             <AreaChart data={trendData}>
                                 <defs>
                                     <linearGradient id="colorExpenses" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#EF4444" stopOpacity={0.3} />
-                                        <stop offset="95%" stopColor="#EF4444" stopOpacity={0} />
-                                    </linearGradient>
-                                    <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
-                                        <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+                                        <stop offset="0%" stopColor={chart.expense} stopOpacity={0.16} />
+                                        <stop offset="100%" stopColor={chart.expense} stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" className="dark:stroke-gray-700" />
+                                <CartesianGrid vertical={false} stroke={chart.grid} />
                                 <XAxis
                                     dataKey="date"
-                                    stroke="#6B7280"
-                                    tick={{ fontSize: 10 }}
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ ...tick, fontSize: 11 }}
                                     angle={-45}
                                     textAnchor="end"
                                     height={60}
                                 />
                                 <YAxis
-                                    stroke="#6B7280"
-                                    tick={{ fontSize: 12 }}
-                                    tickFormatter={(value) => (isPrivate ? '' : formatCurrency(value, currency).replace(/[^\d.-]/g, ''))}
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={tick}
+                                    tickFormatter={(value) => (isPrivate ? '' : value >= 1000 ? `${value / 1000}k` : value)}
                                 />
                                 <Tooltip
-                                    contentStyle={{
-                                        backgroundColor: 'rgba(30,41,59,0.92)',
-                                        border: '1px solid rgba(255,255,255,0.10)',
-                                        borderRadius: '12px',
-                                        padding: '10px',
-                                        color: '#F3F4F6',
-                                        boxShadow: '0 12px 40px rgba(0,0,0,0.4)'
-                                    }}
-                                    itemStyle={{ color: '#F3F4F6' }}
+                                    contentStyle={tooltipStyle}
+                                    itemStyle={tooltipItem}
                                     formatter={(value, name) => [
                                         isPrivate ? '••••' : formatCurrency(value, currency),
                                         name === 'expenses' ? 'Expenses' : name === 'income' ? 'Income' : 'Net'
@@ -637,12 +562,13 @@ const AnalyticsDashboard = ({
                                 />
                                 <Legend
                                     onClick={handleLegendClick}
-                                    wrapperStyle={{ cursor: 'pointer' }}
+                                    wrapperStyle={{ fontSize: 12, cursor: 'pointer' }}
                                 />
                                 <Area
                                     type="monotone"
                                     dataKey="expenses"
-                                    stroke="#EF4444"
+                                    stroke={chart.expense}
+                                    strokeWidth={2}
                                     fillOpacity={1}
                                     fill="url(#colorExpenses)"
                                     name="Expenses"
@@ -651,9 +577,10 @@ const AnalyticsDashboard = ({
                                 <Area
                                     type="monotone"
                                     dataKey="income"
-                                    stroke="#10B981"
-                                    fillOpacity={1}
-                                    fill="url(#colorIncome)"
+                                    stroke={chart.income}
+                                    strokeWidth={1.5}
+                                    strokeDasharray="4 4"
+                                    fill="none"
                                     name="Income"
                                     hide={!visibleSeries.income}
                                 />
@@ -661,7 +588,7 @@ const AnalyticsDashboard = ({
                         </ResponsiveContainer>
                         </div>
                     ) : (
-                        <div className="flex items-center justify-center h-[200px] sm:h-[300px] text-gray-400 dark:text-gray-500">
+                        <div className="flex items-center justify-center h-[200px] sm:h-[300px] text-gray-400 dark:text-[#85858b]">
                             <p>No data available for the selected period</p>
                         </div>
                     )}
@@ -671,10 +598,9 @@ const AnalyticsDashboard = ({
                 <div className="glass-card p-4 sm:p-6">
                     <div className="flex items-center justify-between mb-3 sm:mb-4">
                         <div>
-                            <h3 className="text-sm sm:text-lg font-semibold text-gray-900 dark:text-white">Category Breakdown</h3>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">Expense distribution by category</p>
+                            <h3 className="text-base font-medium text-gray-900 dark:text-[#ededed]">By category</h3>
+                            <p className="text-xs text-gray-500 dark:text-[#a1a1a6] hidden sm:block">Expense distribution by category</p>
                         </div>
-                        <PieChartIcon size={18} className="text-gray-400 dark:text-gray-500" />
                     </div>
                     {categoryChartData.length > 0 ? (
                         <div className="h-[200px] sm:h-[300px]">
@@ -695,22 +621,15 @@ const AnalyticsDashboard = ({
                                     ))}
                                 </Pie>
                                 <Tooltip
-                                    contentStyle={{
-                                        backgroundColor: 'rgba(30,41,59,0.92)',
-                                        border: '1px solid rgba(255,255,255,0.10)',
-                                        borderRadius: '12px',
-                                        padding: '10px',
-                                        color: '#F3F4F6',
-                                        boxShadow: '0 12px 40px rgba(0,0,0,0.4)'
-                                    }}
-                                    itemStyle={{ color: '#F3F4F6' }}
+                                    contentStyle={tooltipStyle}
+                                    itemStyle={tooltipItem}
                                     formatter={(value) => (isPrivate ? '••••' : formatCurrency(value, currency))}
                                 />
                             </PieChart>
                         </ResponsiveContainer>
                         </div>
                     ) : (
-                        <div className="flex items-center justify-center h-[200px] sm:h-[300px] text-gray-400 dark:text-gray-500">
+                        <div className="flex items-center justify-center h-[200px] sm:h-[300px] text-gray-400 dark:text-[#85858b]">
                             <p>No category data available</p>
                         </div>
                     )}
@@ -719,17 +638,16 @@ const AnalyticsDashboard = ({
                 {!isSharedView && (
                     <div className="glass-card p-4 sm:p-6">
                         <div className="flex items-center justify-between mb-3 sm:mb-4">
-                            <h3 className="text-sm sm:text-lg font-semibold text-gray-900 dark:text-white">
+                            <h3 className="text-base font-medium text-gray-900 dark:text-[#ededed]">
                                 Spending by payment method
                             </h3>
-                            <BarChart3 size={18} className="text-gray-400 dark:text-gray-500" />
                         </div>
                         {paymentModeError ? (
-                            <p className="text-sm text-gray-500 dark:text-slate-500 py-8 text-center">
+                            <p className="text-sm text-gray-500 dark:text-[#85858b] py-8 text-center">
                                 Couldn't load payment-method data.
                             </p>
                         ) : paymentModeData.length === 0 ? (
-                            <p className="text-sm text-gray-500 dark:text-slate-500 py-8 text-center">
+                            <p className="text-sm text-gray-500 dark:text-[#85858b] py-8 text-center">
                                 No spending in this range.
                             </p>
                         ) : (
@@ -745,19 +663,17 @@ const AnalyticsDashboard = ({
                                             type="category"
                                             dataKey="label"
                                             width={90}
-                                            tick={{ fontSize: 12 }}
+                                            tick={tick}
                                             axisLine={false}
                                             tickLine={false}
                                         />
                                         <Tooltip
                                             formatter={(v) => (isPrivate ? '••••' : formatCurrency(v, currency))}
-                                            cursor={{ fill: 'transparent' }}
+                                            contentStyle={tooltipStyle}
+                                            itemStyle={tooltipItem}
+                                            cursor={{ fill: chart.cursor }}
                                         />
-                                        <Bar dataKey="total" radius={[0, 6, 6, 0]}>
-                                            {paymentModeData.map((_, i) => (
-                                                <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                                            ))}
-                                        </Bar>
+                                        <Bar dataKey="total" radius={[0, 4, 4, 0]} fill={chart.expense} barSize={16} />
                                     </BarChart>
                                 </ResponsiveContainer>
                             </div>
@@ -769,53 +685,47 @@ const AnalyticsDashboard = ({
                 <div className="glass-card p-4 sm:p-6 lg:col-span-2">
                     <div className="flex items-center justify-between mb-3 sm:mb-4">
                         <div>
-                            <h3 className="text-sm sm:text-lg font-semibold text-gray-900 dark:text-white">Monthly Comparison</h3>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">Expenses and income by month</p>
+                            <h3 className="text-base font-medium text-gray-900 dark:text-[#ededed]">By month</h3>
+                            <p className="text-xs text-gray-500 dark:text-[#a1a1a6] hidden sm:block">Expenses and income by month</p>
                         </div>
-                        <BarChart3 size={18} className="text-gray-400 dark:text-gray-500" />
                     </div>
                     {monthlyData.length > 0 ? (
                         <div className="h-[200px] sm:h-[300px]">
                         <ResponsiveContainer width="100%" height="100%" className="bg-transparent">
                             <BarChart data={monthlyData} style={{ backgroundColor: 'transparent' }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#374151' : '#D1D5DB'} fill="transparent" vertical={false} />
+                                <CartesianGrid stroke={chart.grid} vertical={false} />
                                 <XAxis
                                     dataKey="month"
-                                    stroke={isDark ? '#9CA3AF' : '#4B5563'}
-                                    tick={{ fontSize: 12, fill: isDark ? '#9CA3AF' : '#4B5563' }}
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={tick}
                                 />
                                 <YAxis
-                                    stroke={isDark ? '#9CA3AF' : '#4B5563'}
-                                    tick={{ fontSize: 12, fill: isDark ? '#9CA3AF' : '#4B5563' }}
-                                    tickFormatter={(value) => (isPrivate ? '' : formatCurrency(value, currency).replace(/[^\d.-]/g, ''))}
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={tick}
+                                    tickFormatter={(value) => (isPrivate ? '' : value >= 1000 ? `${value / 1000}k` : value)}
                                 />
                                 <Tooltip
-                                    contentStyle={{
-                                        backgroundColor: 'rgba(30,41,59,0.92)',
-                                        borderColor: 'rgba(255,255,255,0.10)',
-                                        borderRadius: '12px',
-                                        padding: '10px',
-                                        boxShadow: '0 12px 40px rgba(0,0,0,0.4)',
-                                        color: '#F3F4F6'
-                                    }}
-                                    itemStyle={{ color: '#F3F4F6' }}
+                                    contentStyle={tooltipStyle}
+                                    itemStyle={tooltipItem}
                                     formatter={(value) => (isPrivate ? '••••' : formatCurrency(value, currency))}
-                                    cursor={{ fill: isDark ? '#374151' : '#F3F4F6', opacity: 0.4 }}
+                                    cursor={{ fill: chart.cursor }}
                                 />
                                 <Legend
-                                    wrapperStyle={{ color: isDark ? '#F3F4F6' : '#374151', paddingTop: '10px', cursor: 'pointer' }}
+                                    wrapperStyle={{ fontSize: 12, paddingTop: '8px', cursor: 'pointer' }}
                                     onClick={handleLegendClick}
                                 />
                                 <Bar
                                     dataKey="expenses"
-                                    fill="#EF4444"
+                                    fill={chart.expense}
                                     name="Expenses"
                                     radius={[4, 4, 0, 0]}
                                     hide={!visibleSeries.expenses}
                                 />
                                 <Bar
                                     dataKey="income"
-                                    fill="#10B981"
+                                    fill={chart.income}
                                     name="Income"
                                     radius={[4, 4, 0, 0]}
                                     hide={!visibleSeries.income}
@@ -824,7 +734,7 @@ const AnalyticsDashboard = ({
                         </ResponsiveContainer>
                         </div>
                     ) : (
-                        <div className="flex items-center justify-center h-[200px] sm:h-[300px] text-gray-400 dark:text-gray-500">
+                        <div className="flex items-center justify-center h-[200px] sm:h-[300px] text-gray-400 dark:text-[#85858b]">
                             <p>No monthly data available</p>
                         </div>
                     )}
@@ -835,7 +745,7 @@ const AnalyticsDashboard = ({
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 {/* Top Categories */}
                 <div className="glass-card p-4 sm:p-6">
-                    <h3 className="text-sm sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">Top Spending Categories</h3>
+                    <h3 className="text-base font-medium text-gray-900 dark:text-[#ededed] mb-3 sm:mb-4">Top categories</h3>
                     {topCategories.length > 0 ? (
                         <div className="space-y-4">
                             {topCategories.map((category, index) => {
@@ -844,25 +754,23 @@ const AnalyticsDashboard = ({
                                     <div key={index} className="space-y-2">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-3">
-                                                <div
-                                                    className="w-10 h-10 rounded-lg flex items-center justify-center text-lg"
-                                                    style={{ backgroundColor: `${category.color}20` }}
-                                                >
-                                                    {category.icon || '•'}
-                                                </div>
+                                                <span
+                                                    className="w-2 h-2 rounded-full shrink-0"
+                                                    style={{ backgroundColor: category.color || '#a3a3a3' }}
+                                                />
                                                 <div>
                                                     <p className="font-medium text-gray-900 dark:text-white">{category.name}</p>
-                                                    <p className="text-xs text-gray-500 dark:text-gray-400">{category.count || 0} transaction{category.count !== 1 ? 's' : ''}</p>
+                                                    <p className="text-xs text-gray-500 dark:text-[#a1a1a6]">{category.count || 0} transaction{category.count !== 1 ? 's' : ''}</p>
                                                 </div>
                                             </div>
                                             <div className="text-right">
-                                                <p className="font-semibold text-gray-900 dark:text-white"><Amount value={category.value} currency={currency} /></p>
-                                                <p className="text-xs text-gray-500 dark:text-gray-400">{percentage}%</p>
+                                                <p className="font-mono tabular-nums text-gray-900 dark:text-[#ededed]"><Amount value={category.value} currency={currency} /></p>
+                                                <p className="text-xs text-gray-500 dark:text-[#a1a1a6]">{percentage}%</p>
                                             </div>
                                         </div>
-                                        <div className="w-full bg-gray-200 dark:bg-white/[0.06] rounded-full h-2">
+                                        <div className="w-full bg-gray-100 dark:bg-white/[0.06] rounded-full h-1.5">
                                             <div
-                                                className="h-2 rounded-full transition-all duration-300"
+                                                className="h-1.5 rounded-full"
                                                 style={{
                                                     width: `${percentage}%`,
                                                     backgroundColor: category.color
@@ -874,7 +782,7 @@ const AnalyticsDashboard = ({
                             })}
                         </div>
                     ) : (
-                        <div className="text-center py-8 text-gray-400 dark:text-gray-500">
+                        <div className="text-center py-8 text-gray-400 dark:text-[#85858b]">
                             <p>No category data available</p>
                         </div>
                     )}
@@ -882,16 +790,16 @@ const AnalyticsDashboard = ({
 
                 {/* Insights */}
                 <div className="glass-card p-4 sm:p-6">
-                    <h3 className="text-sm sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">Insights</h3>
+                    <h3 className="text-base font-medium text-gray-900 dark:text-[#ededed] mb-3 sm:mb-4">Insights</h3>
                     <div className="space-y-2.5 sm:space-y-3">
                         {summary.totalExpenses > 0 && (
-                            <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800/40">
-                                <div className="p-1.5 sm:p-2 bg-blue-200 dark:bg-blue-800/40 rounded-lg flex-shrink-0">
-                                    <TrendingUp size={16} className="text-blue-700 dark:text-blue-300" />
+                            <div className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 dark:border-white/[0.06]">
+                                <div className="p-1.5 sm:p-2 bg-gray-100 dark:bg-white/[0.06] rounded-md flex-shrink-0">
+                                    <TrendingUp size={16} className="text-gray-500 dark:text-[#a1a1a6]" />
                                 </div>
                                 <div className="min-w-0">
-                                    <p className="text-xs sm:text-sm font-semibold text-blue-900 dark:text-blue-100">Total Transactions</p>
-                                    <p className="text-xs text-blue-700 dark:text-blue-300 mt-0.5 leading-snug">
+                                    <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-[#ededed]">Transactions</p>
+                                    <p className="text-xs text-gray-500 dark:text-[#a1a1a6] mt-0.5 leading-snug">
                                         {summary.transactionCount} transaction{summary.transactionCount !== 1 ? 's' : ''} in this period
                                     </p>
                                 </div>
@@ -899,13 +807,13 @@ const AnalyticsDashboard = ({
                         )}
 
                         {summary.avgDailyExpense > 0 && (
-                            <div className="flex items-center gap-3 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-100 dark:border-emerald-800/40">
-                                <div className="p-1.5 sm:p-2 bg-emerald-200 dark:bg-emerald-800/40 rounded-lg flex-shrink-0">
-                                    <Calendar size={16} className="text-emerald-700 dark:text-emerald-300" />
+                            <div className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 dark:border-white/[0.06]">
+                                <div className="p-1.5 sm:p-2 bg-gray-100 dark:bg-white/[0.06] rounded-md flex-shrink-0">
+                                    <Calendar size={16} className="text-gray-500 dark:text-[#a1a1a6]" />
                                 </div>
                                 <div className="min-w-0">
-                                    <p className="text-xs sm:text-sm font-semibold text-emerald-900 dark:text-emerald-100">Avg Daily Spending</p>
-                                    <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-0.5 leading-snug">
+                                    <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-[#ededed]">Average per day</p>
+                                    <p className="text-xs text-gray-500 dark:text-[#a1a1a6] mt-0.5 leading-snug">
                                         <Amount value={summary.avgDailyExpense} currency={currency} /> per day
                                     </p>
                                 </div>
@@ -913,13 +821,13 @@ const AnalyticsDashboard = ({
                         )}
 
                         {topCategories.length > 0 && (
-                            <div className="flex items-center gap-3 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-100 dark:border-purple-800/40">
-                                <div className="p-1.5 sm:p-2 bg-purple-200 dark:bg-purple-800/40 rounded-lg flex-shrink-0">
-                                    <PieChartIcon size={16} className="text-purple-700 dark:text-purple-300" />
+                            <div className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 dark:border-white/[0.06]">
+                                <div className="p-1.5 sm:p-2 bg-gray-100 dark:bg-white/[0.06] rounded-md flex-shrink-0">
+                                    <PieChartIcon size={16} className="text-gray-500 dark:text-[#a1a1a6]" />
                                 </div>
                                 <div className="min-w-0">
-                                    <p className="text-xs sm:text-sm font-semibold text-purple-900 dark:text-purple-100">Top Category</p>
-                                    <p className="text-xs text-purple-700 dark:text-purple-300 mt-0.5 leading-snug">
+                                    <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-[#ededed]">Top category</p>
+                                    <p className="text-xs text-gray-500 dark:text-[#a1a1a6] mt-0.5 leading-snug">
                                         <span className="font-medium">{topCategories[0]?.name}</span> — <Amount value={topCategories[0]?.value || 0} currency={currency} />
                                     </p>
                                 </div>
@@ -927,13 +835,13 @@ const AnalyticsDashboard = ({
                         )}
 
                         {summary.netAmount < 0 && (
-                            <div className="flex items-center gap-3 p-3 bg-rose-50 dark:bg-rose-900/20 rounded-xl border border-rose-100 dark:border-rose-800/40">
-                                <div className="p-1.5 sm:p-2 bg-rose-200 dark:bg-rose-800/40 rounded-lg flex-shrink-0">
-                                    <TrendingDown size={16} className="text-rose-700 dark:text-rose-300" />
+                            <div className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 dark:border-white/[0.06]">
+                                <div className="p-1.5 sm:p-2 bg-gray-100 dark:bg-white/[0.06] rounded-md flex-shrink-0">
+                                    <TrendingDown size={16} className="text-gray-500 dark:text-[#a1a1a6]" />
                                 </div>
                                 <div className="min-w-0">
-                                    <p className="text-xs sm:text-sm font-semibold text-rose-900 dark:text-rose-100">Spending Alert</p>
-                                    <p className="text-xs text-rose-700 dark:text-rose-300 mt-0.5 leading-snug">
+                                    <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-[#ededed]">Spending above income</p>
+                                    <p className="text-xs text-gray-500 dark:text-[#a1a1a6] mt-0.5 leading-snug">
                                         Expenses exceed income by <Amount value={Math.abs(summary.netAmount)} currency={currency} />
                                     </p>
                                 </div>
@@ -941,14 +849,14 @@ const AnalyticsDashboard = ({
                         )}
 
                         {summary.netAmount >= 0 && summary.totalIncome > 0 && (
-                            <div className="flex items-center gap-3 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-100 dark:border-emerald-800/40">
-                                <div className="p-1.5 sm:p-2 bg-emerald-200 dark:bg-emerald-800/40 rounded-lg flex-shrink-0">
-                                    <TrendingUp size={16} className="text-emerald-700 dark:text-emerald-300" />
+                            <div className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 dark:border-white/[0.06]">
+                                <div className="p-1.5 sm:p-2 bg-gray-100 dark:bg-white/[0.06] rounded-md flex-shrink-0">
+                                    <TrendingUp size={16} className="text-gray-500 dark:text-[#a1a1a6]" />
                                 </div>
                                 <div className="min-w-0">
-                                    <p className="text-xs sm:text-sm font-semibold text-emerald-900 dark:text-emerald-100">Positive Balance</p>
-                                    <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-0.5 leading-snug">
-                                        Net balance of <Amount value={summary.netAmount} currency={currency} /> 🎉
+                                    <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-[#ededed]">Positive balance</p>
+                                    <p className="text-xs text-gray-500 dark:text-[#a1a1a6] mt-0.5 leading-snug">
+                                        Net balance of <Amount value={summary.netAmount} currency={currency} />
                                     </p>
                                 </div>
                             </div>

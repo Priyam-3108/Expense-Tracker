@@ -10,10 +10,10 @@ export default function SegmentedToggle({ value, onChange, options = [] }) {
             key={opt.value}
             type="button"
             onClick={() => onChange(opt.value)}
-            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium min-h-[44px] transition-all duration-200
+            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium min-h-[44px] transition-colors
               ${active
                 ? `bg-white dark:bg-white/[0.08] shadow-sm ${opt.activeColor || 'text-gray-900 dark:text-white'}`
-                : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white'
+                : 'text-gray-500 dark:text-[#a1a1a6] hover:text-gray-700 dark:hover:text-white'
               }`}
           >
             {opt.icon}

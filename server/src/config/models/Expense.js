@@ -49,15 +49,6 @@ const expenseSchema = new mongoose.Schema({
     enum: PAYMENT_MODES,
     default: DEFAULT_PAYMENT_MODE
   },
-  account: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Account',
-    default: null
-  },
-  isAdjustment: {
-    type: Boolean,
-    default: false
-  },
   isRecurring: {
     type: Boolean,
     default: false
@@ -89,7 +80,6 @@ const expenseSchema = new mongoose.Schema({
 expenseSchema.index({ user: 1, date: -1 });
 expenseSchema.index({ user: 1, category: 1 });
 expenseSchema.index({ user: 1, type: 1 });
-expenseSchema.index({ user: 1, account: 1 });
 
 // Virtual for formatted amount
 expenseSchema.virtual('formattedAmount').get(function () {

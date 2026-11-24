@@ -14,7 +14,6 @@ import {
   Wallet,
   Eye,
   EyeOff,
-  Landmark
 } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { cn } from '../utils/cn'
@@ -49,7 +48,6 @@ const Layout = () => {
     { name: 'Dashboard', href: '/app/dashboard', icon: Home },
     { name: 'Expenses', href: '/app/expenses', icon: CreditCard },
     { name: 'Debts', href: '/app/debts', icon: Wallet },
-    { name: 'Accounts', href: '/app/accounts', icon: Landmark },
     { name: 'Categories', href: '/app/categories', icon: Tag },
     { name: 'Analytics', href: '/app/analytics', icon: BarChart3 },
     { name: 'Profile', href: '/app/profile', icon: User },
@@ -77,19 +75,6 @@ const Layout = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  // Track click position on .btn-primary for CSS ripple effect
-  useEffect(() => {
-    const handlePointerDown = (e) => {
-      const btn = e.target.closest('.btn-primary')
-      if (!btn) return
-      const rect = btn.getBoundingClientRect()
-      btn.style.setProperty('--ripple-x', `${((e.clientX - rect.left) / rect.width) * 100}%`)
-      btn.style.setProperty('--ripple-y', `${((e.clientY - rect.top) / rect.height) * 100}%`)
-    }
-    document.addEventListener('pointerdown', handlePointerDown)
-    return () => document.removeEventListener('pointerdown', handlePointerDown)
-  }, [])
-
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden relative">
       {/* Content wrapper */}
@@ -97,7 +82,7 @@ const Layout = () => {
       {/* Mobile sidebar overlay — always rendered, toggled by opacity for smooth fade */}
       <div
         className={cn(
-          "fixed inset-0 z-40 lg:hidden transition-all duration-300 bg-[#0d253d]/50",
+          "fixed inset-0 z-40 lg:hidden transition-opacity bg-[#171717]/50",
           sidebarOpen
             ? 'opacity-100 pointer-events-auto'
             : 'opacity-0 pointer-events-none'
@@ -115,27 +100,26 @@ const Layout = () => {
           {/* Sidebar Header */}
           <div className="flex items-center justify-between h-16 px-4 sm:px-6 border-b border-gray-200 dark:border-white/[0.08]">
               <div className="flex items-center min-w-0">
-              <div className="w-8 h-8 shrink-0 rounded-xl flex items-center justify-center shadow-lg" style={{background: 'linear-gradient(135deg, #665efd 0%, #533afd 100%)'}}>
+              <div className="w-7 h-7 shrink-0 rounded-lg flex items-center justify-center bg-[#533afd]">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d="M3 4h10M3 8h7M3 12h5" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-                  <circle cx="13" cy="12" r="2.5" fill="#ea2261"/>
+                  <path d="M3 4h10M3 8h7M3 12h5" stroke="white" strokeWidth="1.75" strokeLinecap="round"/>
                 </svg>
               </div>
-              <h1 className="ml-2.5 text-lg font-semibold tracking-tight text-gray-900 dark:text-white truncate whitespace-nowrap">
+              <h1 className="ml-2 text-base font-medium text-gray-900 dark:text-[#ededed] truncate whitespace-nowrap">
                 Spendly
               </h1>
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
               aria-label="Close sidebar"
-              className="lg:hidden p-2 rounded-lg text-gray-400 dark:text-white/50 hover:text-gray-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/[0.08] transition-all duration-200 shrink-0"
+              className="lg:hidden p-2 rounded-lg text-gray-400 dark:text-white/50 hover:text-gray-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/[0.08] transition-colors shrink-0"
             >
-              <X size={20} />
+              <X size={18} strokeWidth={1.5} />
             </button>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-3 py-6 space-y-1">
+          <nav className="flex-1 px-3 py-4 space-y-0.5">
             {navigation.map((item) => {
               const Icon = item.icon
               return (
@@ -145,27 +129,19 @@ const Layout = () => {
                   onClick={() => setSidebarOpen(false)}
                   className={({ isActive }) =>
                     cn(
-                      "group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 min-h-[44px] relative",
+                      "flex items-center gap-2.5 px-3 text-sm rounded-lg transition-colors min-h-[44px] lg:min-h-0 lg:h-9",
                       isActive
-                        ? "bg-[#533afd]/10 dark:bg-[#533afd]/15 text-[#533afd] dark:text-[#8b7ffe]"
-                        : "text-gray-600 dark:text-white/50 hover:bg-gray-100 dark:hover:bg-white/[0.05] hover:text-gray-900 dark:hover:text-white"
+                        ? "bg-gray-100 dark:bg-[#232325] text-gray-900 dark:text-[#ededed] font-medium dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+                        : "text-gray-600 dark:text-[#a1a1a6] hover:bg-gray-50 dark:hover:bg-white/[0.04] hover:text-gray-900 dark:hover:text-[#ededed]"
                     )
                   }
                 >
                   {({ isActive }) => (
                     <>
-                      {/* Glowing active indicator */}
-                      {isActive && (
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full bg-[#533afd] shadow-[0_0_8px_rgba(83,58,253,0.5)]" />
-                      )}
                       <Icon
-                        size={20}
-                        className={cn(
-                          "mr-3 transition-all duration-200",
-                          isActive
-                            ? "drop-shadow-[0_0_6px_rgba(99,102,241,0.4)]"
-                            : "group-hover:scale-110"
-                        )}
+                        size={18}
+                        strokeWidth={1.5}
+                        className={cn("shrink-0", isActive ? "text-[#533afd] dark:text-[#8b7ffe]" : "text-gray-400 dark:text-[#85858b]")}
                       />
                       {item.name}
                     </>
@@ -188,9 +164,9 @@ const Layout = () => {
                 <button
                   onClick={() => setSidebarOpen(true)}
                   aria-label="Open navigation menu"
-                  className="p-2.5 rounded-xl text-gray-400 dark:text-slate-400 hover:text-gray-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-all duration-200"
+                  className="p-2.5 rounded-lg text-gray-500 dark:text-[#a1a1a6] hover:text-gray-600 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-colors"
                 >
-                  <Menu size={22} />
+                  <Menu size={18} strokeWidth={1.5} />
                 </button>
               </div>
 
@@ -203,9 +179,9 @@ const Layout = () => {
                   onClick={togglePrivacy}
                   aria-label={isPrivate ? 'Show amounts' : 'Hide amounts'}
                   title={isPrivate ? 'Show amounts' : 'Hide amounts'}
-                  className="p-2 rounded-xl text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-white/[0.06] hover:text-gray-700 dark:hover:text-white transition-all duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  className="p-2 rounded-lg text-gray-500 dark:text-[#a1a1a6] hover:bg-gray-100 dark:hover:bg-white/[0.06] hover:text-gray-700 dark:hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
                 >
-                  {isPrivate ? <EyeOff size={20} /> : <Eye size={20} />}
+                  {isPrivate ? <EyeOff size={18} strokeWidth={1.5} /> : <Eye size={18} strokeWidth={1.5} />}
                 </button>
                 <ThemeToggle />
 
@@ -213,20 +189,20 @@ const Layout = () => {
                 <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                    className="flex items-center space-x-2 px-2 sm:px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-all duration-200 min-h-[44px]"
+                    className="flex items-center space-x-2 px-2 sm:px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-colors min-h-[44px]"
                   >
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gradient-to-br from-indigo-500 to-violet-500 ring-2 ring-indigo-500/20 shadow-glow-indigo">
-                      <span className="text-white font-medium text-sm">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-100 dark:bg-[#232325] border border-gray-200 dark:border-white/[0.08]">
+                      <span className="text-gray-700 dark:text-[#ededed] font-medium text-sm">
                         {user?.name?.charAt(0).toUpperCase()}
                       </span>
                     </div>
-                    <span className="hidden sm:block text-sm font-medium text-gray-900 dark:text-slate-200">
+                    <span className="hidden sm:block text-sm font-medium text-gray-900 dark:text-[#ededed]">
                       {user?.name?.split(' ')[0]}
                     </span>
                     <ChevronDown
                       size={16}
                       className={cn(
-                        "text-gray-500 dark:text-slate-500 transition-transform duration-200",
+                        "text-gray-500 dark:text-[#85858b] transition-transform duration-200",
                         profileDropdownOpen && "rotate-180"
                       )}
                     />
@@ -238,15 +214,15 @@ const Layout = () => {
                       {/* User Info */}
                       <div className="px-4 py-3 border-b border-gray-200 dark:border-white/[0.08] min-h-[44px] flex flex-col justify-center">
                         <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.name}</p>
-                        <p className="text-xs text-gray-500 dark:text-slate-500 truncate">{user?.email}</p>
+                        <p className="text-xs text-gray-500 dark:text-[#85858b] truncate">{user?.email}</p>
                       </div>
 
                       {/* Sign out */}
                       <button
                         onClick={handleLogout}
-                        className="flex items-center w-full px-4 py-3 text-sm font-medium text-gray-700 dark:text-slate-300 hover:bg-red-50 dark:hover:bg-rose-500/10 hover:text-red-600 dark:hover:text-rose-400 transition-all duration-200 min-h-[44px]"
+                        className="flex items-center w-full px-4 py-3 text-sm font-medium text-gray-700 dark:text-[#a1a1a6] hover:bg-red-50 dark:hover:bg-rose-500/10 hover:text-red-600 dark:hover:text-rose-400 transition-colors min-h-[44px]"
                       >
-                        <LogOut size={18} className="mr-3" />
+                        <LogOut size={16} strokeWidth={1.5} className="mr-2.5" />
                         Sign out
                       </button>
                     </div>

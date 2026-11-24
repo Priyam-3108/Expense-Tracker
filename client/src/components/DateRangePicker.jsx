@@ -128,7 +128,7 @@ const DateRangePicker = ({ startDate, endDate, onStartDateChange, onEndDateChang
         >
           <div className="flex items-center gap-2">
             <CalendarIcon size={18} className="text-gray-400" />
-            <span className={startDate ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}>
+            <span className={startDate ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-[#a1a1a6]'}>
               {displayValue()}
             </span>
           </div>
@@ -141,7 +141,7 @@ const DateRangePicker = ({ startDate, endDate, onStartDateChange, onEndDateChang
               onStartDateChange('');
               onEndDateChange('');
             }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 p-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-[#a1a1a6] hover:text-gray-600 dark:hover:text-gray-100 p-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
             <X size={16} />
           </button>
@@ -182,17 +182,17 @@ const DateRangePicker = ({ startDate, endDate, onStartDateChange, onEndDateChang
               <button
                 type="button"
                 onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-                className="p-1 hover:bg-gray-100 dark:hover:bg-white/[0.06] rounded-xl transition-all duration-200"
+                className="p-1 hover:bg-gray-100 dark:hover:bg-white/[0.06] rounded-xl transition-colors"
               >
                 <ChevronLeft size={20} className="text-gray-600" />
               </button>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+              <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
                 {format(currentMonth, 'MMMM yyyy')}
               </h3>
               <button
                 type="button"
                 onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-                className="p-1 hover:bg-gray-100 dark:hover:bg-white/[0.06] rounded-xl transition-all duration-200"
+                className="p-1 hover:bg-gray-100 dark:hover:bg-white/[0.06] rounded-xl transition-colors"
               >
                 <ChevronRight size={20} className="text-gray-600" />
               </button>
@@ -202,7 +202,7 @@ const DateRangePicker = ({ startDate, endDate, onStartDateChange, onEndDateChang
             <div className="grid grid-cols-7 gap-1">
               {/* Day headers */}
               {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => (
-                <div key={day} className="p-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400">
+                <div key={day} className="p-2 text-center text-xs font-medium text-gray-500 dark:text-[#a1a1a6]">
                   {day}
                 </div>
               ))}
@@ -221,15 +221,15 @@ const DateRangePicker = ({ startDate, endDate, onStartDateChange, onEndDateChang
                     type="button"
                     onClick={() => handleDateSelect(day)}
                     onMouseEnter={() => setHoverDate(day)}
-                    className={`p-2 text-sm rounded-lg transition-all duration-200 relative ${!isCurrentMonthDay
-                      ? 'text-gray-300 dark:text-slate-600 cursor-not-allowed'
+                    className={`p-2 text-sm rounded-lg transition-colors relative ${!isCurrentMonthDay
+                      ? 'text-gray-300 dark:text-[#85858b] cursor-not-allowed'
                       : isStart || isEnd
-                        ? 'bg-indigo-600 text-white font-semibold shadow-[0_0_10px_rgba(99,102,241,0.3)]'
+                        ? 'bg-indigo-600 text-white font-medium'
                         : inRange
                           ? 'bg-indigo-100 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300'
                           : isToday
-                            ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold'
-                            : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-white/[0.06]'
+                            ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-medium'
+                            : 'text-gray-700 dark:text-[#a1a1a6] hover:bg-gray-100 dark:hover:bg-white/[0.06]'
                       }`}
                     disabled={!isCurrentMonthDay}
                   >
@@ -248,14 +248,14 @@ const DateRangePicker = ({ startDate, endDate, onStartDateChange, onEndDateChang
                   onStartDateChange(format(today, 'yyyy-MM-dd'));
                   onEndDateChange('');
                 }}
-                className="flex-1 px-3 py-2 text-sm text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-xl transition-all duration-200"
+                className="flex-1 px-3 py-2 text-sm text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-xl transition-colors"
               >
                 Today
               </button>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="flex-1 px-3 py-2 text-sm text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-white/[0.06] rounded-xl transition-all duration-200 min-h-[40px]"
+                className="flex-1 px-3 py-2 text-sm text-gray-600 dark:text-[#a1a1a6] hover:bg-gray-50 dark:hover:bg-white/[0.06] rounded-xl transition-colors min-h-[40px]"
               >
                 Close
               </button>
