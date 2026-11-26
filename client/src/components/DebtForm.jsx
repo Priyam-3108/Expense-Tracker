@@ -149,7 +149,7 @@ export default function DebtForm({ isOpen, onClose, editDebt = null, type = 'bor
         <StickyFormFooter
           variant={variant}
           loading={loading}
-          label={editDebt ? 'Update Record' : 'Save Record'}
+          label={editDebt ? 'Save changes' : 'Save'}
           loadingLabel="Saving…"
           onCancel={onClose}
         />

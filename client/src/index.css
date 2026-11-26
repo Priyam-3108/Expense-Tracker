@@ -8,14 +8,14 @@
     -webkit-text-size-adjust: 100%;
     /* Removes 300ms tap delay on mobile */
     touch-action: manipulation;
-    font-feature-settings: "ss01" 1;
+    font-feature-settings: "kern" 1;
   }
 }
 
-/* Tabular figures for money / numeric cells — Stripi's financial-data signature */
+/* Tabular figures for money and numeric cells */
 .tabular-nums,
 .font-tabular {
-  font-feature-settings: "tnum" 1, "ss01" 1;
+  font-feature-settings: "tnum" 1;
 }
 
 /* Bottom-sheet slide-up animation */
@@ -31,7 +31,7 @@
 }
 
 .animate-slide-up {
-  animation: slide-up 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  animation: slide-up 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* Safe-area bottom padding for bottom nav (iPhone notch/home bar) */
@@ -76,50 +76,52 @@
 
 @layer base {
   :root {
-    /* Light canvas — graphite ink, indigo primary */
+    /* Light: graphite surfaces, brass accent */
     --background: 0 0% 98%;
     --foreground: 0 0% 9%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 9%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 9%;
-    --primary: 251 98% 63%;
+    --primary: 30 71% 38%;
     --primary-foreground: 0 0% 100%;
     --secondary: 240 5% 96%;
     --secondary-foreground: 0 0% 9%;
     --muted: 240 5% 96%;
     --muted-foreground: 0 0% 45%;
-    --accent: 251 92% 91%;
-    --accent-foreground: 249 63% 45%;
-    --destructive: 340 82% 51%;
+    --accent: 36 64% 95%;
+    --accent-foreground: 30 71% 30%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
     --border: 0 0% 90%;
     --input: 0 0% 83%;
-    --ring: 251 98% 63%;
+    --ring: 30 71% 38%;
     --radius: 0.75rem;
+    --brass: 168 97 28;
   }
 
   .dark {
-    /* Spendly dark shell — graphite neutrals, same indigo primary */
+    /* Dark: graphite surfaces, lighter brass so it reads on dark */
     --background: 240 2% 8%;     /* #141415 */
     --foreground: 0 0% 93%;      /* #ededed */
     --card: 240 4% 10%;          /* #19191b */
     --card-foreground: 0 0% 93%;
     --popover: 240 4% 10%;
     --popover-foreground: 0 0% 93%;
-    --primary: 251 98% 65%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 33 62% 56%;
+    --primary-foreground: 0 0% 9%;
     --secondary: 240 3% 14%;     /* #232325 */
     --secondary-foreground: 0 0% 93%;
     --muted: 240 3% 14%;
     --muted-foreground: 240 2% 53%;
     --accent: 240 3% 14%;
     --accent-foreground: 0 0% 93%;
-    --destructive: 340 82% 51%;
+    --destructive: 358 75% 59%;
     --destructive-foreground: 0 0% 100%;
     --border: 240 3% 17%;        /* hairline */
     --input: 240 3% 17%;
-    --ring: 251 98% 65%;
+    --ring: 33 62% 56%;
+    --brass: 212 149 74;
   }
 
   * {
@@ -133,7 +135,7 @@
 }
 
 /* ================================================================
-   STRIPI SURFACE SYSTEM
+   SURFACES
    Flat cards, hairline borders, subtle elevation shadows —
    class names kept as `.glass-*` for backward compatibility with
    existing markup, but the surfaces are no longer glassmorphic.
@@ -214,8 +216,8 @@
   }
 
   .glass-input:focus {
-    border-color: #533afd;
-    box-shadow: 0 0 0 3px rgba(83, 58, 253, 0.15);
+    border-color: rgb(var(--brass));
+    box-shadow: 0 0 0 3px rgb(var(--brass) / 0.16);
     outline: none;
   }
 
@@ -250,7 +252,7 @@
 
   .glass-table tbody tr {
     border-bottom: 1px solid #e5e5e5;
-    transition: background 0.2s ease;
+    transition: background-color 150ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .glass-table tbody tr:hover {
@@ -294,7 +296,7 @@
   }
 
   .glass-modal-backdrop {
-    background: rgba(5, 6, 15, 0.65);
+    background: rgba(10, 10, 10, 0.55);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
   }
@@ -314,7 +316,7 @@
   }
 
   /* ================================================================
-     UNIFIED PREMIUM BUTTON DESIGN SYSTEM
+     BUTTONS
      ================================================================ */
   .btn,
   .btn-primary,
@@ -324,7 +326,7 @@
   .btn-outline,
   .btn-ghost,
   .glass-btn {
-    @apply inline-flex items-center justify-center font-medium tracking-tight whitespace-nowrap select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#533afd]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent disabled:opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center font-medium whitespace-nowrap select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/50 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent disabled:opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed;
     position: relative;
     overflow: hidden;
     border-radius: 0.625rem;
@@ -371,28 +373,40 @@
     font-size: 1rem !important;
     line-height: 1.5rem !important;
     min-height: 3.25rem !important;
-    border-radius: 0.75rem !important;
-    gap: 0.625rem !important;
+    border-radius: 0.625rem !important;
+    gap: 0.5rem !important;
   }
 
-  /* --- Primary Button (Stripi flat indigo pill) --- */
+  /* --- Primary: ink on light, off-white on dark --- */
   .btn-primary {
-    background: #533afd;
-    color: #ffffff !important;
+    background: #171717;
+    color: #fafafa !important;
     border: 1px solid transparent;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
 
   .btn-primary:hover {
-    background: #4434d4;
-    color: #ffffff !important;
+    background: #2e2e2e;
+    color: #fafafa !important;
   }
 
   .btn-primary:active {
-    background: #2e2b8c;
+    background: #000000;
     transform: scale(0.98);
   }
 
-  /* --- Secondary Button (Stripi outline pill) --- */
+  .dark .btn-primary {
+    background: #ededed;
+    color: #171717 !important;
+    box-shadow: none;
+  }
+
+  .dark .btn-primary:hover {
+    background: #ffffff;
+    color: #171717 !important;
+  }
+
+  /* --- Secondary --- */
   .btn-secondary,
   .glass-btn {
     background: #ffffff;
@@ -411,7 +425,7 @@
   .btn-secondary:active,
   .glass-btn:active {
     transform: scale(0.98);
-    background: #eef2f6;
+    background: #ededed;
   }
 
   .dark .btn-secondary,
@@ -428,7 +442,7 @@
     border-color: rgba(255, 255, 255, 0.16);
   }
 
-  /* --- Danger Button (Stripi ruby pill) --- */
+  /* --- Danger --- */
   .btn-danger {
     background: #dc2626;
     color: #ffffff !important;
@@ -445,7 +459,7 @@
     transform: scale(0.98);
   }
 
-  /* --- Success Button (flat emerald pill) --- */
+  /* --- Success --- */
   .btn-success {
     background: #16a34a;
     color: #ffffff !important;
@@ -485,14 +499,14 @@
   
   /* --- Inputs --- */
   .input {
-    @apply flex h-11 min-h-[44px] w-full rounded-lg px-3 py-2 text-base placeholder:text-gray-400 dark:placeholder:text-[#85858b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#533afd]/50 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply flex h-11 min-h-[44px] w-full rounded-lg px-3 py-2 text-base placeholder:text-gray-400 dark:placeholder:text-[#85858b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/50 disabled:cursor-not-allowed disabled:opacity-50;
     background: #ffffff;
     border: 1px solid #d4d4d4;
     color: #171717;
   }
 
   .input:focus {
-    border-color: #533afd;
+    border-color: rgb(var(--brass));
   }
 
   .dark .input {
@@ -535,16 +549,25 @@
 
   .stagger-item {
     opacity: 0;
-    animation: staggerFadeUp 0.4s ease-out forwards;
+    animation: staggerFadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
 
-  /* Focus ring — smooth outline for keyboard navigation */
+  /* Signature: the accountant's double rule under a final total */
+  .double-rule {
+    text-decoration-line: underline;
+    text-decoration-style: double;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 6px;
+    text-decoration-color: rgb(var(--brass) / 0.7);
+  }
+
+  /* Focus ring for keyboard navigation */
   .focus-ring {
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#533afd]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/50 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent;
   }
 }
 
-/* Custom scrollbar — glass themed */
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -564,7 +587,7 @@
 
 /* Loading animation */
 .loading-spinner {
-  @apply animate-spin rounded-full h-4 w-4 border-2 border-gray-300 dark:border-white/20 border-t-[#533afd];
+  @apply animate-spin rounded-full h-4 w-4 border-2 border-gray-300 dark:border-white/20 border-t-brass;
 }
 
 /* Fade animations */

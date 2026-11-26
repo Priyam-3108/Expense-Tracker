@@ -119,7 +119,7 @@ const PrivacyPolicy = () => {
                             <ul>
                                 <li><strong>Service Providers:</strong> With trusted third-party services that help us operate (e.g., hosting providers, analytics tools) - these parties are bound by confidentiality agreements</li>
                                 <li><strong>Legal Requirements:</strong> When required by law, court order, or government request</li>
-                                <li><strong>Safety and Security:</strong> To protect the rights, property, or safety of Expense Tracker, our users, or the public</li>
+                                <li><strong>Safety and Security:</strong> To protect the rights, property, or safety of Spendly, our users, or the public</li>
                                 <li><strong>Business Transfers:</strong> In connection with a merger, acquisition, or sale of assets - we will notify you beforehand</li>
                             </ul>
                             <p>
@@ -145,7 +145,7 @@ const PrivacyPolicy = () => {
                                 <li><strong>Withdraw Consent:</strong> Stop using the service at any time</li>
                             </ul>
                             <p>
-                                To exercise these rights, visit your Profile page or contact us through our <Link to="/support" className="text-[#533afd] hover:underline">Support page</Link>.
+                                To exercise these rights, visit your Profile page or contact us through our <Link to="/support" className="text-brass hover:underline">Support page</Link>.
                             </p>
                         </div>
                     </div>
@@ -178,7 +178,7 @@ const PrivacyPolicy = () => {
                         </h2>
                         <div className="section-content">
                             <p>
-                                Expense Tracker is not intended for users under the age of 13. We do not knowingly collect personal information from children under 13. If you believe we have collected information from a child under 13, please contact us immediately and we will delete it.
+                                Spendly is not intended for users under the age of 13. We do not knowingly collect personal information from children under 13. If you believe we have collected information from a child under 13, please contact us immediately and we will delete it.
                             </p>
                         </div>
                     </div>
@@ -189,7 +189,7 @@ const PrivacyPolicy = () => {
                         </h2>
                         <div className="section-content">
                             <p>
-                                If you're using Expense Tracker from outside the United States, please note that your data may be transferred to and processed in countries where we operate. By using our service, you consent to this transfer.
+                                If you're using Spendly from outside the United States, please note that your data may be transferred to and processed in countries where we operate. By using our service, you consent to this transfer.
                             </p>
                             <p>
                                 <strong>GDPR Compliance:</strong> For users in the European Economic Area (EEA), we comply with GDPR requirements and respect your rights under GDPR, including rights to access, rectification, erasure, and data portability.
@@ -211,7 +211,7 @@ const PrivacyPolicy = () => {
                                 <li>Displaying a notice in the application</li>
                             </ul>
                             <p>
-                                Your continued use of Expense Tracker after changes are posted constitutes your acceptance of the updated policy.
+                                Your continued use of Spendly after changes are posted constitutes your acceptance of the updated policy.
                             </p>
                         </div>
                     </div>
@@ -225,7 +225,7 @@ const PrivacyPolicy = () => {
                                 If you have questions or concerns about this Privacy Policy or our data practices, please contact us:
                             </p>
                             <ul>
-                                <li>Through our <Link to="/support" className="text-[#533afd] hover:underline">Support page</Link></li>
+                                <li>Through our <Link to="/support" className="text-brass hover:underline">Support page</Link></li>
                                 <li>By email: privacy@expensetracker.com</li>
                             </ul>
                             <p>

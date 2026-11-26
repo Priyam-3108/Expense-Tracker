@@ -31,10 +31,10 @@ const ThemeToggle = () => {
         <div className="relative" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="p-2 rounded-xl text-gray-500 dark:text-[#a1a1a6] hover:bg-gray-100 dark:hover:bg-white/[0.06] hover:text-gray-700 dark:hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                className="p-2 rounded-lg text-gray-500 dark:text-[#a1a1a6] hover:bg-gray-100 dark:hover:bg-white/[0.06] hover:text-gray-700 dark:hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
                 aria-label="Toggle theme"
             >
-                <CurrentIcon size={20} />
+                <CurrentIcon size={18} strokeWidth={1.5} />
             </button>
 
             {isOpen && (
@@ -52,13 +52,12 @@ const ThemeToggle = () => {
                                     className={cn(
                                         "flex w-full items-center rounded-lg px-3 py-2.5 text-sm outline-none transition-colors min-h-[44px]",
                                         theme === t.name
-                                            ? "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400"
+                                            ? "bg-gray-100 dark:bg-[#232325] text-gray-900 dark:text-[#ededed]"
                                             : "text-gray-700 dark:text-[#a1a1a6] hover:bg-gray-100 dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white"
                                     )}
                                 >
-                                    <Icon className={cn(
-                                        "mr-3 h-4 w-4",
-                                        theme === t.name && ""
+                                    <Icon strokeWidth={1.5} className={cn(
+                                        "mr-2.5 h-4 w-4"
                                     )} />
                                     <span>{t.label}</span>
                                 </button>

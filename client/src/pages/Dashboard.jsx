@@ -74,8 +74,8 @@ const Dashboard = () => {
   const availableYears = Array.from({ length: currentYear - 2019 }, (_, i) => currentYear - i)
 
   const chartColors = isDark
-    ? { expense: '#8b7ffe', income: '#85858b', grid: 'rgba(237,237,237,0.06)', tick: '#85858b' }
-    : { expense: '#533afd', income: '#a3a3a3', grid: 'rgba(23,23,23,0.06)', tick: '#737373' }
+    ? { expense: '#d4954a', income: '#85858b', grid: 'rgba(237,237,237,0.06)', tick: '#85858b' }
+    : { expense: '#a8611c', income: '#a3a3a3', grid: 'rgba(23,23,23,0.06)', tick: '#737373' }
 
   const ChartTooltip = ({ active, payload, label }) => {
     if (!active || !payload?.length) return null
@@ -88,19 +88,18 @@ const Dashboard = () => {
               <span className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
               {entry.name}
             </span>
-            <Amount value={entry.value} currency={currency} className="font-mono tabular-nums text-gray-900 dark:text-[#ededed]" />
+            <Amount value={entry.value} currency={currency} className="tabular-nums text-gray-900 dark:text-[#ededed]" />
           </p>
         ))}
       </div>
     )
   }
 
-  const statCards = [
-    { label: 'Expenses', value: totalExpenses },
+  const sideFigures = [
     { label: 'Income', value: totalIncome },
-    { label: 'Net', value: netAmount, tone: netAmount >= 0 ? 'pos' : 'neg' },
-    totalPayable > 0 && { label: 'You owe', value: totalPayable },
+    { label: 'Expenses', value: totalExpenses },
     totalReceivable > 0 && { label: 'Owed to you', value: totalReceivable },
+    totalPayable > 0 && { label: 'You owe', value: totalPayable },
   ].filter(Boolean)
 
   const toneClass = {
@@ -110,27 +109,41 @@ const Dashboard = () => {
 
   const sectionTitle = 'text-base font-medium text-gray-900 dark:text-[#ededed]'
   const meta = 'text-xs text-gray-500 dark:text-[#85858b]'
-  const textLink = 'inline-flex items-center gap-1 text-sm text-[#533afd] dark:text-[#8b7ffe] hover:text-[#4434d4] dark:hover:text-[#a59bff] transition-colors'
+  const textLink = 'inline-flex items-center gap-1 text-sm text-gray-600 dark:text-[#a1a1a6] hover:text-gray-900 dark:hover:text-[#ededed] transition-colors'
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl md:text-[28px] leading-tight font-medium text-gray-900 dark:text-[#ededed]">Overview</h1>
-        <p className="mt-1 text-sm text-gray-500 dark:text-[#a1a1a6]">{format(new Date(), 'EEEE, MMMM d, yyyy')}</p>
+      <div className="flex items-end justify-between gap-4">
+        <div>
+          <h1 className="text-2xl md:text-[28px] leading-tight font-medium text-gray-900 dark:text-[#ededed]">Overview</h1>
+          <p className="mt-1 text-sm text-gray-500 dark:text-[#a1a1a6]">{format(new Date(), 'EEEE, MMMM d, yyyy')}</p>
+        </div>
+        <span className={`hidden sm:block ${meta}`}>All time</span>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-4">
-        {statCards.map(({ label, value, tone }) => (
-          <div key={label} className="glass-card p-5">
+      {/* Statement: net leads, the rest are its parts */}
+      <div className="glass-card grid grid-cols-2 lg:grid-cols-[minmax(0,1.6fr)_repeat(var(--n),minmax(0,1fr))]" style={{ '--n': sideFigures.length }}>
+        <div className="col-span-2 lg:col-span-1 p-5 md:p-6 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-white/[0.07]">
+          <p className="text-sm text-gray-600 dark:text-[#a1a1a6]">Net balance</p>
+          <p className={`mt-3 pb-2 text-[32px] md:text-[40px] leading-none font-medium tabular-nums truncate ${netAmount < 0 ? toneClass.neg : 'text-gray-900 dark:text-[#ededed]'}`}>
+            {loading
+              ? <span className="inline-block w-40 h-9 rounded-md bg-gray-100 dark:bg-white/[0.06]" />
+              : <Amount value={netAmount} currency={currency} sign={netAmount > 0 ? '+' : ''} className="double-rule" />}
+          </p>
+          <p className={`mt-4 ${meta}`}>Income minus expenses</p>
+        </div>
+        {sideFigures.map(({ label, value }, i) => (
+          <div
+            key={label}
+            className={`p-5 md:p-6 border-gray-200 dark:border-white/[0.07] ${i % 2 === 0 ? 'border-r' : ''} ${i < 2 && sideFigures.length > 2 ? 'border-b lg:border-b-0' : ''} ${i < sideFigures.length - 1 ? 'lg:border-r' : ''}`}
+          >
             <p className="text-sm text-gray-600 dark:text-[#a1a1a6]">{label}</p>
-            <p className={`mt-2 text-xl md:text-2xl leading-none font-mono font-medium tabular-nums truncate ${tone ? toneClass[tone] : 'text-gray-900 dark:text-[#ededed]'}`}>
+            <p className="mt-3 text-lg md:text-xl leading-none font-medium tabular-nums truncate text-gray-900 dark:text-[#ededed]">
               {loading
-                ? <span className="inline-block w-24 h-7 rounded-md bg-gray-100 dark:bg-white/[0.06]" />
+                ? <span className="inline-block w-24 h-6 rounded-md bg-gray-100 dark:bg-white/[0.06]" />
                 : <Amount value={value} currency={currency} />}
             </p>
-            <p className={`mt-2 ${meta}`}>All time</p>
           </div>
         ))}
       </div>
@@ -151,7 +164,7 @@ const Dashboard = () => {
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(Number(e.target.value))}
                 aria-label="Year"
-                className="h-9 pl-3 pr-8 rounded-lg text-sm font-mono tabular-nums text-gray-700 dark:text-[#ededed] bg-white dark:bg-[#232325] border border-gray-200 dark:border-white/[0.08] hover:bg-gray-50 dark:hover:bg-[#2a2a2c] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#533afd]/50 transition-colors appearance-none bg-no-repeat cursor-pointer"
+                className="h-9 pl-3 pr-8 rounded-lg text-sm tabular-nums text-gray-700 dark:text-[#ededed] bg-white dark:bg-[#232325] border border-gray-200 dark:border-white/[0.08] hover:bg-gray-50 dark:hover:bg-[#2a2a2c] focus:outline-none focus-visible:ring-2 focus-visible:ring-brass/50 transition-colors appearance-none bg-no-repeat cursor-pointer"
                 style={{
                   backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 20 20\'%3E%3Cpath stroke=\'%2385858b\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M6 8l4 4 4-4\'/%3E%3C/svg%3E")',
                   backgroundPosition: 'right 0.5rem center',
@@ -268,13 +281,13 @@ const Dashboard = () => {
                       <span className="block text-sm text-gray-900 dark:text-[#ededed] truncate">
                         {transaction.description || transaction.category?.name}
                       </span>
-                      <span className={`block ${meta}`}>{format(new Date(transaction.date), 'MMM d')}</span>
+                      <span className={`block font-mono ${meta}`}>{format(new Date(transaction.date), 'MMM d')}</span>
                     </span>
                     <Amount
                       value={transaction.amount}
                       currency={currency}
                       sign={transaction.type === 'income' ? '+' : '−'}
-                      className={`text-sm font-mono tabular-nums ${transaction.type === 'income' ? toneClass.pos : 'text-gray-900 dark:text-[#ededed]'}`}
+                      className={`text-sm tabular-nums ${transaction.type === 'income' ? toneClass.pos : 'text-gray-900 dark:text-[#ededed]'}`}
                     />
                   </button>
                 ))}
@@ -290,7 +303,7 @@ const Dashboard = () => {
 
           {/* Quick actions */}
           <div className="glass-card p-5">
-            <h2 className={`${sectionTitle} mb-4`}>Quick actions</h2>
+            <h2 className={`${sectionTitle} mb-4`}>Add to the ledger</h2>
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => navigate('/app/expenses', { state: { action: 'add_expense' } })}

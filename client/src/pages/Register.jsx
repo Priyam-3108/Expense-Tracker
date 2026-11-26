@@ -6,6 +6,7 @@ import { Eye, EyeOff, Mail, Lock, User, AlertCircle } from 'lucide-react'
 import { validateEmail, validatePassword } from '../utils/helpers'
 import { cn } from '../utils/cn'
 import Logo from '../components/Logo'
+import AuthAside from '../components/AuthAside'
 
 const Register = () => {
   const { register: registerUser } = useAuth()
@@ -59,22 +60,26 @@ const Register = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[#fafafa]">
-      <div className="max-w-2xl w-full relative z-10">
-        {/* Auth Card */}
-        <div className="bg-white rounded-xl border border-[#e5e5e5] shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
-          {/* Card Content */}
-          <div className="p-8 sm:p-10">
-            {/* Logo */}
-            <div className="flex justify-center mb-5">
-              <Logo size="default" />
+    <div className="min-h-screen flex bg-[#fafafa]">
+      <AuthAside
+        title="Open a ledger in a minute"
+        text="Pick your currency, add what you spend and earn, and see the month take shape."
+      />
+
+      <div className="flex flex-1 items-center justify-center py-12 px-6 lg:px-14">
+        <div className="w-full max-w-lg">
+          <div>
+            {/* Mobile logo */}
+            <div className="lg:hidden flex justify-center mb-8">
+              <Logo />
             </div>
 
             {/* Title */}
-            <div className="text-center mb-5">
-              <h2 className="text-2xl font-medium mb-2 text-[#171717]">
+            <div className="mb-8">
+              <h1 className="text-2xl font-medium mb-2 text-[#171717]">
                 Create your account
-              </h2>
+              </h1>
+              <p className="text-sm text-[#737373]">Free to use · No credit card</p>
             </div>
 
             <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
@@ -90,7 +95,7 @@ const Register = () => {
                   </label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                      <User className="h-4 w-4 text-[#737373] group-focus-within:text-primary-500" />
+                      <User className="h-4 w-4 text-[#737373] group-focus-within:text-[#171717]" />
                     </div>
                     <input
                       id="name"
@@ -108,16 +113,16 @@ const Register = () => {
                         }
                       })}
                       className={cn(
-                        "block w-full pl-11 pr-4 py-2.5 rounded-xl transition-colors text-sm font-medium min-h-[44px]",
+                        "block w-full pl-11 pr-4 py-2.5 rounded-lg transition-colors text-sm min-h-[44px]",
                         "focus:outline-none focus:ring-2 focus:ring-offset-0",
-                        "bg-white border border-[#d4d4d4] text-[#171717] placeholder:text-[#737373]/60 focus:border-primary-500 focus:ring-primary-500/20",
+                        "bg-white border border-[#d4d4d4] text-[#171717] placeholder:text-[#737373]/60 focus:border-brass-700 focus:ring-brass-700/20",
                         errors.name && "!border-red-500 focus:!border-red-500 focus:!ring-red-500/20"
                       )}
-                      placeholder="Enter your full name"
+                      placeholder="Asha Mehta"
                     />
                   </div>
                   {errors.name && (
-                    <p className="text-sm text-red-500 flex items-center gap-1 animate-in slide-in-from-left-1">
+                    <p className="text-sm text-red-500 flex items-center gap-1">
                       {errors.name.message}
                     </p>
                   )}
@@ -133,7 +138,7 @@ const Register = () => {
                   </label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                    <Mail className="h-4 w-4 text-[#737373] group-focus-within:text-primary-500" />
+                    <Mail className="h-4 w-4 text-[#737373] group-focus-within:text-[#171717]" />
                     </div>
                     <input
                       id="email"
@@ -144,16 +149,16 @@ const Register = () => {
                         validate: (value) => validateEmail(value) || 'Please enter a valid email'
                       })}
                       className={cn(
-                        "block w-full pl-11 pr-4 py-2.5 rounded-xl transition-colors text-sm font-medium min-h-[44px]",
+                        "block w-full pl-11 pr-4 py-2.5 rounded-lg transition-colors text-sm min-h-[44px]",
                         "focus:outline-none focus:ring-2 focus:ring-offset-0",
-                        "bg-white border border-[#d4d4d4] text-[#171717] placeholder:text-[#737373]/60 focus:border-primary-500 focus:ring-primary-500/20",
+                        "bg-white border border-[#d4d4d4] text-[#171717] placeholder:text-[#737373]/60 focus:border-brass-700 focus:ring-brass-700/20",
                         errors.email && "!border-red-500 focus:!border-red-500 focus:!ring-red-500/20"
                       )}
-                      placeholder="Enter your email"
+                      placeholder="you@example.com"
                     />
                   </div>
                   {errors.email && (
-                    <p className="text-sm text-red-500 flex items-center gap-1 animate-in slide-in-from-left-1">
+                    <p className="text-sm text-red-500 flex items-center gap-1">
                       {errors.email.message}
                     </p>
                   )}
@@ -170,7 +175,7 @@ const Register = () => {
                 </label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                    <span className="text-base font-medium text-[#737373] group-focus-within:text-primary-500">
+                    <span className="text-base font-medium text-[#737373] group-focus-within:text-[#171717]">
                       {currencyMap[selectedCurrency || 'USD'].symbol}
                     </span>
                   </div>
@@ -180,7 +185,7 @@ const Register = () => {
                     className={cn(
                       "block w-full pl-11 pr-4 py-2.5 rounded-xl transition-colors text-sm font-medium appearance-none cursor-pointer min-h-[44px]",
                       "focus:outline-none focus:ring-2 focus:ring-offset-0",
-                      "bg-white border border-[#d4d4d4] text-[#171717] placeholder:text-[#737373]/60 focus:border-primary-500 focus:ring-primary-500/20",
+                      "bg-white border border-[#d4d4d4] text-[#171717] placeholder:text-[#737373]/60 focus:border-brass-700 focus:ring-brass-700/20",
                       errors.currency && "!border-red-500 focus:!border-red-500 focus:!ring-red-500/20"
                     )}
                   >
@@ -195,7 +200,7 @@ const Register = () => {
                   </select>
                 </div>
                 {errors.currency && (
-                  <p className="text-sm text-red-500 flex items-center gap-1 animate-in slide-in-from-left-1">
+                  <p className="text-sm text-red-500 flex items-center gap-1">
                     {errors.currency.message}
                   </p>
                 )}
@@ -213,7 +218,7 @@ const Register = () => {
                   </label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                      <Lock className="h-4 w-4 text-[#737373] group-focus-within:text-primary-500" />
+                      <Lock className="h-4 w-4 text-[#737373] group-focus-within:text-[#171717]" />
                     </div>
                     <input
                       id="password"
@@ -224,12 +229,12 @@ const Register = () => {
                         validate: (value) => validatePassword(value) || 'Password must be at least 6 characters'
                       })}
                       className={cn(
-                        "block w-full pl-11 pr-12 py-2.5 rounded-xl transition-colors text-sm font-medium min-h-[44px]",
+                        "block w-full pl-11 pr-12 py-2.5 rounded-lg transition-colors text-sm min-h-[44px]",
                         "focus:outline-none focus:ring-2 focus:ring-offset-0",
-                        "bg-white border border-[#d4d4d4] text-[#171717] placeholder:text-[#737373]/60 focus:border-primary-500 focus:ring-primary-500/20",
+                        "bg-white border border-[#d4d4d4] text-[#171717] placeholder:text-[#737373]/60 focus:border-brass-700 focus:ring-brass-700/20",
                         errors.password && "!border-red-500 focus:!border-red-500 focus:!ring-red-500/20"
                       )}
-                      placeholder="Create a password (min. 6 characters)"
+                      placeholder="At least 6 characters"
                     />
                     <button
                       type="button"
@@ -244,7 +249,7 @@ const Register = () => {
                     </button>
                   </div>
                   {errors.password && (
-                    <p className="text-sm text-red-500 flex items-center gap-1 animate-in slide-in-from-left-1">
+                    <p className="text-sm text-red-500 flex items-center gap-1">
                       {errors.password.message}
                     </p>
                   )}
@@ -260,7 +265,7 @@ const Register = () => {
                   </label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                      <Lock className="h-4 w-4 text-[#737373] group-focus-within:text-primary-500" />
+                      <Lock className="h-4 w-4 text-[#737373] group-focus-within:text-[#171717]" />
                     </div>
                     <input
                       id="confirmPassword"
@@ -271,12 +276,12 @@ const Register = () => {
                         validate: (value) => value === password || 'Passwords do not match'
                       })}
                       className={cn(
-                        "block w-full pl-11 pr-12 py-2.5 rounded-xl transition-colors text-sm font-medium min-h-[44px]",
+                        "block w-full pl-11 pr-12 py-2.5 rounded-lg transition-colors text-sm min-h-[44px]",
                         "focus:outline-none focus:ring-2 focus:ring-offset-0",
-                        "bg-white border border-[#d4d4d4] text-[#171717] placeholder:text-[#737373]/60 focus:border-primary-500 focus:ring-primary-500/20",
+                        "bg-white border border-[#d4d4d4] text-[#171717] placeholder:text-[#737373]/60 focus:border-brass-700 focus:ring-brass-700/20",
                         errors.confirmPassword && "!border-red-500 focus:!border-red-500 focus:!ring-red-500/20"
                       )}
-                      placeholder="Confirm your password"
+                      placeholder="Repeat the password"
                     />
                     <button
                       type="button"
@@ -291,7 +296,7 @@ const Register = () => {
                     </button>
                   </div>
                   {errors.confirmPassword && (
-                    <p className="text-sm text-red-500 flex items-center gap-1 animate-in slide-in-from-left-1">
+                    <p className="text-sm text-red-500 flex items-center gap-1">
                       {errors.confirmPassword.message}
                     </p>
                   )}
@@ -301,7 +306,7 @@ const Register = () => {
               {/* Error message */}
               {errors.root && (
                 <div className={cn(
-                  "rounded-xl p-3 animate-in slide-in-from-top-2 border",
+                  "rounded-lg p-3 border",
                     "bg-red-50 border-red-200"
                 )}>
                   <p className={cn(
@@ -323,7 +328,7 @@ const Register = () => {
                 <span className="flex items-center justify-center gap-2">
                   {isLoading ? (
                     <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-current border-t-transparent"></div>
                       Creating account
                     </>
                   ) : (
@@ -334,12 +339,12 @@ const Register = () => {
             </form>
           </div>
 
-          <div className="px-6 py-4 border-t border-[#e5e5e5]">
-            <p className="text-center text-sm text-[#737373]">
+          <div className="mt-8 pt-6 border-t border-[#e5e5e5]">
+            <p className="text-sm text-[#737373]">
               Already have an account?{' '}
               <Link
                 to="/login"
-                className="font-medium transition-colors hover:underline text-primary-500 hover:text-primary-700"
+                className="font-medium text-[#171717] underline decoration-[#d4d4d4] underline-offset-4 hover:decoration-[#171717] transition-colors"
               >
                 Sign in
               </Link>

@@ -19,6 +19,7 @@ import { useState, useRef, useEffect } from 'react'
 import { cn } from '../utils/cn'
 import ThemeToggle from './ThemeToggle'
 import BottomNav from './BottomNav'
+import Logo from './Logo'
 
 const currencySymbols = {
   USD: '$',
@@ -82,7 +83,7 @@ const Layout = () => {
       {/* Mobile sidebar overlay — always rendered, toggled by opacity for smooth fade */}
       <div
         className={cn(
-          "fixed inset-0 z-40 lg:hidden transition-opacity bg-[#171717]/50",
+          "fixed inset-0 z-40 lg:hidden transition-opacity bg-[#0a0a0a]/50",
           sidebarOpen
             ? 'opacity-100 pointer-events-auto'
             : 'opacity-0 pointer-events-none'
@@ -93,22 +94,13 @@ const Layout = () => {
 
       {/* ============ SIDEBAR ============ */}
       <div className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out lg:translate-x-0",
+        "fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:translate-x-0",
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="flex flex-col h-full glass-sidebar">
           {/* Sidebar Header */}
           <div className="flex items-center justify-between h-16 px-4 sm:px-6 border-b border-gray-200 dark:border-white/[0.08]">
-              <div className="flex items-center min-w-0">
-              <div className="w-7 h-7 shrink-0 rounded-lg flex items-center justify-center bg-[#533afd]">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d="M3 4h10M3 8h7M3 12h5" stroke="white" strokeWidth="1.75" strokeLinecap="round"/>
-                </svg>
-              </div>
-              <h1 className="ml-2 text-base font-medium text-gray-900 dark:text-[#ededed] truncate whitespace-nowrap">
-                Spendly
-              </h1>
-            </div>
+              <Logo to="/app/dashboard" />
             <button
               onClick={() => setSidebarOpen(false)}
               aria-label="Close sidebar"
@@ -141,7 +133,7 @@ const Layout = () => {
                       <Icon
                         size={18}
                         strokeWidth={1.5}
-                        className={cn("shrink-0", isActive ? "text-[#533afd] dark:text-[#8b7ffe]" : "text-gray-400 dark:text-[#85858b]")}
+                        className={cn("shrink-0", isActive ? "text-brass dark:text-brass" : "text-gray-400 dark:text-[#85858b]")}
                       />
                       {item.name}
                     </>
@@ -234,8 +226,8 @@ const Layout = () => {
         </nav>
 
         {/* Page content */}
-        <main className="relative flex-1 overflow-y-auto overflow-x-clip p-4 sm:p-6 lg:p-8 xl:p-10 pb-20 lg:pb-8 xl:pb-10">
-          <div className="relative z-10 w-full max-w-none">
+        <main className="relative flex-1 overflow-y-auto overflow-x-clip p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8">
+          <div className="relative z-10 w-full max-w-[1440px] mx-auto">
             <Outlet />
           </div>
         </main>

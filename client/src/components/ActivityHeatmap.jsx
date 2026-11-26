@@ -95,7 +95,7 @@ export default function ActivityHeatmap({
                     cell,
                   })}
                   onMouseLeave={() => setHover(null)}
-                  className="w-full aspect-square rounded-[3px] transition-opacity hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#533afd] disabled:cursor-default disabled:hover:opacity-100"
+                  className="w-full aspect-square rounded-[3px] transition-opacity hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brass disabled:cursor-default disabled:hover:opacity-100"
                   style={{
                     backgroundColor: cell.inWindow ? palette[cell.bucket] : 'transparent',
                     boxShadow: cell.inWindow && cell.bucket === 0 ? `inset 0 0 0 1px ${emptyColor}` : undefined,
@@ -114,7 +114,7 @@ export default function ActivityHeatmap({
               style={{ left: hover.x + 20, top: hover.y - 40 }}
             >
               <div className="font-medium">{format(parseISO(hover.cell.date), 'EEE, MMM d, yyyy')}</div>
-              <div className="font-mono tabular-nums">{hover.cell.count} txn · {isPrivate ? '••••' : formatCurrency(hover.cell.expenseTotal, currency)}</div>
+              <div className="font-mono tabular-nums">{hover.cell.count} {hover.cell.count === 1 ? 'entry' : 'entries'} · {isPrivate ? '••••' : formatCurrency(hover.cell.expenseTotal, currency)}</div>
             </div>
           )}
         </div>

@@ -1,3 +1,19 @@
+// Passbook brass, from paper ledgers. Replaces the old violet.
+const brass = {
+  50: '#fbf6ee',
+  100: '#f5e8d3',
+  200: '#ebd0a8',
+  300: '#ddb072',
+  400: '#d4954a',
+  500: '#c07a2e',
+  600: '#a8611c',
+  700: '#8a4d16',
+  800: '#6b3c14',
+  900: '#4d2c10',
+}
+
+import colors from 'tailwindcss/colors'
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -8,33 +24,23 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Graphite: map the blue-tinted gray onto neutral so every gray-* sits on one ramp
+        gray: colors.neutral,
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         primary: {
-          50: '#f2f0ff',
-          100: '#e4e0ff',
-          200: '#b9b9f9',
-          300: '#918dfd',
-          400: '#665efd',
-          500: '#533afd',
-          600: '#4434d4',
-          700: '#2e2b8c',
-          800: '#1c1e54',
-          900: '#1c1e54',
+          ...brass,
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
         },
-        ink: {
-          DEFAULT: '#171717',
-          secondary: '#404040',
-          mute: '#737373',
+        // The one accent. Plain `brass` follows the theme via --brass in index.css
+        brass: {
+          ...brass,
+          DEFAULT: 'rgb(var(--brass) / <alpha-value>)',
         },
-        ruby: '#ea2261',
-        magenta: '#f96bee',
-        canvasCream: '#f5e9d4',
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
           foreground: 'hsl(var(--secondary-foreground))',
@@ -97,7 +103,8 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['"sohne-var"', 'Inter', '"SF Pro Display"', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['"Instrument Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+        serif: ['Newsreader', 'Georgia', 'serif'],
         mono: ['"IBM Plex Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
       },
       borderRadius: {

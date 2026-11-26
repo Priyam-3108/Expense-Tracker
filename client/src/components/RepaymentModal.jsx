@@ -134,7 +134,7 @@ export default function RepaymentModal({ isOpen, onClose, debt }) {
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                                             <BanknotesIcon className="h-4 w-4 inline mr-1.5" />
-                                            Payment Amount
+                                            Amount
                                         </label>
                                         <div className="relative">
                                             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
@@ -159,7 +159,7 @@ export default function RepaymentModal({ isOpen, onClose, debt }) {
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                                             <CalendarIcon className="h-4 w-4 inline mr-1.5" />
-                                            Payment Date
+                                            Date
                                         </label>
                                         <DatePicker
                                             value={date}
@@ -209,7 +209,7 @@ export default function RepaymentModal({ isOpen, onClose, debt }) {
                                             ) : (
                                                 <span className="flex items-center justify-center gap-2">
                                                     <CheckCircleIcon className="h-4 w-4" />
-                                                    Confirm Payment
+                                                    Record payment
                                                 </span>
                                             )}
                                         </button>

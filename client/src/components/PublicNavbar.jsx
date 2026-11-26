@@ -26,7 +26,7 @@ const PublicNavbar = () => {
     const isLanding = location.pathname === '/'
 
     return (
-        <nav className={`fixed top-0 left-0 right-0 z-50 transition-colors bg-white border-b ${scrolled ? 'border-[#e5e5e5]' : 'border-transparent'}`}>
+        <nav className={`fixed top-0 left-0 right-0 z-50 transition-colors bg-[#f7f4ee] border-b ${scrolled ? 'border-[#1f1b16]/[0.08]' : 'border-transparent'}`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="nav-content flex items-center justify-between h-16">
                     <Logo />
@@ -35,15 +35,15 @@ const PublicNavbar = () => {
                     <div className="hidden md:flex items-center gap-8">
                         {isLanding ? (
                             <>
-                                <a href="#features" className="text-sm text-[#404040] hover:text-[#171717] transition-colors">Features</a>
-                                <a href="#how-it-works" className="text-sm text-[#404040] hover:text-[#171717] transition-colors">How it works</a>
+                                <a href="#features" className="text-sm text-[#5e554a] hover:text-[#1f1b16] transition-colors">Features</a>
+                                <a href="#how-it-works" className="text-sm text-[#5e554a] hover:text-[#1f1b16] transition-colors">How it works</a>
                             </>
                         ) : (
-                            <Link to="/" className={`text-sm transition-colors ${location.pathname === '/' ? 'text-[#171717]' : 'text-[#404040] hover:text-[#171717]'}`}>Home</Link>
+                            <Link to="/" className={`text-sm transition-colors ${location.pathname === '/' ? 'text-[#1f1b16]' : 'text-[#5e554a] hover:text-[#1f1b16]'}`}>Home</Link>
                         )}
-                        <Link to="/faq" className={`text-sm transition-colors ${location.pathname === '/faq' ? 'text-[#171717]' : 'text-[#404040] hover:text-[#171717]'}`}>FAQ</Link>
-                        <Link to="/support" className={`text-sm transition-colors ${location.pathname === '/support' ? 'text-[#171717]' : 'text-[#404040] hover:text-[#171717]'}`}>Support</Link>
-                        <Link to="/docs" className={`text-sm transition-colors ${location.pathname === '/docs' ? 'text-[#171717]' : 'text-[#404040] hover:text-[#171717]'}`}>Docs</Link>
+                        <Link to="/faq" className={`text-sm transition-colors ${location.pathname === '/faq' ? 'text-[#1f1b16]' : 'text-[#5e554a] hover:text-[#1f1b16]'}`}>FAQ</Link>
+                        <Link to="/support" className={`text-sm transition-colors ${location.pathname === '/support' ? 'text-[#1f1b16]' : 'text-[#5e554a] hover:text-[#1f1b16]'}`}>Support</Link>
+                        <Link to="/docs" className={`text-sm transition-colors ${location.pathname === '/docs' ? 'text-[#1f1b16]' : 'text-[#5e554a] hover:text-[#1f1b16]'}`}>Docs</Link>
                     </div>
 
                     {/* Action Buttons */}
@@ -54,7 +54,7 @@ const PublicNavbar = () => {
                             </Link>
                         ) : (
                             <>
-                                <Link to="/login" className="text-sm text-[#404040] hover:text-[#171717] transition-colors">Sign in</Link>
+                                <Link to="/login" className="text-sm text-[#5e554a] hover:text-[#1f1b16] transition-colors">Sign in</Link>
                                 <Link to="/register" className="btn-primary btn-sm">Create account</Link>
                             </>
                         )}
@@ -64,7 +64,7 @@ const PublicNavbar = () => {
                     <div className="md:hidden flex items-center">
                         <button
                             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                            className="p-2 rounded-lg text-[#404040] hover:text-[#171717] hover:bg-[#f5f5f5] transition-colors"
+                            className="p-2 rounded-lg text-[#5e554a] hover:text-[#1f1b16] hover:bg-[#1f1b16]/[0.05] transition-colors"
                             aria-label="Menu"
                         >
                             {mobileMenuOpen ? <X size={18} strokeWidth={1.5} /> : <Menu size={18} strokeWidth={1.5} />}
@@ -75,23 +75,23 @@ const PublicNavbar = () => {
 
             {/* Mobile Navigation Drawer */}
             {mobileMenuOpen && (
-                <div className="md:hidden mx-4 mb-4 p-4 rounded-xl bg-white border border-[#e5e5e5] shadow-[0_8px_24px_rgba(0,0,0,0.06)] animate-fade-in">
+                <div className="md:hidden mx-4 mb-4 p-4 rounded-xl bg-[#fdfbf7] border border-[#1f1b16]/[0.08] shadow-[0_8px_24px_rgba(0,0,0,0.06)] animate-fade-in">
                     <div className="flex flex-col space-y-1">
                         {isLanding ? (
                             <>
-                                <a href="#features" onClick={() => setMobileMenuOpen(false)} className="text-sm text-[#404040] hover:text-[#171717] py-2">Features</a>
-                                <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="text-sm text-[#404040] hover:text-[#171717] py-2">How it works</a>
+                                <a href="#features" onClick={() => setMobileMenuOpen(false)} className="text-sm text-[#5e554a] hover:text-[#1f1b16] py-2">Features</a>
+                                <a href="#how-it-works" onClick={() => setMobileMenuOpen(false)} className="text-sm text-[#5e554a] hover:text-[#1f1b16] py-2">How it works</a>
                             </>
                         ) : (
-                            <Link to="/" className="text-sm text-[#404040] hover:text-[#171717] py-2">Home</Link>
+                            <Link to="/" className="text-sm text-[#5e554a] hover:text-[#1f1b16] py-2">Home</Link>
                         )}
-                        <Link to="/faq" className="text-sm text-[#404040] hover:text-[#171717] py-2">FAQ</Link>
-                        <Link to="/support" className="text-sm text-[#404040] hover:text-[#171717] py-2">Support</Link>
-                        <Link to="/docs" className="text-sm text-[#404040] hover:text-[#171717] py-2">Documentation</Link>
-                        <Link to="/terms" className="text-sm text-[#404040] hover:text-[#171717] py-2">Terms of Service</Link>
-                        <Link to="/privacy" className="text-sm text-[#404040] hover:text-[#171717] py-2">Privacy Policy</Link>
+                        <Link to="/faq" className="text-sm text-[#5e554a] hover:text-[#1f1b16] py-2">FAQ</Link>
+                        <Link to="/support" className="text-sm text-[#5e554a] hover:text-[#1f1b16] py-2">Support</Link>
+                        <Link to="/docs" className="text-sm text-[#5e554a] hover:text-[#1f1b16] py-2">Documentation</Link>
+                        <Link to="/terms" className="text-sm text-[#5e554a] hover:text-[#1f1b16] py-2">Terms of Service</Link>
+                        <Link to="/privacy" className="text-sm text-[#5e554a] hover:text-[#1f1b16] py-2">Privacy Policy</Link>
 
-                        <div className="pt-4 border-t border-[#e5e5e5] flex flex-col space-y-3">
+                        <div className="pt-4 border-t border-[#1f1b16]/[0.08] flex flex-col space-y-3">
                             {user ? (
                                 <Link to="/app/dashboard" className="btn-primary btn-md justify-center ">
                                     Open app

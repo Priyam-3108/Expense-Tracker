@@ -220,9 +220,9 @@ const DatePicker = ({ value, onChange, placeholder = "Select date", className = 
                       className={`p-2 text-sm rounded-lg transition-colors ${!isCurrentMonthDay
                         ? 'text-gray-300 dark:text-[#85858b] cursor-not-allowed'
                         : isSelected
-                          ? 'bg-indigo-600 text-white font-medium'
+                          ? 'bg-brass-600 text-white font-medium'
                           : isToday
-                            ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-medium'
+                            ? 'bg-brass-50 dark:bg-brass-500/10 text-brass-600 dark:text-brass-400 font-medium'
                             : 'text-gray-700 dark:text-[#a1a1a6] hover:bg-gray-100 dark:hover:bg-white/[0.06]'
                         }`}
                       disabled={!isCurrentMonthDay}
@@ -239,7 +239,7 @@ const DatePicker = ({ value, onChange, placeholder = "Select date", className = 
               <button
                 type="button"
                 onClick={() => handleDateSelect(new Date())}
-                className="flex-1 px-3 py-2 text-sm text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-xl transition-colors"
+                className="flex-1 px-3 py-2 text-sm text-brass-600 dark:text-brass-400 hover:bg-brass-50 dark:hover:bg-brass-500/10 rounded-xl transition-colors"
               >
                 Today
               </button>

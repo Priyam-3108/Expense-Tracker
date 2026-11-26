@@ -1,8 +1,6 @@
 // client/src/components/form/StickyFormFooter.jsx
-import { gradientR } from './gradients'
 
 export default function StickyFormFooter({
-  variant = 'neutral',
   loading = false,
   label,
   loadingLabel,
@@ -23,11 +21,11 @@ export default function StickyFormFooter({
       <button
         type="submit"
         disabled={loading}
-        className={`flex-1 min-h-[48px] rounded-2xl text-white text-base font-medium flex items-center justify-center gap-2 shadow-md transition-opacity ${gradientR(variant)} ${loading ? 'opacity-70' : ''}`}
+        className="btn-primary btn-md flex-1"
       >
         {loading ? (
           <>
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
             {loadingLabel || 'Saving…'}
           </>
         ) : (

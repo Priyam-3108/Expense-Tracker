@@ -21,11 +21,11 @@ const FAQ = () => {
             questions: [
                 {
                     q: "How do I create an account?",
-                    a: "Click on 'Get Started Free' or 'Sign Up' button, enter your name, email, password, and choose your preferred currency. That's it! No credit card required."
+                    a: "Select 'Create account', enter your name, email, password, and choose your preferred currency. No credit card required."
                 },
                 {
-                    q: "Is Expense Tracker really free?",
-                    a: "Yes! Expense Tracker is completely free to use with all features included. There are no premium tiers or hidden costs."
+                    q: "Is Spendly really free?",
+                    a: "Yes. Spendly is free to use, with every feature included. There are no premium tiers or hidden costs."
                 },
                 {
                     q: "What currencies are supported?",
@@ -38,11 +38,11 @@ const FAQ = () => {
             questions: [
                 {
                     q: "How do I add an expense?",
-                    a: "Navigate to the Expenses page and click 'Add Expense'. Enter the amount, select a category, add a description (optional), choose the date, and click save. You can also bulk import expenses from CSV files."
+                    a: "Navigate to the Expenses page and click 'Add expense'. Enter the amount, select a category, add a description (optional), choose the date, and click save. You can also bulk import expenses from CSV files."
                 },
                 {
                     q: "Can I create custom categories?",
-                    a: "Absolutely! Go to the Categories page where you can create, edit, delete, and reorder your expense categories. You can also assign custom colors and icons to each category."
+                    a: "Yes. Go to the Categories page where you can create, edit, delete, and reorder your expense categories. You can also assign custom colors and icons to each category."
                 },
                 {
                     q: "What export formats are available?",
@@ -76,15 +76,15 @@ const FAQ = () => {
             questions: [
                 {
                     q: "Is my financial data secure?",
-                    a: "Yes! We use industry-standard encryption (HTTPS) for all data transmission and store passwords using bcrypt hashing. Your data is stored securely on encrypted servers."
+                    a: "Yes. We use industry-standard encryption (HTTPS) for all data transmission and store passwords using bcrypt hashing. Your data is stored securely on encrypted servers."
                 },
                 {
                     q: "Who can see my expense data?",
-                    a: "Only you! Your expense data is completely private and only visible to you when you're logged into your account. We never share or sell your data to third parties."
+                    a: "Only you. Your expense data is completely private and only visible to you when you're logged into your account. We never share or sell your data to third parties."
                 },
                 {
                     q: "Can I backup my data?",
-                    a: "Yes! Use the export feature to download all your expense data in CSV, Excel, or PDF format. We recommend regular backups for your peace of mind."
+                    a: "Yes. Use the export feature to download all your expense data in CSV, Excel, or PDF format. Exporting now and then gives you a backup you control."
                 },
                 {
                     q: "What happens to my data if I delete my account?",
@@ -97,7 +97,7 @@ const FAQ = () => {
             questions: [
                 {
                     q: "I forgot my password. What should I do?",
-                    a: "Click on 'Forgot Password' on the login page. Enter your email address and we'll send you instructions to reset your password."
+                    a: "Click on 'Forgot password' on the login page. Enter your email address and we'll send you instructions to reset your password."
                 },
                 {
                     q: "Why aren't my charts updating?",
@@ -108,8 +108,8 @@ const FAQ = () => {
                     a: "First, try clearing your browser cache and cookies, then refresh the page. Make sure you're using a modern browser (Chrome, Firefox, Safari, or Edge). If issues persist, contact our support team."
                 },
                 {
-                    q: "Can I use Expense Tracker on mobile?",
-                    a: "Yes! Expense Tracker is fully responsive and works great on mobile browsers (iOS Safari, Chrome, etc.). Simply visit the website on your mobile device and log in."
+                    q: "Can I use Spendly on mobile?",
+                    a: "Yes. Spendly works in mobile browsers (iOS Safari, Chrome, etc.). Simply visit the website on your mobile device and log in."
                 }
             ]
         }
@@ -127,7 +127,7 @@ const FAQ = () => {
                         <span className="page-badge">Help center</span>
                         <h1 className="page-title">Frequently asked questions</h1>
                         <p className="page-subtitle">
-                            Find answers to common questions about Expense Tracker
+                            Find answers to common questions about Spendly
                         </p>
                     </div>
 

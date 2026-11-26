@@ -15,19 +15,19 @@ const ExportModal = ({ isOpen, onClose, onExport, loading }) => {
     }
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Export Expenses" maxWidth="max-w-md">
+        <Modal isOpen={isOpen} onClose={onClose} title="Export entries" maxWidth="max-w-md">
             <div className="p-6 space-y-6">
                 {/* Format Selection */}
                 <div className="space-y-3">
                     <label className="text-sm font-medium text-gray-700 dark:text-[#a1a1a6]">
-                        Export Format
+                        Format
                     </label>
                     <div className="grid grid-cols-3 gap-3">
                         <button
                             onClick={() => setFormat('csv')}
                             className={`flex flex-col items-center gap-2 rounded-xl border p-3 transition-colors min-h-[44px] ${format === 'csv'
-                                    ? 'border-indigo-500/60 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 ring-1 ring-indigo-500/30'
-                                    : 'border-gray-200 dark:border-white/[0.08] hover:border-indigo-300 dark:hover:border-white/[0.15] hover:bg-gray-50 dark:hover:bg-white/[0.03]'
+                                    ? 'border-brass-500/60 bg-brass-50 dark:bg-brass-500/10 text-brass-600 dark:text-brass-400 ring-1 ring-brass-500/30'
+                                    : 'border-gray-200 dark:border-white/[0.08] hover:border-brass-300 dark:hover:border-white/[0.15] hover:bg-gray-50 dark:hover:bg-white/[0.03]'
                                 }`}
                         >
                             <FileText size={24} />

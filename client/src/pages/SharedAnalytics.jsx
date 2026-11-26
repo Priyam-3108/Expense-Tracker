@@ -126,7 +126,7 @@ const SharedAnalytics = () => {
             <div className="flex-1 container mx-auto px-4 pt-28 pb-16 relative z-10">
                 {profile && (
                     <div className="mb-6 flex items-center gap-4 p-4 glass-card">
-                        <div className="h-12 w-12 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-xl font-medium text-indigo-400">
+                        <div className="h-12 w-12 rounded-full bg-brass-500/20 border border-brass-500/30 flex items-center justify-center text-xl font-medium text-brass-400">
                             {profile.avatar || profile.name.charAt(0).toUpperCase()}
                         </div>
                         <div>

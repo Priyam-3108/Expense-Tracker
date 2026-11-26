@@ -4,8 +4,18 @@ import { LayoutGrid, Coins, LineChart, Download, SlidersHorizontal, Moon } from 
 import PublicNavbar from '../components/PublicNavbar'
 import PublicFooter from '../components/PublicFooter'
 
+// Warm paper ramp for the public pages; the app itself stays graphite
+const paper = {
+    page: 'bg-[#f7f4ee]',
+    card: 'bg-[#fdfbf7]',
+    ink: 'text-[#1f1b16]',
+    second: 'text-[#5e554a]',
+    mute: 'text-[#7b7266]',
+    rule: 'border-[#1f1b16]/[0.08]',
+}
+
 const features = [
-    { icon: LayoutGrid, title: 'Custom categories', description: 'Create, edit and reorder categories so your ledger reads the way you think about money.' },
+    { icon: LayoutGrid, title: 'Your own categories', description: 'Create, rename and reorder categories so the ledger reads the way you think about money.' },
     { icon: Coins, title: 'Your currency', description: 'Track in USD, EUR, INR, GBP and more. Pick one when you sign up and change it later.' },
     { icon: LineChart, title: 'Charts by month and category', description: 'See where the money went across a month, a year or any date range you choose.' },
     { icon: Download, title: 'Export anytime', description: 'Download your records as CSV, Excel or PDF whenever you need them.' },
@@ -15,12 +25,12 @@ const features = [
 
 const steps = [
     {
-        title: 'Create your account',
+        title: 'Open an account',
         text: 'Sign up with your name, email and preferred currency. No credit card.',
         points: ['Name, email, password', 'Choose a currency', 'Free'],
     },
     {
-        title: 'Record what you spend and earn',
+        title: 'Write down what moves',
         text: 'Add the amount, category, date and an optional note. Income goes in the same ledger.',
         points: ['One short form', 'Your own categories', 'Notes and dates'],
     },
@@ -37,73 +47,75 @@ const Landing = () => {
     }, [])
 
     return (
-        <div className="min-h-screen flex flex-col bg-white text-[#171717]">
+        <div className={`min-h-screen flex flex-col ${paper.page} ${paper.ink}`}>
             <PublicNavbar />
 
             {/* Hero */}
-            <section className="pt-28 pb-20 md:pt-36 md:pb-28 bg-[#fafafa] border-b border-[#e5e5e5]">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-12 lg:gap-16 items-center">
+            <section className={`relative min-h-[100svh] flex items-center pt-24 pb-16 lg:pt-24 lg:pb-16 border-b ${paper.rule}`}>
+                <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-12 lg:gap-16 items-center">
                     <div className="animate-slide-up">
-                        <h1 className="text-[40px] md:text-[56px] leading-[1.05] font-medium tracking-[-0.03em]">
+                        <h1 className="font-serif text-[44px] md:text-[64px] leading-[1.04] font-normal tracking-[-0.02em]" style={{ textWrap: 'balance' }}>
                             A plain ledger for what you spend and earn
                         </h1>
-                        <p className="mt-6 text-lg leading-8 text-[#525252] max-w-xl">
-                            Spendly records your expenses and income by category, shows the pattern in clear charts,
+                        <p className={`mt-6 text-lg leading-8 ${paper.second} max-w-[36rem]`}>
+                            Spendly records expenses, income and debts by category, shows the pattern by month,
                             and exports everything to CSV, Excel or PDF.
                         </p>
                         <div className="mt-8 flex flex-wrap items-center gap-3">
-                            <Link to="/register" className="btn-primary btn-lg">Create free account</Link>
-                            <Link to="/login" className="btn-secondary btn-lg">Sign in</Link>
+                            <Link to="/register" className="btn-primary btn-lg">Open your ledger</Link>
+                            <Link to="/login" className="btn-lg inline-flex items-center px-5 rounded-[10px] text-base font-medium text-[#1f1b16] hover:bg-[#1f1b16]/[0.05] transition-colors focus-ring">Sign in</Link>
                         </div>
-                        <p className="mt-4 text-sm text-[#737373]">Free to use · No credit card</p>
+                        <p className={`mt-4 text-sm ${paper.mute}`}>Free to use · No credit card</p>
                     </div>
 
                     <div className="animate-slide-up [animation-delay:60ms] [animation-fill-mode:both]">
-                        <LedgerPreview />
+                        <Passbook />
                     </div>
                 </div>
             </section>
 
             {/* Features */}
-            <section id="features" className="py-20 md:py-28">
+            <section id="features" className="py-24 md:py-32">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="max-w-2xl">
-                        <p className="text-sm text-[#533afd]">Features</p>
-                        <h2 className="mt-2 text-3xl md:text-4xl leading-tight font-medium tracking-[-0.02em]">
-                            Everything you need to keep the books on your own money
-                        </h2>
-                    </div>
-                    <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 border-t border-[#e5e5e5]">
-                        {features.map(({ icon: Icon, title, description }) => (
-                            <div key={title} className="py-8 pr-8 border-b border-[#e5e5e5]">
-                                <Icon size={18} strokeWidth={1.5} className="text-[#737373]" />
-                                <h3 className="mt-4 text-base font-medium">{title}</h3>
-                                <p className="mt-2 text-sm leading-6 text-[#525252]">{description}</p>
-                            </div>
-                        ))}
+                    <div className="grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-x-16 gap-y-12">
+                        <div>
+                            <p className={`text-sm ${paper.mute}`}>Features</p>
+                            <h2 className="mt-3 font-serif text-[36px] md:text-[44px] leading-[1.1] tracking-[-0.02em]" style={{ textWrap: 'balance' }}>
+                                Everything you need to keep the books on your own money
+                            </h2>
+                        </div>
+                        <div className={`grid sm:grid-cols-2 border-t ${paper.rule}`}>
+                            {features.map(({ icon: Icon, title, description }) => (
+                                <div key={title} className={`py-8 sm:pr-8 border-b ${paper.rule}`}>
+                                    <Icon size={18} strokeWidth={1.5} className={paper.mute} />
+                                    <h3 className="mt-4 text-base font-medium">{title}</h3>
+                                    <p className={`mt-2 text-sm leading-6 ${paper.second}`}>{description}</p>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </section>
 
             {/* How it works */}
-            <section id="how-it-works" className="py-20 md:py-28 bg-[#fafafa] border-y border-[#e5e5e5]">
+            <section id="how-it-works" className={`py-24 md:py-32 bg-[#efe9df]/60 border-y ${paper.rule}`}>
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="max-w-2xl">
-                        <p className="text-sm text-[#533afd]">How it works</p>
-                        <h2 className="mt-2 text-3xl md:text-4xl leading-tight font-medium tracking-[-0.02em]">
-                            Start tracking in three steps
+                        <p className={`text-sm ${paper.mute}`}>How it works</p>
+                        <h2 className="mt-3 font-serif text-[36px] md:text-[44px] leading-[1.1] tracking-[-0.02em]">
+                            Start keeping the books in three steps
                         </h2>
                     </div>
-                    <ol className="mt-12 grid md:grid-cols-3 gap-6">
+                    <ol className="mt-12 grid md:grid-cols-3 gap-4">
                         {steps.map((step, i) => (
-                            <li key={step.title} className="glass-card p-6">
-                                <span className="font-mono text-sm text-[#737373]">0{i + 1}</span>
-                                <h3 className="mt-4 text-lg font-medium">{step.title}</h3>
-                                <p className="mt-2 text-sm leading-6 text-[#525252]">{step.text}</p>
-                                <ul className="mt-6 pt-4 border-t border-[#f0f0f0] space-y-2">
+                            <li key={step.title} className={`rounded-2xl border ${paper.rule} ${paper.card} p-6`}>
+                                <span className={`font-mono text-sm ${paper.mute}`}>0{i + 1}</span>
+                                <h3 className="mt-8 text-lg font-medium">{step.title}</h3>
+                                <p className={`mt-2 text-sm leading-6 ${paper.second}`}>{step.text}</p>
+                                <ul className={`mt-6 pt-4 border-t ${paper.rule} space-y-2`}>
                                     {step.points.map((point) => (
-                                        <li key={point} className="flex items-center gap-2 text-sm text-[#525252]">
-                                            <span className="w-1 h-1 rounded-full bg-[#a3a3a3]" />
+                                        <li key={point} className={`flex items-center gap-2 text-sm ${paper.second}`}>
+                                            <span className="w-1 h-1 rounded-full bg-[#7b7266]" />
                                             {point}
                                         </li>
                                     ))}
@@ -115,27 +127,27 @@ const Landing = () => {
             </section>
 
             {/* Call to action */}
-            <section id="cta" className="py-20 md:py-28">
+            <section id="cta" className="py-24 md:py-32">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="rounded-2xl bg-[#171717] px-6 py-12 sm:px-12 sm:py-16 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+                    <div className="rounded-2xl bg-[#1c1a18] px-6 py-12 sm:px-12 sm:py-16 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
                         <div className="max-w-xl">
-                            <h2 className="text-3xl md:text-4xl leading-tight font-medium tracking-[-0.02em] text-[#ededed]">
-                                Open your ledger
+                            <h2 className="font-serif text-[36px] md:text-[44px] leading-[1.1] tracking-[-0.02em] text-[#efe9de]">
+                                Close this month <span className="double-rule [text-underline-offset:10px]">balanced</span>
                             </h2>
-                            <p className="mt-3 text-base text-[#a1a1a6]">
-                                Free to use, no credit card required.
+                            <p className="mt-4 text-base text-[#aaa398]">
+                                Free to use, no credit card required
                             </p>
                         </div>
                         <div className="flex flex-wrap gap-3">
                             <Link
                                 to="/register"
-                                className="inline-flex items-center justify-center min-h-[48px] px-6 rounded-lg bg-[#ededed] text-[#171717] text-base font-medium hover:bg-white transition-colors"
+                                className="inline-flex items-center justify-center min-h-[48px] px-6 rounded-[10px] bg-[#efe9de] text-[#1f1b16] text-base font-medium hover:bg-white transition-colors focus-ring"
                             >
-                                Create free account
+                                Open your ledger
                             </Link>
                             <Link
                                 to="/login"
-                                className="inline-flex items-center justify-center min-h-[48px] px-6 rounded-lg border border-white/[0.12] text-[#ededed] text-base font-medium hover:bg-white/[0.06] transition-colors"
+                                className="inline-flex items-center justify-center min-h-[48px] px-6 rounded-[10px] text-[#efe9de] text-base font-medium hover:bg-white/[0.06] transition-colors focus-ring"
                             >
                                 Sign in
                             </Link>
@@ -149,86 +161,72 @@ const Landing = () => {
     )
 }
 
-// Product preview drawn in code: one month of the ledger, as the app shows it.
-const monthly = [24.1, 27.8, 22.6, 30.4, 26.2, 33.5, 28.9, 25.7, 31.2, 29.4, 31.2]
-const income = [42, 42, 46.5, 42, 42, 49, 42, 42, 42, 51, 48.5]
+// Product preview drawn in code: one month of the ledger, set like a passbook page.
+const entries = [
+    ['Nov 01', 'Salary', 'Income', 48500],
+    ['Nov 01', 'Rent', 'Housing', -18000],
+    ['Nov 04', 'Electricity', 'Utilities', -1290],
+    ['Nov 09', 'Lent to Riya', 'Debts', -3000],
+    ['Nov 18', 'Big Basket', 'Groceries', -2340],
+    ['Nov 20', 'Metro card', 'Transport', -500],
+    ['Nov 23', 'Riya paid back', 'Debts', 1500],
+]
+const monthly = [24.1, 27.8, 22.6, 30.4, 26.2, 33.5, 28.9, 25.7, 31.2, 29.4, 26.0]
+const inr = (n) => n.toLocaleString('en-IN')
 
-const toPath = (values, max, w, h) =>
-    values.map((v, i) => `${i === 0 ? 'M' : 'L'}${(i / (values.length - 1)) * w},${h - (v / max) * h}`).join(' ')
-
-const LedgerPreview = () => {
-    const w = 520, h = 140, max = 56
-    const expensePath = toPath(monthly, max, w, h)
-    const rows = [
-        ['Rent', 'Housing', '#2563eb', 'Nov 1', '−₹18,000'],
-        ['Salary', 'Income', '#16a34a', 'Nov 1', '+₹48,500'],
-        ['Big Basket', 'Groceries', '#d97706', 'Nov 18', '−₹2,340'],
-        ['Metro card recharge', 'Transport', '#0891b2', 'Nov 20', '−₹500'],
-    ]
+const Passbook = () => {
+    let balance = 0
+    const rows = entries.map((e) => {
+        balance += e[3]
+        return [...e, balance]
+    })
+    const w = 280, h = 56, max = 36
+    const path = monthly.map((v, i) => `${i ? 'L' : 'M'}${(i / (monthly.length - 1)) * w},${h - (v / max) * h}`).join(' ')
 
     return (
-        <div className="rounded-2xl border border-[#e5e5e5] bg-white shadow-[0_24px_64px_rgba(0,0,0,0.08)] overflow-hidden" aria-label="Spendly dashboard preview">
-            <div className="flex items-center gap-2 px-4 h-10 border-b border-[#f0f0f0]">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#e5e5e5]" />
-                <span className="w-2.5 h-2.5 rounded-full bg-[#e5e5e5]" />
-                <span className="w-2.5 h-2.5 rounded-full bg-[#e5e5e5]" />
-                <span className="ml-auto text-xs text-[#a3a3a3]">Overview · November 2026</span>
-            </div>
-
-            <div className="p-5 sm:p-6">
-                <div className="grid grid-cols-3 gap-3">
-                    {[
-                        ['Expenses', '₹31,200', 'text-[#171717]'],
-                        ['Income', '₹48,500', 'text-[#171717]'],
-                        ['Net', '+₹17,300', 'text-green-600'],
-                    ].map(([label, value, tone]) => (
-                        <div key={label} className="rounded-lg border border-[#f0f0f0] p-3">
-                            <p className="text-xs text-[#737373]">{label}</p>
-                            <p className={`mt-1 font-mono tabular-nums text-sm sm:text-lg font-medium ${tone}`}>{value}</p>
-                        </div>
-                    ))}
-                </div>
-
-                <div className="mt-5">
-                    <div className="flex items-center justify-between text-xs text-[#737373]">
-                        <span>Income and expenses, 2026</span>
-                        <span className="flex items-center gap-3">
-                            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#533afd]" />Expenses</span>
-                            <span className="hidden sm:flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#a3a3a3]" />Income</span>
-                        </span>
+        <figure className="relative" aria-label="Spendly ledger preview for November 2026">
+            <div className="rounded-2xl border border-[#1f1b16]/[0.1] bg-[#fdfbf7] shadow-[0_1px_2px_rgba(31,27,22,0.06),0_24px_64px_rgba(31,27,22,0.10)] overflow-hidden">
+                <div className="flex items-end justify-between gap-6 px-6 pt-6 pb-5 border-b border-[#1f1b16]/[0.08]">
+                    <div>
+                        <p className="text-xs text-[#7b7266]">Statement</p>
+                        <p className="mt-1 font-serif text-2xl leading-none">November 2026</p>
                     </div>
-                    <svg viewBox={`0 0 ${w} ${h}`} className="mt-3 w-full h-28 sm:h-36" preserveAspectRatio="none">
-                        <defs>
-                            <linearGradient id="preview-fill" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor="#533afd" stopOpacity="0.14" />
-                                <stop offset="100%" stopColor="#533afd" stopOpacity="0" />
-                            </linearGradient>
-                        </defs>
-                        {[0.25, 0.5, 0.75].map((f) => (
-                            <line key={f} x1="0" x2={w} y1={h * f} y2={h * f} stroke="rgba(23,23,23,0.06)" />
-                        ))}
-                        <path d={toPath(income, max, w, h)} fill="none" stroke="#a3a3a3" strokeWidth="1.5" strokeDasharray="4 4" vectorEffect="non-scaling-stroke" />
-                        <path d={`${expensePath} L${w},${h} L0,${h} Z`} fill="url(#preview-fill)" />
-                        <path d={expensePath} fill="none" stroke="#533afd" strokeWidth="2" vectorEffect="non-scaling-stroke" />
-                    </svg>
-                    <div className="mt-2 flex justify-between font-mono text-[11px] text-[#a3a3a3]">
-                        {['Jan', 'Mar', 'May', 'Jul', 'Sep', 'Nov'].map((m) => <span key={m}>{m}</span>)}
+                    <div className="hidden sm:block text-right">
+                        <svg viewBox={`0 0 ${w} ${h}`} className="w-40 h-10" preserveAspectRatio="none" aria-hidden="true">
+                            <path d={path} fill="none" stroke="#a8611c" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
+                        </svg>
+                        <p className="mt-1 font-mono text-[11px] text-[#7b7266]">Spending, Jan to Nov</p>
                     </div>
                 </div>
 
-                <div className="mt-5 border-t border-[#f0f0f0] pt-2 hidden sm:block">
-                    {rows.map(([name, category, color, date, amount]) => (
-                        <div key={name} className="h-11 flex items-center gap-3 text-sm">
-                            <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
-                            <span className="flex-1 min-w-0 truncate">{name}</span>
-                            <span className="hidden md:block w-24 text-xs text-[#737373]">{category}</span>
-                            <span className="w-14 text-xs text-[#a3a3a3]">{date}</span>
-                            <span className={`w-24 text-right font-mono tabular-nums ${amount.startsWith('+') ? 'text-green-600' : ''}`}>{amount}</span>
+                {/* Ruled ledger: faint lines like a passbook page, a brass margin rule */}
+                <div className="relative px-6">
+                    <span className="absolute left-[5.25rem] top-0 bottom-0 w-px bg-[#a8611c]/25 hidden sm:block" aria-hidden="true" />
+                    <div className="grid grid-cols-[3.5rem_minmax(0,1fr)_auto] sm:grid-cols-[3.5rem_minmax(0,1fr)_6rem_6.5rem_6.5rem] items-center h-9 text-[11px] text-[#7b7266] border-b border-[#1f1b16]/[0.08] gap-x-4 sm:pl-0">
+                        <span className="font-mono">Date</span>
+                        <span className="sm:pl-2">Entry</span>
+                        <span className="hidden sm:block">Category</span>
+                        <span className="text-right">Amount</span>
+                        <span className="hidden sm:block text-right">Balance</span>
+                    </div>
+                    {rows.map(([date, name, cat, amt, bal]) => (
+                        <div key={date + name} className="grid grid-cols-[3.5rem_minmax(0,1fr)_auto] sm:grid-cols-[3.5rem_minmax(0,1fr)_6rem_6.5rem_6.5rem] items-center h-10 text-sm border-b border-[#1f1b16]/[0.06] gap-x-4">
+                            <span className="font-mono text-xs text-[#7b7266]">{date}</span>
+                            <span className="sm:pl-2 truncate">{name}</span>
+                            <span className="hidden sm:block text-xs text-[#5e554a] truncate">{cat}</span>
+                            <span className={`text-right tabular-nums ${amt > 0 ? 'text-[#2f7a4f]' : ''}`}>{amt > 0 ? '+' : '−'}₹{inr(Math.abs(amt))}</span>
+                            <span className="hidden sm:block text-right tabular-nums text-[#5e554a]">₹{inr(bal)}</span>
                         </div>
                     ))}
                 </div>
+                <div className="px-6">
+                    <div className="flex items-baseline justify-between h-16 pt-2">
+                        <span className="text-sm text-[#5e554a]">Closing balance</span>
+                        <span className="text-2xl font-medium tabular-nums double-rule">₹{inr(balance)}</span>
+                    </div>
+                </div>
             </div>
-        </div>
+        </figure>
     )
 }
 

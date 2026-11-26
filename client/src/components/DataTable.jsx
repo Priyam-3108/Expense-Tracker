@@ -68,39 +68,39 @@ const DataTable = ({
 
     return (
         <div className="w-full space-y-4">
-            {/* Toolbar: Search and Total Results */}
+            {/* Toolbar: search and count */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="relative flex-1 max-w-md">
                     <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-[#85858b]" />
                     <input
                         type="text"
-                        placeholder="Search expenses..."
+                        placeholder="Search"
                         value={searchValue || ''}
                         onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 glass-input text-sm"
+                        className="w-full h-10 pl-10 pr-4 glass-input text-sm"
                     />
                 </div>
                 {totalResults !== undefined && (
-                    <div className="text-sm text-gray-500 dark:text-[#85858b] font-medium">
-                        Total Results: <span className="text-gray-900 dark:text-white">{totalResults}</span>
+                    <div className="text-sm text-gray-500 dark:text-[#85858b]">
+                        <span className="tabular-nums text-gray-900 dark:text-[#ededed]">{totalResults}</span> {totalResults === 1 ? 'entry' : 'entries'}
                     </div>
                 )}
             </div>
 
             {/* Bulk Actions Toolbar */}
             {hasSelection && (
-                <div className="flex items-center justify-between p-4 rounded-xl border border-indigo-200 dark:border-indigo-500/20 bg-indigo-50 dark:bg-indigo-500/10">
-                    <span className="text-sm font-medium text-indigo-700 dark:text-indigo-300">
-                        {selectedRows.length} row(s) selected
+                <div className="flex items-center justify-between p-4 rounded-xl border border-brass-200 dark:border-brass-500/20 bg-brass-50 dark:bg-brass-500/10">
+                    <span className="text-sm font-medium text-brass-700 dark:text-brass-300">
+                        {selectedRows.length} selected
                     </span>
                     <div className="flex gap-2">
                         {onBulkEdit && (
                             <button
                                 onClick={() => onBulkEdit(selectedRows.map(row => row.original))}
-                                className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 rounded-lg transition-colors"
+                                className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-brass-700 dark:text-brass-300 hover:bg-brass-100 dark:hover:bg-brass-500/20 rounded-lg transition-colors"
                             >
                                 <Edit size={16} />
-                                Edit Selected
+                                Edit selected
                             </button>
                         )}
                         {onBulkDelete && (
@@ -145,7 +145,7 @@ const DataTable = ({
                                                     {header.column.getCanSort() && (
                                                         <ArrowUpDown
                                                             size={14}
-                                                            className={`text-gray-400 dark:text-[#85858b] group-hover:text-gray-600 dark:group-hover:text-slate-400 transition-colors ${header.column.getIsSorted() ? 'text-indigo-500 dark:text-indigo-400' : ''
+                                                            className={`text-gray-400 dark:text-[#85858b] group-hover:text-gray-600 dark:group-hover:text-slate-400 transition-colors ${header.column.getIsSorted() ? 'text-brass-500 dark:text-brass-400' : ''
                                                                 }`}
                                                         />
                                                     )}
@@ -161,7 +161,7 @@ const DataTable = ({
                                 <tr>
                                     <td colSpan={columns.length} className="px-6 py-10 text-center">
                                         <div className="flex justify-center">
-                                            <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 dark:border-white/[0.08] border-t-[#533afd]" />
+                                            <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 dark:border-white/[0.08] border-t-brass" />
                                         </div>
                                     </td>
                                 </tr>
@@ -179,7 +179,7 @@ const DataTable = ({
                                 table.getRowModel().rows.map((row, index) => (
                                     <tr
                                         key={row.id}
-                                        className={`transition-colors stagger-item ${row.getIsSelected() ? 'bg-indigo-50 dark:bg-indigo-500/5' : ''
+                                        className={`transition-colors stagger-item ${row.getIsSelected() ? 'bg-brass-50 dark:bg-brass-500/5' : ''
                                             }`}
                                         style={{ animationDelay: `${index * 30}ms` }}
                                     >
@@ -259,7 +259,7 @@ const DataTable = ({
                                 if (manualPagination && onPageSizeChange) onPageSizeChange(newSize)
                                 else table.setPageSize(newSize)
                             }}
-                            className="ml-2 rounded-lg border border-gray-200 dark:border-white/[0.07] bg-white dark:bg-[#232325] text-gray-700 dark:text-[#a1a1a6] px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#533afd]/30 transition-colors"
+                            className="ml-2 rounded-lg border border-gray-200 dark:border-white/[0.07] bg-white dark:bg-[#232325] text-gray-700 dark:text-[#a1a1a6] px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brass/30 transition-colors"
                         >
                             {[5, 10, 20, 30, 40, 50].map(size => (
                                 <option key={size} value={size} className="bg-white dark:bg-[#19191b] text-gray-900 dark:text-white">

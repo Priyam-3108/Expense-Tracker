@@ -21,7 +21,7 @@ const Documentation = () => {
                         <span className="page-badge">Documentation</span>
                         <h1 className="page-title">User guide</h1>
                         <p className="page-subtitle">
-                            Learn how to use Expense Tracker to take control of your finances
+                            Learn how to use Spendly to keep track of what you spend and earn
                         </p>
                     </div>
 
@@ -34,7 +34,7 @@ const Documentation = () => {
                                 Create your free account in seconds. No credit card required!
                             </p>
                             <ul>
-                                <li>Click "Get Started Free" or "Sign Up"</li>
+                                <li>Select "Create account"</li>
                                 <li>Enter your name, email, and create a password</li>
                                 <li>Select your preferred currency (USD, EUR, INR, etc.)</li>
                                 <li>Click "Register" to create your account</li>
@@ -193,7 +193,7 @@ const Documentation = () => {
                         <div className="step-content">
                             <h3>Dark mode</h3>
                             <p>
-                                Expense Tracker includes a beautiful dark theme that's easy on the eyes.
+                                Spendly includes a dark theme that follows your system setting or your choice.
                             </p>
                             <ul>
                                 <li>Click the theme toggle icon in the navigation bar</li>
@@ -212,7 +212,7 @@ const Documentation = () => {
                         <div className="step-content">
                             <h3>Tips & best practices</h3>
                             <p>
-                                Get the most out of Expense Tracker with these pro tips:
+                                Get the most out of Spendly with these tips:
                             </p>
                             <ul>
                                 <li><strong>Regular Updates:</strong> Log expenses daily or weekly for accurate tracking</li>

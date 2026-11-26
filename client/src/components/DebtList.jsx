@@ -6,13 +6,13 @@ import EmptyState from './EmptyState';
 const dueInfo = (debt, today) => {
     if (!debt.dueDate || debt.status === 'paid') return null;
     const days = Math.round((new Date(debt.dueDate) - new Date(today)) / 86400000);
-    if (days < 0) return { text: `Overdue by ${-days}d`, cls: 'bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-300' };
-    if (days === 0) return { text: 'Due today', cls: 'bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300' };
-    if (days <= 7) return { text: `Due in ${days}d`, cls: 'bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300' };
-    return { text: `Due ${debt.dueDate}`, cls: 'bg-gray-100 text-gray-600 dark:bg-white/[0.06] dark:text-[#a1a1a6]' };
+    if (days < 0) return { text: `Overdue by ${-days}d`, cls: 'text-red-600 dark:text-[#e5484d]' };
+    if (days === 0) return { text: 'Due today', cls: 'text-brass-700 dark:text-brass' };
+    if (days <= 7) return { text: `Due in ${days}d`, cls: 'text-brass-700 dark:text-brass' };
+    return { text: `Due ${debt.dueDate}`, cls: '' };
 };
 
-const iconBtn = 'p-2.5 rounded-lg text-gray-400 dark:text-[#85858b] hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#533afd]/50';
+const iconBtn = 'p-2.5 rounded-lg text-gray-400 dark:text-[#85858b] hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brass/50';
 
 export default function DebtList({ debts, today, onRecord, onEdit, onDelete, onAdd, filtered }) {
     const { currency } = useAuth();
@@ -40,7 +40,7 @@ export default function DebtList({ debts, today, onRecord, onEdit, onDelete, onA
                     <li key={d._id} className="py-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                         <div className="flex items-center gap-3 min-w-0 flex-1">
                             <div
-                                className={`h-10 w-10 shrink-0 rounded-full flex items-center justify-center text-sm font-medium ${lent ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300' : 'bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300'}`}
+                                className={`h-10 w-10 shrink-0 rounded-full flex items-center justify-center text-sm font-medium bg-gray-100 text-gray-700 dark:bg-[#232325] dark:text-[#a1a1a6]`}
                                 aria-hidden="true"
                             >
                                 {d.personName.trim().charAt(0).toUpperCase() || '?'}
@@ -48,25 +48,25 @@ export default function DebtList({ debts, today, onRecord, onEdit, onDelete, onA
                             <div className="min-w-0">
                                 <p className="text-sm font-medium text-gray-900 dark:text-[#ededed] truncate">{d.personName}</p>
                                 <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-500 dark:text-[#85858b]">
-                                    <span>{lent ? 'Lent' : 'Borrowed'} {d.date}</span>
-                                    {due && <span className={`px-2 py-0.5 rounded-full font-medium ${due.cls}`}>{due.text}</span>}
-                                    {paid && <span className="px-2 py-0.5 rounded-full font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300">Settled</span>}
+                                    <span>{lent ? 'Lent' : 'Borrowed'} <span className="font-mono">{d.date}</span></span>
+                                    {due && <span className={due.cls}>· {due.text}</span>}
+                                    {paid && <span>· Settled</span>}
                                 </div>
                                 {d.notes && <p className="mt-1 text-xs text-gray-500 dark:text-[#85858b] truncate">{d.notes}</p>}
                             </div>
                         </div>
 
                         <div className="sm:w-48 sm:text-right">
-                            <p className={`text-base font-mono font-medium tabular-nums ${paid ? 'text-gray-400 dark:text-[#85858b]' : lent ? 'text-emerald-600 dark:text-[#4cc38a]' : 'text-gray-900 dark:text-[#ededed]'}`}>
+                            <p className={`text-base font-medium tabular-nums ${paid ? 'text-gray-400 dark:text-[#85858b]' : 'text-gray-900 dark:text-[#ededed]'}`}>
                                 <Amount value={paid ? d.amount : d.currentAmount} currency={currency} />
                             </p>
                             {!paid && d.currentAmount !== d.amount && (
                                 <>
                                     <div
-                                        className="mt-1.5 h-1.5 rounded-full bg-gray-100 dark:bg-white/[0.08] overflow-hidden"
+                                        className="mt-2 h-1 rounded-full bg-gray-100 dark:bg-white/[0.08] overflow-hidden"
                                         role="progressbar" aria-valuenow={Math.round(pct)} aria-valuemin={0} aria-valuemax={100} aria-label="Repaid"
                                     >
-                                        <div className="h-full rounded-full bg-emerald-500" style={{ width: `${pct}%` }} />
+                                        <div className="h-full rounded-full bg-brass" style={{ width: `${pct}%` }} />
                                     </div>
                                     <p className="mt-1 text-xs text-gray-500 dark:text-[#85858b]">
                                         <Amount value={d.amount - d.currentAmount} currency={currency} /> of <Amount value={d.amount} currency={currency} /> {lent ? 'received' : 'paid'}
