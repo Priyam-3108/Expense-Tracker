@@ -1,21 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
-import hapticFeedback from '../utils/haptics';
+import Amount from './Amount';
 
 function BalanceCard({ balance = 0, onPress }) {
     const { isDark, borderRadius, shadows } = useTheme();
-    const [isBalanceVisible, setIsBalanceVisible] = useState(true);
-
-    const toggleBalanceVisibility = () => {
-        hapticFeedback.light();
-        setIsBalanceVisible(prev => !prev);
-    };
-
-    const formatNumber = (amount) =>
-        new Intl.NumberFormat('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount);
 
     // Always a dark gradient so white text is always legible in both modes
     const gradientColors = isDark
@@ -41,25 +32,11 @@ function BalanceCard({ balance = 0, onPress }) {
                         <View style={styles.liveDot} />
                         <Text style={styles.badgeText}>TOTAL BALANCE</Text>
                     </View>
-                    <TouchableOpacity
-                        onPress={toggleBalanceVisibility}
-                        style={styles.eyeBtn}
-                        hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-                    >
-                        <Ionicons
-                            name={isBalanceVisible ? 'eye-outline' : 'eye-off-outline'}
-                            size={19}
-                            color="rgba(255,255,255,0.9)"
-                        />
-                    </TouchableOpacity>
                 </View>
 
                 {/* Amount */}
                 <View style={styles.amountRow}>
-                    <Text style={styles.currencySymbol}>₹</Text>
-                    <Text style={styles.balance}>
-                        {isBalanceVisible ? formatNumber(balance) : '••••••'}
-                    </Text>
+                    <Amount value={balance} currency="INR" style={styles.balance} />
                 </View>
 
                 {/* Footer */}
@@ -108,13 +85,7 @@ const styles = StyleSheet.create({
     },
     liveDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#10b981', marginRight: 6 },
     badgeText: { fontSize: 10, fontWeight: '600', color: '#ffffff', letterSpacing: 1 },
-    eyeBtn: {
-        backgroundColor: 'rgba(255,255,255,0.12)',
-        borderRadius: 9999, padding: 7,
-        borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)',
-    },
     amountRow: { flexDirection: 'row', alignItems: 'flex-start', marginVertical: 12, zIndex: 1 },
-    currencySymbol: { fontSize: 22, fontWeight: '300', color: 'rgba(255,255,255,0.75)', marginTop: 10, marginRight: 3 },
     balance: { fontSize: 44, fontWeight: '200', color: '#ffffff', letterSpacing: -1.5, fontVariant: ['tabular-nums'] },
     footer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', zIndex: 1 },
     footerLeft: { flexDirection: 'row', alignItems: 'center', gap: 5 },

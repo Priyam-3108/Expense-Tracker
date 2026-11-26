@@ -4,18 +4,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import hapticFeedback from '../utils/haptics';
+import Amount from './Amount';
 
 function TransactionItem({ item, onPress, onEdit, onDelete }) {
     const { colors, spacing, borderRadius, shadows } = useTheme();
-
-    const formatAmount = (amount) => {
-        return new Intl.NumberFormat('en-IN', {
-            style: 'currency',
-            currency: 'INR',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-        }).format(amount);
-    };
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -102,9 +94,12 @@ function TransactionItem({ item, onPress, onEdit, onDelete }) {
 
             {/* Right side: amount + sync status */}
             <View style={styles.right}>
-                <Text style={[styles.amount, { color: amountColor }]}>
-                    {isIncome ? '+' : '-'}{formatAmount(Math.abs(item.amount))}
-                </Text>
+                <Amount
+                    value={Math.abs(item.amount)}
+                    sign={isIncome ? '+' : '-'}
+                    currency="INR"
+                    style={[styles.amount, { color: amountColor }]}
+                />
                 <View style={styles.statusRow}>
                     {item.syncStatus === 'PENDING' && (
                         <Ionicons name="time-outline" size={13} color={colors.warning} />

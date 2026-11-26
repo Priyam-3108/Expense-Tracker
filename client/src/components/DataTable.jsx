@@ -71,7 +71,7 @@ const DataTable = ({
             {/* Toolbar: Search and Total Results */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="relative flex-1 max-w-md">
-                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-slate-500" />
+                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-[#85858b]" />
                     <input
                         type="text"
                         placeholder="Search expenses..."
@@ -81,7 +81,7 @@ const DataTable = ({
                     />
                 </div>
                 {totalResults !== undefined && (
-                    <div className="text-sm text-gray-500 dark:text-slate-500 font-medium">
+                    <div className="text-sm text-gray-500 dark:text-[#85858b] font-medium">
                         Total Results: <span className="text-gray-900 dark:text-white">{totalResults}</span>
                     </div>
                 )}
@@ -97,7 +97,7 @@ const DataTable = ({
                         {onBulkEdit && (
                             <button
                                 onClick={() => onBulkEdit(selectedRows.map(row => row.original))}
-                                className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 rounded-lg transition-all duration-200"
+                                className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 rounded-lg transition-colors"
                             >
                                 <Edit size={16} />
                                 Edit Selected
@@ -109,10 +109,10 @@ const DataTable = ({
                                     onBulkDelete(selectedRows.map(row => row.original))
                                     setRowSelection({})
                                 }}
-                                className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-500/20 rounded-lg transition-all duration-200"
+                                className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-500/20 rounded-lg transition-colors"
                             >
                                 <Trash2 size={16} />
-                                Delete Selected
+                                Delete selected
                             </button>
                         )}
                     </div>
@@ -123,7 +123,7 @@ const DataTable = ({
             <div className="glass-table">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">
-                        <thead className="text-xs uppercase text-gray-500 dark:text-slate-400">
+                        <thead className="text-xs text-gray-500 dark:text-[#a1a1a6]">
                             {table.getHeaderGroups().map(headerGroup => (
                                 <tr key={headerGroup.id}>
                                     {headerGroup.headers.map(header => (
@@ -145,7 +145,7 @@ const DataTable = ({
                                                     {header.column.getCanSort() && (
                                                         <ArrowUpDown
                                                             size={14}
-                                                            className={`text-gray-400 dark:text-slate-600 group-hover:text-gray-600 dark:group-hover:text-slate-400 transition-colors ${header.column.getIsSorted() ? 'text-indigo-500 dark:text-indigo-400' : ''
+                                                            className={`text-gray-400 dark:text-[#85858b] group-hover:text-gray-600 dark:group-hover:text-slate-400 transition-colors ${header.column.getIsSorted() ? 'text-indigo-500 dark:text-indigo-400' : ''
                                                                 }`}
                                                         />
                                                     )}
@@ -179,12 +179,12 @@ const DataTable = ({
                                 table.getRowModel().rows.map((row, index) => (
                                     <tr
                                         key={row.id}
-                                        className={`transition-all duration-200 stagger-item ${row.getIsSelected() ? 'bg-indigo-50 dark:bg-indigo-500/5' : ''
+                                        className={`transition-colors stagger-item ${row.getIsSelected() ? 'bg-indigo-50 dark:bg-indigo-500/5' : ''
                                             }`}
                                         style={{ animationDelay: `${index * 30}ms` }}
                                     >
                                         {row.getVisibleCells().map(cell => (
-                                            <td key={cell.id} className="px-6 py-4 text-gray-700 dark:text-slate-200">
+                                            <td key={cell.id} className="px-6 py-4 text-gray-700 dark:text-[#ededed]">
                                                 {flexRender(
                                                     cell.column.columnDef.cell,
                                                     cell.getContext()
@@ -200,7 +200,7 @@ const DataTable = ({
 
                 {/* Pagination */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-6 py-4 border-t border-gray-200 dark:border-white/[0.06]">
-                    <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-slate-400">
+                    <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-[#a1a1a6]">
                         <span className="hidden sm:inline">Page</span>
                         <span className="font-medium text-gray-900 dark:text-white">
                             {table.getState().pagination.pageIndex + 1} of{' '}
@@ -209,7 +209,7 @@ const DataTable = ({
                     </div>
                     <div className="flex items-center gap-1">
                         <button
-                            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] disabled:opacity-30 disabled:cursor-not-allowed min-h-[40px] min-w-[40px] flex items-center justify-center text-gray-500 dark:text-slate-400 transition-all duration-200"
+                            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] disabled:opacity-30 disabled:cursor-not-allowed min-h-[40px] min-w-[40px] flex items-center justify-center text-gray-500 dark:text-[#a1a1a6] transition-colors"
                             onClick={() => {
                                 if (manualPagination && onPageChange) onPageChange(0)
                                 else table.setPageIndex(0)
@@ -220,7 +220,7 @@ const DataTable = ({
                             <ChevronsLeft size={18} />
                         </button>
                         <button
-                            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] disabled:opacity-30 disabled:cursor-not-allowed min-h-[40px] min-w-[40px] flex items-center justify-center text-gray-500 dark:text-slate-400 transition-all duration-200"
+                            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] disabled:opacity-30 disabled:cursor-not-allowed min-h-[40px] min-w-[40px] flex items-center justify-center text-gray-500 dark:text-[#a1a1a6] transition-colors"
                             onClick={() => {
                                 if (manualPagination && onPageChange) onPageChange(pageIndex - 1)
                                 else table.previousPage()
@@ -231,7 +231,7 @@ const DataTable = ({
                             <ChevronLeft size={18} />
                         </button>
                         <button
-                            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] disabled:opacity-30 disabled:cursor-not-allowed min-h-[40px] min-w-[40px] flex items-center justify-center text-gray-500 dark:text-slate-400 transition-all duration-200"
+                            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] disabled:opacity-30 disabled:cursor-not-allowed min-h-[40px] min-w-[40px] flex items-center justify-center text-gray-500 dark:text-[#a1a1a6] transition-colors"
                             onClick={() => {
                                 if (manualPagination && onPageChange) onPageChange(pageIndex + 1)
                                 else table.nextPage()
@@ -242,7 +242,7 @@ const DataTable = ({
                             <ChevronRight size={18} />
                         </button>
                         <button
-                            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] disabled:opacity-30 disabled:cursor-not-allowed min-h-[40px] min-w-[40px] flex items-center justify-center text-gray-500 dark:text-slate-400 transition-all duration-200"
+                            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] disabled:opacity-30 disabled:cursor-not-allowed min-h-[40px] min-w-[40px] flex items-center justify-center text-gray-500 dark:text-[#a1a1a6] transition-colors"
                             onClick={() => {
                                 if (manualPagination && onPageChange) onPageChange(pageCount - 1)
                                 else table.setPageIndex(table.getPageCount() - 1)
@@ -259,10 +259,10 @@ const DataTable = ({
                                 if (manualPagination && onPageSizeChange) onPageSizeChange(newSize)
                                 else table.setPageSize(newSize)
                             }}
-                            className="ml-2 rounded-lg border border-gray-200 dark:border-white/[0.07] bg-white dark:bg-[#1a1f35] text-gray-700 dark:text-slate-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#533afd]/30 transition-all duration-200"
+                            className="ml-2 rounded-lg border border-gray-200 dark:border-white/[0.07] bg-white dark:bg-[#232325] text-gray-700 dark:text-[#a1a1a6] px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#533afd]/30 transition-colors"
                         >
                             {[5, 10, 20, 30, 40, 50].map(size => (
-                                <option key={size} value={size} className="bg-white dark:bg-[#131726] text-gray-900 dark:text-white">
+                                <option key={size} value={size} className="bg-white dark:bg-[#19191b] text-gray-900 dark:text-white">
                                     Show {size}
                                 </option>
                             ))}

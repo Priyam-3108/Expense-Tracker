@@ -6,8 +6,10 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
+import { usePrivacy } from '../context/PrivacyContext';
 import { debtService } from '../services/debtService';
 import ModernDatePicker from '../components/ModernDatePicker';
+import Amount from '../components/Amount';
 import hapticFeedback from '../utils/haptics';
 
 const fmtDate = (d) => {
@@ -18,6 +20,7 @@ const displayDate = (d) => d.toLocaleDateString('en-IN', { day: '2-digit', month
 
 export default function AddDebtScreen({ navigation, route }) {
     const { colors, isDark, shadows } = useTheme();
+    const { isPrivate } = usePrivacy();
     const { debt, mode } = route.params || {}; // mode: 'add' | 'edit' | 'repay'
     const isEdit = mode === 'edit';
     const isRepay = mode === 'repay';
@@ -92,7 +95,7 @@ export default function AddDebtScreen({ navigation, route }) {
             return;
         }
         if (amt > (debt?.currentAmount || 0)) {
-            Alert.alert('Too Much', `Payment cannot exceed remaining amount of ₹${debt?.currentAmount}.`);
+            Alert.alert('Too Much', `Payment cannot exceed remaining amount of ${isPrivate ? '••••••' : '₹' + debt?.currentAmount}.`);
             return;
         }
 
@@ -230,7 +233,7 @@ export default function AddDebtScreen({ navigation, route }) {
                             editable={!isEdit} // amount not editable in edit mode
                         />
                         {isRepay && debt && (
-                            <Text style={s.heroMeta}>Remaining: ₹{debt.currentAmount?.toLocaleString('en-IN')}</Text>
+                            <Text style={s.heroMeta}>Remaining: <Amount value={debt.currentAmount} currency="INR" /></Text>
                         )}
                     </LinearGradient>
                 </View>
@@ -241,7 +244,7 @@ export default function AddDebtScreen({ navigation, route }) {
                         <Ionicons name="information-circle-outline" size={20} color={colors.success} />
                         <Text style={s.repayInfoText}>
                             Recording payment for <Text style={{ fontWeight: '600' }}>{debt.personName}</Text>.
-                            Original: ₹{debt.amount?.toLocaleString('en-IN')} · Paid: ₹{(debt.amount - debt.currentAmount)?.toLocaleString('en-IN')}.
+                            Original: <Amount value={debt.amount} currency="INR" /> · Paid: <Amount value={debt.amount - debt.currentAmount} currency="INR" />.
                         </Text>
                     </View>
                 )}

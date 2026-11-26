@@ -36,6 +36,10 @@ const userSchema = new mongoose.Schema({
     default: 'USD',
     required: true
   },
+  privacyModeDefault: {
+    type: Boolean,
+    default: false
+  },
   categoryOrder: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Category'
@@ -44,6 +48,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     unique: true,
     sparse: true,
+    select: false
+  },
+  resetPasswordToken: {
+    type: String,
+    select: false
+  },
+  resetPasswordExpires: {
+    type: Date,
     select: false
   }
 }, {

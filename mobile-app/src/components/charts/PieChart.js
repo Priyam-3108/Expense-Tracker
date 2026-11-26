@@ -6,7 +6,7 @@ import { useTheme } from '../../context/ThemeContext';
 
 const screenWidth = Dimensions.get('window').width;
 
-function PieChart({ data, height = 240, width, showLegend = true }) {
+function PieChart({ data, height = 240, width, showLegend = true, hideValues = false }) {
     const { colors, isDark } = useTheme();
 
     const chartConfig = {
@@ -54,7 +54,7 @@ function PieChart({ data, height = 240, width, showLegend = true }) {
                     accessor="population"
                     backgroundColor="transparent"
                     paddingLeft="0"
-                    absolute
+                    absolute={!hideValues ? true : undefined}
                     hasLegend={showLegend}
                     style={styles.chart}
                     avoidFalseZero

@@ -19,13 +19,13 @@ const ExportModal = ({ isOpen, onClose, onExport, loading }) => {
             <div className="p-6 space-y-6">
                 {/* Format Selection */}
                 <div className="space-y-3">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <label className="text-sm font-medium text-gray-700 dark:text-[#a1a1a6]">
                         Export Format
                     </label>
                     <div className="grid grid-cols-3 gap-3">
                         <button
                             onClick={() => setFormat('csv')}
-                            className={`flex flex-col items-center gap-2 rounded-xl border p-3 transition-all duration-200 min-h-[44px] ${format === 'csv'
+                            className={`flex flex-col items-center gap-2 rounded-xl border p-3 transition-colors min-h-[44px] ${format === 'csv'
                                     ? 'border-indigo-500/60 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 ring-1 ring-indigo-500/30'
                                     : 'border-gray-200 dark:border-white/[0.08] hover:border-indigo-300 dark:hover:border-white/[0.15] hover:bg-gray-50 dark:hover:bg-white/[0.03]'
                                 }`}
@@ -35,7 +35,7 @@ const ExportModal = ({ isOpen, onClose, onExport, loading }) => {
                         </button>
                         <button
                             onClick={() => setFormat('excel')}
-                            className={`flex flex-col items-center gap-2 rounded-xl border p-3 transition-all duration-200 min-h-[44px] ${format === 'excel'
+                            className={`flex flex-col items-center gap-2 rounded-xl border p-3 transition-colors min-h-[44px] ${format === 'excel'
                                     ? 'border-emerald-500/60 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/30'
                                     : 'border-gray-200 dark:border-white/[0.08] hover:border-emerald-300 dark:hover:border-white/[0.15] hover:bg-gray-50 dark:hover:bg-white/[0.03]'
                                 }`}
@@ -45,7 +45,7 @@ const ExportModal = ({ isOpen, onClose, onExport, loading }) => {
                         </button>
                         <button
                             onClick={() => setFormat('pdf')}
-                            className={`flex flex-col items-center gap-2 rounded-xl border p-3 transition-all duration-200 min-h-[44px] ${format === 'pdf'
+                            className={`flex flex-col items-center gap-2 rounded-xl border p-3 transition-colors min-h-[44px] ${format === 'pdf'
                                     ? 'border-rose-500/60 bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 ring-1 ring-rose-500/30'
                                     : 'border-gray-200 dark:border-white/[0.08] hover:border-rose-300 dark:hover:border-white/[0.15] hover:bg-gray-50 dark:hover:bg-white/[0.03]'
                                 }`}
@@ -56,16 +56,15 @@ const ExportModal = ({ isOpen, onClose, onExport, loading }) => {
                     </div>
                 </div>
 
-                {/* Date Range Selection */}
+                {/* Date range Selection */}
                 <div className="space-y-3">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Date Range (Optional)
+                    <label className="text-sm font-medium text-gray-700 dark:text-[#a1a1a6]">
+                        Date range (Optional)
                     </label>
                     <DateRangePicker
                         startDate={dateRange.startDate}
                         endDate={dateRange.endDate}
-                        onStartDateChange={(date) => setDateRange({ ...dateRange, startDate: date })}
-                        onEndDateChange={(date) => setDateRange({ ...dateRange, endDate: date })}
+                        onChange={(startDate, endDate) => setDateRange((r) => ({ ...r, startDate, endDate }))}
                     />
                 </div>
             </div>

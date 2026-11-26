@@ -24,6 +24,34 @@ export const syncExpenses = async (req, res) => {
                     };
                 }
 
+                // Edits carry the existing server _id — update in place rather
+                // than matching/creating by client_uuid (a fresh uuid is minted
+                // for every local save, so client_uuid never matches on edit).
+                const editId = data._id || data.id;
+                if (editId) {
+                    const { _id, id, ...updateData } = data;
+                    const updated = await Expense.findOneAndUpdate(
+                        { _id: editId, user: req.user._id },
+                        { ...updateData, client_uuid },
+                        { new: true, runValidators: true }
+                    );
+
+                    if (!updated) {
+                        return {
+                            client_uuid,
+                            status: 'FAILED',
+                            error: 'Expense not found for update'
+                        };
+                    }
+
+                    return {
+                        client_uuid,
+                        server_id: updated._id,
+                        status: 'SYNCED',
+                        action: 'UPDATED'
+                    };
+                }
+
                 // Check if exists
                 let expense = await Expense.findOne({ client_uuid, user: req.user._id });
 

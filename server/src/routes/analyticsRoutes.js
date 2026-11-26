@@ -1,7 +1,7 @@
 import express from 'express';
 import { authenticateToken } from '../middleware/auth.js';
 import { sharedAuth } from '../middleware/sharedAuth.js';
-import { getShareToken, revokeShareToken, getSharedProfile, getSharedCategories } from '../controllers/analyticsController.js';
+import { getShareToken, revokeShareToken, getSharedProfile, getSharedCategories, getDailyActivity } from '../controllers/analyticsController.js';
 import { getDetailedAnalytics, getExpenseTrends, getExpenses, getExpenseStats } from '../controllers/expenseController.js';
 
 const router = express.Router();
@@ -9,6 +9,7 @@ const router = express.Router();
 // Management routes (Protected)
 router.post('/share', authenticateToken, getShareToken);
 router.delete('/share', authenticateToken, revokeShareToken);
+router.get('/daily-activity', authenticateToken, getDailyActivity);
 
 // Shared View Routes (Public with Token)
 // These routes reuse the expense controller logic but authenticate via the share token

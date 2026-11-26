@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { usePrivacy } from '../context/PrivacyContext';
 import { toast } from 'react-hot-toast';
 
 const Profile = () => {
   const { user, updateProfile, changePassword } = useAuth();
+  const { setPrivate } = usePrivacy();
   const [activeTab, setActiveTab] = useState('profile');
   const [loading, setLoading] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
+  const [savingPrivacy, setSavingPrivacy] = useState(false);
+  const privacyDefault = !!user?.privacyModeDefault;
 
   const [profileForm, setProfileForm] = useState({ name: '', email: '', currency: 'USD' });
   const [passwordForm, setPasswordForm] = useState({
@@ -35,6 +39,16 @@ const Profile = () => {
     }
   };
 
+  const handlePrivacyDefaultChange = async (next) => {
+    setSavingPrivacy(true)
+    setPrivate(next) // immediate effect this session
+    const result = await updateProfile({ privacyModeDefault: next })
+    if (!result.success) {
+      setPrivate(!next) // revert session — updateProfile already toasted the error
+    }
+    setSavingPrivacy(false)
+  }
+
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
@@ -55,16 +69,16 @@ const Profile = () => {
   };
 
   const tabs = [
-    { id: 'profile', label: 'Profile Information' },
-    { id: 'password', label: 'Change Password'},
+    { id: 'profile', label: 'Profile information' },
+    { id: 'password', label: 'Change password'},
     { id: 'account', label: 'Account Info'},
   ];
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Profile</h1>
-        <p className="text-gray-600 dark:text-slate-500">Manage your account settings and preferences</p>
+        <h1 className="text-2xl md:text-[28px] leading-tight font-medium text-gray-900 dark:text-[#ededed]">Profile</h1>
+        <p className="text-gray-600 dark:text-[#85858b]">Manage your account settings and preferences</p>
       </div>
 
       <div className="border-b border-gray-200 dark:border-white/[0.06]">
@@ -73,9 +87,9 @@ const Profile = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`py-2 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${activeTab === tab.id
+              className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === tab.id
                 ? 'border-indigo-500 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400'
-                : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/[0.15]'
+                : 'border-transparent text-gray-500 dark:text-[#a1a1a6] hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/[0.15]'
                 }`}
             >
               {tab.label}
@@ -87,10 +101,10 @@ const Profile = () => {
       <div className="glass-card">
         {activeTab === 'profile' && (
           <div className="p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Profile Information</h2>
+            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Profile information</h2>
             <form onSubmit={handleProfileSubmit} className="space-y-4">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-[#a1a1a6] mb-1">
                   Full Name
                 </label>
                 <input
@@ -105,7 +119,7 @@ const Profile = () => {
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-[#a1a1a6] mb-1">
                   Email Address
                 </label>
                 <input
@@ -120,7 +134,7 @@ const Profile = () => {
               </div>
 
               <div>
-                <label htmlFor="currency" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label htmlFor="currency" className="block text-sm font-medium text-gray-700 dark:text-[#a1a1a6] mb-1">
                   Preferred Currency
                 </label>
                 <select
@@ -148,20 +162,45 @@ const Profile = () => {
                   disabled={loading}
                   className="btn-primary btn-md"
                 >
-                  {loading ? 'Updating...' : 'Update Profile'}
+                  {loading ? 'Updating...' : 'Update profile'}
                 </button>
               </div>
             </form>
+
+            <div className="flex items-center justify-between py-3">
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">Hide amounts by default</p>
+                <p className="text-xs text-gray-500 dark:text-[#85858b]">
+                  Masks all monetary values across the app until you reveal them.
+                </p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={privacyDefault}
+                disabled={savingPrivacy}
+                onClick={() => handlePrivacyDefaultChange(!privacyDefault)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  privacyDefault ? 'bg-indigo-600' : 'bg-gray-300 dark:bg-white/[0.15]'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    privacyDefault ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
           </div>
         )}
 
         {activeTab === 'password' && (
           <div className="p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Change Password</h2>
+            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Change password</h2>
             <form onSubmit={handlePasswordSubmit} className="space-y-4">
               <div>
-                <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Current Password
+                <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 dark:text-[#a1a1a6] mb-1">
+                  Current password
                 </label>
                 <input
                   type="password"
@@ -175,8 +214,8 @@ const Profile = () => {
               </div>
 
               <div>
-                <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  New Password
+                <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 dark:text-[#a1a1a6] mb-1">
+                  New password
                 </label>
                 <input
                   type="password"
@@ -188,12 +227,12 @@ const Profile = () => {
                   required
                   minLength={6}
                 />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Password must be at least 6 characters long</p>
+                <p className="text-xs text-gray-500 dark:text-[#a1a1a6] mt-1">Password must be at least 6 characters long</p>
               </div>
 
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Confirm New Password
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-[#a1a1a6] mb-1">
+                  Confirm new password
                 </label>
                 <input
                   type="password"
@@ -212,7 +251,7 @@ const Profile = () => {
                   disabled={passwordLoading}
                   className="btn-primary btn-md"
                 >
-                  {passwordLoading ? 'Changing...' : 'Change Password'}
+                  {passwordLoading ? 'Changing...' : 'Change password'}
                 </button>
               </div>
             </form>
@@ -221,27 +260,27 @@ const Profile = () => {
 
         {activeTab === 'account' && (
           <div className="p-6">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Account Information</h2>
+            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Account information</h2>
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="bg-gray-50 dark:bg-white/[0.03] p-4 rounded-xl border border-gray-100 dark:border-white/[0.05]">
-                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Account ID</h3>
+                  <h3 className="text-sm font-medium text-gray-500 dark:text-[#a1a1a6] mb-1">Account ID</h3>
                   <p className="text-sm text-gray-900 dark:text-gray-100 font-mono">{user?._id || 'N/A'}</p>
                 </div>
                 <div className="bg-gray-50 dark:bg-white/[0.03] p-4 rounded-xl border border-gray-100 dark:border-white/[0.05]">
-                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Member Since</h3>
+                  <h3 className="text-sm font-medium text-gray-500 dark:text-[#a1a1a6] mb-1">Member since</h3>
                   <p className="text-sm text-gray-900 dark:text-gray-100">
                     {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
                   </p>
                 </div>
                 <div className="bg-gray-50 dark:bg-white/[0.03] p-4 rounded-xl border border-gray-100 dark:border-white/[0.05]">
-                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Last Updated</h3>
+                  <h3 className="text-sm font-medium text-gray-500 dark:text-[#a1a1a6] mb-1">Last updated</h3>
                   <p className="text-sm text-gray-900 dark:text-gray-100">
                     {user?.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : 'N/A'}
                   </p>
                 </div>
                 <div className="bg-gray-50 dark:bg-white/[0.03] p-4 rounded-xl border border-gray-100 dark:border-white/[0.05]">
-                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Account Status</h3>
+                  <h3 className="text-sm font-medium text-gray-500 dark:text-[#a1a1a6] mb-1">Account status</h3>
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-500/15 text-emerald-800 dark:text-emerald-300">
                     Active
                   </span>
@@ -249,7 +288,7 @@ const Profile = () => {
               </div>
 
               <div className="mt-6 p-4 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl border border-indigo-100 dark:border-indigo-500/20">
-                <h3 className="text-sm font-medium text-indigo-900 dark:text-indigo-300 mb-2">Account Security</h3>
+                <h3 className="text-sm font-medium text-indigo-900 dark:text-indigo-300 mb-2">Account security</h3>
                 <ul className="text-sm text-indigo-800 dark:text-indigo-400 space-y-1">
                   <li>• Your password is securely hashed and stored</li>
                   <li>• All data is transmitted over encrypted connections</li>

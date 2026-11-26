@@ -427,7 +427,7 @@ export const ExpenseProvider = ({ children }) => {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-red-600 mb-2">Something went wrong</h2>
+          <h2 className="text-xl font-medium text-red-600 mb-2">Something went wrong</h2>
           <p className="text-gray-600 mb-4">{error}</p>
           <button
             onClick={() => setError(null)}

@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
 import { useEffect } from 'react'
-import { BarChart2, Target, Database, Link2, Settings, Cookie, Shield, Globe, RefreshCw, Mail } from 'lucide-react'
 import PublicNavbar from '../components/PublicNavbar'
 import PublicFooter from '../components/PublicFooter'
 import '../styles/StaticPages.css'
@@ -20,7 +19,7 @@ const PrivacyPolicy = () => {
                 <div className="static-container">
                     <div className="page-header">
                         <span className="page-badge">Privacy</span>
-                        <h1 className="page-title">Privacy Policy</h1>
+                        <h1 className="page-title">Privacy policy</h1>
                         <p className="page-subtitle">
                             Your privacy is important to us. This policy explains how we collect, use, and protect your data.
                         </p>
@@ -29,7 +28,6 @@ const PrivacyPolicy = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon"><BarChart2 className="w-5 h-5 text-indigo-400" /></span>
                             1. Information We Collect
                         </h2>
                         <div className="section-content">
@@ -64,7 +62,6 @@ const PrivacyPolicy = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon"><Target className="w-5 h-5 text-indigo-400" /></span>
                             2. How We Use Your Information
                         </h2>
                         <div className="section-content">
@@ -86,7 +83,6 @@ const PrivacyPolicy = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon"><Database className="w-5 h-5 text-indigo-400" /></span>
                             3. Data Storage and Security
                         </h2>
                         <div className="section-content">
@@ -111,7 +107,6 @@ const PrivacyPolicy = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon"><Link2 className="w-5 h-5 text-indigo-400" /></span>
                             4. Data Sharing and Disclosure
                         </h2>
                         <div className="section-content">
@@ -135,7 +130,6 @@ const PrivacyPolicy = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon"><Settings className="w-5 h-5 text-indigo-400" /></span>
                             5. Your Rights and Choices
                         </h2>
                         <div className="section-content">
@@ -151,14 +145,13 @@ const PrivacyPolicy = () => {
                                 <li><strong>Withdraw Consent:</strong> Stop using the service at any time</li>
                             </ul>
                             <p>
-                                To exercise these rights, visit your Profile page or contact us through our <Link to="/support" className="text-indigo-400 hover:text-indigo-300 underline font-medium">Support page</Link>.
+                                To exercise these rights, visit your Profile page or contact us through our <Link to="/support" className="text-[#533afd] hover:underline">Support page</Link>.
                             </p>
                         </div>
                     </div>
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon"><Cookie className="w-5 h-5 text-indigo-400" /></span>
                             6. Cookies and Tracking
                         </h2>
                         <div className="section-content">
@@ -181,7 +174,6 @@ const PrivacyPolicy = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon"><Shield className="w-5 h-5 text-indigo-400" /></span>
                             7. Children's Privacy
                         </h2>
                         <div className="section-content">
@@ -193,7 +185,6 @@ const PrivacyPolicy = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon"><Globe className="w-5 h-5 text-indigo-400" /></span>
                             8. International Users
                         </h2>
                         <div className="section-content">
@@ -208,7 +199,6 @@ const PrivacyPolicy = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon"><RefreshCw className="w-5 h-5 text-indigo-400" /></span>
                             9. Changes to Privacy Policy
                         </h2>
                         <div className="section-content">
@@ -228,7 +218,6 @@ const PrivacyPolicy = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon"><Mail className="w-5 h-5 text-indigo-400" /></span>
                             10. Contact Us
                         </h2>
                         <div className="section-content">
@@ -236,7 +225,7 @@ const PrivacyPolicy = () => {
                                 If you have questions or concerns about this Privacy Policy or our data practices, please contact us:
                             </p>
                             <ul>
-                                <li>Through our <Link to="/support" className="text-indigo-400 hover:text-indigo-300 underline font-medium">Support page</Link></li>
+                                <li>Through our <Link to="/support" className="text-[#533afd] hover:underline">Support page</Link></li>
                                 <li>By email: privacy@expensetracker.com</li>
                             </ul>
                             <p>

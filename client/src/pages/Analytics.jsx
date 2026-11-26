@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useExpense } from '../context/ExpenseContext'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
@@ -39,10 +39,6 @@ const Analytics = () => {
   const [shareEnabled, setShareEnabled] = useState(false)
   const [copying, setCopying] = useState(false)
 
-  // Ref to prevent concurrent API calls
-  const isLoadingRef = useRef(false)
-  const lastFiltersRef = useRef({ startDate: '', endDate: '', category: '', type: '' })
-
   // Load data when filters change
   useEffect(() => {
     if (!user) return
@@ -53,22 +49,13 @@ const Analytics = () => {
     const category = selectedCategory || ''
     const type = filterType || 'all'
 
-    // Check if filters actually changed
-    const currentFilters = { startDate, endDate, category, type }
-    const filtersChanged =
-      lastFiltersRef.current.startDate !== startDate ||
-      lastFiltersRef.current.endDate !== endDate ||
-      lastFiltersRef.current.category !== category ||
-      lastFiltersRef.current.type !== type
+    // Wait until the range is complete (or fully cleared) - a lone start date is mid-selection
+    if (!startDate !== !endDate) return
 
-    // Prevent concurrent calls and unnecessary calls
-    if (isLoadingRef.current || !filtersChanged) {
-      return
-    }
+    // A newer filter change cancels this run, so the latest selection always wins
+    let cancelled = false
 
     const loadData = async () => {
-      isLoadingRef.current = true
-      lastFiltersRef.current = currentFilters
       setLoadingStats(true)
 
       try {
@@ -84,23 +71,25 @@ const Analytics = () => {
         ])
 
         // Store in local state so context overwrites can't clobber analytics data
+        if (cancelled) return
         if (expenseResult?.expenses) {
           setAnalyticsExpenses(expenseResult.expenses)
         }
 
         // Load category stats
         const stats = await getCategoryStats({ startDate, endDate })
-        setCategoryStats(stats || [])
+        if (!cancelled) setCategoryStats(stats || [])
       } catch (error) {
+        if (cancelled) return
         console.error('Error loading analytics data:', error)
         toast.error('Failed to load analytics data')
       } finally {
-        setLoadingStats(false)
-        isLoadingRef.current = false
+        if (!cancelled) setLoadingStats(false)
       }
     }
 
     loadData()
+    return () => { cancelled = true }
   }, [user, dateRange.startDate, dateRange.endDate, selectedCategory, filterType])
 
   // Check share status on mount
@@ -189,16 +178,16 @@ const Analytics = () => {
           <div className="glass-modal-panel rounded-xl shadow-xl w-full max-w-md overflow-hidden">
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Share Analytics</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Share analytics</h3>
                 <button
                   onClick={() => setShowShareModal(false)}
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                  className="text-gray-500 hover:text-gray-700 dark:text-[#a1a1a6] dark:hover:text-gray-200 transition-colors"
                 >
                   <X size={20} />
                 </button>
               </div>
 
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+              <p className="text-sm text-gray-600 dark:text-[#a1a1a6] mb-4">
                 Anyone with this link can view your analytics dashboard. They won't be able to edit your data.
               </p>
 
@@ -207,7 +196,7 @@ const Analytics = () => {
                   type="text"
                   value={shareLink}
                   readOnly
-                  className="flex-1 bg-transparent border-none focus:ring-0 text-sm text-gray-600 dark:text-gray-300 w-full"
+                  className="flex-1 bg-transparent border-none focus:ring-0 text-sm text-gray-600 dark:text-[#a1a1a6] w-full"
                 />
                 <button
                   onClick={copyToClipboard}

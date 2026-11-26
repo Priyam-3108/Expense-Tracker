@@ -1,14 +1,38 @@
 import React, { useContext } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, StatusBar, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContext } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { usePrivacy } from '../context/PrivacyContext';
+import * as authService from '../services/authService';
 import hapticFeedback from '../utils/haptics';
 
 function ProfileScreen({ navigation }) {
-    const { user, signOut } = useContext(AuthContext);
+    const { user, signOut, signIn } = useContext(AuthContext);
     const { colors, isDark, toggleTheme, spacing, borderRadius, shadows } = useTheme();
+    const { setPrivate } = usePrivacy();
+    const [savingPrivacy, setSavingPrivacy] = React.useState(false);
+    const privacyDefault = !!user?.privacyModeDefault;
+
+    const onTogglePrivacyDefault = async (next) => {
+        setSavingPrivacy(true);
+        setPrivate(next);
+        try {
+            const res = await authService.updateProfile({ privacyModeDefault: next });
+            const updatedUser = res.data?.user;
+            if (updatedUser) {
+                const token = await AsyncStorage.getItem('token');
+                if (token) await signIn(token, updatedUser);
+            }
+        } catch (e) {
+            setPrivate(!next);
+            Alert.alert('Error', 'Could not save privacy preference.');
+        } finally {
+            setSavingPrivacy(false);
+        }
+    };
 
     const handleLogout = () => {
         if (hapticFeedback && hapticFeedback.medium) {
@@ -188,6 +212,30 @@ function ProfileScreen({ navigation }) {
                                 {
                                     backgroundColor: isDark ? colors.primary : '#CBD5E1', // Active vs Inactive color
                                     alignItems: isDark ? 'flex-end' : 'flex-start' // Position thumb
+                                }
+                            ]}
+                        >
+                            <View style={[styles.toggleThumb, { backgroundColor: '#ffffff' }]} />
+                        </TouchableOpacity>
+                    ),
+                },
+                {
+                    icon: privacyDefault ? 'eye-off-outline' : 'eye-outline',
+                    title: 'Hide amounts by default',
+                    subtitle: 'Mask all values across the app',
+                    onPress: () => {
+                        if (!savingPrivacy) onTogglePrivacyDefault(!privacyDefault);
+                    },
+                    showChevron: false,
+                    rightComponent: (
+                        <TouchableOpacity
+                            disabled={savingPrivacy}
+                            onPress={() => onTogglePrivacyDefault(!privacyDefault)}
+                            style={[
+                                styles.toggle,
+                                {
+                                    backgroundColor: privacyDefault ? colors.primary : '#CBD5E1',
+                                    alignItems: privacyDefault ? 'flex-end' : 'flex-start'
                                 }
                             ]}
                         >

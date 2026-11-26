@@ -38,6 +38,9 @@ export const expenseService = {
     getDetailedAnalytics: (filters = {}) => {
         return api.get('/expenses/analytics', { params: filters });
     },
+    getDailyActivity: (weeks = 16) => {
+        return api.get('/analytics/daily-activity', { params: { weeks } });
+    },
     exportExpenses: (format, filters = {}) => {
         const params = { format, ...filters };
         return api.get('/expenses/export', {

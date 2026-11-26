@@ -3,7 +3,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon, BanknotesIcon, CalendarIcon, DocumentTextIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import { useDebt } from '../context/DebtContext';
 import { useAuth } from '../context/AuthContext';
-import { formatCurrency } from '../utils/helpers';
+import Amount from './Amount';
 import DatePicker from './DatePicker';
 
 export default function RepaymentModal({ isOpen, onClose, debt }) {
@@ -76,13 +76,13 @@ export default function RepaymentModal({ isOpen, onClose, debt }) {
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <Dialog.Panel className="glass-modal-panel w-full max-w-md transform overflow-hidden rounded-xl transition-all">
+                            <Dialog.Panel className="glass-modal-panel w-full max-w-md transform overflow-hidden rounded-xl transition-[transform,opacity]">
                                 {/* Header */}
                                 <div className="bg-[#10b981] px-6 py-5 rounded-t-xl">
                                     <div className="flex items-center justify-between">
-                                        <Dialog.Title className="text-xl font-semibold text-white flex items-center gap-2">
+                                        <Dialog.Title className="text-xl font-medium text-white flex items-center gap-2">
                                             <BanknotesIcon className="h-6 w-6" />
-                                            Record Repayment
+                                            Record repayment
                                         </Dialog.Title>
                                         <button
                                             onClick={onClose}
@@ -100,15 +100,15 @@ export default function RepaymentModal({ isOpen, onClose, debt }) {
                                 <div className="px-6 py-4 bg-gray-50 dark:bg-white/[0.02] border-b border-gray-200 dark:border-white/[0.05]">
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Total Amount</p>
-                                            <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">
-                                                {formatCurrency(debt.amount, currency)}
+                                            <p className="text-xs font-medium text-gray-500 dark:text-[#a1a1a6]">Total amount</p>
+                                            <p className="text-lg font-medium text-gray-900 dark:text-white mt-1">
+                                                <Amount value={debt.amount} currency={currency} />
                                             </p>
                                         </div>
                                         <div>
-                                            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Remaining</p>
-                                            <p className="text-lg font-bold text-green-600 dark:text-green-400 mt-1">
-                                                {formatCurrency(debt.currentAmount, currency)}
+                                            <p className="text-xs font-medium text-gray-500 dark:text-[#a1a1a6]">Remaining</p>
+                                            <p className="text-lg font-medium text-green-600 dark:text-green-400 mt-1">
+                                                <Amount value={debt.currentAmount} currency={currency} />
                                             </p>
                                         </div>
                                     </div>
@@ -116,12 +116,12 @@ export default function RepaymentModal({ isOpen, onClose, debt }) {
                                     {/* Progress Bar */}
                                     <div className="mt-4">
                                         <div className="flex justify-between items-center mb-2">
-                                            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Payment Progress</span>
-                                            <span className="text-xs font-semibold text-green-600 dark:text-green-400">{percentagePaid.toFixed(0)}%</span>
+                                            <span className="text-xs font-medium text-gray-600 dark:text-[#a1a1a6]">Payment progress</span>
+                                            <span className="text-xs font-medium text-green-600 dark:text-green-400">{percentagePaid.toFixed(0)}%</span>
                                         </div>
                                         <div className="w-full bg-gray-200 dark:bg-white/[0.06] rounded-full h-2.5">
                                             <div
-                                                className="bg-gradient-to-r from-emerald-500 to-emerald-400 h-2.5 rounded-full transition-all duration-500"
+                                                className="bg-green-600 dark:bg-[#4cc38a] h-2 rounded-full"
                                                 style={{ width: `${percentagePaid}%` }}
                                             ></div>
                                         </div>
@@ -132,13 +132,13 @@ export default function RepaymentModal({ isOpen, onClose, debt }) {
                                 <form onSubmit={handleSubmit} className="px-6 py-6 space-y-5">
                                     {/* Payment Amount */}
                                     <div>
-                                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                                             <BanknotesIcon className="h-4 w-4 inline mr-1.5" />
                                             Payment Amount
                                         </label>
                                         <div className="relative">
                                             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                                                <span className="text-gray-500 dark:text-gray-400 font-medium">{currencySymbol}</span>
+                                                <span className="text-gray-500 dark:text-[#a1a1a6] font-medium">{currencySymbol}</span>
                                             </div>
                                             <input
                                                 type="number"
@@ -150,14 +150,14 @@ export default function RepaymentModal({ isOpen, onClose, debt }) {
                                                 placeholder="0"
                                             />
                                         </div>
-                                        <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-                                            Maximum: {formatCurrency(debt.currentAmount, currency)}
+                                        <p className="mt-1.5 text-xs text-gray-500 dark:text-[#a1a1a6]">
+                                            Maximum: <Amount value={debt.currentAmount} currency={currency} />
                                         </p>
                                     </div>
 
                                     {/* Date */}
                                     <div>
-                                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                                             <CalendarIcon className="h-4 w-4 inline mr-1.5" />
                                             Payment Date
                                         </label>
@@ -170,7 +170,7 @@ export default function RepaymentModal({ isOpen, onClose, debt }) {
 
                                     {/* Note */}
                                     <div>
-                                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                                             <DocumentTextIcon className="h-4 w-4 inline mr-1.5" />
                                             Note
                                             <span className="text-xs font-normal text-gray-500 ml-1">(Optional)</span>

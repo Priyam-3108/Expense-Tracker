@@ -2,32 +2,25 @@ import { Link } from 'react-router-dom'
 
 const Logo = ({ className = "", size = "default" }) => {
     const sizes = {
-        small: { svg: 32, text: "text-lg" },
-        default: { svg: 40, text: "text-xl" },
-        large: { svg: 48, text: "text-2xl" }
+        small: { box: 24, glyph: 14, text: "text-base" },
+        default: { box: 28, glyph: 16, text: "text-base" },
+        large: { box: 32, glyph: 18, text: "text-lg" }
     }
 
     const currentSize = sizes[size] || sizes.default
 
     return (
-        <Link to="/" className={`flex items-center gap-3 ${className}`}>
-            <svg
-                width={currentSize.svg}
-                height={currentSize.svg}
-                viewBox="0 0 40 40"
-                fill="none"
+        <Link to="/" className={`flex items-center gap-2 ${className}`}>
+            <span
+                className="shrink-0 rounded-lg bg-[#533afd] flex items-center justify-center"
+                style={{ width: currentSize.box, height: currentSize.box }}
             >
-                <rect width="40" height="40" rx="10" fill="url(#logo-gradient)" />
-                <path d="M20 10L28 16V24L20 30L12 24V16L20 10Z" fill="white" opacity="0.9" />
-                <defs>
-                    <linearGradient id="logo-gradient" x1="0" y1="0" x2="40" y2="40">
-                        <stop offset="0%" stopColor="#665efd" />
-                        <stop offset="100%" stopColor="#533afd" />
-                    </linearGradient>
-                </defs>
-            </svg>
-            <span className={`font-bold text-gray-900 dark:text-white ${currentSize.text}`}>
-                Expense Tracker
+                <svg width={currentSize.glyph} height={currentSize.glyph} viewBox="0 0 16 16" fill="none">
+                    <path d="M3 4h10M3 8h7M3 12h5" stroke="white" strokeWidth="1.75" strokeLinecap="round" />
+                </svg>
+            </span>
+            <span className={`font-medium text-gray-900 dark:text-[#ededed] ${currentSize.text}`}>
+                Spendly
             </span>
         </Link>
     )

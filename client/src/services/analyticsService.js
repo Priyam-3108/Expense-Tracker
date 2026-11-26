@@ -56,5 +56,10 @@ export const analyticsService = {
             }
         })
         return api.get(`/analytics/shared/${token}/expenses?${params.toString()}`)
+    },
+
+    // GitHub-style daily activity for the trailing `weeks`
+    getDailyActivity: (weeks = 16) => {
+        return api.get(`/analytics/daily-activity?weeks=${weeks}`)
     }
 }

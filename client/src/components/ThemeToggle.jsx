@@ -31,7 +31,7 @@ const ThemeToggle = () => {
         <div className="relative" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="p-2 rounded-xl text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-white/[0.06] hover:text-gray-700 dark:hover:text-white transition-all duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                className="p-2 rounded-xl text-gray-500 dark:text-[#a1a1a6] hover:bg-gray-100 dark:hover:bg-white/[0.06] hover:text-gray-700 dark:hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
                 aria-label="Toggle theme"
             >
                 <CurrentIcon size={20} />
@@ -50,15 +50,15 @@ const ThemeToggle = () => {
                                         setIsOpen(false)
                                     }}
                                     className={cn(
-                                        "flex w-full items-center rounded-lg px-3 py-2.5 text-sm outline-none transition-all duration-200 min-h-[44px]",
+                                        "flex w-full items-center rounded-lg px-3 py-2.5 text-sm outline-none transition-colors min-h-[44px]",
                                         theme === t.name
                                             ? "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400"
-                                            : "text-gray-700 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white"
+                                            : "text-gray-700 dark:text-[#a1a1a6] hover:bg-gray-100 dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white"
                                     )}
                                 >
                                     <Icon className={cn(
                                         "mr-3 h-4 w-4",
-                                        theme === t.name && "drop-shadow-[0_0_4px_rgba(99,102,241,0.4)]"
+                                        theme === t.name && ""
                                     )} />
                                     <span>{t.label}</span>
                                 </button>

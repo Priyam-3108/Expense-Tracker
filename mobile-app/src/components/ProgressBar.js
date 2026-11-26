@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
+import Amount from './Amount';
 
 function ProgressBar({
     progress = 0, // 0 to 1
@@ -98,15 +99,6 @@ function ProgressBar({
         },
     });
 
-    const formatAmount = (amt) => {
-        return new Intl.NumberFormat('en-IN', {
-            style: 'currency',
-            currency: 'INR',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-        }).format(amt);
-    };
-
     const remaining = budget - amount;
 
     return (
@@ -116,8 +108,9 @@ function ProgressBar({
                     <Text style={styles.label}>{label}</Text>
                     {amount !== undefined && budget !== undefined && (
                         <View style={styles.amounts}>
-                            <Text style={styles.amount}>{formatAmount(amount)}</Text>
-                            <Text style={styles.budget}>/ {formatAmount(budget)}</Text>
+                            <Amount value={amount} currency="INR" style={styles.amount} />
+                            <Text style={styles.budget}>/ </Text>
+                            <Amount value={budget} currency="INR" style={styles.budget} />
                         </View>
                     )}
                 </View>
@@ -137,12 +130,12 @@ function ProgressBar({
                     <Text style={styles.percentage}>{percentage}% used</Text>
                     {remaining > 0 && (
                         <Text style={styles.remaining}>
-                            {formatAmount(remaining)} remaining
+                            <Amount value={remaining} currency="INR" style={styles.remaining} /> remaining
                         </Text>
                     )}
                     {remaining <= 0 && (
                         <Text style={[styles.remaining, { color: colors.danger }]}>
-                            Over budget by {formatAmount(Math.abs(remaining))}
+                            Over budget by <Amount value={Math.abs(remaining)} currency="INR" style={[styles.remaining, { color: colors.danger }]} />
                         </Text>
                     )}
                 </View>

@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, StatusBar, TouchableOpacity, RefreshControl, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, StatusBar, TouchableOpacity, RefreshControl, Platform, Dimensions } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import NetInfo from '@react-native-community/netinfo';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { expenseService } from '../services/expenseService';
@@ -11,9 +12,12 @@ import LineChart from '../components/charts/LineChart';
 import InsightCard from '../components/InsightCard';
 import { SkeletonCard } from '../components/SkeletonLoader';
 import hapticFeedback from '../utils/haptics';
+import { usePrivacy } from '../context/PrivacyContext';
 
 function AnalyticsScreen() {
     const { colors, isDark, spacing, borderRadius, shadows } = useTheme();
+    const { isPrivate, toggle: togglePrivacy } = usePrivacy();
+    const maskMoney = (msg) => isPrivate ? msg.replace(/₹[\d,.]+/g, '₹••••') : msg;
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [selectedPeriod, setSelectedPeriod] = useState('month'); // 'week', 'month', '3months', '6months', 'year', 'custom'
@@ -31,6 +35,7 @@ function AnalyticsScreen() {
         spendingTrend: [],
         insights: [],
     });
+
 
     const getDateRange = useCallback(() => {
         const end = new Date();
@@ -152,6 +157,7 @@ function AnalyticsScreen() {
             } else {
                 setAnalyticsData(generateSampleData());
             }
+
         } catch (error) {
             console.error('Error fetching analytics:', error);
             setAnalyticsData(generateSampleData());
@@ -441,12 +447,12 @@ function AnalyticsScreen() {
             const minWidth = Math.max(labels.length * 60, 320);
             return (
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                    <BarChart data={data} labels={labels} width={minWidth} />
+                    <BarChart data={data} labels={labels} width={minWidth} hideValues={isPrivate} />
                 </ScrollView>
             );
         } else if (chartType === 'pie') {
             // Fixed size pie chart without horizontal scroll
-            return <PieChart data={analyticsData.categoryBreakdown} height={175} />;
+            return <PieChart data={analyticsData.categoryBreakdown} height={175} hideValues={isPrivate} />;
         } else {
             // For line chart, aggregate daily data into weekly data for better visualization
             const dailyData = analyticsData.spendingTrend;
@@ -482,7 +488,7 @@ function AnalyticsScreen() {
             const minWidth = Math.max(aggregatedLabels.length * 50, 320);
             return (
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                    <LineChart data={aggregatedData} labels={aggregatedLabels} width={minWidth} />
+                    <LineChart data={aggregatedData} labels={aggregatedLabels} width={minWidth} hideValues={isPrivate} />
                 </ScrollView>
             );
         }
@@ -520,7 +526,12 @@ function AnalyticsScreen() {
                 }
             >
                 <View style={styles.header}>
-                    <Text style={styles.title}>Analytics</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Text style={styles.title}>Analytics</Text>
+                        <TouchableOpacity onPress={togglePrivacy} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                            <Ionicons name={isPrivate ? 'eye-off-outline' : 'eye-outline'} size={20} color={colors.text} />
+                        </TouchableOpacity>
+                    </View>
 
                     {/* Period Selector */}
                     <View style={styles.periodSelector}>
@@ -663,7 +674,7 @@ function AnalyticsScreen() {
                                     key={index}
                                     icon={insight.icon}
                                     title={insight.title}
-                                    message={insight.message}
+                                    message={maskMoney(insight.message)}
                                     type={insight.type}
                                     trend={insight.trend}
                                 />

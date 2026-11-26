@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
 import { useEffect } from 'react'
-import { HelpCircle } from 'lucide-react'
 import PublicNavbar from '../components/PublicNavbar'
 import PublicFooter from '../components/PublicFooter'
 import '../styles/StaticPages.css'
@@ -20,7 +19,7 @@ const Documentation = () => {
                 <div className="static-container">
                     <div className="page-header">
                         <span className="page-badge">Documentation</span>
-                        <h1 className="page-title">User Guide</h1>
+                        <h1 className="page-title">User guide</h1>
                         <p className="page-subtitle">
                             Learn how to use Expense Tracker to take control of your finances
                         </p>
@@ -30,7 +29,7 @@ const Documentation = () => {
                     <div className="doc-step">
                         <div className="step-number">1</div>
                         <div className="step-content">
-                            <h3>Getting Started</h3>
+                            <h3>Getting started</h3>
                             <p>
                                 Create your free account in seconds. No credit card required!
                             </p>
@@ -38,7 +37,7 @@ const Documentation = () => {
                                 <li>Click "Get Started Free" or "Sign Up"</li>
                                 <li>Enter your name, email, and create a password</li>
                                 <li>Select your preferred currency (USD, EUR, INR, etc.)</li>
-                                <li>Click "Register" and you're ready to go!</li>
+                                <li>Click "Register" to create your account</li>
                             </ul>
                             <p>
                                 <strong>Pro Tip:</strong> Choose the currency you use most often. You can change it later in your profile settings.
@@ -49,7 +48,7 @@ const Documentation = () => {
                     <div className="doc-step">
                         <div className="step-number">2</div>
                         <div className="step-content">
-                            <h3>Dashboard Overview</h3>
+                            <h3>Dashboard overview</h3>
                             <p>
                                 After logging in, you'll see your Dashboard - your financial command center.
                             </p>
@@ -68,7 +67,7 @@ const Documentation = () => {
                     <div className="doc-step">
                         <div className="step-number">3</div>
                         <div className="step-content">
-                            <h3>Adding Expenses</h3>
+                            <h3>Adding expenses</h3>
                             <p>
                                 Navigate to the Expenses page to add your spending data.
                             </p>
@@ -89,7 +88,7 @@ const Documentation = () => {
                     <div className="doc-step">
                         <div className="step-number">4</div>
                         <div className="step-content">
-                            <h3>Managing Categories</h3>
+                            <h3>Managing categories</h3>
                             <p>
                                 Categories help you organize your spending. Customize them to match your needs.
                             </p>
@@ -108,7 +107,7 @@ const Documentation = () => {
                     <div className="doc-step">
                         <div className="step-number">5</div>
                         <div className="step-content">
-                            <h3>Using Analytics</h3>
+                            <h3>Using analytics</h3>
                             <p>
                                 The Analytics page provides detailed insights into your spending patterns.
                             </p>
@@ -128,7 +127,7 @@ const Documentation = () => {
                     <div className="doc-step">
                         <div className="step-number">6</div>
                         <div className="step-content">
-                            <h3>Exporting Data</h3>
+                            <h3>Exporting data</h3>
                             <p>
                                 Download your expense data in multiple formats for backup or external analysis.
                             </p>
@@ -153,7 +152,7 @@ const Documentation = () => {
                     <div className="doc-step">
                         <div className="step-number">7</div>
                         <div className="step-content">
-                            <h3>Filtering and Searching</h3>
+                            <h3>Filtering and searching</h3>
                             <p>
                                 Find specific expenses quickly using powerful filters.
                             </p>
@@ -173,7 +172,7 @@ const Documentation = () => {
                     <div className="doc-step">
                         <div className="step-number">8</div>
                         <div className="step-content">
-                            <h3>Profile & Settings</h3>
+                            <h3>Profile & settings</h3>
                             <p>
                                 Customize your account and preferences in the Profile page.
                             </p>
@@ -192,7 +191,7 @@ const Documentation = () => {
                     <div className="doc-step">
                         <div className="step-number">9</div>
                         <div className="step-content">
-                            <h3>Dark Mode</h3>
+                            <h3>Dark mode</h3>
                             <p>
                                 Expense Tracker includes a beautiful dark theme that's easy on the eyes.
                             </p>
@@ -211,7 +210,7 @@ const Documentation = () => {
                     <div className="doc-step">
                         <div className="step-number">10</div>
                         <div className="step-content">
-                            <h3>Tips & Best Practices</h3>
+                            <h3>Tips & best practices</h3>
                             <p>
                                 Get the most out of Expense Tracker with these pro tips:
                             </p>
@@ -230,13 +229,12 @@ const Documentation = () => {
                     </div>
 
                     {/* Need More Help */}
-                    <div className="content-section text-center my-16">
-                        <h2 className="section-title justify-center text-[#0d253d]">
-                            <span className="section-icon"><HelpCircle className="w-5 h-5 text-[#4434d4]" /></span>
-                            Need More Help?
+                    <div className="content-section mt-16">
+                        <h2 className="section-title text-[#171717]">
+                            Need more help?
                         </h2>
                         <div className="section-content">
-                            <p className="mb-6 text-[#64748d]">
+                            <p className="mb-6 text-[#737373]">
                                 Check out our FAQ or contact our support team for personalized assistance.
                             </p>
                             <div className="flex gap-4 justify-center flex-wrap">

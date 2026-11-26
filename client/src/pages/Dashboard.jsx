@@ -3,30 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useExpense } from '../context/ExpenseContext'
 import { useDebt } from '../context/DebtContext'
+import { useDailyActivity } from '../hooks/useDailyActivity'
+import ActivityHeatmap from '../components/ActivityHeatmap'
 import { expenseService } from '../services/expenseService'
-import { formatCurrency } from '../utils/helpers'
+import Amount from '../components/Amount'
 import { format } from 'date-fns'
-import {
-  TrendingUp,
-  TrendingDown,
-  CreditCard,
-  Calendar,
-  PieChart,
-  Activity,
-  Wallet,
-  ArrowUpRight,
-  ArrowDownRight,
-  Sparkles,
-  Plus,
-  ArrowRight,
-  Receipt
-} from 'lucide-react'
+import { Plus, ArrowUpRight, Receipt } from 'lucide-react'
 import EmptyState from '../components/EmptyState'
-import {
-  BanknotesIcon,
-  ArrowDownTrayIcon,
-  ArrowUpTrayIcon
-} from '@heroicons/react/24/outline'
+import { useTheme } from '../context/ThemeContext'
 import {
   AreaChart,
   Area,
@@ -38,13 +22,17 @@ import {
 } from 'recharts'
 
 const Dashboard = () => {
-  const { user, currency } = useAuth()
+  const { currency } = useAuth()
   const { stats, trends, loading, loadStats, loadTrends } = useExpense()
   const { debts, loadDebts } = useDebt()
   const [recentTransactions, setRecentTransactions] = useState([])
   const [loadingRecent, setLoadingRecent] = useState(true)
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
   const navigate = useNavigate()
+  const activity = useDailyActivity(52)
+  const { theme } = useTheme()
+  const isDark = theme === 'dark' ||
+    (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
 
   useEffect(() => {
     loadStats()
@@ -85,377 +73,250 @@ const Dashboard = () => {
   const currentYear = new Date().getFullYear()
   const availableYears = Array.from({ length: currentYear - 2019 }, (_, i) => currentYear - i)
 
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div
-          className="px-4 py-3 rounded-xl text-sm border border-white/[0.10]"
-          style={{
-            background: 'rgba(30, 41, 59, 0.92)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            boxShadow: '0 12px 40px rgba(0,0,0,0.4)',
-          }}
-        >
-          <p className="font-semibold text-white mb-1.5">{label}</p>
-          {payload.map((entry, index) => (
-            <p key={index} className="flex items-center gap-2 py-0.5">
-              <span
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: entry.color }}
-              />
-              <span className="text-slate-400">{entry.name}:</span>
-              <span className="font-medium text-white">
-                {formatCurrency(entry.value, currency)}
-              </span>
-            </p>
-          ))}
-        </div>
-      )
-    }
-    return null
+  const chartColors = isDark
+    ? { expense: '#8b7ffe', income: '#85858b', grid: 'rgba(237,237,237,0.06)', tick: '#85858b' }
+    : { expense: '#533afd', income: '#a3a3a3', grid: 'rgba(23,23,23,0.06)', tick: '#737373' }
+
+  const ChartTooltip = ({ active, payload, label }) => {
+    if (!active || !payload?.length) return null
+    return (
+      <div className="glass-dropdown px-3 py-2 text-xs">
+        <p className="font-medium text-gray-900 dark:text-[#ededed] mb-1">{label}</p>
+        {payload.map((entry) => (
+          <p key={entry.dataKey} className="flex items-center justify-between gap-6 py-0.5">
+            <span className="flex items-center gap-2 text-gray-500 dark:text-[#a1a1a6]">
+              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
+              {entry.name}
+            </span>
+            <Amount value={entry.value} currency={currency} className="font-mono tabular-nums text-gray-900 dark:text-[#ededed]" />
+          </p>
+        ))}
+      </div>
+    )
   }
 
-  // Greeting based on time of day
-  const getGreeting = () => {
-    const hour = new Date().getHours()
-    if (hour < 12) return 'Good morning'
-    if (hour < 17) return 'Good afternoon'
-    return 'Good evening'
+  const statCards = [
+    { label: 'Expenses', value: totalExpenses },
+    { label: 'Income', value: totalIncome },
+    { label: 'Net', value: netAmount, tone: netAmount >= 0 ? 'pos' : 'neg' },
+    totalPayable > 0 && { label: 'You owe', value: totalPayable },
+    totalReceivable > 0 && { label: 'Owed to you', value: totalReceivable },
+  ].filter(Boolean)
+
+  const toneClass = {
+    pos: 'text-green-600 dark:text-[#4cc38a]',
+    neg: 'text-red-600 dark:text-[#e5484d]',
   }
+
+  const sectionTitle = 'text-base font-medium text-gray-900 dark:text-[#ededed]'
+  const meta = 'text-xs text-gray-500 dark:text-[#85858b]'
+  const textLink = 'inline-flex items-center gap-1 text-sm text-[#533afd] dark:text-[#8b7ffe] hover:text-[#4434d4] dark:hover:text-[#a59bff] transition-colors'
 
   return (
-    <div className="space-y-6 md:space-y-8">
-      {/* ============ HEADER ============ */}
-      <div className="glass-card p-5 md:p-8">
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-500 dark:text-slate-500 mb-1">
-              {getGreeting()},
-            </p>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
-              {user?.name?.split(' ')[0]}
-            </h1>
-            <p className="text-gray-600 dark:text-slate-400 mt-1 text-sm">
-              Here's your financial overview for {format(new Date(), 'MMMM yyyy')}
-            </p>
-          </div>
-          <div className="hidden md:flex items-center gap-2">
-            <Sparkles size={16} className="text-indigo-500 dark:text-indigo-400 animate-pulse-glow" />
-            <span className="text-xs font-medium text-gray-500 dark:text-slate-500">
-              {format(new Date(), 'EEEE, MMM d')}
-            </span>
-          </div>
-        </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl md:text-[28px] leading-tight font-medium text-gray-900 dark:text-[#ededed]">Overview</h1>
+        <p className="mt-1 text-sm text-gray-500 dark:text-[#a1a1a6]">{format(new Date(), 'EEEE, MMMM d, yyyy')}</p>
       </div>
 
-      {/* ============ STATS CARDS ============ */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6 stagger-enter">
-        {/* Total Expenses */}
-        <div className="glass-card p-5 md:p-6 group cursor-default border-l-2 border-l-rose-500/50 hover:border-l-rose-400">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Total Expenses</p>
-              <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mt-1 md:mt-2">
-                {loading ? (
-                  <span className="inline-block w-24 h-8 rounded-lg animate-pulse bg-gray-100 dark:bg-white/[0.06]" />
-                ) : formatCurrency(totalExpenses, currency)}
-              </p>
-            </div>
-            <div className="p-2.5 md:p-3 rounded-xl bg-rose-50 dark:bg-rose-500/10 group-hover:shadow-glow-rose transition-all duration-300">
-              <TrendingDown className="h-6 w-6 md:h-7 md:w-7 text-rose-500 dark:text-rose-400 drop-shadow-[0_0_6px_rgba(251,113,133,0.3)]" />
-            </div>
+      {/* Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-4">
+        {statCards.map(({ label, value, tone }) => (
+          <div key={label} className="glass-card p-5">
+            <p className="text-sm text-gray-600 dark:text-[#a1a1a6]">{label}</p>
+            <p className={`mt-2 text-xl md:text-2xl leading-none font-mono font-medium tabular-nums truncate ${tone ? toneClass[tone] : 'text-gray-900 dark:text-[#ededed]'}`}>
+              {loading
+                ? <span className="inline-block w-24 h-7 rounded-md bg-gray-100 dark:bg-white/[0.06]" />
+                : <Amount value={value} currency={currency} />}
+            </p>
+            <p className={`mt-2 ${meta}`}>All time</p>
           </div>
-        </div>
-
-        {/* Total Income */}
-        <div className="glass-card p-5 md:p-6 group cursor-default border-l-2 border-l-emerald-500/50 hover:border-l-emerald-400">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Total Income</p>
-              <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mt-1 md:mt-2">
-                {loading ? (
-                  <span className="inline-block w-24 h-8 rounded-lg animate-pulse bg-gray-100 dark:bg-white/[0.06]" />
-                ) : formatCurrency(totalIncome, currency)}
-              </p>
-            </div>
-            <div className="p-2.5 md:p-3 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 group-hover:shadow-glow-emerald transition-all duration-300">
-              <TrendingUp className="h-6 w-6 md:h-7 md:w-7 text-emerald-500 dark:text-emerald-400 drop-shadow-[0_0_6px_rgba(52,211,153,0.3)]" />
-            </div>
-          </div>
-        </div>
-
-        {/* Net Amount */}
-        <div className="glass-card p-5 md:p-6 group cursor-default border-l-2 border-l-indigo-500/50 hover:border-l-indigo-400">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Net Balance</p>
-              <p className={`text-2xl md:text-3xl font-bold mt-1 md:mt-2 ${
-                netAmount >= 0
-                  ? 'text-emerald-600 dark:text-emerald-400'
-                  : 'text-rose-600 dark:text-rose-400'
-              }`}>
-                {loading ? (
-                  <span className="inline-block w-24 h-8 rounded-lg animate-pulse bg-gray-100 dark:bg-white/[0.06]" />
-                ) : formatCurrency(netAmount, currency)}
-              </p>
-            </div>
-            <div className="p-2.5 md:p-3 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 group-hover:shadow-glow-indigo transition-all duration-300">
-              <Wallet className="h-6 w-6 md:h-7 md:w-7 text-indigo-500 dark:text-indigo-400 drop-shadow-[0_0_6px_rgba(99,102,241,0.3)]" />
-            </div>
-          </div>
-        </div>
-
-        {/* Debt: Outstanding Payable */}
-        {totalPayable > 0 && (
-          <div className="glass-card p-5 md:p-6 group cursor-default border-l-2 border-l-amber-500/50 hover:border-l-amber-400">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Outstanding Payable</p>
-                <p className="text-2xl md:text-3xl font-bold text-rose-600 dark:text-rose-400 mt-1 md:mt-2">
-                  {formatCurrency(totalPayable, currency)}
-                </p>
-              </div>
-              <div className="p-2.5 md:p-3 rounded-xl bg-amber-50 dark:bg-amber-500/10 group-hover:shadow-[0_0_20px_rgba(251,191,36,0.12)] transition-all duration-300">
-                <ArrowDownTrayIcon className="h-6 w-6 md:h-7 md:w-7 text-amber-500 dark:text-amber-400" />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Debt: Outstanding Receivable */}
-        {totalReceivable > 0 && (
-          <div className="glass-card p-5 md:p-6 group cursor-default border-l-2 border-l-teal-500/50 hover:border-l-teal-400">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-slate-400">Outstanding Receivable</p>
-                <p className="text-2xl md:text-3xl font-bold text-emerald-600 dark:text-emerald-400 mt-1 md:mt-2">
-                  {formatCurrency(totalReceivable, currency)}
-                </p>
-              </div>
-              <div className="p-2.5 md:p-3 rounded-xl bg-teal-50 dark:bg-teal-500/10 group-hover:shadow-glow-emerald transition-all duration-300">
-                <ArrowUpTrayIcon className="h-6 w-6 md:h-7 md:w-7 text-teal-500 dark:text-teal-400" />
-              </div>
-            </div>
-          </div>
-        )}
+        ))}
       </div>
 
-      {/* ============ MAIN CONTENT GRID ============ */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 md:gap-8">
-        {/* Financial Overview Chart */}
-        <div className="xl:col-span-2">
+      {/* Chart + side column */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
+        <div className="xl:col-span-2 space-y-6">
           <div className="glass-card p-5 md:p-6">
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-5 md:mb-6">
-              <h2 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white flex items-center">
-                <PieChart className="h-5 w-5 mr-2 text-indigo-500 dark:text-indigo-400" />
-                Financial Overview
-              </h2>
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+              <div className="flex items-center gap-5">
+                <h2 className={sectionTitle}>Income and expenses</h2>
+                <div className={`hidden sm:flex items-center gap-4 ${meta}`}>
+                  <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full" style={{ backgroundColor: chartColors.expense }} />Expenses</span>
+                  <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full" style={{ backgroundColor: chartColors.income }} />Income</span>
+                </div>
+              </div>
               <select
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(Number(e.target.value))}
-                className="pl-3 pr-8 py-2 rounded-xl text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-50 dark:bg-white/[0.06] border border-gray-200 dark:border-white/[0.08] hover:bg-gray-100 dark:hover:bg-white/[0.10] focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-200 appearance-none bg-no-repeat bg-right cursor-pointer"
+                aria-label="Year"
+                className="h-9 pl-3 pr-8 rounded-lg text-sm font-mono tabular-nums text-gray-700 dark:text-[#ededed] bg-white dark:bg-[#232325] border border-gray-200 dark:border-white/[0.08] hover:bg-gray-50 dark:hover:bg-[#2a2a2c] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#533afd]/50 transition-colors appearance-none bg-no-repeat cursor-pointer"
                 style={{
-                  backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 20 20\'%3E%3Cpath stroke=\'%2394a3b8\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M6 8l4 4 4-4\'/%3E%3C/svg%3E")',
+                  backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 20 20\'%3E%3Cpath stroke=\'%2385858b\' stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M6 8l4 4 4-4\'/%3E%3C/svg%3E")',
                   backgroundPosition: 'right 0.5rem center',
-                  backgroundSize: '1.5em 1.5em'
+                  backgroundSize: '1.25em 1.25em'
                 }}
               >
                 {availableYears.map(year => (
-                  <option key={year} value={year} className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">{year}</option>
+                  <option key={year} value={year}>{year}</option>
                 ))}
               </select>
             </div>
-            <div className="h-[220px] md:h-[300px] w-full">
+            <div className="h-[240px] md:h-[320px] xl:h-[360px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <AreaChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                   <defs>
-                    <linearGradient id="glassGradientIncome" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#34d399" stopOpacity={0.25} />
-                      <stop offset="100%" stopColor="#34d399" stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id="glassGradientExpense" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#fb7185" stopOpacity={0.25} />
-                      <stop offset="100%" stopColor="#fb7185" stopOpacity={0} />
+                    <linearGradient id="expenseFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={chartColors.expense} stopOpacity={0.16} />
+                      <stop offset="100%" stopColor={chartColors.expense} stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    vertical={false}
-                    stroke="rgba(148, 163, 184, 0.06)"
-                  />
+                  <CartesianGrid vertical={false} stroke={chartColors.grid} />
                   <XAxis
                     dataKey="name"
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: '#64748b', fontSize: 12 }}
-                    dy={10}
+                    tick={{ fill: chartColors.tick, fontSize: 12, fontFamily: 'IBM Plex Mono, monospace' }}
+                    dy={8}
                   />
                   <YAxis
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fill: '#64748b', fontSize: 12 }}
+                    width={44}
+                    tick={{ fill: chartColors.tick, fontSize: 12, fontFamily: 'IBM Plex Mono, monospace' }}
                     tickFormatter={(value) => `${value / 1000}k`}
                   />
-                  <Tooltip content={<CustomTooltip />} />
+                  <Tooltip content={<ChartTooltip />} cursor={{ stroke: chartColors.grid }} />
                   <Area
                     type="monotone"
                     dataKey="Income"
-                    stroke="#34d399"
-                    strokeWidth={2.5}
-                    fillOpacity={1}
-                    fill="url(#glassGradientIncome)"
+                    stroke={chartColors.income}
+                    strokeWidth={1.5}
+                    strokeDasharray="4 4"
+                    fill="none"
                     dot={false}
-                    activeDot={{
-                      r: 5,
-                      fill: '#34d399',
-                      stroke: 'rgba(52,211,153,0.3)',
-                      strokeWidth: 6
-                    }}
+                    activeDot={{ r: 3, fill: chartColors.income, strokeWidth: 0 }}
                   />
                   <Area
                     type="monotone"
                     dataKey="Expense"
-                    stroke="#fb7185"
-                    strokeWidth={2.5}
-                    fillOpacity={1}
-                    fill="url(#glassGradientExpense)"
+                    name="Expenses"
+                    stroke={chartColors.expense}
+                    strokeWidth={2}
+                    fill="url(#expenseFill)"
                     dot={false}
-                    activeDot={{
-                      r: 5,
-                      fill: '#fb7185',
-                      stroke: 'rgba(251,113,133,0.3)',
-                      strokeWidth: 6
-                    }}
+                    activeDot={{ r: 4, fill: chartColors.expense, strokeWidth: 0 }}
                   />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
           </div>
+
+          {/* Activity */}
+          <div className="glass-card p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className={sectionTitle}>Activity</h2>
+              <span className={meta}>Last 12 months</span>
+            </div>
+            <ActivityHeatmap
+              grid={activity.grid}
+              weekdayLabels={activity.weekdayLabels}
+              monthLabels={activity.monthLabels}
+              loading={activity.loading}
+              error={activity.error}
+              currency={currency}
+              onCellClick={(date) => navigate('/app/expenses', { state: { date } })}
+            />
+          </div>
         </div>
 
-        {/* Quick Actions & Recent Activity */}
-        <div className="xl:col-span-1 space-y-6 md:space-y-8">
-          {/* Quick Actions */}
-          <div className="glass-card p-5 md:p-6">
-            <h2 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white mb-4 md:mb-5 flex items-center">
-              <Activity className="h-5 w-5 mr-2 text-indigo-500 dark:text-indigo-400" />
-              Quick Actions
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-1 gap-3">
+        <div className="space-y-6">
+          {/* Recent */}
+          <div className="glass-card p-5">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className={sectionTitle}>Recent</h2>
+              <button onClick={() => navigate('/app/expenses')} className={textLink}>
+                View all
+                <ArrowUpRight size={16} strokeWidth={1.5} />
+              </button>
+            </div>
+
+            {loadingRecent ? (
+              <div className="space-y-1">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="h-12 flex items-center gap-3 px-2">
+                    <div className="w-2 h-2 rounded-full bg-gray-200 dark:bg-white/[0.08]" />
+                    <div className="flex-1 h-3 rounded bg-gray-100 dark:bg-white/[0.06]" />
+                    <div className="w-16 h-3 rounded bg-gray-100 dark:bg-white/[0.06]" />
+                  </div>
+                ))}
+              </div>
+            ) : recentTransactions.length > 0 ? (
+              <div className="-mx-2">
+                {recentTransactions.map((transaction) => (
+                  <button
+                    key={transaction._id}
+                    onClick={() => navigate('/app/expenses')}
+                    className="w-full h-12 flex items-center gap-3 px-2 rounded-lg text-left hover:bg-gray-50 dark:hover:bg-white/[0.04] transition-colors"
+                  >
+                    <span
+                      className="w-2 h-2 shrink-0 rounded-full"
+                      style={{ backgroundColor: transaction.category?.color || '#a3a3a3' }}
+                    />
+                    <span className="flex-1 min-w-0">
+                      <span className="block text-sm text-gray-900 dark:text-[#ededed] truncate">
+                        {transaction.description || transaction.category?.name}
+                      </span>
+                      <span className={`block ${meta}`}>{format(new Date(transaction.date), 'MMM d')}</span>
+                    </span>
+                    <Amount
+                      value={transaction.amount}
+                      currency={currency}
+                      sign={transaction.type === 'income' ? '+' : '−'}
+                      className={`text-sm font-mono tabular-nums ${transaction.type === 'income' ? toneClass.pos : 'text-gray-900 dark:text-[#ededed]'}`}
+                    />
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <EmptyState
+                icon={Receipt}
+                title="No transactions yet"
+                description="Add an expense or income and it shows up here."
+              />
+            )}
+          </div>
+
+          {/* Quick actions */}
+          <div className="glass-card p-5">
+            <h2 className={`${sectionTitle} mb-4`}>Quick actions</h2>
+            <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => navigate('/app/expenses', { state: { action: 'add_expense' } })}
-                className="btn-primary group w-full justify-center min-h-[44px]"
+                className="btn-primary w-full min-h-[44px]"
               >
-                <Plus size={16} className="group-hover:rotate-90 transition-transform duration-300" />
-                Add Expense
+                <Plus size={16} strokeWidth={1.5} />
+                Add expense
               </button>
               <button
                 onClick={() => navigate('/app/expenses', { state: { action: 'add_income' } })}
-                className="btn-success group w-full justify-center min-h-[44px]"
+                className="btn-secondary w-full min-h-[44px]"
               >
-                <Plus size={16} className="group-hover:rotate-90 transition-transform duration-300" />
-                Add Income
+                <Plus size={16} strokeWidth={1.5} />
+                Add income
               </button>
-              <button
-                onClick={() => navigate('/app/categories')}
-                className="group w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium rounded-full border transition-all duration-200 min-h-[44px] hover:-translate-y-px"
-                style={{ borderColor: 'rgba(139,92,246,0.4)', color: '#7c3aed', background: 'rgba(139,92,246,0.06)' }}
-              >
-                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-300" />
+              <button onClick={() => navigate('/app/categories')} className="btn-secondary w-full min-h-[44px]">
                 Categories
               </button>
-              <button
-                onClick={() => navigate('/app/debts')}
-                className="group w-full flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium rounded-full border transition-all duration-200 min-h-[44px] hover:-translate-y-px"
-                style={{ borderColor: 'rgba(217,119,6,0.4)', color: '#b45309', background: 'rgba(217,119,6,0.06)' }}
-              >
-                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-300" />
+              <button onClick={() => navigate('/app/debts')} className="btn-secondary w-full min-h-[44px]">
                 Debts
               </button>
             </div>
           </div>
-
-          {/* Recent Activity */}
-          <div className="glass-card p-5 md:p-6">
-            <div className="flex items-center justify-between mb-4 md:mb-5">
-              <h2 className="text-base md:text-lg font-semibold text-gray-900 dark:text-white flex items-center">
-                <Calendar className="h-5 w-5 mr-2 text-indigo-500 dark:text-indigo-400" />
-                Recent Activity
-              </h2>
-              <button
-                onClick={() => navigate('/app/expenses')}
-                className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium transition-colors duration-200 flex items-center gap-1"
-              >
-                View All
-                <ArrowUpRight size={14} />
-              </button>
-            </div>
-
-            <div className="space-y-2">
-              {loadingRecent ? (
-                <div className="space-y-3">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="flex items-center gap-3 p-3 rounded-xl animate-pulse">
-                      <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-white/[0.06]" />
-                      <div className="flex-1 space-y-2">
-                        <div className="h-3 rounded w-24 bg-gray-100 dark:bg-white/[0.06]" />
-                        <div className="h-2 rounded w-16 bg-gray-100 dark:bg-white/[0.04]" />
-                      </div>
-                      <div className="h-4 rounded w-16 bg-gray-100 dark:bg-white/[0.06]" />
-                    </div>
-                  ))}
-                </div>
-              ) : recentTransactions.length > 0 ? (
-                recentTransactions.map((transaction) => (
-                  <div
-                    key={transaction._id}
-                    className="flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-white/[0.04] rounded-xl transition-all duration-200 cursor-pointer group border border-transparent hover:border-gray-100 dark:hover:border-white/[0.06]"
-                    onClick={() => navigate('/app/expenses')}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 ${
-                        transaction.type === 'income'
-                          ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                          : 'bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400'
-                      }`}>
-                        {transaction.category?.icon ? (
-                          <span className="text-lg">{transaction.category.icon}</span>
-                        ) : (
-                          transaction.type === 'income'
-                            ? <TrendingUp className="h-5 w-5" />
-                            : <CreditCard className="h-5 w-5" />
-                        )}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[140px] md:max-w-[120px]">
-                          {transaction.description || transaction.category?.name}
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-slate-500">
-                          {format(new Date(transaction.date), 'MMM d, yyyy')}
-                        </p>
-                      </div>
-                    </div>
-                    <span className={`font-semibold text-sm ${
-                      transaction.type === 'income'
-                        ? 'text-emerald-600 dark:text-emerald-400'
-                        : 'text-rose-600 dark:text-rose-400'
-                    }`}>
-                      {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount, currency)}
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <EmptyState
-                  icon={Receipt}
-                  title="No transactions yet"
-                  description="Add your first expense or income to get started."
-                />
-              )}
-            </div>
-          </div>
         </div>
       </div>
+
     </div>
   )
 }

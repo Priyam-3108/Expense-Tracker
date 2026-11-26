@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
 import { useEffect } from 'react'
-import { FileText, Briefcase, User, Lock, Scale, Copyright, AlertTriangle, RefreshCw, Mail } from 'lucide-react'
 import PublicNavbar from '../components/PublicNavbar'
 import PublicFooter from '../components/PublicFooter'
 import '../styles/StaticPages.css'
@@ -20,7 +19,7 @@ const TermsOfService = () => {
                 <div className="static-container">
                     <div className="page-header">
                         <span className="page-badge">Legal</span>
-                        <h1 className="page-title">Terms of Service</h1>
+                        <h1 className="page-title">Terms of service</h1>
                         <p className="page-subtitle">
                             Please read these terms carefully before using Expense Tracker
                         </p>
@@ -29,7 +28,6 @@ const TermsOfService = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon"><FileText className="w-5 h-5 text-indigo-400" /></span>
                             1. Introduction
                         </h2>
                         <div className="section-content">
@@ -44,7 +42,6 @@ const TermsOfService = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon"><Briefcase className="w-5 h-5 text-indigo-400" /></span>
                             2. Service Description
                         </h2>
                         <div className="section-content">
@@ -67,7 +64,6 @@ const TermsOfService = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon"><User className="w-5 h-5 text-indigo-400" /></span>
                             3. User Accounts
                         </h2>
                         <div className="section-content">
@@ -91,7 +87,6 @@ const TermsOfService = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon"><Lock className="w-5 h-5 text-indigo-400" /></span>
                             4. Data and Privacy
                         </h2>
                         <div className="section-content">
@@ -102,14 +97,13 @@ const TermsOfService = () => {
                                 <strong>Data Security:</strong> While we implement industry-standard security measures to protect your data, no system is completely secure. You acknowledge that you provide your data at your own risk.
                             </p>
                             <p>
-                                <strong>Privacy Policy:</strong> Our collection and use of personal information is governed by our <Link to="/privacy" className="text-indigo-400 hover:text-indigo-300 underline font-medium">Privacy Policy</Link>, which is incorporated into these terms by reference.
+                                <strong>Privacy Policy:</strong> Our collection and use of personal information is governed by our <Link to="/privacy" className="text-[#533afd] hover:underline">Privacy Policy</Link>, which is incorporated into these terms by reference.
                             </p>
                         </div>
                     </div>
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon"><Scale className="w-5 h-5 text-indigo-400" /></span>
                             5. Acceptable Use
                         </h2>
                         <div className="section-content">
@@ -129,7 +123,6 @@ const TermsOfService = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon"><Copyright className="w-5 h-5 text-indigo-400" /></span>
                             6. Intellectual Property
                         </h2>
                         <div className="section-content">
@@ -147,7 +140,6 @@ const TermsOfService = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon"><AlertTriangle className="w-5 h-5 text-indigo-400" /></span>
                             7. Disclaimer and Limitation of Liability
                         </h2>
                         <div className="section-content">
@@ -165,7 +157,6 @@ const TermsOfService = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon"><RefreshCw className="w-5 h-5 text-indigo-400" /></span>
                             8. Changes to Terms
                         </h2>
                         <div className="section-content">
@@ -180,12 +171,11 @@ const TermsOfService = () => {
 
                     <div className="content-section">
                         <h2 className="section-title">
-                            <span className="section-icon"><Mail className="w-5 h-5 text-indigo-400" /></span>
                             9. Contact Information
                         </h2>
                         <div className="section-content">
                             <p>
-                                If you have any questions about these Terms of Service, please contact us through our <Link to="/support" className="text-indigo-400 hover:text-indigo-300 underline font-medium">Support page</Link>.
+                                If you have any questions about these Terms of Service, please contact us through our <Link to="/support" className="text-[#533afd] hover:underline">Support page</Link>.
                             </p>
                         </div>
                     </div>

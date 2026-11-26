@@ -28,9 +28,9 @@ export default {
           foreground: 'hsl(var(--primary-foreground))',
         },
         ink: {
-          DEFAULT: '#0d253d',
-          secondary: '#273951',
-          mute: '#64748d',
+          DEFAULT: '#171717',
+          secondary: '#404040',
+          mute: '#737373',
         },
         ruby: '#ea2261',
         magenta: '#f96bee',
@@ -98,34 +98,18 @@ export default {
       },
       fontFamily: {
         sans: ['"sohne-var"', 'Inter', '"SF Pro Display"', 'system-ui', '-apple-system', 'sans-serif'],
+        mono: ['"IBM Plex Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
       },
       borderRadius: {
         pill: '9999px',
       },
       boxShadow: {
-        'glow-indigo': '0 0 20px rgba(83,58,253,0.15), 0 0 40px rgba(83,58,253,0.05)',
-        'glow-emerald': '0 0 20px rgba(52,211,153,0.12), 0 0 40px rgba(52,211,153,0.04)',
-        'glow-rose': '0 0 20px rgba(234,34,97,0.12), 0 0 40px rgba(234,34,97,0.04)',
-        'glow-violet': '0 0 20px rgba(83,58,253,0.12), 0 0 40px rgba(83,58,253,0.04)',
-        'glass': '0 8px 32px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.05)',
-        'glass-lg': '0 16px 48px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.06)',
-        'glass-hover': '0 12px 40px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.08)',
-        'elevation-1': '0 1px 3px rgba(0,55,112,0.08)',
-        'elevation-2': '0 8px 24px rgba(0,55,112,0.08), 0 2px 6px rgba(0,55,112,0.04)',
-      },
-      backdropBlur: {
-        '3xl': '64px',
+        'elevation-1': '0 1px 2px rgba(0,0,0,0.05)',
+        'elevation-2': '0 8px 24px rgba(0,0,0,0.06)',
       },
       animation: {
-        'fade-in': 'fadeIn 0.5s ease-in-out',
-        'slide-up': 'slideUp 0.3s ease-out',
-        'bounce-in': 'bounceIn 0.6s ease-out',
-        'orb-float': 'orbFloat 20s ease-in-out infinite',
-        'orb-drift': 'orbDrift 25s ease-in-out infinite',
-        'orb-orbit': 'orbOrbit 18s ease-in-out infinite',
-        'orb-breathe': 'orbBreathe 22s ease-in-out infinite',
-        'shimmer': 'shimmer 2s ease-in-out infinite',
-        'pulse-glow': 'pulseGlow 3s ease-in-out infinite',
+        'fade-in': 'fadeIn 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
+        'slide-up': 'slideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
       },
       keyframes: {
         fadeIn: {
@@ -133,43 +117,8 @@ export default {
           '100%': { opacity: '1' },
         },
         slideUp: {
-          '0%': { transform: 'translateY(10px)', opacity: '0' },
+          '0%': { transform: 'translateY(8px)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
-        },
-        bounceIn: {
-          '0%': { transform: 'scale(0.3)', opacity: '0' },
-          '50%': { transform: 'scale(1.05)' },
-          '70%': { transform: 'scale(0.9)' },
-          '100%': { transform: 'scale(1)', opacity: '1' },
-        },
-        orbFloat: {
-          '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
-          '25%': { transform: 'translate(30px, -50px) scale(1.05)' },
-          '50%': { transform: 'translate(-20px, -25px) scale(0.95)' },
-          '75%': { transform: 'translate(15px, 20px) scale(1.02)' },
-        },
-        orbDrift: {
-          '0%, 100%': { transform: 'translate(0, 0) scale(1) rotate(0deg)' },
-          '33%': { transform: 'translate(-40px, 30px) scale(1.08) rotate(5deg)' },
-          '66%': { transform: 'translate(25px, -20px) scale(0.92) rotate(-3deg)' },
-        },
-        orbOrbit: {
-          '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
-          '25%': { transform: 'translate(-35px, -30px) scale(1.1)' },
-          '50%': { transform: 'translate(20px, -50px) scale(0.9)' },
-          '75%': { transform: 'translate(30px, 15px) scale(1.05)' },
-        },
-        orbBreathe: {
-          '0%, 100%': { transform: 'scale(1)', opacity: '0.6' },
-          '50%': { transform: 'scale(1.15)', opacity: '1' },
-        },
-        shimmer: {
-          '0%, 100%': { opacity: '0.5' },
-          '50%': { opacity: '1' },
-        },
-        pulseGlow: {
-          '0%, 100%': { boxShadow: '0 0 15px rgba(99,102,241,0.1)' },
-          '50%': { boxShadow: '0 0 25px rgba(99,102,241,0.25)' },
         },
       },
     },

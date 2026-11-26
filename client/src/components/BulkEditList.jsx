@@ -41,7 +41,7 @@ const BulkEditList = ({ expenses, categories, currency, onExpensesChange }) => {
 
     return (
         <div className="space-y-4">
-            <div className="grid grid-cols-12 gap-4 px-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            <div className="grid grid-cols-12 gap-4 px-2 text-xs font-medium text-gray-500 dark:text-[#a1a1a6]">
                 <div className="col-span-1 text-center">Type</div>
                 <div className="col-span-3">Date</div>
                 <div className="col-span-3">Category</div>
@@ -53,14 +53,14 @@ const BulkEditList = ({ expenses, categories, currency, onExpensesChange }) => {
                 {editableExpenses.map((expense, index) => (
                     <div
                         key={expense._id}
-                        className="grid grid-cols-12 gap-3 items-start p-3 border border-gray-200 dark:border-white/[0.07] rounded-xl bg-white dark:bg-white/[0.02] hover:border-indigo-300 dark:hover:border-white/[0.15] transition-all duration-200"
+                        className="grid grid-cols-12 gap-3 items-start p-3 border border-gray-200 dark:border-white/[0.07] rounded-xl bg-white dark:bg-white/[0.02] hover:border-indigo-300 dark:hover:border-white/[0.15] transition-colors"
                     >
                         {/* Type Toggle */}
                         <div className="col-span-1 flex justify-center pt-2">
                             <button
                                 type="button"
                                 onClick={() => toggleType(index)}
-                                className={`transition-transform hover:scale-110 ${expense.type === 'income'
+                                className={`transition-transform ${expense.type === 'income'
                                     ? 'text-emerald-600 dark:text-emerald-400'
                                     : 'text-rose-600 dark:text-rose-400'
                                     }`}
@@ -100,7 +100,7 @@ const BulkEditList = ({ expenses, categories, currency, onExpensesChange }) => {
                                 type="text"
                                 value={expense.description}
                                 onChange={(e) => updateExpense(index, 'description', e.target.value)}
-                                className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-white/[0.07] rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/30 bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 transition-all duration-200"
+                                className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-white/[0.07] rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/30 bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 transition-colors"
                                 placeholder="Description"
                             />
                         </div>
@@ -108,7 +108,7 @@ const BulkEditList = ({ expenses, categories, currency, onExpensesChange }) => {
                         {/* Amount */}
                         <div className="col-span-2">
                             <div className="relative">
-                                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 text-xs">
+                                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 dark:text-[#a1a1a6] text-xs">
                                     {currency === 'USD' ? '$' : currency}
                                 </span>
                                 <input
@@ -117,7 +117,7 @@ const BulkEditList = ({ expenses, categories, currency, onExpensesChange }) => {
                                     min="1"
                                     value={expense.amount}
                                     onChange={(e) => updateExpense(index, 'amount', e.target.value)}
-                                    className="w-full pl-9 pr-2 py-1.5 text-sm border border-gray-300 dark:border-white/[0.07] rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/30 bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 transition-all duration-200"
+                                    className="w-full pl-9 pr-2 py-1.5 text-sm border border-gray-300 dark:border-white/[0.07] rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/30 bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 transition-colors"
                                     placeholder="0.00"
                                 />
                             </div>

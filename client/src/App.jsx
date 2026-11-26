@@ -3,10 +3,13 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import { ExpenseProvider } from './context/ExpenseContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { DebtProvider } from './context/DebtContext'
+import { PrivacyProvider } from './context/PrivacyContext'
 import Layout from './components/Layout'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 import Dashboard from './pages/Dashboard'
 import Expenses from './pages/Expenses'
 import Categories from './pages/Categories'
@@ -19,6 +22,7 @@ import FAQ from './pages/FAQ'
 import Support from './pages/Support'
 import Documentation from './pages/Documentation'
 import SharedAnalytics from './pages/SharedAnalytics'
+import FormKitShowcase from './components/form/Showcase'
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -46,6 +50,8 @@ function AppRoutes() {
       {/* Public Routes */}
       <Route path="/login" element={user ? <Navigate to="/app/dashboard" replace /> : <Login />} />
       <Route path="/register" element={user ? <Navigate to="/app/dashboard" replace /> : <Register />} />
+      <Route path="/forgot-password" element={user ? <Navigate to="/app/dashboard" replace /> : <ForgotPassword />} />
+      <Route path="/reset-password/:token" element={user ? <Navigate to="/app/dashboard" replace /> : <ResetPassword />} />
 
       {/* Static Pages - Public Routes */}
       <Route path="/terms" element={<TermsOfService />} />
@@ -72,6 +78,10 @@ function AppRoutes() {
         <Route path="profile" element={<Profile />} />
       </Route>
 
+      {import.meta.env.DEV && (
+        <Route path="/dev/form-kit" element={<FormKitShowcase />} />
+      )}
+
       {/* Catch all route */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
@@ -82,11 +92,13 @@ function App() {
   return (
     <AuthProvider>
       <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-        <ExpenseProvider>
-          <DebtProvider>
-            <AppRoutes />
-          </DebtProvider>
-        </ExpenseProvider>
+        <PrivacyProvider>
+          <ExpenseProvider>
+            <DebtProvider>
+              <AppRoutes />
+            </DebtProvider>
+          </ExpenseProvider>
+        </PrivacyProvider>
       </ThemeProvider>
     </AuthProvider>
   )
