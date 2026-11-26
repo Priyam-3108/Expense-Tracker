@@ -5,9 +5,9 @@ import { useTheme } from '../context/ThemeContext'
 import { usePrivacy } from '../context/PrivacyContext'
 import { formatCurrency } from '../utils/helpers'
 
-// Single-hue ink ramp: empty → filled, like ink on a ledger calendar
-const LIGHT = ['#f4f4f5', '#d4d4d4', '#a3a3a3', '#525252', '#171717']
-const DARK = ['rgba(237,237,237,0.05)', 'rgba(237,237,237,0.18)', 'rgba(237,237,237,0.36)', 'rgba(237,237,237,0.62)', '#ededed']
+// Bucket 0 (no activity) is neutral; buckets 1-4 are a brass ramp, light to dense
+const LIGHT = ['#f4f4f5', '#ebd0a8', '#ddb072', '#c07a2e', '#8a4d16']
+const DARK = ['rgba(237,237,237,0.05)', 'rgba(212,149,74,0.32)', 'rgba(212,149,74,0.52)', 'rgba(212,149,74,0.76)', '#d4954a']
 const EMPTY_LIGHT = 'rgba(23,23,23,0.04)'
 const EMPTY_DARK = 'rgba(237,237,237,0.04)'
 
@@ -101,7 +101,7 @@ export default function ActivityHeatmap({
                     boxShadow: cell.inWindow && cell.bucket === 0 ? `inset 0 0 0 1px ${emptyColor}` : undefined,
                     cursor: cell.count > 0 ? 'pointer' : 'default',
                   }}
-                  aria-label={cell.date ? `${cell.date}: ${cell.count} transactions` : undefined}
+                  aria-label={cell.date ? `${format(parseISO(cell.date), 'MMM d, yyyy')}: ${cell.count} ${cell.count === 1 ? 'entry' : 'entries'}, ${isPrivate ? '••••' : formatCurrency(cell.expenseTotal, currency, { whole: true })}` : undefined}
                 />
               ))
             )}
