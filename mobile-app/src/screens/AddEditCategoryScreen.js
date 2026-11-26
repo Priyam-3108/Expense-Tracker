@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { categoryService } from '../services/categoryService';
 import hapticFeedback from '../utils/haptics';
+import { iconForCategory } from '../utils/categoryIcons';
 
 // Icon options matching web app
 const iconOptions = [
@@ -194,7 +195,7 @@ function AddEditCategoryScreen({ navigation, route }) {
         },
         headerTitle: {
             fontSize: 24,
-            fontWeight: 'bold',
+            fontWeight: '500',
             color: colors.text,
         },
         backButton: {
@@ -229,20 +230,20 @@ function AddEditCategoryScreen({ navigation, route }) {
         },
         input: {
             backgroundColor: colors.card,
-            borderRadius: 6, // Stripe text-input rounded.sm (6px)
+            borderRadius: 6,
             padding: 12,
             fontSize: 15,
-            fontWeight: '300',
+            fontWeight: '400',
             color: colors.text,
             borderWidth: 1,
             borderColor: colors.border,
             ...shadows.sm,
         },
         inputError: {
-            borderColor: colors.danger || '#ea2261',
+            borderColor: colors.danger || '#dc2626',
         },
         errorText: {
-            color: colors.danger || '#ea2261',
+            color: colors.danger || '#dc2626',
             fontSize: 12,
             marginTop: spacing.xs,
         },
@@ -284,8 +285,8 @@ function AddEditCategoryScreen({ navigation, route }) {
             borderWidth: 2,
         },
         saveButton: {
-            backgroundColor: colors.primary || '#533afd',
-            borderRadius: 9999, // Stripe button-primary-pill
+            backgroundColor: colors.primary || '#a8611c',
+            borderRadius: 10,
             paddingVertical: 12,
             paddingHorizontal: 20,
             alignItems: 'center',
@@ -345,7 +346,7 @@ function AddEditCategoryScreen({ navigation, route }) {
             >
                 {/* Category Name */}
                 <View style={styles.section}>
-                    <Text style={styles.label}>Category Name</Text>
+                    <Text style={styles.label}>Name</Text>
                     <TextInput
                         style={[styles.input, errors.name && styles.inputError]}
                         value={formData.name}
@@ -378,7 +379,7 @@ function AddEditCategoryScreen({ navigation, route }) {
                                 }}
                                 disabled={loading}
                             >
-                                <Text style={styles.iconText}>{icon}</Text>
+                                <Ionicons name={iconForCategory(icon)} size={20} color={formData.icon === icon ? colors.text : colors.subText} accessibilityLabel={icon} />
                             </TouchableOpacity>
                         ))}
                     </View>

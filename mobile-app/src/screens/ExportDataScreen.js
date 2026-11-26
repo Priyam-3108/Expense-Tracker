@@ -38,13 +38,13 @@ function ExportDataScreen({ navigation }) {
         },
         title: {
             fontSize: 28,
-            fontWeight: '300', // Sohne thin display
+            fontWeight: '400',
             color: colors.text,
             letterSpacing: -0.64,
         },
         card: {
             backgroundColor: colors.card,
-            borderRadius: 12, // Stripe rounded.lg
+            borderRadius: 12,
             padding: 20,
             borderWidth: 1,
             borderColor: colors.border,
@@ -52,7 +52,7 @@ function ExportDataScreen({ navigation }) {
         },
         label: {
             fontSize: 14,
-            fontWeight: '300',
+            fontWeight: '400',
             color: colors.text,
             marginBottom: 16,
             letterSpacing: -0.2,
@@ -67,14 +67,14 @@ function ExportDataScreen({ navigation }) {
         },
         optionText: {
             fontSize: 15,
-            fontWeight: '300',
+            fontWeight: '400',
             color: colors.text,
         },
         exportButton: {
-            backgroundColor: colors.primary || '#533afd',
+            backgroundColor: colors.primary || '#a8611c',
             paddingVertical: 12,
             paddingHorizontal: 20,
-            borderRadius: 9999, // Stripe button-primary-pill
+            borderRadius: 10,
             alignItems: 'center',
             marginTop: 10,
         },
@@ -92,12 +92,12 @@ function ExportDataScreen({ navigation }) {
                 <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
                     <Ionicons name="arrow-back" size={20} color={colors.text} />
                 </TouchableOpacity>
-                <Text style={styles.title}>Export Data</Text>
+                <Text style={styles.title}>Export data</Text>
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={styles.card}>
-                    <Text style={styles.label}>Select Export Format</Text>
+                    <Text style={styles.label}>Format</Text>
 
                     {['csv', 'json', 'pdf'].map(fmt => (
                         <TouchableOpacity
@@ -110,14 +110,14 @@ function ExportDataScreen({ navigation }) {
                         >
                             <Text style={styles.optionText}>{fmt.toUpperCase()} File</Text>
                             {exportFormat === fmt && (
-                                <Ionicons name="checkmark-circle" size={20} color={colors.primary || '#533afd'} />
+                                <Ionicons name="checkmark-circle" size={20} color={colors.primary || '#a8611c'} />
                             )}
                         </TouchableOpacity>
                     ))}
                 </View>
 
                 <TouchableOpacity style={styles.exportButton} onPress={handleExport}>
-                    <Text style={styles.exportButtonText}>Download Export File</Text>
+                    <Text style={styles.exportButtonText}>Download</Text>
                 </TouchableOpacity>
             </ScrollView>
         </View>

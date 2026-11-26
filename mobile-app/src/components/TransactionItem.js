@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import hapticFeedback from '../utils/haptics';
 import Amount from './Amount';
+import { iconForCategory } from '../utils/categoryIcons';
 
 function TransactionItem({ item, onPress, onEdit, onDelete }) {
     const { colors, spacing, borderRadius, shadows } = useTheme();
@@ -34,15 +34,8 @@ function TransactionItem({ item, onPress, onEdit, onDelete }) {
         if (item.category?.color) return item.category.color;
 
         const colorMap = {
-            food: '#f59e0b',
-            transport: '#533afd',
-            shopping: '#ec4899',
-            entertainment: '#8b5cf6',
-            health: '#10b981',
-            bills: '#ea2261',
-            education: '#3b82f6',
-            salary: '#10b981',
-            other: '#64748b',
+            ...colors.categoryColors,
+            salary: colors.income,
         };
         return colorMap[category?.toLowerCase()] || colors.primary;
     };
@@ -50,7 +43,7 @@ function TransactionItem({ item, onPress, onEdit, onDelete }) {
     const isIncome = item.type === 'income';
     const catName = item.category?.name || item.category || 'Uncategorized';
     const categoryColor = getCategoryColor(catName);
-    const categoryIcon = getCategoryIcon(catName);
+    const categoryIcon = item.category?.icon ? iconForCategory(item.category.icon) : getCategoryIcon(catName) + '-outline';
     const amountColor = isIncome ? colors.income : colors.expense;
 
     return (
@@ -63,7 +56,6 @@ function TransactionItem({ item, onPress, onEdit, onDelete }) {
                     borderRadius: borderRadius.lg,
                     marginBottom: spacing.sm,
                 },
-                shadows.sm,
             ]}
             onPress={() => {
                 hapticFeedback.light();
@@ -71,21 +63,19 @@ function TransactionItem({ item, onPress, onEdit, onDelete }) {
             }}
             activeOpacity={0.75}
         >
-            {/* Category icon - solid circle with gradient */}
-            <LinearGradient
-                colors={[categoryColor + 'cc', categoryColor]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.iconCircle}
-            >
-                <Ionicons name={categoryIcon} size={20} color="#ffffff" />
-            </LinearGradient>
+            {/* Category: neutral tile with a line icon; the colour lives in the dot */}
+            <View style={[styles.iconTile, { backgroundColor: colors.cardElevated }]}>
+                <Ionicons name={categoryIcon} size={18} color={colors.textSecondary} />
+            </View>
 
             {/* Content */}
             <View style={styles.content}>
-                <Text style={[styles.categoryName, { color: colors.text }]} numberOfLines={1}>
-                    {catName}
-                </Text>
+                <View style={styles.nameRow}>
+                    <View style={[styles.dot, { backgroundColor: categoryColor }]} />
+                    <Text style={[styles.categoryName, { color: colors.text }]} numberOfLines={1}>
+                        {catName}
+                    </Text>
+                </View>
                 <Text style={[styles.meta, { color: colors.subText }]} numberOfLines={1}>
                     {formatDate(item.date)}
                     {item.notes ? ` · ${item.notes.substring(0, 20)}${item.notes.length > 20 ? '…' : ''}` : ''}
@@ -96,7 +86,7 @@ function TransactionItem({ item, onPress, onEdit, onDelete }) {
             <View style={styles.right}>
                 <Amount
                     value={Math.abs(item.amount)}
-                    sign={isIncome ? '+' : '-'}
+                    sign={isIncome ? '+' : '−'}
                     currency="INR"
                     style={[styles.amount, { color: amountColor }]}
                 />
@@ -113,7 +103,7 @@ function TransactionItem({ item, onPress, onEdit, onDelete }) {
                             onPress={() => { hapticFeedback.light(); onEdit(item); }}
                             hitSlop={{ top: 8, bottom: 8, left: 8, right: 4 }}
                         >
-                            <Ionicons name="create-outline" size={15} color={colors.primary} />
+                            <Ionicons name="create-outline" size={16} color={colors.subText} />
                         </TouchableOpacity>
                     )}
                     {onDelete && (
@@ -122,7 +112,7 @@ function TransactionItem({ item, onPress, onEdit, onDelete }) {
                             onPress={() => { hapticFeedback.light(); onDelete(item); }}
                             hitSlop={{ top: 8, bottom: 8, left: 4, right: 8 }}
                         >
-                            <Ionicons name="trash-outline" size={15} color={colors.danger} />
+                            <Ionicons name="trash-outline" size={16} color={colors.subText} />
                         </TouchableOpacity>
                     )}
                 </View>
@@ -135,25 +125,36 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 13,
+        paddingHorizontal: 12,
+        paddingVertical: 12,
         borderWidth: 1,
     },
-    iconCircle: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
+    iconTile: {
+        width: 40,
+        height: 40,
+        borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 12,
+    },
+    nameRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        marginBottom: 2,
+    },
+    dot: {
+        width: 6,
+        height: 6,
+        borderRadius: 3,
     },
     content: {
         flex: 1,
     },
     categoryName: {
+        flexShrink: 1,
         fontSize: 15,
         fontWeight: '400',
-        marginBottom: 3,
-        letterSpacing: -0.2,
     },
     meta: {
         fontSize: 12,
@@ -167,7 +168,6 @@ const styles = StyleSheet.create({
     amount: {
         fontSize: 15,
         fontWeight: '500',
-        letterSpacing: -0.4,
         fontVariant: ['tabular-nums'],
     },
     statusRow: {
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
         gap: 4,
     },
     actionBtn: {
-        padding: 2,
+        padding: 4,
     },
 });
 

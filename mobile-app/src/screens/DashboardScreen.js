@@ -234,24 +234,25 @@ export default function DashboardScreen({ navigation }) {
     setShowDeleteAlert(true);
   };
 
+  // The title names the period, not the person
+  const now = new Date();
+  const monthTitle = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const todayLabel = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
   const renderHeader = () => (
     <View>
       {/* Top Header */}
       <View style={styles.topHeader}>
         <View>
-          <Text style={[styles.greeting, { color: colors.subText }]}>
-            Welcome back
-          </Text>
-          <Text style={[styles.userName, { color: colors.text }]}>
-            {user?.name?.split(' ')[0] || 'User'}
-          </Text>
+          <Text style={[styles.userName, { color: colors.text }]}>{monthTitle}</Text>
+          <Text style={[styles.greeting, { color: colors.subText }]}>{todayLabel}</Text>
         </View>
         <View style={styles.headerActions}>
           <TouchableOpacity
             onPress={() => { hapticFeedback.light(); togglePrivacy(); }}
             style={[styles.iconButton, { backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1 }]}
           >
-            <Ionicons name={isPrivate ? 'eye-off-outline' : 'eye-outline'} size={18} color={colors.text} />
+            <Ionicons name={isPrivate ? 'eye-off-outline' : 'eye-outline'} size={18} color={colors.textSecondary} />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
@@ -260,13 +261,13 @@ export default function DashboardScreen({ navigation }) {
             }}
             style={[styles.iconButton, { backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1 }]}
           >
-            <Ionicons name={isDark ? 'sunny-outline' : 'moon-outline'} size={18} color={colors.text} />
+            <Ionicons name={isDark ? 'sunny-outline' : 'moon-outline'} size={18} color={colors.textSecondary} />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => { hapticFeedback.medium(); signOut(); }}
             style={[styles.iconButton, { backgroundColor: colors.card, borderColor: colors.border, borderWidth: 1 }]}
           >
-            <Ionicons name="log-out-outline" size={18} color={colors.danger} />
+            <Ionicons name="log-out-outline" size={18} color={colors.textSecondary} />
           </TouchableOpacity>
         </View>
       </View>
@@ -276,14 +277,17 @@ export default function DashboardScreen({ navigation }) {
 
       {/* Summary Cards Row */}
       <View style={styles.summaryRow}>
-        <SummaryCard title="Income" amount={summary.income} type="income" icon="trending-up" />
+        <SummaryCard title="Income" amount={summary.income} />
         <View style={{ width: 12 }} />
-        <SummaryCard title="Expenses" amount={summary.expense} type="expense" icon="trending-down" />
+        <SummaryCard title="Expenses" amount={summary.expense} />
       </View>
 
       {heatmap?.grid?.length > 0 && heatmap.grid.some((w) => w.some((c) => c.count > 0)) && (
         <View style={[styles.activityCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <Text style={[styles.activityCardTitle, { color: colors.text }]}>Activity · last ~16 weeks</Text>
+          <View style={styles.activityHeader}>
+            <Text style={[styles.activityCardTitle, { color: colors.text }]}>Activity</Text>
+            <Text style={[styles.activityMeta, { color: colors.subText }]}>Last 16 weeks</Text>
+          </View>
           <ActivityHeatmap
             grid={heatmap.grid}
             monthLabels={heatmap.monthLabels}
@@ -297,16 +301,13 @@ export default function DashboardScreen({ navigation }) {
 
       {/* Recent Transactions Header */}
       <View style={styles.sectionHeader}>
-        <View style={styles.sectionTitleRow}>
-          <View style={[styles.sectionDot, { backgroundColor: colors.primary }]} />
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Recent</Text>
-        </View>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Recent</Text>
         <TouchableOpacity
           onPress={() => { hapticFeedback.light(); navigation.navigate('Search'); }}
-          style={[styles.seeAllBtn, { backgroundColor: colors.primarySubdued, borderColor: colors.primary + '30' }]}
+          style={styles.seeAllBtn}
         >
-          <Ionicons name="search-outline" size={13} color={colors.primary} />
-          <Text style={[styles.seeAllText, { color: colors.primary }]}>Search</Text>
+          <Ionicons name="search-outline" size={16} color={colors.textSecondary} />
+          <Text style={[styles.seeAllText, { color: colors.textSecondary }]}>Search</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -324,17 +325,17 @@ export default function DashboardScreen({ navigation }) {
   const renderEmpty = () => (
     <EmptyState
       icon="receipt-outline"
-      title="No Transactions Yet"
-      subtitle="Start tracking your expenses by adding your first transaction"
+      title="No entries yet"
+      subtitle="Add an expense or income and it shows up here"
       action={
         <TouchableOpacity
-          style={[styles.emptyButton, { backgroundColor: colors.primary }]}
+          style={[styles.emptyButton, { backgroundColor: colors.ink }]}
           onPress={() => {
             hapticFeedback.medium();
             navigation.navigate('AddExpense');
           }}
         >
-          <Text style={styles.emptyButtonText}>Add Transaction</Text>
+          <Text style={[styles.emptyButtonText, { color: colors.onInk }]}>Add expense</Text>
         </TouchableOpacity>
       }
     />
@@ -344,12 +345,8 @@ export default function DashboardScreen({ navigation }) {
     <ScrollView style={styles.container} contentContainerStyle={styles.listContent}>
       <View style={styles.topHeader}>
         <View>
-          <Text style={[styles.greeting, { color: colors.textSecondary }]}>
-            Welcome back,
-          </Text>
-          <Text style={[styles.userName, { color: colors.text }]}>
-            {user?.name || 'User'}
-          </Text>
+          <Text style={[styles.userName, { color: colors.text }]}>{monthTitle}</Text>
+          <Text style={[styles.greeting, { color: colors.subText }]}>{todayLabel}</Text>
         </View>
       </View>
       <SkeletonCard />
@@ -410,11 +407,11 @@ export default function DashboardScreen({ navigation }) {
       <ActionSheet
         visible={showActionSheet}
         onClose={() => setShowActionSheet(false)}
-        title="Transaction Options"
+        title="Entry"
         subtitle={selectedExpense ? `${selectedExpense.category?.name || 'Uncategorized'} - ${isPrivate ? '••••••' : '₹' + selectedExpense.amount}` : ''}
         options={[
           {
-            text: 'Edit Transaction',
+            text: 'Edit',
             icon: 'edit',
             style: 'secondary',
             onPress: () => {
@@ -422,7 +419,7 @@ export default function DashboardScreen({ navigation }) {
             }
           },
           {
-            text: 'Delete Transaction',
+            text: 'Delete',
             icon: 'delete',
             style: 'destructive',
             onPress: () => {
@@ -437,8 +434,8 @@ export default function DashboardScreen({ navigation }) {
       <CustomAlert
         visible={showDeleteAlert}
         type="danger"
-        title="Delete Transaction"
-        message="Are you sure you want to delete this transaction? This action cannot be undone."
+        title="Delete entry"
+        message="This entry will be removed from your ledger. This cannot be undone."
         buttons={[
           {
             text: 'Cancel',
@@ -465,7 +462,7 @@ export default function DashboardScreen({ navigation }) {
         visible={showHeatmapAlert}
         type="default"
         title={heatmapAlertInfo?.date}
-        message={`${heatmapAlertInfo?.count ?? 0} transaction${heatmapAlertInfo?.count === 1 ? '' : 's'}`}
+        message={`${heatmapAlertInfo?.count ?? 0} ${heatmapAlertInfo?.count === 1 ? 'entry' : 'entries'}`}
         buttons={[{ text: 'OK', style: 'primary', onPress: () => setShowHeatmapAlert(false) }]}
         onClose={() => setShowHeatmapAlert(false)}
       />
@@ -487,16 +484,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   greeting: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '400',
-    marginBottom: 3,
-    letterSpacing: 0.2,
-    textTransform: 'uppercase',
+    marginTop: 4,
   },
   userName: {
     fontSize: 28,
-    fontWeight: '300',
-    letterSpacing: -0.7,
+    fontWeight: '500',
+    letterSpacing: -0.6,
   },
   headerActions: {
     flexDirection: 'row',
@@ -505,19 +500,20 @@ const styles = StyleSheet.create({
   iconButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
   },
   summaryRow: {
     flexDirection: 'row',
-    marginBottom: 22,
+    marginBottom: 12,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 14,
+    marginTop: 12,
+    marginBottom: 12,
   },
   sectionTitleRow: {
     flexDirection: 'row',
@@ -530,43 +526,46 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   sectionTitle: {
-    fontSize: 22,
-    fontWeight: '300',
-    letterSpacing: -0.4,
+    fontSize: 17,
+    fontWeight: '500',
   },
   seeAllBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 9999,
-    borderWidth: 1,
+    gap: 6,
+    paddingVertical: 8,
   },
   seeAllText: {
-    fontSize: 12,
-    fontWeight: '500',
+    fontSize: 14,
+    fontWeight: '400',
   },
   searchIconButton: { padding: 6 },
   emptyButton: {
     paddingHorizontal: 20,
-    paddingVertical: 11,
-    borderRadius: 9999,
+    paddingVertical: 12,
+    borderRadius: 10,
   },
   emptyButtonText: {
-    color: '#ffffff',
     fontSize: 15,
-    fontWeight: '400',
+    fontWeight: '500',
   },
   activityCard: {
     borderRadius: 16,
     borderWidth: 1,
     padding: 16,
-    marginBottom: 22,
+    marginBottom: 12,
+  },
+  activityHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    marginBottom: 12,
   },
   activityCardTitle: {
     fontSize: 15,
     fontWeight: '500',
-    marginBottom: 12,
+  },
+  activityMeta: {
+    fontSize: 12,
   },
 });

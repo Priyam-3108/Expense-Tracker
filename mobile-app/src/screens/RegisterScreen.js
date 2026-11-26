@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView, KeyboardAvoidingView, Platform, Modal, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { register } from '../services/authService';
 import { useTheme } from '../context/ThemeContext';
 
@@ -67,7 +68,7 @@ export default function RegisterScreen({ navigation }) {
     setLoading(true);
     try {
       await register(name, email, password, currency);
-      Alert.alert('Success', 'Account created successfully!');
+      Alert.alert('Account created', 'You can sign in now');
       navigation.navigate('Login');
     } catch (error) {
       console.log(error);
@@ -94,10 +95,10 @@ export default function RegisterScreen({ navigation }) {
 
             {/* Name Input */}
             <View style={styles.inputContainer}>
-              <Text style={[styles.label, { color: colors.text }]}>Full Name</Text>
+              <Text style={[styles.label, { color: colors.text }]}>Full name</Text>
               <TextInput
                 style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
-                placeholder="Enter your full name"
+                placeholder="Asha Mehta"
                 value={name}
                 onChangeText={setName}
                 placeholderTextColor={colors.subText}
@@ -106,10 +107,10 @@ export default function RegisterScreen({ navigation }) {
 
             {/* Email Input */}
             <View style={styles.inputContainer}>
-              <Text style={[styles.label, { color: colors.text }]}>Email Address</Text>
+              <Text style={[styles.label, { color: colors.text }]}>Email</Text>
               <TextInput
                 style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
-                placeholder="Enter your email"
+                placeholder="you@example.com"
                 value={email}
                 onChangeText={setEmail}
                 autoCapitalize="none"
@@ -120,7 +121,7 @@ export default function RegisterScreen({ navigation }) {
 
             {/* Currency Picker */}
             <View style={styles.inputContainer}>
-              <Text style={[styles.label, { color: colors.text }]}>Preferred Currency</Text>
+              <Text style={[styles.label, { color: colors.text }]}>Currency</Text>
               <TouchableOpacity
                 style={[styles.pickerButton, { backgroundColor: colors.background, borderColor: colors.border }]}
                 onPress={() => setShowCurrencyPicker(true)}
@@ -135,7 +136,7 @@ export default function RegisterScreen({ navigation }) {
               <Text style={[styles.label, { color: colors.text }]}>Password</Text>
               <TextInput
                 style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
-                placeholder="Min. 6 characters"
+                placeholder="At least 6 characters"
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
@@ -145,10 +146,10 @@ export default function RegisterScreen({ navigation }) {
 
             {/* Confirm Password Input */}
             <View style={styles.inputContainer}>
-              <Text style={[styles.label, { color: colors.text }]}>Confirm Password</Text>
+              <Text style={[styles.label, { color: colors.text }]}>Confirm password</Text>
               <TextInput
                 style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
-                placeholder="Confirm your password"
+                placeholder="Repeat the password"
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 secureTextEntry
@@ -163,7 +164,7 @@ export default function RegisterScreen({ navigation }) {
               disabled={loading}
             >
               <Text style={styles.buttonText}>
-                {loading ? 'Creating Account...' : 'Create Account'}
+                {loading ? 'Creating account…' : 'Create account'}
               </Text>
             </TouchableOpacity>
 
@@ -188,9 +189,9 @@ export default function RegisterScreen({ navigation }) {
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
             <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
-              <Text style={[styles.modalTitle, { color: colors.text }]}>Select Currency</Text>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>Currency</Text>
               <TouchableOpacity onPress={() => setShowCurrencyPicker(false)}>
-                <Text style={[styles.modalClose, { color: colors.subText }]}>✕</Text>
+                <Ionicons name="close" size={20} color={colors.subText} accessibilityLabel="Close" />
               </TouchableOpacity>
             </View>
             <ScrollView>
@@ -213,7 +214,7 @@ export default function RegisterScreen({ navigation }) {
                     <Text style={[styles.currencyCode, { color: colors.subText }]}>{curr.code}</Text>
                   </View>
                   {currency === curr.code && (
-                    <Text style={[styles.checkmark, { color: colors.primary }]}>✓</Text>
+                    <Ionicons name="checkmark" size={18} color={colors.primary} />
                   )}
                 </TouchableOpacity>
               ))}
@@ -231,7 +232,7 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 16,
     padding: 28,
-    shadowColor: '#003770',
+    shadowColor: '#000000',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.12,
     shadowRadius: 24,
@@ -239,17 +240,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   header: { marginBottom: 24, alignItems: 'center' },
-  title: { fontSize: 32, fontWeight: '300', marginBottom: 4, letterSpacing: -0.64 }, // Sohne thin display
-  subtitle: { fontSize: 14, fontWeight: '300', letterSpacing: -0.2 },
+  title: { fontSize: 32, fontWeight: '400', marginBottom: 4, letterSpacing: -0.64 },
+  subtitle: { fontSize: 14, fontWeight: '400' },
   inputContainer: { marginBottom: 16 },
   label: { fontSize: 13, fontWeight: '400', marginBottom: 6 },
   input: {
     borderWidth: 1,
-    borderRadius: 6, // Stripe text-input (6px)
+    borderRadius: 6,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
-    fontWeight: '300',
+    fontWeight: '400',
   },
   pickerButton: {
     borderWidth: 1,
@@ -260,22 +261,22 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  pickerButtonText: { fontSize: 15, fontWeight: '300' },
+  pickerButtonText: { fontSize: 15, fontWeight: '400' },
   pickerArrow: { fontSize: 12 },
   button: {
     paddingVertical: 12,
     paddingHorizontal: 20,
-    borderRadius: 9999, // Stripe pill button
+    borderRadius: 8,
     alignItems: 'center',
     marginTop: 8,
-    shadowColor: '#003770',
+    shadowColor: '#000000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 8,
     elevation: 4,
   },
   buttonDisabled: { opacity: 0.6 },
-  buttonText: { color: 'white', fontWeight: '400', fontSize: 15, letterSpacing: 0 },
+  buttonText: { color: 'white', fontWeight: '400', fontSize: 15 },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -283,11 +284,11 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     borderTopWidth: 1,
   },
-  footerText: { fontSize: 14, fontWeight: '300' },
+  footerText: { fontSize: 14, fontWeight: '400' },
   linkText: { fontWeight: '400', fontSize: 14 },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(13, 37, 61, 0.65)',
+    backgroundColor: 'rgba(10, 10, 10, 0.55)',
     justifyContent: 'flex-end',
   },
   modalContent: {
@@ -303,8 +304,8 @@ const styles = StyleSheet.create({
     padding: 20,
     borderBottomWidth: 1,
   },
-  modalTitle: { fontSize: 18, fontWeight: '300', letterSpacing: -0.2 },
-  modalClose: { fontSize: 22, fontWeight: '300' },
+  modalTitle: { fontSize: 18, fontWeight: '400', letterSpacing: -0.2 },
+  modalClose: { fontSize: 22, fontWeight: '400' },
   currencyOption: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -313,13 +314,13 @@ const styles = StyleSheet.create({
   },
   currencySymbol: {
     fontSize: 22,
-    fontWeight: '300',
+    fontWeight: '400',
     width: 50,
     textAlign: 'center',
     fontVariant: ['tabular-nums'],
   },
   currencyInfo: { flex: 1, marginLeft: 12 },
-  currencyName: { fontSize: 15, fontWeight: '300', marginBottom: 2 },
+  currencyName: { fontSize: 15, fontWeight: '400', marginBottom: 2 },
   currencyCode: { fontSize: 13, fontWeight: '400' },
-  checkmark: { fontSize: 18, fontWeight: '600' },
+  checkmark: { fontSize: 18, fontWeight: '500' },
 });

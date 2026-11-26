@@ -19,8 +19,8 @@ function blend(a, b, t) {
 export default function ActivityHeatmap({ grid = [], monthLabels = [], onCellPress }) {
   const { colors } = useTheme();
   // bucket palette: 0 = faint, 4 = primary
-  const base = typeof colors.primary === 'string' && colors.primary.startsWith('#') ? colors.primary : '#6366F1';
-  const empty = typeof colors.border === 'string' && colors.border.startsWith('#') ? colors.border : '#E2E8F0';
+  const base = typeof colors.primary === 'string' && colors.primary.startsWith('#') ? colors.primary : '#a8611c';
+  const empty = colors.cardElevated; // neutral for days with no activity
   const palette = [empty, blend(empty, base, 0.4), blend(empty, base, 0.65), blend(empty, base, 0.85), base];
 
   const colStride = CELL + GAP;
@@ -87,6 +87,6 @@ export default function ActivityHeatmap({ grid = [], monthLabels = [], onCellPre
 
 const styles = StyleSheet.create({
   monthLabel: { fontSize: 10 },
-  weekdayLabel: { fontSize: 9 },
+  weekdayLabel: { fontSize: 11 },
   legendText: { fontSize: 10 },
 });

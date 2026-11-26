@@ -155,67 +155,20 @@ function AnalyticsScreen() {
                     insights: generateInsights(data),
                 });
             } else {
-                setAnalyticsData(generateSampleData());
+                setAnalyticsData(emptyData());
             }
 
         } catch (error) {
             console.error('Error fetching analytics:', error);
-            setAnalyticsData(generateSampleData());
+            setAnalyticsData(emptyData());
         } finally {
             setLoading(false);
             setRefreshing(false);
         }
     };
 
-    const generateSampleData = () => {
-        return {
-            monthlyExpenses: [
-                { month: 'Jan', amount: 15000 },
-                { month: 'Feb', amount: 18000 },
-                { month: 'Mar', amount: 12000 },
-                { month: 'Apr', amount: 20000 },
-                { month: 'May', amount: 16000 },
-                { month: 'Jun', amount: 22000 },
-            ],
-            categoryBreakdown: [
-                { name: 'Food', population: 8000, color: '#f59e0b' },
-                { name: 'Transport', population: 5000, color: '#3b82f6' },
-                { name: 'Shopping', population: 4000, color: '#ec4899' },
-                { name: 'Entertainment', population: 3000, color: '#8b5cf6' },
-                { name: 'Bills', population: 2000, color: '#ef4444' },
-            ],
-            spendingTrend: [
-                { day: 'Mon', amount: 500 },
-                { day: 'Tue', amount: 800 },
-                { day: 'Wed', amount: 600 },
-                { day: 'Thu', amount: 1200 },
-                { day: 'Fri', amount: 900 },
-                { day: 'Sat', amount: 1500 },
-                { day: 'Sun', amount: 700 },
-            ],
-            insights: [
-                {
-                    icon: 'trending-up',
-                    title: 'Spending Increased',
-                    message: 'Your spending increased by 15% compared to last month',
-                    type: 'warning',
-                    trend: 'up',
-                },
-                {
-                    icon: 'restaurant',
-                    title: 'Top Category: Food',
-                    message: 'You spent ₹8,000 on food this month, 36% of total expenses',
-                    type: 'info',
-                },
-                {
-                    icon: 'checkmark-circle',
-                    title: 'Budget Goal Met',
-                    message: 'You stayed within budget for Transportation this month!',
-                    type: 'success',
-                },
-            ],
-        };
-    };
+    // No data or a failed request shows an empty state, never invented figures
+    const emptyData = () => ({ monthlyExpenses: [], categoryBreakdown: [], spendingTrend: [], insights: [] });
 
     const generateInsights = (data) => {
         const insights = [];
@@ -242,7 +195,7 @@ function AnalyticsScreen() {
             if (totalExpenses > 0) {
                 insights.push({
                     icon: 'wallet',
-                    title: 'Total Spending',
+                    title: 'Total spending',
                     message: `₹${totalExpenses.toFixed(0)} across ${expenseCount} transactions (Avg: ₹${avgExpenseAmount?.toFixed(0) || 0})`,
                     type: 'info',
                 });
@@ -254,12 +207,12 @@ function AnalyticsScreen() {
             const rate = data.summary.savingsRate;
             insights.push({
                 icon: rate > 20 ? 'trending-up' : rate > 0 ? 'remove' : 'trending-down',
-                title: `Savings Rate: ${rate.toFixed(1)}%`,
+                title: `Savings rate: ${rate.toFixed(1)}%`,
                 message: rate > 20
-                    ? 'Great job! You\'re saving well this period.'
+                    ? 'Income is well ahead of spending this period'
                     : rate > 0
-                        ? 'You\'re saving, but there\'s room to improve.'
-                        : 'Consider reducing expenses to start saving.',
+                        ? 'Income is slightly ahead of spending'
+                        : 'Spending is ahead of income this period',
                 type: rate > 20 ? 'success' : rate > 0 ? 'info' : 'warning',
             });
         }
@@ -268,7 +221,7 @@ function AnalyticsScreen() {
         if (data.summary?.avgDailyExpense) {
             insights.push({
                 icon: 'calendar',
-                title: 'Daily Average',
+                title: 'Daily average',
                 message: `You spend an average of ₹${data.summary.avgDailyExpense.toFixed(0)} per day`,
                 type: 'info',
             });
@@ -325,7 +278,7 @@ function AnalyticsScreen() {
         },
         title: {
             fontSize: 32,
-            fontWeight: '300', // Sohne thin display
+            fontWeight: '400',
             color: colors.text,
             marginBottom: spacing.sm,
             letterSpacing: -0.64,
@@ -339,7 +292,7 @@ function AnalyticsScreen() {
         periodButton: {
             paddingHorizontal: 12,
             paddingVertical: 6,
-            borderRadius: 9999, // Stripe pill tag (rounded.pill)
+            borderRadius: 8,
             backgroundColor: colors.card,
             borderWidth: 1,
             borderColor: colors.border,
@@ -347,8 +300,8 @@ function AnalyticsScreen() {
             alignItems: 'center',
         },
         periodButtonActive: {
-            backgroundColor: colors.primary || '#533afd',
-            borderColor: colors.primary || '#533afd',
+            backgroundColor: colors.primary || '#a8611c',
+            borderColor: colors.primary || '#a8611c',
         },
         periodButtonText: {
             fontSize: 13,
@@ -371,7 +324,7 @@ function AnalyticsScreen() {
             justifyContent: 'center',
             backgroundColor: colors.card,
             padding: 10,
-            borderRadius: 9999, // Stripe pill
+            borderRadius: 8,
             borderWidth: 1,
             borderColor: colors.border,
             gap: spacing.xs,
@@ -388,7 +341,7 @@ function AnalyticsScreen() {
             marginBottom: spacing.lg,
             backgroundColor: colors.card,
             padding: 4,
-            borderRadius: 9999, // Stripe pill container
+            borderRadius: 8,
             borderWidth: 1,
             borderColor: colors.border,
         },
@@ -399,11 +352,11 @@ function AnalyticsScreen() {
             justifyContent: 'center',
             gap: 4,
             paddingVertical: 8,
-            borderRadius: 9999, // Stripe pill button
+            borderRadius: 8,
             backgroundColor: 'transparent',
         },
         chartTypeButtonActive: {
-            backgroundColor: colors.primary || '#533afd',
+            backgroundColor: colors.primary || '#a8611c',
         },
         chartTypeButtonText: {
             fontSize: 13,
@@ -421,7 +374,7 @@ function AnalyticsScreen() {
         },
         sectionTitle: {
             fontSize: 20,
-            fontWeight: '300', // Sohne thin display
+            fontWeight: '400',
             color: colors.text,
             marginBottom: spacing.md,
             letterSpacing: -0.26,
@@ -683,7 +636,7 @@ function AnalyticsScreen() {
                             <View style={[styles.chartCard, { padding: spacing.xl, alignItems: 'center' }]}>
                                 <Ionicons name="bulb-outline" size={48} color={colors.subText} />
                                 <Text style={{ color: colors.subText, marginTop: spacing.md, textAlign: 'center' }}>
-                                    No insights available yet. Add some expenses to see analytics!
+                                    Add a few expenses and insights appear here
                                 </Text>
                             </View>
                         )}

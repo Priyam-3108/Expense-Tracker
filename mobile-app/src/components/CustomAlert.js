@@ -9,6 +9,7 @@ import {
     Dimensions,
     TouchableWithoutFeedback
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 
 const { width } = Dimensions.get('window');
@@ -59,26 +60,26 @@ export default function CustomAlert({
     const getIconForType = () => {
         switch (type) {
             case 'success':
-                return '✓';
+                return 'checkmark';
             case 'warning':
-                return '⚠';
+                return 'alert';
             case 'danger':
-                return '✕';
+                return 'trash-outline';
             default:
-                return 'ℹ';
+                return 'information';
         }
     };
 
     const getColorForType = () => {
         switch (type) {
             case 'success':
-                return '#10B981';
+                return colors.success;
             case 'warning':
-                return '#F59E0B';
+                return colors.warning;
             case 'danger':
-                return '#EF4444';
+                return colors.danger;
             default:
-                return colors.primary;
+                return colors.textSecondary;
         }
     };
 
@@ -110,10 +111,8 @@ export default function CustomAlert({
                             ]}
                         >
                             {/* Icon */}
-                            <View style={[styles.iconContainer, { backgroundColor: `${iconColor}15` }]}>
-                                <Text style={[styles.icon, { color: iconColor }]}>
-                                    {getIconForType()}
-                                </Text>
+                            <View style={[styles.iconContainer, { backgroundColor: colors.cardElevated }]}>
+                                <Ionicons name={getIconForType()} size={22} color={iconColor} />
                             </View>
 
                             {/* Title */}
@@ -139,13 +138,13 @@ export default function CustomAlert({
                                     let textColor = colors.text;
 
                                     if (button.style === 'destructive') {
-                                        backgroundColor = colors.danger || '#ea2261';
+                                        backgroundColor = colors.danger || '#dc2626';
                                         textColor = 'white';
                                     } else if (button.style === 'primary') {
-                                        backgroundColor = colors.primary || '#533afd';
+                                        backgroundColor = colors.primary || '#a8611c';
                                         textColor = 'white';
                                     } else if (button.style === 'cancel') {
-                                        backgroundColor = isDark ? '#273951' : '#e3e8ee';
+                                        backgroundColor = isDark ? '#525252' : '#e5e5e5';
                                         textColor = colors.text;
                                     }
 
@@ -184,7 +183,7 @@ export default function CustomAlert({
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(13, 37, 61, 0.65)', // Stripe ink overlay
+        backgroundColor: 'rgba(10, 10, 10, 0.55)',
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
@@ -195,7 +194,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         padding: 24,
         alignItems: 'center',
-        shadowColor: '#003770',
+        shadowColor: '#000000',
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.15,
         shadowRadius: 24,
@@ -213,18 +212,18 @@ const styles = StyleSheet.create({
     },
     icon: {
         fontSize: 26,
-        fontWeight: 'bold',
+        fontWeight: '500',
     },
     title: {
         fontSize: 18,
-        fontWeight: '300', // Sohne thin style
+        fontWeight: '400',
         letterSpacing: -0.22,
         marginBottom: 6,
         textAlign: 'center',
     },
     message: {
         fontSize: 14,
-        fontWeight: '300',
+        fontWeight: '400',
         textAlign: 'center',
         marginBottom: 20,
         lineHeight: 20,
@@ -238,14 +237,14 @@ const styles = StyleSheet.create({
     button: {
         paddingVertical: 10,
         paddingHorizontal: 16,
-        borderRadius: 9999, // Stripe pill button (rounded.pill)
+        borderRadius: 8,
         alignItems: 'center',
         justifyContent: 'center',
         minWidth: 90,
     },
     buttonText: {
         fontSize: 14,
-        fontWeight: '400', // Stripe button-sm typography
+        fontWeight: '400',
         letterSpacing: 0,
     },
 });

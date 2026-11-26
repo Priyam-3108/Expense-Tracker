@@ -118,7 +118,7 @@ export default function ModernDatePicker({ visible, onClose, selectedDate, onDat
                                         <Text style={[
                                             styles.dayText,
                                             { color: isSelected(date) ? '#fff' : colors.text },
-                                            isToday(date) && !isSelected(date) && { color: colors.primary, fontWeight: '700' }
+                                            isToday(date) && !isSelected(date) && { color: colors.primary, fontWeight: '500' }
                                         ]}>
                                             {date.getDate()}
                                         </Text>
@@ -137,7 +137,7 @@ export default function ModernDatePicker({ visible, onClose, selectedDate, onDat
                             <Text style={[styles.todayText, { color: colors.primary }]}>Today</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            style={[styles.closeButton, { backgroundColor: isDark ? '#273951' : '#e3e8ee' }]}
+                            style={[styles.closeButton, { backgroundColor: isDark ? '#525252' : '#e5e5e5' }]}
                             onPress={onClose}
                         >
                             <Text style={[styles.closeText, { color: colors.text }]}>Cancel</Text>
@@ -152,7 +152,7 @@ export default function ModernDatePicker({ visible, onClose, selectedDate, onDat
 const styles = StyleSheet.create({
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(13, 37, 61, 0.65)',
+        backgroundColor: 'rgba(10, 10, 10, 0.55)',
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
         maxWidth: 400,
         borderRadius: 16,
         borderWidth: 1,
-        shadowColor: '#003770',
+        shadowColor: '#000000',
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.15,
         shadowRadius: 24,
@@ -183,11 +183,11 @@ const styles = StyleSheet.create({
     },
     navText: {
         fontSize: 28,
-        fontWeight: '300',
+        fontWeight: '400',
     },
     monthYear: {
         fontSize: 16,
-        fontWeight: '300', // Sohne thin style
+        fontWeight: '400',
         letterSpacing: -0.22,
     },
     dayNamesRow: {
@@ -201,8 +201,7 @@ const styles = StyleSheet.create({
     },
     dayNameText: {
         fontSize: 11,
-        fontWeight: '600',
-        textTransform: 'uppercase',
+        fontWeight: '500',
         letterSpacing: 0.1,
     },
     daysContainer: {
@@ -219,7 +218,7 @@ const styles = StyleSheet.create({
         aspectRatio: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 9999, // Stripe pill geometry
+        borderRadius: 8,
         marginVertical: 2,
     },
     emptyCell: {
@@ -239,7 +238,7 @@ const styles = StyleSheet.create({
     todayButton: {
         flex: 1,
         paddingVertical: 10,
-        borderRadius: 9999, // Stripe pill button (rounded.pill)
+        borderRadius: 8,
         alignItems: 'center',
         borderWidth: 1,
     },
@@ -250,7 +249,7 @@ const styles = StyleSheet.create({
     closeButton: {
         flex: 1,
         paddingVertical: 10,
-        borderRadius: 9999, // Stripe pill button (rounded.pill)
+        borderRadius: 8,
         alignItems: 'center',
     },
     closeText: {

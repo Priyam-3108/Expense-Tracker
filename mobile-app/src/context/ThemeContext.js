@@ -27,111 +27,111 @@ export const ThemeProvider = ({ children }) => {
 
     const isDark = theme === 'dark';
 
+    // Graphite surfaces and one brass accent, matching the web client.
+    // Keys are kept so every screen keeps working; only the values changed.
+    const brass = isDark ? '#ad651e' : '#a8611c';
     const colors = {
-        // ─── SURFACES ────────────────────────────────────────────────
-        // Dark: true deep navy-black shells; Light: clean whites & soft canvas
-        background:          isDark ? '#080c14' : '#f6f9fc',
-        backgroundSecondary: isDark ? '#0f1623' : '#ffffff',
-        card:                isDark ? '#141d2e' : '#ffffff',
-        cardElevated:        isDark ? '#1a2438' : '#f8fafd',
-        cardSecondary:       isDark ? '#1e2a3b' : '#f5e9d4', // canvas-cream in light
+        // Surfaces
+        background:          isDark ? '#141415' : '#fafafa',
+        backgroundSecondary: isDark ? '#0f0f10' : '#ffffff',
+        card:                isDark ? '#19191b' : '#ffffff',
+        cardElevated:        isDark ? '#232325' : '#f4f4f5',
+        cardSecondary:       isDark ? '#232325' : '#f4f4f5',
 
-        // ─── TYPOGRAPHY ──────────────────────────────────────────────
-        // Dark: high-contrast near-white; Light: deep navy ink
-        text:           isDark ? '#f0f4ff' : '#0d253d',
-        textSecondary:  isDark ? '#b8c8e8' : '#273951',
-        subText:        isDark ? '#6b82a0' : '#64748d',
+        // Text: primary, secondary, muted
+        text:           isDark ? '#ededed' : '#171717',
+        textSecondary:  isDark ? '#a1a1a6' : '#525252',
+        subText:        isDark ? '#85858b' : '#737373',
         textOnPrimary:  '#ffffff',
 
-        // ─── BORDERS ─────────────────────────────────────────────────
-        border:        isDark ? '#1e2d45' : '#e3e8ee',
-        borderLight:   isDark ? '#162033' : '#f0f4f8',
-        borderStrong:  isDark ? '#2d4060' : '#c8d5e3',
-        inputBorder:   isDark ? '#2a3d58' : '#a8c3de',
+        // Hairlines
+        border:        isDark ? 'rgba(237,237,237,0.08)' : 'rgba(23,23,23,0.08)',
+        borderLight:   isDark ? 'rgba(237,237,237,0.05)' : 'rgba(23,23,23,0.05)',
+        borderStrong:  isDark ? 'rgba(237,237,237,0.14)' : 'rgba(23,23,23,0.14)',
+        inputBorder:   isDark ? 'rgba(237,237,237,0.12)' : 'rgba(23,23,23,0.16)',
 
-        // ─── BRAND / CTA ─────────────────────────────────────────────
-        primary:         '#533afd',
-        primaryLight:    '#7b68fe',
-        primaryDark:     '#4434d4',
-        primaryPress:    '#2e2b8c',
-        primarySubdued:  isDark ? '#2a2060' : '#ede8ff',
-        primaryGlow:     isDark ? 'rgba(83,58,253,0.25)' : 'rgba(83,58,253,0.10)',
+        // Accent: brass, for the selection, the primary action and the key figure
+        primary:         brass,
+        primaryLight:    isDark ? '#d4954a' : '#c07a2e',
+        primaryDark:     '#8a4d16',
+        primaryPress:    '#8a4d16',
+        primarySubdued:  isDark ? 'rgba(212,149,74,0.14)' : '#fbf6ee',
+        primaryGlow:     'transparent',
 
-        brandDark900: '#1c1e54',
+        // Ink: the neutral fill where the accent would be too loud
+        ink:        isDark ? '#ededed' : '#171717',
+        onInk:      isDark ? '#171717' : '#fafafa',
 
-        // ─── ACCENTS ─────────────────────────────────────────────────
-        secondary: isDark ? '#1c1e54' : '#1c1e54',
-        accent:    '#ea2261',
-        ruby:      '#ea2261',
-        magenta:   '#f96bee',
-        lemon:     '#c8860a',
+        brandDark900: '#171717',
+        secondary: isDark ? '#232325' : '#f4f4f5',
+        accent:    brass,
+        ruby:      isDark ? '#e5484d' : '#dc2626',
+        magenta:   brass,
+        lemon:     brass,
 
-        // ─── STATUS COLORS ───────────────────────────────────────────
-        success:      '#10b981',
-        successLight: '#34d399',
-        successDark:  '#059669',
-        successBg:    isDark ? '#0a2e22' : '#ecfdf5',
+        // Semantic colours carry meaning only, toned to sit inside the palette
+        success:      isDark ? '#4cc38a' : '#16a34a',
+        successLight: isDark ? '#4cc38a' : '#22c55e',
+        successDark:  isDark ? '#4cc38a' : '#15803d',
+        successBg:    isDark ? 'rgba(76,195,138,0.12)' : '#f0fdf4',
 
-        danger:      '#ea2261',
-        dangerLight: '#ff4d8d',
-        dangerDark:  '#c71852',
-        dangerBg:    isDark ? '#2e0a1a' : '#fff0f5',
+        danger:      isDark ? '#e5484d' : '#dc2626',
+        dangerLight: isDark ? '#e5484d' : '#ef4444',
+        dangerDark:  isDark ? '#e5484d' : '#b91c1c',
+        dangerBg:    isDark ? 'rgba(229,72,77,0.12)' : '#fef2f2',
 
-        warning:      '#f59e0b',
-        warningLight: '#fbbf24',
-        warningDark:  '#d97706',
-        warningBg:    isDark ? '#2e1f0a' : '#fffbeb',
+        warning:      isDark ? '#d4954a' : '#b45309',
+        warningLight: isDark ? '#d4954a' : '#d97706',
+        warningDark:  isDark ? '#d4954a' : '#92400e',
+        warningBg:    isDark ? 'rgba(212,149,74,0.12)' : '#fbf6ee',
 
-        info:      '#533afd',
-        infoLight: '#7b68fe',
-        infoDark:  '#4434d4',
-        infoBg:    isDark ? '#1a1640' : '#f0edff',
+        info:      isDark ? '#a1a1a6' : '#525252',
+        infoLight: isDark ? '#a1a1a6' : '#737373',
+        infoDark:  isDark ? '#ededed' : '#171717',
+        infoBg:    isDark ? '#232325' : '#f4f4f5',
 
-        // ─── INCOME / EXPENSE ────────────────────────────────────────
-        income:     '#10b981',
-        incomeBg:   isDark ? '#0a2e22' : '#ecfdf5',
-        expense:    '#ea2261',
-        expenseBg:  isDark ? '#2e0a1a' : '#fff0f5',
+        // Money in and out: income green, spending stays ink
+        income:     isDark ? '#4cc38a' : '#16a34a',
+        incomeBg:   isDark ? 'rgba(76,195,138,0.12)' : '#f0fdf4',
+        expense:    isDark ? '#ededed' : '#171717',
+        expenseBg:  isDark ? '#232325' : '#f4f4f5',
 
-        // ─── CATEGORY PALETTE ────────────────────────────────────────
+        // Category fallbacks (real categories carry their own colour)
         categoryColors: {
-            food:          '#f59e0b',
-            transport:     '#533afd',
-            shopping:      '#ec4899',
-            entertainment: '#8b5cf6',
-            health:        '#10b981',
-            bills:         '#ea2261',
-            education:     '#3b82f6',
-            other:         '#64748b',
+            food:          '#d97706',
+            transport:     '#2563eb',
+            shopping:      '#db2777',
+            entertainment: '#7c3aed',
+            health:        '#16a34a',
+            bills:         '#dc2626',
+            education:     '#0891b2',
+            other:         '#737373',
         },
 
-        // ─── GRADIENTS ───────────────────────────────────────────────
+        // Gradients are retired: each pair is one flat tone, so existing LinearGradient calls render solid
         gradients: {
-            primary:    ['#533afd', '#4434d4'],
-            // Richer dark balance gradient: deep navy → electric indigo → midnight
-            balanceDark: ['#0f1623', '#1c1e54', '#533afd', '#2a1a8a'],
-            // Light balance: soft cream → magenta → indigo → deep navy  
-            balanceLight: ['#e8e0ff', '#b9b9f9', '#533afd', '#1c1e54'],
-            mesh:       ['#f5e9d4', '#f96bee', '#533afd', '#1c1e54'],
-            income:     ['#059669', '#10b981'],
-            expense:    ['#c71852', '#ea2261'],
-            success:    ['#059669', '#10b981'],
-            warning:    ['#d97706', '#f59e0b'],
-            danger:     ['#c71852', '#ea2261'],
-            purple:     ['#7c3aed', '#533afd'],
-            blue:       ['#3b82f6', '#4434d4'],
-            teal:       ['#0d9488', '#10b981'],
-            darkCard:   ['#141d2e', '#1a2438'],
+            primary:      [brass, brass],
+            balanceDark:  ['#19191b', '#19191b'],
+            balanceLight: ['#ffffff', '#ffffff'],
+            mesh:         [isDark ? '#141415' : '#fafafa', isDark ? '#141415' : '#fafafa'],
+            income:       [isDark ? '#4cc38a' : '#16a34a', isDark ? '#4cc38a' : '#16a34a'],
+            expense:      [isDark ? '#e5484d' : '#dc2626', isDark ? '#e5484d' : '#dc2626'],
+            success:      [isDark ? '#4cc38a' : '#16a34a', isDark ? '#4cc38a' : '#16a34a'],
+            warning:      [brass, brass],
+            danger:       [isDark ? '#e5484d' : '#dc2626', isDark ? '#e5484d' : '#dc2626'],
+            purple:       [brass, brass],
+            blue:         [brass, brass],
+            teal:         [brass, brass],
+            darkCard:     ['#19191b', '#19191b'],
         },
 
-        // ─── SHADOWS ─────────────────────────────────────────────────
-        shadow:       isDark ? 'rgba(0,0,0,0.5)'          : 'rgba(0,55,112,0.08)',
-        shadowMedium: isDark ? 'rgba(0,0,0,0.7)'          : 'rgba(0,55,112,0.12)',
-        shadowHeavy:  isDark ? 'rgba(0,0,0,0.9)'          : 'rgba(0,55,112,0.22)',
+        // Neutral shadows only
+        shadow:       isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.05)',
+        shadowMedium: isDark ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.08)',
+        shadowHeavy:  isDark ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.12)',
 
-        // ─── OVERLAY ─────────────────────────────────────────────────
-        overlay:      isDark ? 'rgba(8,12,20,0.92)' : 'rgba(13,37,61,0.5)',
-        overlayLight: isDark ? 'rgba(8,12,20,0.70)' : 'rgba(13,37,61,0.3)',
+        overlay:      isDark ? 'rgba(10,10,10,0.8)' : 'rgba(10,10,10,0.5)',
+        overlayLight: isDark ? 'rgba(10,10,10,0.6)' : 'rgba(10,10,10,0.3)',
     };
 
     // Spacing tokens (base 8px)
@@ -146,7 +146,7 @@ export const ThemeProvider = ({ children }) => {
         huge: 64,
     };
 
-    // Border radius tokens matching DESIGN.md
+    // Radius: controls 8-10, cards 12-16
     const borderRadius = {
         xs: 4,
         sm: 6,
@@ -158,51 +158,51 @@ export const ThemeProvider = ({ children }) => {
         full: 9999,
     };
 
-    // Stripe Typographic Tokens (Sohne inspired weights & tracking)
+    // Type scale: hierarchy from size and colour, weights 400 and 500, tight tracking only on display sizes
     const typography = {
-        displayXxl: { fontSize: 56, fontWeight: '300', letterSpacing: -1.4, lineHeight: 58 },
-        displayXl: { fontSize: 48, fontWeight: '300', letterSpacing: -0.96, lineHeight: 52 },
-        displayLg: { fontSize: 32, fontWeight: '300', letterSpacing: -0.64, lineHeight: 36 },
-        displayMd: { fontSize: 26, fontWeight: '300', letterSpacing: -0.26, lineHeight: 30 },
-        headingLg: { fontSize: 22, fontWeight: '300', letterSpacing: -0.22, lineHeight: 26 },
-        headingMd: { fontSize: 20, fontWeight: '300', letterSpacing: -0.2, lineHeight: 26 },
-        headingSm: { fontSize: 18, fontWeight: '300', letterSpacing: 0, lineHeight: 24 },
-        bodyLg: { fontSize: 16, fontWeight: '300', lineHeight: 22 },
-        bodyMd: { fontSize: 15, fontWeight: '300', lineHeight: 21 },
-        bodyTabular: { fontSize: 14, fontWeight: '300', letterSpacing: -0.42, fontVariant: ['tabular-nums'] },
-        buttonMd: { fontSize: 16, fontWeight: '400', lineHeight: 20 },
-        buttonSm: { fontSize: 14, fontWeight: '400', lineHeight: 18 },
-        caption: { fontSize: 13, fontWeight: '400', letterSpacing: -0.39, fontVariant: ['tabular-nums'] },
-        microCap: { fontSize: 10, fontWeight: '400', letterSpacing: 0.1 },
+        displayXxl: { fontSize: 56, fontWeight: '400', letterSpacing: -1.6, lineHeight: 60 },
+        displayXl: { fontSize: 44, fontWeight: '400', letterSpacing: -1, lineHeight: 48 },
+        displayLg: { fontSize: 32, fontWeight: '500', letterSpacing: -0.6, lineHeight: 36 },
+        displayMd: { fontSize: 26, fontWeight: '500', letterSpacing: -0.3, lineHeight: 30 },
+        headingLg: { fontSize: 22, fontWeight: '500', letterSpacing: -0.2, lineHeight: 28 },
+        headingMd: { fontSize: 20, fontWeight: '500', lineHeight: 26 },
+        headingSm: { fontSize: 17, fontWeight: '500', lineHeight: 22 },
+        bodyLg: { fontSize: 16, fontWeight: '400', lineHeight: 22 },
+        bodyMd: { fontSize: 15, fontWeight: '400', lineHeight: 21 },
+        bodyTabular: { fontSize: 14, fontWeight: '400', fontVariant: ['tabular-nums'] },
+        buttonMd: { fontSize: 16, fontWeight: '500', lineHeight: 20 },
+        buttonSm: { fontSize: 14, fontWeight: '500', lineHeight: 18 },
+        caption: { fontSize: 13, fontWeight: '400', fontVariant: ['tabular-nums'] },
+        microCap: { fontSize: 12, fontWeight: '400' },
     };
 
-    // Stripe Elevation & Shadow styles
+    // Neutral elevation: soft on light, close to none on dark where depth comes from surface steps
     const shadows = {
         sm: {
-            shadowColor: '#003770',
+            shadowColor: '#000000',
             shadowOffset: { width: 0, height: 1 },
-            shadowOpacity: isDark ? 0.3 : 0.08,
-            shadowRadius: 3,
-            elevation: 2,
+            shadowOpacity: isDark ? 0 : 0.05,
+            shadowRadius: 2,
+            elevation: isDark ? 0 : 1,
         },
         md: {
-            shadowColor: '#003770',
+            shadowColor: '#000000',
             shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: isDark ? 0.4 : 0.1,
+            shadowOpacity: isDark ? 0.2 : 0.06,
             shadowRadius: 12,
             elevation: 4,
         },
         lg: {
-            shadowColor: '#003770',
+            shadowColor: '#000000',
             shadowOffset: { width: 0, height: 8 },
-            shadowOpacity: isDark ? 0.5 : 0.14,
+            shadowOpacity: isDark ? 0.3 : 0.08,
             shadowRadius: 24,
             elevation: 8,
         },
         xl: {
-            shadowColor: '#003770',
+            shadowColor: '#000000',
             shadowOffset: { width: 0, height: 12 },
-            shadowOpacity: isDark ? 0.6 : 0.2,
+            shadowOpacity: isDark ? 0.35 : 0.12,
             shadowRadius: 32,
             elevation: 12,
         },

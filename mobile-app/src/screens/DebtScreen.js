@@ -3,7 +3,6 @@ import {
     View, Text, StyleSheet, TouchableOpacity, ScrollView,
     StatusBar, RefreshControl, Alert, Platform
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -93,7 +92,7 @@ function DebtScreen({ navigation }) {
     const filterTabs = [
         { id: 'all', label: 'Active', icon: 'layers-outline' },
         { id: 'borrowed', label: 'I Owe', icon: 'arrow-down-circle-outline' },
-        { id: 'lent', label: 'Owed Me', icon: 'arrow-up-circle-outline' },
+        { id: 'lent', label: 'Owed to me', icon: 'arrow-up-circle-outline' },
         { id: 'paid', label: 'Paid', icon: 'checkmark-circle-outline' },
     ];
 
@@ -103,11 +102,11 @@ function DebtScreen({ navigation }) {
         // Header
         header: { paddingTop: Platform.OS === 'ios' ? 54 : 44, paddingHorizontal: 20, paddingBottom: 10 },
         headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-        title: { fontSize: 32, fontWeight: '300', color: colors.text, letterSpacing: -0.8 },
+        title: { fontSize: 32, fontWeight: '400', color: colors.text, letterSpacing: -0.8 },
         addBtn: {
             flexDirection: 'row', alignItems: 'center', gap: 6,
             backgroundColor: colors.primary, paddingHorizontal: 14, paddingVertical: 9,
-            borderRadius: 9999, ...shadows.md,
+            borderRadius: 8, ...shadows.md,
         },
         addBtnText: { color: '#ffffff', fontSize: 14, fontWeight: '500' },
 
@@ -116,16 +115,16 @@ function DebtScreen({ navigation }) {
         summaryCard: {
             flex: 1, borderRadius: 18, overflow: 'hidden', ...shadows.md,
         },
-        summaryGradient: { padding: 16 },
-        summaryLabel: { fontSize: 11, color: 'rgba(255,255,255,0.7)', fontWeight: '500', letterSpacing: 0.5, marginBottom: 6, textTransform: 'uppercase' },
-        summaryAmount: { fontSize: 22, fontWeight: '300', color: '#ffffff', letterSpacing: -0.6, fontVariant: ['tabular-nums'] },
-        summaryMeta: { fontSize: 11, color: 'rgba(255,255,255,0.6)', marginTop: 4, fontWeight: '300' },
+        summaryGradient: { padding: 16, backgroundColor: colors.card },
+        summaryLabel: { fontSize: 13, color: colors.textSecondary, fontWeight: '400', marginBottom: 6 },
+        summaryAmount: { fontSize: 20, fontWeight: '500', color: colors.text, fontVariant: ['tabular-nums'] },
+        summaryMeta: { fontSize: 12, color: colors.subText, marginTop: 4, fontWeight: '400' },
         paidCard: {
             flex: 1, borderRadius: 18, backgroundColor: colors.card,
             borderWidth: 1, borderColor: colors.border, padding: 16, ...shadows.sm,
         },
-        paidLabel: { fontSize: 11, color: colors.subText, fontWeight: '500', letterSpacing: 0.5, marginBottom: 6, textTransform: 'uppercase' },
-        paidCount: { fontSize: 22, fontWeight: '300', color: colors.text, letterSpacing: -0.6 },
+        paidLabel: { fontSize: 11, color: colors.subText, fontWeight: '500', marginBottom: 6 },
+        paidCount: { fontSize: 22, fontWeight: '400', color: colors.text, letterSpacing: -0.6 },
         paidMeta: { fontSize: 11, color: colors.subText, marginTop: 4 },
 
         // Filter tabs
@@ -136,7 +135,7 @@ function DebtScreen({ navigation }) {
         filterTab: {
             flexDirection: 'row', alignItems: 'center', gap: 5,
             paddingHorizontal: 12, paddingVertical: 7,
-            borderRadius: 9999, borderWidth: 1,
+            borderRadius: 8, borderWidth: 1,
         },
         filterTabText: { fontSize: 12, fontWeight: '500' },
 
@@ -153,13 +152,13 @@ function DebtScreen({ navigation }) {
             width: 46, height: 46, borderRadius: 23,
             justifyContent: 'center', alignItems: 'center', marginRight: 12,
         },
-        avatarText: { fontSize: 16, fontWeight: '500', color: '#ffffff' },
+        avatarText: { fontSize: 15, fontWeight: '500', color: colors.textSecondary },
         cardContent: { flex: 1 },
         personName: { fontSize: 16, fontWeight: '400', color: colors.text, letterSpacing: -0.2, marginBottom: 3 },
         cardMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
-        statusPill: { paddingHorizontal: 7, paddingVertical: 2, borderRadius: 9999 },
-        statusText: { fontSize: 10, fontWeight: '600' },
-        duePill: { paddingHorizontal: 7, paddingVertical: 2, borderRadius: 9999, backgroundColor: colors.borderLight },
+        statusPill: { paddingHorizontal: 7, paddingVertical: 2, borderRadius: 8 },
+        statusText: { fontSize: 10, fontWeight: '500' },
+        duePill: { paddingHorizontal: 7, paddingVertical: 2, borderRadius: 8, backgroundColor: colors.borderLight },
         dueText: { fontSize: 10, fontWeight: '500' },
         cardRight: { alignItems: 'flex-end', gap: 8 },
         debtAmount: { fontSize: 16, fontWeight: '500', letterSpacing: -0.4, fontVariant: ['tabular-nums'] },
@@ -183,7 +182,7 @@ function DebtScreen({ navigation }) {
             width: 72, height: 72, borderRadius: 36,
             backgroundColor: colors.primarySubdued, justifyContent: 'center', alignItems: 'center', marginBottom: 16,
         },
-        emptyTitle: { fontSize: 20, fontWeight: '300', color: colors.text, letterSpacing: -0.4, marginBottom: 6, textAlign: 'center' },
+        emptyTitle: { fontSize: 20, fontWeight: '400', color: colors.text, letterSpacing: -0.4, marginBottom: 6, textAlign: 'center' },
         emptySubtitle: { fontSize: 14, color: colors.subText, textAlign: 'center', lineHeight: 20 },
     });
 
@@ -200,13 +199,9 @@ function DebtScreen({ navigation }) {
 
                 <View style={s.cardInner}>
                     {/* Avatar */}
-                    <LinearGradient
-                        colors={isBorrowed ? [colors.dangerDark || '#c71852', colors.danger] : [colors.successDark || '#059669', colors.success]}
-                        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                        style={s.avatar}
-                    >
+                    <View style={[s.avatar, { backgroundColor: colors.cardElevated }]}>
                         <Text style={s.avatarText}>{getInitials(debt.personName)}</Text>
-                    </LinearGradient>
+                    </View>
 
                     {/* Content */}
                     <View style={s.cardContent}>
@@ -250,7 +245,7 @@ function DebtScreen({ navigation }) {
                             onPress={() => { hapticFeedback.light(); navigation.navigate('AddDebt', { debt, mode: 'repay' }); }}
                         >
                             <Ionicons name="cash-outline" size={14} color={colors.success} />
-                            <Text style={[s.actionBtnText, { color: colors.success }]}>Record Payment</Text>
+                            <Text style={[s.actionBtnText, { color: colors.success }]}>Record payment</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={[s.actionBtn, { backgroundColor: colors.primarySubdued, borderColor: colors.primary + '30', flex: 0.5 }]}
@@ -260,7 +255,7 @@ function DebtScreen({ navigation }) {
                             <Text style={[s.actionBtnText, { color: colors.primary }]}>Edit</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            style={[s.actionBtn, { backgroundColor: colors.dangerBg || '#fff0f5', borderColor: colors.danger + '30', flex: 0.4 }]}
+                            style={[s.actionBtn, { backgroundColor: colors.dangerBg || '#fef2f2', borderColor: colors.danger + '30', flex: 0.4 }]}
                             onPress={() => handleDelete(debt)}
                         >
                             <Ionicons name="trash-outline" size={14} color={colors.danger} />
@@ -270,7 +265,7 @@ function DebtScreen({ navigation }) {
                 {isPaid && (
                     <View style={s.cardActions}>
                         <TouchableOpacity
-                            style={[s.actionBtn, { backgroundColor: colors.dangerBg || '#fff0f5', borderColor: colors.danger + '30' }]}
+                            style={[s.actionBtn, { backgroundColor: colors.dangerBg || '#fef2f2', borderColor: colors.danger + '30' }]}
                             onPress={() => handleDelete(debt)}
                         >
                             <Ionicons name="trash-outline" size={14} color={colors.danger} />
@@ -305,18 +300,18 @@ function DebtScreen({ navigation }) {
             {/* Summary Strip */}
             <View style={s.summaryRow}>
                 <View style={s.summaryCard}>
-                    <LinearGradient colors={['#c71852', '#ea2261']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.summaryGradient}>
-                        <Text style={s.summaryLabel}>You Owe</Text>
+                    <View style={s.summaryGradient}>
+                        <Text style={s.summaryLabel}>You owe</Text>
                         <Amount value={totalBorrowed} currency="INR" style={s.summaryAmount} />
-                        <Text style={s.summaryMeta}>{debts.filter(d => d.type === 'borrowed' && d.status !== 'paid').length} active</Text>
-                    </LinearGradient>
+                        <Text style={s.summaryMeta}>{debts.filter(d => d.type === 'borrowed' && d.status !== 'paid').length} open</Text>
+                    </View>
                 </View>
                 <View style={s.summaryCard}>
-                    <LinearGradient colors={['#059669', '#10b981']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.summaryGradient}>
-                        <Text style={s.summaryLabel}>Owed To You</Text>
+                    <View style={s.summaryGradient}>
+                        <Text style={s.summaryLabel}>Owed to you</Text>
                         <Amount value={totalLent} currency="INR" style={s.summaryAmount} />
-                        <Text style={s.summaryMeta}>{debts.filter(d => d.type === 'lent' && d.status !== 'paid').length} active</Text>
-                    </LinearGradient>
+                        <Text style={s.summaryMeta}>{debts.filter(d => d.type === 'lent' && d.status !== 'paid').length} open</Text>
+                    </View>
                 </View>
                 <View style={s.paidCard}>
                     <Text style={s.paidLabel}>Cleared</Text>

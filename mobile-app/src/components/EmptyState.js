@@ -32,7 +32,7 @@ function EmptyState({
         },
         title: {
             fontSize: 22,
-            fontWeight: '300', // Sohne thin style
+            fontWeight: '400',
             color: colors.text,
             marginBottom: spacing.xs,
             textAlign: 'center',
@@ -40,7 +40,7 @@ function EmptyState({
         },
         subtitle: {
             fontSize: 14,
-            fontWeight: '300',
+            fontWeight: '400',
             color: colors.subText,
             textAlign: 'center',
             marginBottom: spacing.lg,

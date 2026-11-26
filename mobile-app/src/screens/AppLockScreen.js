@@ -203,7 +203,7 @@ function AppLockScreen({ navigation }) {
             backgroundColor: colors.card,
             paddingVertical: 12,
             paddingHorizontal: 20,
-            borderRadius: 9999, // Stripe pill button
+            borderRadius: 8,
             alignItems: 'center',
             borderWidth: 1,
             borderColor: colors.border,
@@ -216,7 +216,7 @@ function AppLockScreen({ navigation }) {
         },
         description: {
             fontSize: 13,
-            fontWeight: '300',
+            fontWeight: '400',
             color: colors.subText,
             marginTop: 4,
             lineHeight: 18,
@@ -228,7 +228,7 @@ function AppLockScreen({ navigation }) {
             <View style={styles.section}>
                 <View style={styles.item}>
                     <View style={{ flex: 1, paddingRight: 10 }}>
-                        <Text style={styles.itemText}>Enable App Lock</Text>
+                        <Text style={styles.itemText}>App lock</Text>
                         <Text style={styles.description}>
                             Require a PIN to access the app
                         </Text>
@@ -245,7 +245,7 @@ function AppLockScreen({ navigation }) {
                     <>
                         <View style={styles.item}>
                             <View style={{ flex: 1, paddingRight: 10 }}>
-                                <Text style={styles.itemText}>Biometric Unlock</Text>
+                                <Text style={styles.itemText}>Biometric unlock</Text>
                                 <Text style={styles.description}>
                                     Use Fingerprint or FaceID to unlock
                                 </Text>
@@ -268,13 +268,13 @@ function AppLockScreen({ navigation }) {
 
             {/* PIN MODAL */}
             <Modal visible={showPinModal} animationType="slide" transparent={false}>
-                <SafeAreaView style={{ flex: 1, backgroundColor: isDark ? '#0d253d' : colors.background }}>
+                <SafeAreaView style={{ flex: 1, backgroundColor: isDark ? '#171717' : colors.background }}>
                     <View style={{ padding: 20 }}>
                         <TouchableOpacity onPress={() => setShowPinModal(false)} style={{ alignSelf: 'flex-end', padding: 10 }}>
                             <Ionicons name="close" size={26} color={colors.text} />
                         </TouchableOpacity>
 
-                        <Text style={{ fontSize: 28, fontWeight: '300', color: colors.text, textAlign: 'center', marginTop: 30, letterSpacing: -0.64 }}>
+                        <Text style={{ fontSize: 28, fontWeight: '400', color: colors.text, textAlign: 'center', marginTop: 30, letterSpacing: -0.64 }}>
                             {pinMode === 'CHANGE_VERIFY' ? 'Enter Old PIN' :
                                 pinStep === 'ENTER' ? (pinMode === 'CHANGE_NEW' ? 'Enter New PIN' : 'Create PIN') :
                                     'Confirm PIN'}
@@ -286,18 +286,18 @@ function AppLockScreen({ navigation }) {
                                 <View key={i} style={{
                                     width: 14, height: 14, borderRadius: 7, borderWidth: 1, borderColor: colors.border,
                                     marginHorizontal: 10,
-                                    backgroundColor: i < modalPin.length ? (colors.primary || '#533afd') : 'transparent'
+                                    backgroundColor: i < modalPin.length ? (colors.primary || '#a8611c') : 'transparent'
                                 }} />
                             ))}
                         </View>
 
-                        {modalError ? <Text style={{ color: colors.danger || '#ea2261', textAlign: 'center', marginBottom: 20, fontSize: 13 }}>{modalError}</Text> : null}
+                        {modalError ? <Text style={{ color: colors.danger || '#dc2626', textAlign: 'center', marginBottom: 20, fontSize: 13 }}>{modalError}</Text> : null}
                     </View>
 
                     <View style={{ flex: 1, justifyContent: 'flex-end', paddingBottom: 40 }}>
                         {renderKeypad()}
                         <TouchableOpacity
-                            style={{ alignSelf: 'center', marginTop: 20, paddingVertical: 12, paddingHorizontal: 24, minWidth: 120, alignItems: 'center', backgroundColor: colors.primary || '#533afd', borderRadius: 9999 }}
+                            style={{ alignSelf: 'center', marginTop: 20, paddingVertical: 12, paddingHorizontal: 24, minWidth: 120, alignItems: 'center', backgroundColor: colors.primary || '#a8611c', borderRadius: 8 }}
                             onPress={handleSubmitPin}
                         >
                             <Text style={{ color: '#fff', fontWeight: '400', fontSize: 15 }}>
@@ -328,7 +328,7 @@ const localStyles = StyleSheet.create({
     },
     keyText: {
         fontSize: 24,
-        fontWeight: '300',
+        fontWeight: '400',
         fontVariant: ['tabular-nums'],
     }
 });

@@ -150,13 +150,13 @@ const LockScreen = () => {
     const styles = StyleSheet.create({
         container: {
             flex: 1,
-            backgroundColor: isDark ? '#0d253d' : colors.background, // Stripe dark-app shell (#0d253d)
+            backgroundColor: isDark ? '#171717' : colors.background,
             alignItems: 'center',
             justifyContent: 'center',
         },
         title: {
             fontSize: 28,
-            fontWeight: '300', // Sohne thin display
+            fontWeight: '400',
             color: colors.text,
             marginBottom: 36,
             letterSpacing: -0.64,
@@ -174,12 +174,12 @@ const LockScreen = () => {
             marginHorizontal: 10,
         },
         dotFilled: {
-            backgroundColor: colors.primary || '#533afd', // Electric Indigo
-            borderColor: colors.primary || '#533afd',
+            backgroundColor: colors.primary || '#a8611c', // Electric Indigo
+            borderColor: colors.primary || '#a8611c',
         },
         dotError: {
-            borderColor: colors.danger || '#ea2261',
-            backgroundColor: colors.danger || '#ea2261',
+            borderColor: colors.danger || '#dc2626',
+            backgroundColor: colors.danger || '#dc2626',
         },
         keypad: {
             width: '100%',
@@ -195,13 +195,13 @@ const LockScreen = () => {
             alignItems: 'center',
             justifyContent: 'center',
             margin: 8,
-            backgroundColor: isDark ? '#1c1e54' : '#ffffff', // Stripe Brand Dark 900 or white
+            backgroundColor: isDark ? '#171717' : '#ffffff',
             borderWidth: 1,
             borderColor: colors.border,
         },
         keyText: {
             fontSize: 24,
-            fontWeight: '300', // Sohne thin style
+            fontWeight: '400',
             color: colors.text,
             fontVariant: ['tabular-nums'],
         },
@@ -217,7 +217,7 @@ const LockScreen = () => {
             color: colors.primary,
             marginTop: 8,
             fontSize: 13,
-            fontWeight: '300',
+            fontWeight: '400',
         }
     });
 

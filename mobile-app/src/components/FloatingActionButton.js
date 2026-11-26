@@ -1,73 +1,42 @@
-import React, { useRef } from 'react';
-import { TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import React from 'react';
+import { Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../context/ThemeContext';
 import hapticFeedback from '../utils/haptics';
 
-function FloatingActionButton({ onPress, icon = 'add', style }) {
+// Primary action: a flat ink tile, a small press-down instead of a spring
+function FloatingActionButton({ onPress, icon = 'add', style, accessibilityLabel = 'Add expense' }) {
     const { colors, shadows } = useTheme();
-    const scaleAnim = useRef(new Animated.Value(1)).current;
-
-    const handlePressIn = () => {
-        Animated.spring(scaleAnim, {
-            toValue: 0.9,
-            useNativeDriver: true,
-        }).start();
-    };
-
-    const handlePressOut = () => {
-        Animated.spring(scaleAnim, {
-            toValue: 1,
-            friction: 3,
-            tension: 40,
-            useNativeDriver: true,
-        }).start();
-    };
-
-    const handlePress = () => {
-        hapticFeedback.medium();
-        onPress && onPress();
-    };
 
     return (
-        <Animated.View
-            style={[
-                styles.container,
+        <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={accessibilityLabel}
+            onPress={() => {
+                hapticFeedback.medium();
+                onPress && onPress();
+            }}
+            style={({ pressed }) => [
+                styles.button,
+                shadows.md,
+                { backgroundColor: colors.ink, transform: [{ scale: pressed ? 0.97 : 1 }] },
                 style,
-                { transform: [{ scale: scaleAnim }] }
             ]}
         >
-            <TouchableOpacity
-                activeOpacity={0.9}
-                onPress={handlePress}
-                onPressIn={handlePressIn}
-                onPressOut={handlePressOut}
-            >
-                <LinearGradient
-                    colors={[colors.primary || '#533afd', colors.primaryDark || '#4434d4']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={[styles.button, shadows.xl]}
-                >
-                    <Ionicons name={icon} size={28} color="#ffffff" />
-                </LinearGradient>
-            </TouchableOpacity>
-        </Animated.View>
+            <Ionicons name={icon} size={24} color={colors.onInk} />
+        </Pressable>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        position: 'absolute',
-        bottom: 30,
-        right: 20,
-        zIndex: 999,
-    },
     button: {
-        width: 60,
-        height: 60,
-        borderRadius: 30,
+        position: 'absolute',
+        bottom: 24,
+        right: 16,
+        zIndex: 999,
+        width: 56,
+        height: 56,
+        borderRadius: 16,
         justifyContent: 'center',
         alignItems: 'center',
     },

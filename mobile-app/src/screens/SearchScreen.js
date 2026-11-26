@@ -33,7 +33,7 @@ function SearchScreen({ navigation }) {
         },
         title: {
             fontSize: 28,
-            fontWeight: '300', // Sohne thin display
+            fontWeight: '400',
             color: colors.text,
             letterSpacing: -0.64,
         },
@@ -42,8 +42,8 @@ function SearchScreen({ navigation }) {
             alignItems: 'center',
             backgroundColor: colors.card,
             borderWidth: 1,
-            borderColor: colors.inputBorder || '#a8c3de',
-            borderRadius: 6, // Stripe text-input (6px)
+            borderColor: colors.inputBorder || '#d4d4d4',
+            borderRadius: 6,
             paddingHorizontal: 14,
             paddingVertical: 10,
             marginBottom: 24,
@@ -51,7 +51,7 @@ function SearchScreen({ navigation }) {
         input: {
             flex: 1,
             fontSize: 15,
-            fontWeight: '300',
+            fontWeight: '400',
             color: colors.text,
             marginLeft: 8,
         },

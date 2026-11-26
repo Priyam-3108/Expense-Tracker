@@ -3,7 +3,6 @@ import {
     View, Text, TextInput, TouchableOpacity, StyleSheet,
     ScrollView, StatusBar, Platform, KeyboardAvoidingView, Alert
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { usePrivacy } from '../context/PrivacyContext';
@@ -133,14 +132,14 @@ export default function AddDebtScreen({ navigation, route }) {
         headerTitle: { fontSize: 20, fontWeight: '400', color: colors.text, letterSpacing: -0.3, flex: 1 },
 
         // Hero / repay card
-        heroCard: { marginHorizontal: 16, marginBottom: 24, borderRadius: 20, overflow: 'hidden', ...shadows.lg },
-        heroGradient: { padding: 28, alignItems: 'center' },
-        heroLabel: { fontSize: 13, color: 'rgba(255,255,255,0.7)', fontWeight: '400', marginBottom: 8 },
+        heroCard: { marginHorizontal: 16, marginBottom: 24, borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: colors.border, backgroundColor: colors.cardElevated },
+        heroGradient: { padding: 24, alignItems: 'center' },
+        heroLabel: { fontSize: 13, color: colors.textSecondary, fontWeight: '400', marginBottom: 8 },
         heroInput: {
-            fontSize: 48, fontWeight: '200', color: '#ffffff', letterSpacing: -1.5,
+            fontSize: 48, fontWeight: '400', color: colors.text, letterSpacing: -1,
             textAlign: 'center', fontVariant: ['tabular-nums'], minWidth: 120,
         },
-        heroMeta: { fontSize: 12, color: 'rgba(255,255,255,0.6)', marginTop: 6 },
+        heroMeta: { fontSize: 12, color: colors.subText, marginTop: 6 },
 
         // Type toggle
         typeToggle: {
@@ -149,10 +148,10 @@ export default function AddDebtScreen({ navigation, route }) {
             borderWidth: 1, borderColor: colors.border, ...shadows.sm,
         },
         typeBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, paddingVertical: 13, borderRadius: 13 },
-        typeBtnText: { fontSize: 15, fontWeight: '500', letterSpacing: -0.2 },
+        typeBtnText: { fontSize: 15, fontWeight: '500' },
 
         // Section label
-        label: { fontSize: 11, fontWeight: '600', color: colors.subText, letterSpacing: 0.8, textTransform: 'uppercase', marginHorizontal: 20, marginBottom: 8 },
+        label: { fontSize: 11, fontWeight: '500', color: colors.subText, marginHorizontal: 20, marginBottom: 8 },
 
         // Input card
         inputCard: {
@@ -160,7 +159,7 @@ export default function AddDebtScreen({ navigation, route }) {
             backgroundColor: colors.card, borderRadius: 14,
             borderWidth: 1, borderColor: colors.border, ...shadows.sm,
         },
-        textInput: { padding: 16, fontSize: 15, fontWeight: '300', color: colors.text },
+        textInput: { padding: 16, fontSize: 15, fontWeight: '400', color: colors.text },
 
         // Date row
         dateRow: {
@@ -173,10 +172,10 @@ export default function AddDebtScreen({ navigation, route }) {
             backgroundColor: colors.primarySubdued, justifyContent: 'center', alignItems: 'center',
         },
         dateLabelText: { fontSize: 11, color: colors.subText, marginBottom: 1 },
-        dateValueText: { fontSize: 15, fontWeight: '300', color: colors.text },
+        dateValueText: { fontSize: 15, fontWeight: '400', color: colors.text },
 
         // Note input
-        noteInput: { padding: 16, fontSize: 14, fontWeight: '300', color: colors.text, minHeight: 70 },
+        noteInput: { padding: 16, fontSize: 14, fontWeight: '400', color: colors.text, minHeight: 70 },
 
         // Submit
         submitWrapper: {
@@ -184,9 +183,9 @@ export default function AddDebtScreen({ navigation, route }) {
             padding: 16, paddingBottom: Platform.OS === 'ios' ? 32 : 20,
             backgroundColor: colors.background, borderTopWidth: 1, borderTopColor: colors.border,
         },
-        submitBtn: { borderRadius: 16, overflow: 'hidden', ...shadows.md },
+        submitBtn: { borderRadius: 12, overflow: 'hidden', backgroundColor: colors.ink },
         submitGradient: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 16 },
-        submitText: { color: '#ffffff', fontSize: 16, fontWeight: '500', letterSpacing: -0.2 },
+        submitText: { color: colors.onInk, fontSize: 16, fontWeight: '500' },
 
         // Repay remaining info
         repayInfo: {
@@ -198,11 +197,8 @@ export default function AddDebtScreen({ navigation, route }) {
         repayInfoText: { flex: 1, fontSize: 13, color: colors.success, fontWeight: '400' },
     });
 
-    const heroGradient = isRepay
-        ? [colors.successDark || '#059669', colors.success]
-        : isBorrowed ? [colors.dangerDark || '#c71852', colors.danger] : [colors.successDark || '#059669', colors.success];
 
-    const title = isRepay ? 'Record Payment' : isEdit ? 'Edit Debt' : 'Add Debt';
+    const title = isRepay ? 'Record payment' : isEdit ? 'Edit debt' : 'New debt';
 
     return (
         <KeyboardAvoidingView style={s.outer} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -220,12 +216,12 @@ export default function AddDebtScreen({ navigation, route }) {
 
                 {/* ── Hero Amount Card ── */}
                 <View style={s.heroCard}>
-                    <LinearGradient colors={heroGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={s.heroGradient}>
-                        <Text style={s.heroLabel}>{isRepay ? 'Payment Amount (₹)' : 'Debt Amount (₹)'}</Text>
+                    <View style={s.heroGradient}>
+                        <Text style={s.heroLabel}>{isRepay ? 'Payment (₹)' : 'Amount (₹)'}</Text>
                         <TextInput
                             style={s.heroInput}
                             placeholder="0"
-                            placeholderTextColor="rgba(255,255,255,0.3)"
+                            placeholderTextColor={colors.subText}
                             value={isRepay ? repayAmount : amount}
                             onChangeText={isRepay ? setRepayAmount : setAmount}
                             keyboardType="numeric"
@@ -233,9 +229,9 @@ export default function AddDebtScreen({ navigation, route }) {
                             editable={!isEdit} // amount not editable in edit mode
                         />
                         {isRepay && debt && (
-                            <Text style={s.heroMeta}>Remaining: <Amount value={debt.currentAmount} currency="INR" /></Text>
+                            <Text style={s.heroMeta}>Remaining <Amount value={debt.currentAmount} currency="INR" /></Text>
                         )}
-                    </LinearGradient>
+                    </View>
                 </View>
 
                 {/* ── Repay info banner ── */}
@@ -243,7 +239,7 @@ export default function AddDebtScreen({ navigation, route }) {
                     <View style={s.repayInfo}>
                         <Ionicons name="information-circle-outline" size={20} color={colors.success} />
                         <Text style={s.repayInfoText}>
-                            Recording payment for <Text style={{ fontWeight: '600' }}>{debt.personName}</Text>.
+                            Recording payment for <Text style={{ fontWeight: '500' }}>{debt.personName}</Text>.
                             Original: <Amount value={debt.amount} currency="INR" /> · Paid: <Amount value={debt.amount - debt.currentAmount} currency="INR" />.
                         </Text>
                     </View>
@@ -254,7 +250,7 @@ export default function AddDebtScreen({ navigation, route }) {
                     <>
                         <View style={s.typeToggle}>
                             <TouchableOpacity
-                                style={[s.typeBtn, isBorrowed && { backgroundColor: colors.dangerBg || '#fff0f5' }]}
+                                style={[s.typeBtn, isBorrowed && { backgroundColor: colors.dangerBg || '#fef2f2' }]}
                                 onPress={() => { hapticFeedback.light(); setDebtType('borrowed'); }}
                             >
                                 <Ionicons name="arrow-down-circle" size={20} color={isBorrowed ? colors.danger : colors.subText} />
@@ -274,7 +270,7 @@ export default function AddDebtScreen({ navigation, route }) {
                 {/* ── Person Name ── */}
                 {!isRepay && (
                     <>
-                        <Text style={s.label}>Person Name</Text>
+                        <Text style={s.label}>Person</Text>
                         <View style={s.inputCard}>
                             <TextInput
                                 style={s.textInput}
@@ -317,7 +313,7 @@ export default function AddDebtScreen({ navigation, route }) {
                                         <Ionicons name="alarm-outline" size={16} color={colors.warning} />
                                     </View>
                                     <View>
-                                        <Text style={s.dateLabelText}>Due Date</Text>
+                                        <Text style={s.dateLabelText}>Due date</Text>
                                         <Text style={s.dateValueText}>{dueDate ? displayDate(dueDate) : 'Not set'}</Text>
                                     </View>
                                 </View>
@@ -353,21 +349,11 @@ export default function AddDebtScreen({ navigation, route }) {
                     disabled={loading}
                     activeOpacity={0.85}
                 >
-                    <LinearGradient
-                        colors={isRepay
-                            ? [colors.successDark || '#059669', colors.success]
-                            : [colors.primaryDark || '#4434d4', colors.primary]}
-                        start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                        style={s.submitGradient}
-                    >
-                        <Ionicons
-                            name={loading ? 'hourglass-outline' : isRepay ? 'cash' : isEdit ? 'pencil' : 'checkmark-circle'}
-                            size={20} color="#ffffff"
-                        />
+                    <View style={s.submitGradient}>
                         <Text style={s.submitText}>
-                            {loading ? 'Saving…' : isRepay ? 'Record Payment' : isEdit ? 'Update Debt' : 'Save Debt'}
+                            {loading ? 'Saving…' : isRepay ? 'Record payment' : isEdit ? 'Save changes' : 'Save debt'}
                         </Text>
-                    </LinearGradient>
+                    </View>
                 </TouchableOpacity>
             </View>
         </KeyboardAvoidingView>

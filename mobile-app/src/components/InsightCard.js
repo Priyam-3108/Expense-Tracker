@@ -29,12 +29,12 @@ function InsightCard({
 
     const styles = StyleSheet.create({
         container: {
-            backgroundColor: isDark ? colors.card : '#f5e9d4', // Stripe canvas-cream warm band
+            backgroundColor: isDark ? colors.card : '#f4f4f5',
             borderRadius: borderRadius.lg,
             padding: 16,
             marginBottom: 12,
             borderWidth: 1,
-            borderColor: isDark ? colors.border : '#e3e8ee',
+            borderColor: isDark ? colors.border : '#e5e5e5',
             ...shadows.sm,
         },
         header: {
@@ -59,27 +59,27 @@ function InsightCard({
         },
         title: {
             fontSize: 15,
-            fontWeight: '300', // Sohne thin style
-            color: '#0d253d', // Stripe Ink
+            fontWeight: '400',
+            color: '#171717',
             letterSpacing: -0.2,
         },
         message: {
             fontSize: 13,
-            fontWeight: '300',
-            color: '#273951', // Stripe Ink-secondary
+            fontWeight: '400',
+            color: '#525252',
             lineHeight: 19,
         },
         pillTag: {
-            backgroundColor: colors.primarySubdued || '#b9b9f9',
+            backgroundColor: colors.primarySubdued || '#fbf6ee',
             paddingHorizontal: 8,
             paddingVertical: 2,
-            borderRadius: 9999,
+            borderRadius: 8,
             marginLeft: 6,
         },
         pillTagText: {
             fontSize: 10,
-            fontWeight: '600',
-            color: colors.primaryDark || '#4434d4',
+            fontWeight: '500',
+            color: colors.primaryDark || '#a8611c',
             letterSpacing: 0.1,
         },
     });
