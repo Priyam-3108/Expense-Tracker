@@ -15,7 +15,8 @@ export const loginSchema = z.object({
 export const categorySchema = z.object({
   name: z.string().min(1, 'Category name is required').max(30, 'Category name cannot exceed 30 characters'),
   color: z.string().regex(/^#[0-9A-F]{6}$/i, 'Color must be a valid hex color').optional(),
-  icon: z.string().optional()
+  icon: z.string().optional(),
+  isSavings: z.boolean().optional()
 });
 
 export const expenseSchema = z.object({

@@ -21,15 +21,15 @@ function LineChart({ data, labels, height = 220, width, hideValues = false }) {
         backgroundGradientFrom: colors.card,
         backgroundGradientTo: colors.card,
         decimalPlaces: 0,
-        color: (opacity = 1) => `rgba(139, 92, 246, ${opacity})`,
-        labelColor: (opacity = 1) => isDark ? `rgba(241, 245, 249, ${opacity})` : `rgba(15, 23, 42, ${opacity})`,
+        color: (opacity = 1) => `rgba(168, 97, 28, ${opacity})`,
+        labelColor: (opacity = 1) => isDark ? `rgba(133, 133, 139, ${opacity})` : `rgba(115, 115, 115, ${opacity})`,
         style: {
             borderRadius: 16,
         },
         propsForDots: {
             r: '5',
             strokeWidth: '2',
-            stroke: '#8b5cf6',
+            stroke: '#a8611c',
         },
         propsForBackgroundLines: {
             strokeDasharray: '',
@@ -46,7 +46,7 @@ function LineChart({ data, labels, height = 220, width, hideValues = false }) {
         datasets: [
             {
                 data: validData,
-                color: (opacity = 1) => `rgba(139, 92, 246, ${opacity})`,
+                color: (opacity = 1) => `rgba(168, 97, 28, ${opacity})`,
                 strokeWidth: 3,
             },
         ],

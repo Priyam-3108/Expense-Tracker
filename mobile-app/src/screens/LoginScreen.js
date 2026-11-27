@@ -41,15 +41,15 @@ export default function LoginScreen({ navigation }) {
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <View style={styles.header}>
-              <Text style={[styles.title, { color: colors.text }]}>Welcome Back</Text>
-              <Text style={[styles.subtitle, { color: colors.subText }]}>Sign in to continue</Text>
+              <Text style={[styles.title, { color: colors.text }]}>Sign in</Text>
+              <Text style={[styles.subtitle, { color: colors.subText }]}>Use the email and password for your Spendly account</Text>
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={[styles.label, { color: colors.text }]}>Email Address</Text>
+              <Text style={[styles.label, { color: colors.text }]}>Email</Text>
               <TextInput
                 style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
-                placeholder="Enter your email"
+                placeholder="you@example.com"
                 value={email}
                 onChangeText={setEmail}
                 autoCapitalize="none"
@@ -62,7 +62,7 @@ export default function LoginScreen({ navigation }) {
               <Text style={[styles.label, { color: colors.text }]}>Password</Text>
               <TextInput
                 style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
-                placeholder="Enter your password"
+                placeholder="Password"
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
@@ -75,7 +75,7 @@ export default function LoginScreen({ navigation }) {
               onPress={handleLogin}
               disabled={loading}
             >
-              <Text style={styles.buttonText}>{loading ? 'Signing in...' : 'Sign In'}</Text>
+              <Text style={styles.buttonText}>{loading ? 'Signing in…' : 'Sign in'}</Text>
             </TouchableOpacity>
 
             <View style={[styles.footer, { borderTopColor: colors.border }]}>
@@ -95,9 +95,9 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   scrollContent: { flexGrow: 1, justifyContent: 'center', padding: 20 },
   card: {
-    borderRadius: 16, // Stripe rounded.xl container
+    borderRadius: 16,
     padding: 28,
-    shadowColor: '#003770',
+    shadowColor: '#000000',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.12,
     shadowRadius: 24,
@@ -105,32 +105,32 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   header: { marginBottom: 28, alignItems: 'center' },
-  title: { fontSize: 32, fontWeight: '300', marginBottom: 4, letterSpacing: -0.64 }, // Sohne thin display
-  subtitle: { fontSize: 14, fontWeight: '300', letterSpacing: -0.2 },
+  title: { fontSize: 32, fontWeight: '400', marginBottom: 4, letterSpacing: -0.64 },
+  subtitle: { fontSize: 14, fontWeight: '400', textAlign: 'center' },
   inputContainer: { marginBottom: 20 },
-  label: { fontSize: 13, fontWeight: '400', marginBottom: 6, letterSpacing: 0 },
+  label: { fontSize: 13, fontWeight: '400', marginBottom: 6 },
   input: {
     borderWidth: 1,
-    borderRadius: 6, // Stripe text-input rounded.sm (6px)
+    borderRadius: 6,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
-    fontWeight: '300',
+    fontWeight: '400',
   },
   button: {
     paddingVertical: 12,
     paddingHorizontal: 20,
-    borderRadius: 9999, // Stripe button-primary-pill
+    borderRadius: 10,
     alignItems: 'center',
     marginTop: 10,
-    shadowColor: '#003770',
+    shadowColor: '#000000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 8,
     elevation: 4,
   },
   buttonDisabled: { opacity: 0.6 },
-  buttonText: { color: 'white', fontWeight: '400', fontSize: 15, letterSpacing: 0 },
+  buttonText: { color: 'white', fontWeight: '400', fontSize: 15 },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -138,6 +138,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     paddingTop: 20
   },
-  footerText: { fontSize: 14, fontWeight: '300' },
+  footerText: { fontSize: 14, fontWeight: '400' },
   linkText: { fontWeight: '400', fontSize: 14 },
 });

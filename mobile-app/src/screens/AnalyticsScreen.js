@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, StatusBar, TouchableOpacity, RefreshControl, Platform, Dimensions } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -13,8 +13,11 @@ import InsightCard from '../components/InsightCard';
 import { SkeletonCard } from '../components/SkeletonLoader';
 import hapticFeedback from '../utils/haptics';
 import { usePrivacy } from '../context/PrivacyContext';
+import { useExcludeSavings } from '../hooks/useExcludeSavings';
+import SavingsToggle from '../components/SavingsToggle';
+import Amount from '../components/Amount';
 
-function AnalyticsScreen() {
+function AnalyticsScreen({ navigation }) {
     const { colors, isDark, spacing, borderRadius, shadows } = useTheme();
     const { isPrivate, toggle: togglePrivacy } = usePrivacy();
     const maskMoney = (msg) => isPrivate ? msg.replace(/₹[\d,.]+/g, '₹••••') : msg;
@@ -22,6 +25,8 @@ function AnalyticsScreen() {
     const [refreshing, setRefreshing] = useState(false);
     const [selectedPeriod, setSelectedPeriod] = useState('month'); // 'week', 'month', '3months', '6months', 'year', 'custom'
     const [chartType, setChartType] = useState('bar'); // 'bar', 'pie', 'line'
+    const [excludeSavings, setExcludeSavings] = useExcludeSavings();
+    const latestRequest = useRef(0);
 
     // Custom Date Range State
     const [customStartDate, setCustomStartDate] = useState(new Date());
@@ -34,6 +39,10 @@ function AnalyticsScreen() {
         categoryBreakdown: [],
         spendingTrend: [],
         insights: [],
+        categoryRows: [],
+        totalExpenses: 0,
+        savingsTotal: 0,
+        range: null,
     });
 
 
@@ -66,6 +75,8 @@ function AnalyticsScreen() {
     }, [selectedPeriod, customStartDate, customEndDate]);
 
     const fetchAnalytics = async () => {
+        // A newer request (period or savings toggle changed) wins over this one
+        const requestId = ++latestRequest.current;
         try {
             const range = getDateRange();
             const start = range.start;
@@ -88,8 +99,10 @@ function AnalyticsScreen() {
             // Fetch analytics data from backend with explicit dates
             const response = await expenseService.getDetailedAnalytics({
                 startDate: startDateStr,
-                endDate: endDateStr
+                endDate: endDateStr,
+                excludeSavings: excludeSavings ? 'true' : undefined
             });
+            if (requestId !== latestRequest.current) return;
 
             if (response.data.success) {
                 const data = response.data.data;
@@ -148,74 +161,43 @@ function AnalyticsScreen() {
                     };
                 });
 
+                // 4. Rows for the tappable category list
+                const categoryRows = rawCategories.map(item => ({
+                    id: item._id,
+                    name: item.category?.name || 'Other',
+                    color: item.category?.color || colors.subText,
+                    total: parseFloat(item.totalAmount || 0),
+                    count: item.count || 0,
+                }));
+
                 setAnalyticsData({
                     monthlyExpenses,
                     categoryBreakdown,
                     spendingTrend,
                     insights: generateInsights(data),
+                    categoryRows,
+                    totalExpenses: data.summary?.totalExpenses || 0,
+                    savingsTotal: data.summary?.savingsTotal || 0,
+                    range: { startDate: startDateStr, endDate: endDateStr },
                 });
             } else {
-                setAnalyticsData(generateSampleData());
+                setAnalyticsData(emptyData());
             }
 
         } catch (error) {
+            if (requestId !== latestRequest.current) return;
             console.error('Error fetching analytics:', error);
-            setAnalyticsData(generateSampleData());
+            setAnalyticsData(emptyData());
         } finally {
-            setLoading(false);
-            setRefreshing(false);
+            if (requestId === latestRequest.current) {
+                setLoading(false);
+                setRefreshing(false);
+            }
         }
     };
 
-    const generateSampleData = () => {
-        return {
-            monthlyExpenses: [
-                { month: 'Jan', amount: 15000 },
-                { month: 'Feb', amount: 18000 },
-                { month: 'Mar', amount: 12000 },
-                { month: 'Apr', amount: 20000 },
-                { month: 'May', amount: 16000 },
-                { month: 'Jun', amount: 22000 },
-            ],
-            categoryBreakdown: [
-                { name: 'Food', population: 8000, color: '#f59e0b' },
-                { name: 'Transport', population: 5000, color: '#3b82f6' },
-                { name: 'Shopping', population: 4000, color: '#ec4899' },
-                { name: 'Entertainment', population: 3000, color: '#8b5cf6' },
-                { name: 'Bills', population: 2000, color: '#ef4444' },
-            ],
-            spendingTrend: [
-                { day: 'Mon', amount: 500 },
-                { day: 'Tue', amount: 800 },
-                { day: 'Wed', amount: 600 },
-                { day: 'Thu', amount: 1200 },
-                { day: 'Fri', amount: 900 },
-                { day: 'Sat', amount: 1500 },
-                { day: 'Sun', amount: 700 },
-            ],
-            insights: [
-                {
-                    icon: 'trending-up',
-                    title: 'Spending Increased',
-                    message: 'Your spending increased by 15% compared to last month',
-                    type: 'warning',
-                    trend: 'up',
-                },
-                {
-                    icon: 'restaurant',
-                    title: 'Top Category: Food',
-                    message: 'You spent ₹8,000 on food this month, 36% of total expenses',
-                    type: 'info',
-                },
-                {
-                    icon: 'checkmark-circle',
-                    title: 'Budget Goal Met',
-                    message: 'You stayed within budget for Transportation this month!',
-                    type: 'success',
-                },
-            ],
-        };
-    };
+    // No data or a failed request shows an empty state, never invented figures
+    const emptyData = () => ({ monthlyExpenses: [], categoryBreakdown: [], spendingTrend: [], insights: [], categoryRows: [], totalExpenses: 0, savingsTotal: 0, range: null });
 
     const generateInsights = (data) => {
         const insights = [];
@@ -242,7 +224,7 @@ function AnalyticsScreen() {
             if (totalExpenses > 0) {
                 insights.push({
                     icon: 'wallet',
-                    title: 'Total Spending',
+                    title: 'Total spending',
                     message: `₹${totalExpenses.toFixed(0)} across ${expenseCount} transactions (Avg: ₹${avgExpenseAmount?.toFixed(0) || 0})`,
                     type: 'info',
                 });
@@ -254,12 +236,12 @@ function AnalyticsScreen() {
             const rate = data.summary.savingsRate;
             insights.push({
                 icon: rate > 20 ? 'trending-up' : rate > 0 ? 'remove' : 'trending-down',
-                title: `Savings Rate: ${rate.toFixed(1)}%`,
+                title: `Savings rate: ${rate.toFixed(1)}%`,
                 message: rate > 20
-                    ? 'Great job! You\'re saving well this period.'
+                    ? 'Income is well ahead of spending this period'
                     : rate > 0
-                        ? 'You\'re saving, but there\'s room to improve.'
-                        : 'Consider reducing expenses to start saving.',
+                        ? 'Income is slightly ahead of spending'
+                        : 'Spending is ahead of income this period',
                 type: rate > 20 ? 'success' : rate > 0 ? 'info' : 'warning',
             });
         }
@@ -268,7 +250,7 @@ function AnalyticsScreen() {
         if (data.summary?.avgDailyExpense) {
             insights.push({
                 icon: 'calendar',
-                title: 'Daily Average',
+                title: 'Daily average',
                 message: `You spend an average of ₹${data.summary.avgDailyExpense.toFixed(0)} per day`,
                 type: 'info',
             });
@@ -280,13 +262,23 @@ function AnalyticsScreen() {
     useFocusEffect(
         useCallback(() => {
             fetchAnalytics();
-        }, [selectedPeriod, customStartDate, customEndDate])
+        }, [selectedPeriod, customStartDate, customEndDate, excludeSavings])
     );
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
         fetchAnalytics();
-    }, [selectedPeriod, customStartDate, customEndDate]);
+    }, [selectedPeriod, customStartDate, customEndDate, excludeSavings]);
+
+    const openCategory = (row) => {
+        hapticFeedback.light();
+        navigation.navigate('CategoryDetail', {
+            categoryId: row.id,
+            name: row.name,
+            ...analyticsData.range,
+            totalExpenses: analyticsData.totalExpenses,
+        });
+    };
 
     const onDateChange = (event, selectedDate, type) => {
         if (type === 'start') {
@@ -325,7 +317,7 @@ function AnalyticsScreen() {
         },
         title: {
             fontSize: 32,
-            fontWeight: '300', // Sohne thin display
+            fontWeight: '400',
             color: colors.text,
             marginBottom: spacing.sm,
             letterSpacing: -0.64,
@@ -339,7 +331,7 @@ function AnalyticsScreen() {
         periodButton: {
             paddingHorizontal: 12,
             paddingVertical: 6,
-            borderRadius: 9999, // Stripe pill tag (rounded.pill)
+            borderRadius: 8,
             backgroundColor: colors.card,
             borderWidth: 1,
             borderColor: colors.border,
@@ -347,8 +339,8 @@ function AnalyticsScreen() {
             alignItems: 'center',
         },
         periodButtonActive: {
-            backgroundColor: colors.primary || '#533afd',
-            borderColor: colors.primary || '#533afd',
+            backgroundColor: colors.primary || '#a8611c',
+            borderColor: colors.primary || '#a8611c',
         },
         periodButtonText: {
             fontSize: 13,
@@ -371,7 +363,7 @@ function AnalyticsScreen() {
             justifyContent: 'center',
             backgroundColor: colors.card,
             padding: 10,
-            borderRadius: 9999, // Stripe pill
+            borderRadius: 8,
             borderWidth: 1,
             borderColor: colors.border,
             gap: spacing.xs,
@@ -388,7 +380,7 @@ function AnalyticsScreen() {
             marginBottom: spacing.lg,
             backgroundColor: colors.card,
             padding: 4,
-            borderRadius: 9999, // Stripe pill container
+            borderRadius: 8,
             borderWidth: 1,
             borderColor: colors.border,
         },
@@ -399,11 +391,11 @@ function AnalyticsScreen() {
             justifyContent: 'center',
             gap: 4,
             paddingVertical: 8,
-            borderRadius: 9999, // Stripe pill button
+            borderRadius: 8,
             backgroundColor: 'transparent',
         },
         chartTypeButtonActive: {
-            backgroundColor: colors.primary || '#533afd',
+            backgroundColor: colors.primary || '#a8611c',
         },
         chartTypeButtonText: {
             fontSize: 13,
@@ -421,7 +413,7 @@ function AnalyticsScreen() {
         },
         sectionTitle: {
             fontSize: 20,
-            fontWeight: '300', // Sohne thin display
+            fontWeight: '400',
             color: colors.text,
             marginBottom: spacing.md,
             letterSpacing: -0.26,
@@ -437,6 +429,18 @@ function AnalyticsScreen() {
         insightsSection: {
             marginBottom: spacing.xl,
         },
+        catRow: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 10,
+            paddingVertical: 12,
+            paddingHorizontal: spacing.md,
+        },
+        catDot: { width: 8, height: 8, borderRadius: 4 },
+        catName: { fontSize: 15, color: colors.text },
+        catMeta: { fontSize: 12, color: colors.subText, marginTop: 2 },
+        catAmount: { fontSize: 15, color: colors.text, fontVariant: ['tabular-nums'] },
+        catShare: { fontSize: 12, color: colors.subText, fontVariant: ['tabular-nums'], textAlign: 'right', marginTop: 2 },
     });
 
     const renderChart = () => {
@@ -604,6 +608,10 @@ function AnalyticsScreen() {
                             )}
                         </View>
                     )}
+
+                    {analyticsData.savingsTotal > 0 && (
+                        <SavingsToggle value={excludeSavings} onChange={setExcludeSavings} leftOut={analyticsData.savingsTotal} />
+                    )}
                 </View>
 
                 <View style={styles.content}>
@@ -665,6 +673,38 @@ function AnalyticsScreen() {
                         </View>
                     </View>
 
+                    {/* By category: tap a row to see its entries */}
+                    {analyticsData.categoryRows.length > 0 && (
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>By category</Text>
+                            <View style={[styles.chartCard, { padding: 0 }]}>
+                                {analyticsData.categoryRows.map((row, i) => (
+                                    <TouchableOpacity
+                                        key={row.id}
+                                        onPress={() => openCategory(row)}
+                                        activeOpacity={0.7}
+                                        accessibilityRole="button"
+                                        accessibilityLabel={`${row.name}, ${row.count} entries. Show entries`}
+                                        style={[styles.catRow, i > 0 && { borderTopWidth: 1, borderTopColor: colors.borderLight }]}
+                                    >
+                                        <View style={[styles.catDot, { backgroundColor: row.color }]} />
+                                        <View style={{ flex: 1 }}>
+                                            <Text style={styles.catName} numberOfLines={1}>{row.name}</Text>
+                                            <Text style={styles.catMeta}>{row.count} {row.count === 1 ? 'entry' : 'entries'}</Text>
+                                        </View>
+                                        <View>
+                                            <Amount value={row.total} style={styles.catAmount} />
+                                            <Text style={styles.catShare}>
+                                                {analyticsData.totalExpenses > 0 ? Math.round((row.total / analyticsData.totalExpenses) * 100) : 0}%
+                                            </Text>
+                                        </View>
+                                        <Ionicons name="chevron-forward" size={16} color={colors.subText} />
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+                        </View>
+                    )}
+
                     {/* Insights */}
                     <View style={styles.insightsSection}>
                         <Text style={styles.sectionTitle}>Insights</Text>
@@ -683,7 +723,7 @@ function AnalyticsScreen() {
                             <View style={[styles.chartCard, { padding: spacing.xl, alignItems: 'center' }]}>
                                 <Ionicons name="bulb-outline" size={48} color={colors.subText} />
                                 <Text style={{ color: colors.subText, marginTop: spacing.md, textAlign: 'center' }}>
-                                    No insights available yet. Add some expenses to see analytics!
+                                    Add a few expenses and insights appear here
                                 </Text>
                             </View>
                         )}

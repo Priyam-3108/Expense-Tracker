@@ -16,13 +16,13 @@ const localISO = (d) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).to
 const isOpen = (d) => d.status !== 'paid';
 
 const chip = (on) =>
-    `min-h-[36px] px-3 rounded-full text-sm border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#533afd]/50 ${
+    `min-h-[36px] px-3 rounded-lg text-sm border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brass/50 ${
         on
-            ? 'bg-[#533afd] border-[#533afd] text-white'
+            ? 'bg-gray-900 border-gray-900 text-white dark:bg-[#ededed] dark:border-[#ededed] dark:text-[#171717]'
             : 'bg-white dark:bg-transparent border-gray-200 dark:border-white/[0.1] text-gray-700 dark:text-[#a1a1a6] hover:bg-gray-50 dark:hover:bg-white/[0.04]'
     }`;
 
-const field = 'h-11 rounded-lg text-sm bg-white dark:bg-[#232325] border border-gray-200 dark:border-white/[0.08] text-gray-900 dark:text-[#ededed] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#533afd]/50';
+const field = 'h-11 rounded-lg text-sm bg-white dark:bg-[#232325] border border-gray-200 dark:border-white/[0.08] text-gray-900 dark:text-[#ededed] focus:outline-none focus-visible:ring-2 focus-visible:ring-brass/50';
 
 export default function Debts() {
     const { debts, loading, deleteDebt } = useDebt();
@@ -90,7 +90,7 @@ export default function Debts() {
     if (loading) {
         return (
             <div className="flex justify-center items-center h-64" role="status" aria-label="Loading">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500" />
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brass" />
             </div>
         );
     }
@@ -100,7 +100,7 @@ export default function Debts() {
             <div className="flex flex-wrap items-end justify-between gap-3">
                 <div>
                     <h1 className="text-2xl md:text-[28px] leading-tight font-medium text-gray-900 dark:text-[#ededed]">Debts</h1>
-                    <p className="mt-1 text-sm text-gray-500 dark:text-[#a1a1a6]">Track money you lend and borrow.</p>
+                    <p className="mt-1 text-sm text-gray-500 dark:text-[#a1a1a6]">Money you lent and borrowed, and what is still open</p>
                 </div>
                 <div className="flex gap-2">
                     <button onClick={() => setForm({ type: 'borrowed' })} className="btn-secondary btn-md inline-flex items-center gap-1.5">
@@ -117,13 +117,13 @@ export default function Debts() {
             <div className="glass-card p-4 sm:p-6">
                 <div className="space-y-3">
                     <div className="flex flex-col md:flex-row gap-3">
-                        <div className="flex rounded-xl bg-gray-100 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.06] p-1" role="group" aria-label="Type">
+                        <div className="flex rounded-[10px] bg-gray-100 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.06] p-1" role="group" aria-label="Type">
                             {[['lent', 'Lent'], ['borrowed', 'Borrowed'], ['all', 'All']].map(([v, l]) => (
                                 <button
                                     key={v} aria-pressed={view.type === v}
                                     onClick={() => patch({ type: v })}
-                                    className={`flex-1 md:flex-none md:px-5 min-h-[36px] rounded-lg text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#533afd]/50 ${
-                                        view.type === v ? 'bg-white dark:bg-white/[0.08] text-gray-900 dark:text-white shadow-sm' : 'text-gray-600 dark:text-[#a1a1a6] hover:text-gray-900 dark:hover:text-white'}`}
+                                    className={`flex-1 md:flex-none md:px-5 min-h-[36px] rounded-md text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brass/50 ${
+                                        view.type === v ? 'bg-white dark:bg-[#2a2a2c] text-gray-900 dark:text-white shadow-[0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]' : 'text-gray-600 dark:text-[#a1a1a6] hover:text-gray-900 dark:hover:text-white'}`}
                                 >
                                     {l} <span className="text-xs text-gray-400 dark:text-[#85858b]">{count(v)}</span>
                                 </button>
@@ -157,7 +157,7 @@ export default function Debts() {
                             Due this week{summary.weekCount ? ` · ${summary.weekCount}` : ''}
                         </button>
                         {dirty && (
-                            <button onClick={() => patch({ ...DEFAULT_VIEW, type: view.type })} className="inline-flex items-center gap-1 min-h-[36px] px-2 text-sm text-[#533afd] dark:text-[#8b7ffe] hover:underline">
+                            <button onClick={() => patch({ ...DEFAULT_VIEW, type: view.type })} className="inline-flex items-center gap-1 min-h-[36px] px-2 text-sm text-brass dark:text-brass hover:underline">
                                 <X size={14} aria-hidden="true" /> Reset
                             </button>
                         )}
@@ -166,7 +166,7 @@ export default function Debts() {
 
                 <div className="flex items-center justify-between mt-3 py-3 text-xs text-gray-500 dark:text-[#85858b] border-y border-gray-200 dark:border-white/[0.06]">
                     <span>{visible.length} record{visible.length === 1 ? '' : 's'}</span>
-                    {total > 0 && <span>Pending total <Amount value={total} currency={currency} className="font-mono tabular-nums text-gray-900 dark:text-[#ededed]" /></span>}
+                    {total > 0 && <span>Pending total <Amount value={total} currency={currency} className="tabular-nums text-gray-900 dark:text-[#ededed]" /></span>}
                 </div>
 
                 <DebtList

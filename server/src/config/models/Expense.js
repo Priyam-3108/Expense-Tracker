@@ -148,6 +148,7 @@ expenseSchema.statics.getCategorySummary = async function (userId, startDate, en
         _id: '$category',
         categoryName: { $first: '$categoryInfo.name' },
         categoryColor: { $first: '$categoryInfo.color' },
+        isSavings: { $first: { $ifNull: ['$categoryInfo.isSavings', false] } },
         total: { $sum: '$amount' },
         count: { $sum: 1 }
       }

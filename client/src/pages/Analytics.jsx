@@ -200,7 +200,7 @@ const Analytics = () => {
                 />
                 <button
                   onClick={copyToClipboard}
-                  className="p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-colors"
+                  className="p-2 text-brass-600 dark:text-brass-400 hover:bg-brass-50 dark:hover:bg-brass-900/30 rounded-lg transition-colors"
                   title="Copy link"
                 >
                   {copying ? <Check size={18} /> : <Copy size={18} />}
@@ -215,13 +215,13 @@ const Analytics = () => {
                   className="btn-primary flex-1 justify-center text-sm"
                 >
                   <ExternalLink size={16} />
-                  Open Link
+                  Open link
                 </a>
                 <button
                   onClick={handleDisableSharing}
                   className="btn-danger flex-1 justify-center text-sm"
                 >
-                  Disable Sharing
+                  Stop sharing
                 </button>
               </div>
             </div>

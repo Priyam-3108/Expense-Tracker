@@ -1,5 +1,11 @@
 // client/src/components/form/AmountHero.jsx
-import { gradientBr } from './gradients'
+// The sign colour is the only tint: it says which way the money moves
+const TONE = {
+  expense: 'text-red-600 dark:text-[#e5484d]',
+  borrowed: 'text-red-600 dark:text-[#e5484d]',
+  income: 'text-green-600 dark:text-[#4cc38a]',
+  lent: 'text-green-600 dark:text-[#4cc38a]',
+}
 
 export default function AmountHero({
   value,
@@ -20,13 +26,13 @@ export default function AmountHero({
   }
 
   return (
-    <div className={`rounded-3xl overflow-hidden shadow-lg ${gradientBr(variant)}`}>
+    <div className="rounded-2xl border border-gray-200 dark:border-white/[0.08] bg-gray-50 dark:bg-[#232325]">
       <div className="px-6 py-8 flex flex-col items-center">
         {label && (
-          <span className="text-sm font-light text-white/70 mb-1">{label}</span>
+          <span className="text-sm text-gray-500 dark:text-[#a1a1a6] mb-2">{label}</span>
         )}
-        <div className="flex items-center justify-center gap-1 text-white">
-          <span className="text-3xl font-extralight text-white/60">{currencySymbol}</span>
+        <div className="flex items-center justify-center gap-1 text-gray-900 dark:text-[#ededed]">
+          <span className={`text-3xl ${TONE[variant] || 'text-gray-400 dark:text-[#85858b]'}`}>{currencySymbol}</span>
           <input
             type="text"
             inputMode="decimal"
@@ -34,11 +40,11 @@ export default function AmountHero({
             onChange={handleChange}
             readOnly={disabled}
             placeholder="0"
-            className={`bg-transparent border-0 outline-none text-center text-5xl font-extralight tracking-tight text-white placeholder-white/30 w-[8ch] tabular-nums ${disabled ? 'opacity-60' : ''}`}
+            className={`bg-transparent border-0 outline-none text-center text-5xl font-normal tracking-[-0.02em] text-gray-900 dark:text-[#ededed] placeholder-gray-300 dark:placeholder-white/20 w-[8ch] tabular-nums ${disabled ? 'opacity-60' : ''}`}
           />
         </div>
         {error && (
-          <p className="mt-3 text-sm font-medium text-white bg-black/20 rounded-lg px-3 py-1">
+          <p className="mt-3 text-sm text-red-600 dark:text-[#e5484d]">
             {error}
           </p>
         )}

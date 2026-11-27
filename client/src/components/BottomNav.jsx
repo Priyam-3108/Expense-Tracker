@@ -17,7 +17,7 @@ const navItems = [
 const BottomNav = () => {
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 z-40 lg:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.08)]"
+      className="fixed bottom-0 inset-x-0 z-40 lg:hidden"
       aria-label="Mobile navigation"
     >
       <div className="glass-bottom-nav">
@@ -44,7 +44,7 @@ const BottomNav = () => {
                       className={cn(
                         'flex items-center justify-center w-12 h-7 rounded-lg transition-colors',
                         isActive
-                          ? 'bg-gray-100 dark:bg-[#232325] text-[#533afd] dark:text-[#8b7ffe]'
+                          ? 'bg-gray-100 dark:bg-[#232325] text-brass dark:text-brass'
                           : ''
                       )}
                     >

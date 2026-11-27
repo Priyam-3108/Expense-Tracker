@@ -5,9 +5,9 @@ import { useTheme } from '../context/ThemeContext'
 import { usePrivacy } from '../context/PrivacyContext'
 import { formatCurrency } from '../utils/helpers'
 
-// Single-hue ink ramp: empty → filled, like ink on a ledger calendar
-const LIGHT = ['#f4f4f5', '#d4d4d4', '#a3a3a3', '#525252', '#171717']
-const DARK = ['rgba(237,237,237,0.05)', 'rgba(237,237,237,0.18)', 'rgba(237,237,237,0.36)', 'rgba(237,237,237,0.62)', '#ededed']
+// Bucket 0 (no activity) is neutral; buckets 1-4 are a brass ramp, light to dense
+const LIGHT = ['#f4f4f5', '#ebd0a8', '#ddb072', '#c07a2e', '#8a4d16']
+const DARK = ['rgba(237,237,237,0.05)', 'rgba(212,149,74,0.32)', 'rgba(212,149,74,0.52)', 'rgba(212,149,74,0.76)', '#d4954a']
 const EMPTY_LIGHT = 'rgba(23,23,23,0.04)'
 const EMPTY_DARK = 'rgba(237,237,237,0.04)'
 
@@ -95,13 +95,13 @@ export default function ActivityHeatmap({
                     cell,
                   })}
                   onMouseLeave={() => setHover(null)}
-                  className="w-full aspect-square rounded-[3px] transition-opacity hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#533afd] disabled:cursor-default disabled:hover:opacity-100"
+                  className="w-full aspect-square rounded-[3px] transition-opacity hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brass disabled:cursor-default disabled:hover:opacity-100"
                   style={{
                     backgroundColor: cell.inWindow ? palette[cell.bucket] : 'transparent',
                     boxShadow: cell.inWindow && cell.bucket === 0 ? `inset 0 0 0 1px ${emptyColor}` : undefined,
                     cursor: cell.count > 0 ? 'pointer' : 'default',
                   }}
-                  aria-label={cell.date ? `${cell.date}: ${cell.count} transactions` : undefined}
+                  aria-label={cell.date ? `${format(parseISO(cell.date), 'MMM d, yyyy')}: ${cell.count} ${cell.count === 1 ? 'entry' : 'entries'}, ${isPrivate ? '••••' : formatCurrency(cell.expenseTotal, currency, { whole: true })}` : undefined}
                 />
               ))
             )}
@@ -114,7 +114,7 @@ export default function ActivityHeatmap({
               style={{ left: hover.x + 20, top: hover.y - 40 }}
             >
               <div className="font-medium">{format(parseISO(hover.cell.date), 'EEE, MMM d, yyyy')}</div>
-              <div className="font-mono tabular-nums">{hover.cell.count} txn · {isPrivate ? '••••' : formatCurrency(hover.cell.expenseTotal, currency)}</div>
+              <div className="font-mono tabular-nums">{hover.cell.count} {hover.cell.count === 1 ? 'entry' : 'entries'} · {isPrivate ? '••••' : formatCurrency(hover.cell.expenseTotal, currency)}</div>
             </div>
           )}
         </div>

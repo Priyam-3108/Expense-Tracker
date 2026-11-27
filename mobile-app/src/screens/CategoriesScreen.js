@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
+import { iconForCategory } from '../utils/categoryIcons';
 import DraggableFlatList, { ScaleDecorator } from 'react-native-draggable-flatlist';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useTheme } from '../context/ThemeContext';
@@ -41,7 +41,7 @@ function CategoriesScreen({ navigation }) {
                     ...c,
                     name: c.name || 'Unnamed',
                     icon: c.icon || '💰',
-                    color: c.color || '#533afd'
+                    color: c.color || '#a8611c'
                 }));
                 setCategories(cats);
             } else {
@@ -69,11 +69,8 @@ function CategoriesScreen({ navigation }) {
 
     const handleCategoryPress = (category) => {
         hapticFeedback.light();
-        if (!category.isDefault) {
-            navigation.navigate('AddEditCategory', { category });
-        } else {
-            Alert.alert('Default Category', 'Default categories cannot be edited');
-        }
+        // Default categories open too; only their savings flag can change there
+        navigation.navigate('AddEditCategory', { category });
     };
 
     const handleAddCategory = () => {
@@ -136,13 +133,13 @@ function CategoriesScreen({ navigation }) {
     const renderCategoryIcon = (item) => {
         const icon = item.icon;
         if (icon && [...icon].length <= 2) {
-            return <Text style={{ fontSize: 22 }}>{icon}</Text>;
+            return <Ionicons name={iconForCategory(icon)} size={20} color={colors.textSecondary} />;
         }
         if (icon && icon.length > 2) {
-            return <Ionicons name={icon} size={22} color="#ffffff" />;
+            return <Ionicons name={icon} size={20} color={colors.textSecondary} />;
         }
         return (
-            <Text style={{ fontSize: 18, fontWeight: '600', color: '#ffffff' }}>
+            <Text style={{ fontSize: 16, fontWeight: '500', color: colors.textSecondary }}>
                 {(item.name || '?').charAt(0).toUpperCase()}
             </Text>
         );
@@ -173,14 +170,9 @@ function CategoriesScreen({ navigation }) {
                     <View style={[styles.accentLine, { backgroundColor: catColor }]} />
 
                     {/* Icon pill */}
-                    <LinearGradient
-                        colors={[catColor + 'dd', catColor]}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={styles.iconGradient}
-                    >
+                    <View style={[styles.iconGradient, { backgroundColor: colors.cardElevated }]}>
                         {renderCategoryIcon(item)}
-                    </LinearGradient>
+                    </View>
 
                     {/* Text block */}
                     <View style={styles.catContent}>
@@ -195,6 +187,11 @@ function CategoriesScreen({ navigation }) {
                             ) : (
                                 <View style={[styles.pill, { backgroundColor: colors.successBg || '#ecfdf5' }]}>
                                     <Text style={[styles.pillText, { color: colors.success }]}>Custom</Text>
+                                </View>
+                            )}
+                            {item.isSavings && (
+                                <View style={[styles.pill, { backgroundColor: colors.primarySubdued }]}>
+                                    <Text style={[styles.pillText, { color: colors.primary }]}>Savings</Text>
                                 </View>
                             )}
                             {item.expenseCount > 0 && (
@@ -218,7 +215,7 @@ function CategoriesScreen({ navigation }) {
                                     <Ionicons name="pencil" size={14} color={colors.primary} />
                                 </TouchableOpacity>
                                 <TouchableOpacity
-                                    style={[styles.actionBtn, { backgroundColor: colors.dangerBg || '#fff0f5' }]}
+                                    style={[styles.actionBtn, { backgroundColor: colors.dangerBg || '#fef2f2' }]}
                                     onPress={() => handleDeleteCategory(item)}
                                 >
                                     <Ionicons name="trash-outline" size={14} color={colors.danger} />
@@ -241,7 +238,7 @@ function CategoriesScreen({ navigation }) {
     const renderEmpty = () => (
         <EmptyState
             icon="grid-outline"
-            title="No Categories"
+            title="No categories yet"
             subtitle="Create custom categories to organize your transactions"
             action={
                 <TouchableOpacity
@@ -249,7 +246,7 @@ function CategoriesScreen({ navigation }) {
                     onPress={handleAddCategory}
                 >
                     <Ionicons name="add" size={16} color="#ffffff" style={{ marginRight: 6 }} />
-                    <Text style={styles.emptyButtonText}>Add Category</Text>
+                    <Text style={styles.emptyButtonText}>Add category</Text>
                 </TouchableOpacity>
             }
         />
@@ -291,7 +288,7 @@ function CategoriesScreen({ navigation }) {
         },
         title: {
             fontSize: 32,
-            fontWeight: '300',
+            fontWeight: '400',
             color: colors.text,
             letterSpacing: -0.64,
         },
@@ -302,7 +299,7 @@ function CategoriesScreen({ navigation }) {
             backgroundColor: colors.primary,
             paddingHorizontal: 14,
             paddingVertical: 9,
-            borderRadius: 9999,
+            borderRadius: 8,
             ...shadows.md,
         },
         addButtonText: {
@@ -360,7 +357,7 @@ function CategoriesScreen({ navigation }) {
         pill: {
             paddingHorizontal: 8,
             paddingVertical: 2,
-            borderRadius: 9999,
+            borderRadius: 8,
         },
         pillText: {
             fontSize: 11,
@@ -391,7 +388,7 @@ function CategoriesScreen({ navigation }) {
             alignItems: 'center',
             paddingHorizontal: 20,
             paddingVertical: 11,
-            borderRadius: 9999,
+            borderRadius: 8,
         },
         emptyButtonText: {
             color: '#ffffff',

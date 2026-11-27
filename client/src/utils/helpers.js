@@ -1,10 +1,11 @@
 import { format, parseISO } from 'date-fns'
 
 // Format currency
-export const formatCurrency = (amount, currency = 'USD') => {
+export const formatCurrency = (amount, currency = 'USD', { whole = false } = {}) => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: currency,
+    ...(whole && { minimumFractionDigits: 0, maximumFractionDigits: 0 }),
   }).format(amount)
 }
 

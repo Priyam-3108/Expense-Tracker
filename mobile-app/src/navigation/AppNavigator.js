@@ -19,6 +19,7 @@ import BudgetSettingsScreen from '../screens/BudgetSettingsScreen';
 import ExportDataScreen from '../screens/ExportDataScreen';
 import AppLockScreen from '../screens/AppLockScreen';
 import SearchScreen from '../screens/SearchScreen';
+import CategoryDetailScreen from '../screens/CategoryDetailScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -30,6 +31,16 @@ function DashboardStack() {
             <Stack.Screen name="DashboardMain" component={DashboardScreen} />
             <Stack.Screen name="Search" component={SearchScreen} />
             <Stack.Screen name="AddExpense" component={AddExpenseScreen} />
+        </Stack.Navigator>
+    );
+}
+
+// Analytics Stack: a category row opens its entries
+function AnalyticsStack() {
+    return (
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="AnalyticsMain" component={AnalyticsScreen} />
+            <Stack.Screen name="CategoryDetail" component={CategoryDetailScreen} />
         </Stack.Navigator>
     );
 }
@@ -112,7 +123,7 @@ function AppNavigator() {
             />
             <Tab.Screen
                 name="Analytics"
-                component={AnalyticsScreen}
+                component={AnalyticsStack}
                 options={{ tabBarLabel: 'Analytics' }}
             />
             <Tab.Screen

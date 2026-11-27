@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, StatusBar, Alert } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContext } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -69,19 +69,19 @@ function ProfileScreen({ navigation }) {
         },
         avatarText: {
             fontSize: 26,
-            fontWeight: '300', // Sohne thin display
-            color: '#ffffff',
+            fontWeight: '500',
+            color: colors.textSecondary,
         },
         userName: {
             fontSize: 24,
-            fontWeight: '300', // Sohne thin display style
+            fontWeight: '400',
             color: colors.text,
             marginBottom: 2,
             letterSpacing: -0.64,
         },
         userEmail: {
             fontSize: 13,
-            fontWeight: '300',
+            fontWeight: '400',
             color: colors.subText,
         },
         content: {
@@ -93,9 +93,8 @@ function ProfileScreen({ navigation }) {
         },
         sectionTitle: {
             fontSize: 11,
-            fontWeight: '600',
+            fontWeight: '500',
             color: colors.subText,
-            textTransform: 'uppercase',
             letterSpacing: 0.8,
             marginBottom: spacing.xs,
         },
@@ -124,14 +123,14 @@ function ProfileScreen({ navigation }) {
         },
         menuTitle: {
             fontSize: 15,
-            fontWeight: '300', // Sohne thin style
+            fontWeight: '400',
             color: colors.text,
             marginBottom: 1,
             letterSpacing: -0.2,
         },
         menuSubtitle: {
             fontSize: 12,
-            fontWeight: '300',
+            fontWeight: '400',
             color: colors.subText,
         },
         toggle: {
@@ -150,10 +149,10 @@ function ProfileScreen({ navigation }) {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: colors.danger || '#ea2261',
+            backgroundColor: colors.danger || '#dc2626',
             paddingVertical: 12,
             paddingHorizontal: 20,
-            borderRadius: 9999, // Stripe pill button
+            borderRadius: 8,
             marginHorizontal: spacing.lg,
             marginVertical: spacing.xl,
             ...shadows.md,
@@ -167,7 +166,7 @@ function ProfileScreen({ navigation }) {
         version: {
             textAlign: 'center',
             fontSize: 12,
-            fontWeight: '300',
+            fontWeight: '400',
             color: colors.subText,
             marginBottom: spacing.xl,
             fontVariant: ['tabular-nums'],
@@ -180,7 +179,7 @@ function ProfileScreen({ navigation }) {
             items: [
                 {
                     icon: 'person-outline',
-                    title: 'Profile Information',
+                    title: 'Profile',
                     subtitle: user?.email || 'Update your details',
                     onPress: () => {
                         hapticFeedback.light();
@@ -264,7 +263,7 @@ function ProfileScreen({ navigation }) {
             items: [
                 {
                     icon: 'wallet-outline',
-                    title: 'Budget Settings',
+                    title: 'Budget',
                     subtitle: 'Set monthly budgets',
                     onPress: () => {
                         hapticFeedback.light();
@@ -278,7 +277,7 @@ function ProfileScreen({ navigation }) {
             items: [
                 {
                     icon: 'download-outline',
-                    title: 'Export Data',
+                    title: 'Export data',
                     subtitle: 'Download your transactions',
                     onPress: () => {
                         hapticFeedback.light();
@@ -292,7 +291,7 @@ function ProfileScreen({ navigation }) {
             items: [
                 {
                     icon: 'lock-closed-outline',
-                    title: 'App Lock',
+                    title: 'App lock',
                     subtitle: 'PIN & Biometric settings',
                     onPress: () => {
                         hapticFeedback.light();
@@ -321,16 +320,11 @@ function ProfileScreen({ navigation }) {
             {/* Header with Profile */}
             <View style={styles.header}>
                 <View style={styles.profileSection}>
-                    <LinearGradient
-                        colors={['#7b68fe', '#533afd', '#4434d4']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={styles.avatarGradient}
-                    >
+                    <View style={[styles.avatarGradient, { backgroundColor: colors.cardElevated, borderWidth: 1, borderColor: colors.border }]}>
                         <Text style={styles.avatarText}>{getInitials(user?.name)}</Text>
-                    </LinearGradient>
+                    </View>
                     <Text style={styles.userName}>{user?.name || 'User'}</Text>
-                    <Text style={styles.userEmail}>{user?.email || 'user@example.com'}</Text>
+                    <Text style={styles.userEmail}>{user?.email}</Text>
                 </View>
             </View>
 
@@ -368,7 +362,7 @@ function ProfileScreen({ navigation }) {
                     <Text style={styles.logoutText}>Logout</Text>
                 </TouchableOpacity>
 
-                <Text style={styles.version}>Version 1.0.0</Text>
+                <Text style={styles.version}>Version {Constants.expoConfig?.version}</Text>
             </ScrollView>
         </View>
     );

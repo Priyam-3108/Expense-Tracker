@@ -3,7 +3,7 @@ import { formatCurrency } from '../utils/helpers'
 
 const MASK = '••••••'
 
-export default function Amount({ value, currency = 'USD', sign, className = '' }) {
+export default function Amount({ value, currency = 'USD', sign, whole = false, className = '' }) {
   const { isPrivate } = usePrivacy()
 
   if (isPrivate) {
@@ -15,6 +15,6 @@ export default function Amount({ value, currency = 'USD', sign, className = '' }
     return <span className={className}>—</span>
   }
 
-  const text = `${sign ?? ''}${formatCurrency(Number(value), currency)}`
+  const text = `${sign ?? ''}${formatCurrency(Number(value), currency, { whole })}`
   return <span className={className}>{text}</span>
 }

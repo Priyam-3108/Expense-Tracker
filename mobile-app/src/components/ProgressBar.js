@@ -49,7 +49,7 @@ function ProgressBar({
         },
         label: {
             fontSize: 14,
-            fontWeight: '300', // Sohne thin style
+            fontWeight: '400',
             color: colors.text,
             letterSpacing: -0.2,
         },
@@ -60,7 +60,7 @@ function ProgressBar({
         },
         amount: {
             fontSize: 13,
-            fontWeight: '300',
+            fontWeight: '400',
             color: progressColor,
             fontVariant: ['tabular-nums'],
         },
@@ -72,13 +72,13 @@ function ProgressBar({
         progressContainer: {
             height,
             backgroundColor: colors.borderLight,
-            borderRadius: 9999, // Stripe pill radius
+            borderRadius: 8,
             overflow: 'hidden',
         },
         progressBar: {
             height: '100%',
             backgroundColor: progressColor,
-            borderRadius: 9999,
+            borderRadius: 8,
         },
         footer: {
             flexDirection: 'row',

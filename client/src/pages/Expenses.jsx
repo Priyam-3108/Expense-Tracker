@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import CategorySelector from '../components/CategorySelector'
 import DatePicker from '../components/DatePicker'
 import DateRangePicker from '../components/DateRangePicker'
+import AddFab from '../components/AddFab'
 import DataTable from '../components/DataTable'
 import BulkEditList from '../components/BulkEditList'
 import ExportModal from '../components/ExportModal'
@@ -31,6 +32,8 @@ import {
     LayoutGrid,
     Calendar as CalendarIcon,
     ChevronDown,
+    ChevronLeft,
+    ChevronRight,
     FileText,
     Receipt,
     Layers,
@@ -147,6 +150,7 @@ const Expenses = () => {
 
   // View state
   const [viewMode, setViewMode] = useState('list') // 'list' or 'calendar'
+  const [openRow, setOpenRow] = useState(null) // mobile: which ledger row shows its actions
   const [calendarDate, setCalendarDate] = useState(new Date())
   const [calendarExpenses, setCalendarExpenses] = useState([])
   const [calendarLoading, setCalendarLoading] = useState(false)
@@ -624,7 +628,7 @@ const Expenses = () => {
         const amount = row.original.amount
         const isIncome = row.original.type === 'income'
         return (
-          <span className={`font-mono tabular-nums ${isIncome ? 'text-green-600 dark:text-[#4cc38a]' : 'text-gray-900 dark:text-[#ededed]'}`}>
+          <span className={`tabular-nums ${isIncome ? 'text-green-600 dark:text-[#4cc38a]' : 'text-gray-900 dark:text-[#ededed]'}`}>
             <Amount value={amount} currency={currency} sign={isIncome ? '+' : '−'} />
           </span>
         )
@@ -664,40 +668,40 @@ const Expenses = () => {
   return (
     <div className="">
       {/* Header */}
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between mb-6">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between mb-4 md:mb-6">
         <div>
           <h1 className="text-2xl md:text-[28px] leading-tight font-medium text-gray-900 dark:text-[#ededed]">Expenses</h1>
-          <p className="mt-1 text-sm text-gray-600 dark:text-[#85858b]">
-            Track your expenses and income
+          <p className="mt-1 text-sm text-gray-500 dark:text-[#a1a1a6]">
+            Every entry in your ledger, spending and income
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-2 lg:flex-wrap">
           {/* View Toggle */}
-          <div className="inline-flex gap-1 rounded-xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.03] p-1">
+          <div className="flex-1 sm:flex-none inline-flex gap-1 rounded-[10px] border border-gray-200 dark:border-white/[0.06] bg-gray-100 dark:bg-white/[0.04] p-1">
             <button
               onClick={() => { setViewMode('list') }}
-              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${viewMode === 'list'
-                ? 'bg-indigo-600 text-white'
-                : 'text-gray-600 dark:text-[#a1a1a6] hover:bg-white dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white'
+              className={`flex-1 sm:flex-none justify-center flex items-center gap-2 px-3 h-8 text-sm rounded-md transition-colors ${viewMode === 'list'
+                ? 'bg-white dark:bg-[#2a2a2c] text-gray-900 dark:text-[#ededed] shadow-[0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]'
+                : 'text-gray-600 dark:text-[#a1a1a6] hover:text-gray-900 dark:hover:text-white'
                 }`}
             >
-              <List size={16} />
+              <List size={16} strokeWidth={1.5} />
               List
             </button>
             <button
               onClick={() => { setViewMode('calendar') }}
-              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${viewMode === 'calendar'
-                ? 'bg-indigo-600 text-white'
-                : 'text-gray-600 dark:text-[#a1a1a6] hover:bg-white dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white'
+              className={`flex-1 sm:flex-none justify-center flex items-center gap-2 px-3 h-8 text-sm rounded-md transition-colors ${viewMode === 'calendar'
+                ? 'bg-white dark:bg-[#2a2a2c] text-gray-900 dark:text-[#ededed] shadow-[0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]'
+                : 'text-gray-600 dark:text-[#a1a1a6] hover:text-gray-900 dark:hover:text-white'
                 }`}
             >
-              <CalendarIcon size={16} />
+              <CalendarIcon size={16} strokeWidth={1.5} />
               Calendar
             </button>
           </div>
 
           {/* Divider */}
-          <div className="hidden sm:block h-8 w-px bg-gray-300 dark:bg-white/[0.08]"></div>
+          <div className="hidden sm:block h-6 w-px bg-gray-200 dark:bg-white/[0.08]"></div>
 
           {/* Action Buttons */}
           <button
@@ -705,62 +709,60 @@ const Expenses = () => {
               resetBulkForm()
               setShowBulkForm(true)
             }}
-            className="glass-btn"
+            className="glass-btn !px-0 w-10 sm:w-auto sm:!px-5"
+            aria-label="Bulk add"
           >
-            <Layers size={18} />
-            Bulk add
+            <Layers size={16} strokeWidth={1.5} />
+            <span className="hidden sm:inline">Bulk add</span>
           </button>
           <button
             onClick={() => setShowImportModal(true)}
-            className="glass-btn"
+            className="glass-btn !px-0 w-10 sm:w-auto sm:!px-5"
+            aria-label="Import"
           >
-            <Upload size={18} />
-            Import
+            <Upload size={16} strokeWidth={1.5} />
+            <span className="hidden sm:inline">Import</span>
           </button>
           <button
             onClick={() => setShowExportModal(true)}
-            className="glass-btn"
+            className="glass-btn !px-0 w-10 sm:w-auto sm:!px-5"
+            aria-label="Export"
           >
-            <Download size={18} />
-            Export
+            <Download size={16} strokeWidth={1.5} />
+            <span className="hidden sm:inline">Export</span>
           </button>
           <button
             onClick={() => {
               resetForm()
               setShowForm(true)
             }}
-            className="btn-primary btn-md"
+            className="btn-primary btn-md !hidden md:!inline-flex"
           >
-            <Plus size={18} />
+            <Plus size={16} strokeWidth={1.5} />
             Add expense
           </button>
         </div>
       </div>
 
-      {/* Summary cards */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3 mt-4 mb-4">
-        <div className="glass-card p-5">
-          <p className="text-sm text-gray-600 dark:text-[#a1a1a6]">Expenses</p>
-          <p className={"mt-2 text-xl md:text-2xl leading-none font-mono font-medium tabular-nums text-gray-900 dark:text-[#ededed]"}>
-            <Amount value={totalExpenseAmount} currency={currency} />
+      {/* Summary: net leads, closed with the double rule */}
+      <div className="glass-card grid grid-cols-2 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)] mb-4">
+        <div className="col-span-2 md:col-span-1 p-4 md:p-5 border-b md:border-b-0 md:border-r border-gray-200 dark:border-white/[0.07]">
+          <p className="text-sm text-gray-600 dark:text-[#a1a1a6]">Net for selected dates</p>
+          <p className={`mt-3 pb-2 text-[26px] md:text-[28px] leading-none font-medium tabular-nums ${netAmount < 0 ? 'text-red-600 dark:text-[#e5484d]' : 'text-gray-900 dark:text-[#ededed]'}`}>
+            <Amount value={Math.abs(netAmount)} currency={currency} sign={netAmount < 0 ? '−' : netAmount > 0 ? '+' : undefined} className="double-rule" />
           </p>
-          <p className="mt-2 text-xs text-gray-500 dark:text-[#85858b]">Selected dates</p>
         </div>
-
-        <div className="glass-card p-5">
+        <div className="p-4 md:p-5 border-r border-gray-200 dark:border-white/[0.07]">
           <p className="text-sm text-gray-600 dark:text-[#a1a1a6]">Income</p>
-          <p className={"mt-2 text-xl md:text-2xl leading-none font-mono font-medium tabular-nums text-gray-900 dark:text-[#ededed]"}>
+          <p className="mt-2 md:mt-3 text-base md:text-lg md:text-xl leading-none font-medium tabular-nums text-gray-900 dark:text-[#ededed]">
             <Amount value={totalIncomeAmount} currency={currency} />
           </p>
-          <p className="mt-2 text-xs text-gray-500 dark:text-[#85858b]">Selected dates</p>
         </div>
-
-        <div className="glass-card p-5">
-          <p className="text-sm text-gray-600 dark:text-[#a1a1a6]">Net</p>
-          <p className={`mt-2 text-xl md:text-2xl leading-none font-mono font-medium tabular-nums ${netAmount >= 0 ? 'text-green-600 dark:text-[#4cc38a]' : 'text-red-600 dark:text-[#e5484d]'}`}>
-            <Amount value={Math.abs(netAmount)} currency={currency} sign={netAmount < 0 ? '−' : undefined} />
+        <div className="p-4 md:p-5">
+          <p className="text-sm text-gray-600 dark:text-[#a1a1a6]">Expenses</p>
+          <p className="mt-2 md:mt-3 text-base md:text-lg md:text-xl leading-none font-medium tabular-nums text-gray-900 dark:text-[#ededed]">
+            <Amount value={totalExpenseAmount} currency={currency} />
           </p>
-          <p className="mt-2 text-xs text-gray-500 dark:text-[#85858b]">Selected dates</p>
         </div>
       </div>
 
@@ -794,60 +796,83 @@ const Expenses = () => {
           </div>
 
           {/* Mobile card list */}
-          <div className="md:hidden space-y-3">
+          <div className="md:hidden space-y-3 pb-24">
             {/* Mobile search bar */}
             <div className="relative">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-[#85858b]" />
               <input
                 type="text"
-                placeholder="Search expenses..."
+                placeholder="Search"
                 value={searchTerm}
                 onChange={(e) => { setSearchTerm(e.target.value); setPage(1) }}
-                className="w-full pl-10 pr-4 py-3 glass-input text-sm"
+                className="w-full h-11 pl-10 pr-4 glass-input text-base"
               />
             </div>
 
-            {/* Cards */}
+            {/* Ledger, grouped by day */}
             {loading ? (
               <div className="flex justify-center py-12">
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-100 border-t-blue-500" />
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-200 dark:border-white/[0.08] border-t-brass" />
               </div>
             ) : expenses.length === 0 ? (
               <EmptyState
                 icon={Receipt}
                 title="No expenses found"
-                description="Tap the + button to add your first expense."
+                description="Add an expense or income and it shows up here."
               />
             ) : (
-              expenses.map((expense) => (
-                <MobileExpenseCard
-                  key={expense._id}
-                  expense={expense}
-                  currency={currency}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                />
-              ))
+              <div className="glass-card overflow-hidden">
+                {expenses.reduce((groups, e) => {
+                  const day = String(e.date).slice(0, 10)
+                  const last = groups[groups.length - 1]
+                  if (last && last.day === day) last.items.push(e)
+                  else groups.push({ day, items: [e] })
+                  return groups
+                }, []).map(({ day, items }) => {
+                  const net = items.reduce((s, e) => s + (e.type === 'income' ? e.amount : -e.amount), 0)
+                  return (
+                    <section key={day} className="border-b last:border-b-0 border-gray-200 dark:border-white/[0.07]">
+                      <h3 className="flex items-center justify-between h-9 px-4 text-xs bg-gray-50 dark:bg-white/[0.02] border-b border-gray-100 dark:border-white/[0.05]">
+                        <span className="text-gray-600 dark:text-[#a1a1a6]">{format(parseDateLocal(day), 'EEE, MMM d')}</span>
+                        <Amount value={Math.abs(net)} currency={currency} sign={net < 0 ? '−' : '+'} className="font-mono tabular-nums text-gray-500 dark:text-[#85858b]" />
+                      </h3>
+                      <ul className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                        {items.map((expense) => (
+                          <MobileExpenseCard
+                            key={expense._id}
+                            expense={expense}
+                            currency={currency}
+                            open={openRow === expense._id}
+                            onToggle={() => setOpenRow(openRow === expense._id ? null : expense._id)}
+                            onEdit={handleEdit}
+                            onDelete={handleDelete}
+                          />
+                        ))}
+                      </ul>
+                    </section>
+                  )
+                })}
+              </div>
             )}
 
             {/* Mobile pagination */}
             {pagination.totalPages > 1 && (
               <div className="flex items-center justify-between pt-2">
-                <span className="text-sm text-gray-500 dark:text-[#85858b]">
+                <span className="text-sm tabular-nums text-gray-500 dark:text-[#85858b]">
                   Page {pagination.currentPage} of {pagination.totalPages}
                 </span>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setPage(p => Math.max(1, p - 1))}
                     disabled={pagination.currentPage <= 1}
-                    className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 dark:border-white/[0.08] disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-white/[0.06] transition-colors min-h-[40px] text-gray-700 dark:text-[#a1a1a6]"
+                    className="btn-secondary btn-sm disabled:opacity-40"
                   >
-                    Prev
+                    Previous
                   </button>
                   <button
                     onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))}
                     disabled={pagination.currentPage >= pagination.totalPages}
-                    className="px-4 py-2 text-sm font-medium rounded-xl border border-gray-300 dark:border-white/[0.08] disabled:opacity-30 hover:bg-gray-50 dark:hover:bg-white/[0.06] transition-colors min-h-[40px] text-gray-700 dark:text-[#a1a1a6]"
+                    className="btn-secondary btn-sm disabled:opacity-40"
                   >
                     Next
                   </button>
@@ -857,6 +882,14 @@ const Expenses = () => {
           </div>
         </>
       )}
+      {/* Mobile: primary action floats above the bottom nav */}
+      <AddFab
+        onClick={() => {
+          resetForm()
+          setShowForm(true)
+        }}
+      />
+
       {/* Calendar View */}
       {viewMode === 'calendar' && (
         <>
@@ -868,14 +901,14 @@ const Expenses = () => {
                   <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-[#85858b]" />
                   <input
                     type="text"
-                    placeholder="Search expenses..."
+                    placeholder="Search"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full rounded-xl border border-gray-300 dark:border-white/[0.07] px-10 py-2.5 text-sm focus:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-colors bg-white dark:bg-white/[0.04] text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-slate-500"
+                    className="w-full h-11 pl-10 pr-4 glass-input text-base md:text-sm"
                   />
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-1 p-1 rounded-[10px] border border-gray-200 dark:border-white/[0.06] bg-gray-100 dark:bg-white/[0.04]">
                   {[
                     { label: 'All', value: 'all' },
                     { label: 'Expenses', value: 'expense' },
@@ -885,9 +918,9 @@ const Expenses = () => {
                       key={option.value}
                       type="button"
                       onClick={() => setFilterType(option.value)}
-                      className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors ${filterType === option.value
-                        ? 'border-indigo-500/50 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400'
-                        : 'border-gray-300 dark:border-white/[0.08] text-gray-600 dark:text-[#a1a1a6] hover:bg-gray-50 dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white'
+                      className={`flex-1 md:flex-none px-4 h-9 rounded-md text-sm transition-colors ${filterType === option.value
+                        ? 'bg-white dark:bg-[#2a2a2c] text-gray-900 dark:text-[#ededed] shadow-[0_1px_2px_rgba(0,0,0,0.06)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]'
+                        : 'text-gray-600 dark:text-[#a1a1a6] hover:text-gray-900 dark:hover:text-white'
                         }`}
                     >
                       {option.label}
@@ -898,7 +931,7 @@ const Expenses = () => {
                 {hasActiveFilters && (
                   <button
                     onClick={clearFilters}
-                    className="inline-flex items-center gap-2 rounded-xl border border-gray-300 dark:border-white/[0.08] px-4 py-2.5 text-sm text-gray-600 dark:text-[#a1a1a6] hover:bg-gray-50 dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white transition-colors"
+                    className="inline-flex items-center justify-center gap-2 rounded-lg h-11 px-4 text-sm text-gray-600 dark:text-[#a1a1a6] hover:bg-gray-50 dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white transition-colors"
                   >
                     <X size={16} />
                     Clear
@@ -922,16 +955,16 @@ const Expenses = () => {
             <div className="flex items-center justify-between gap-2 mb-4 sm:mb-6">
               <button
                 onClick={() => setCalendarDate(subMonths(calendarDate, 1))}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-white/[0.06] rounded-xl transition-colors text-gray-600 dark:text-[#a1a1a6] min-h-[40px] min-w-[40px] flex items-center justify-center"
+                className="hover:bg-gray-100 dark:hover:bg-white/[0.06] rounded-lg transition-colors text-gray-600 dark:text-[#a1a1a6] h-10 w-10 flex items-center justify-center border border-gray-200 dark:border-white/[0.08]"
                 title="Previous month"
                 aria-label="Previous month"
               >
-                <ArrowDownCircle size={20} className="rotate-90" />
+                <ChevronLeft size={18} strokeWidth={1.5} />
               </button>
 
               {/* Mobile: just Month Year + Today */}
               <div className="flex items-center gap-2 sm:gap-3 flex-1 justify-center">
-                <h2 className="text-base sm:text-xl font-medium text-gray-900 dark:text-white">
+                <h2 className="text-base sm:text-xl font-medium text-gray-900 dark:text-[#ededed]">
                   {format(calendarDate, 'MMM yyyy')}
                 </h2>
                 {/* Go-to date picker — desktop only */}
@@ -948,7 +981,7 @@ const Expenses = () => {
                 </div>
                 <button
                   onClick={() => setCalendarDate(new Date())}
-                  className="px-2.5 py-1 text-xs sm:text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-xl transition-colors border border-indigo-200 dark:border-indigo-500/20"
+                  className="px-2.5 h-7 text-xs sm:text-sm text-gray-600 dark:text-[#a1a1a6] hover:bg-gray-100 dark:hover:bg-white/[0.06] rounded-md transition-colors border border-gray-200 dark:border-white/[0.08]"
                 >
                   Today
                 </button>
@@ -956,16 +989,16 @@ const Expenses = () => {
 
               <button
                 onClick={() => setCalendarDate(addMonths(calendarDate, 1))}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-white/[0.06] rounded-xl transition-colors text-gray-600 dark:text-[#a1a1a6] min-h-[40px] min-w-[40px] flex items-center justify-center"
+                className="hover:bg-gray-100 dark:hover:bg-white/[0.06] rounded-lg transition-colors text-gray-600 dark:text-[#a1a1a6] h-10 w-10 flex items-center justify-center border border-gray-200 dark:border-white/[0.08]"
                 title="Next month"
                 aria-label="Next month"
               >
-                <ArrowDownCircle size={20} className="-rotate-90" />
+                <ChevronRight size={18} strokeWidth={1.5} />
               </button>
             </div>
 
             {/* Calendar Grid */}
-            <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
+            <div className="grid grid-cols-7 gap-y-1 sm:gap-1">
               {/* Day headers */}
               {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
                 <div key={i} className="p-1 sm:p-2 text-center text-xs font-medium text-gray-500 dark:text-[#85858b]">
@@ -989,27 +1022,18 @@ const Expenses = () => {
                   <div
                     key={idx}
                     onClick={() => handleDateClick(day)}
-                    className={`min-h-[52px] sm:min-h-[100px] p-1 sm:p-2 border border-gray-200 dark:border-white/[0.04] rounded-xl cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-white/[0.04] hover:border-indigo-300 dark:hover:border-indigo-500/30 ${!isCurrentMonth ? 'bg-gray-50 dark:bg-white/[0.01] opacity-40' : 'bg-white dark:bg-white/[0.02]'
-                      } ${isToday ? 'ring-2 ring-indigo-500/50' : ''}`}
+                    className={`h-12 sm:h-auto sm:min-h-[100px] sm:p-2 flex flex-col items-center sm:items-stretch justify-start pt-1 sm:pt-2 sm:border border-gray-200 dark:border-white/[0.05] rounded-lg cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-white/[0.04] ${!isCurrentMonth ? 'opacity-35' : 'sm:bg-white sm:dark:bg-white/[0.02]'
+                      } ${isToday ? 'sm:ring-1 sm:ring-brass' : ''}`}
                   >
-                    <div className={`text-xs sm:text-sm font-medium mb-1 ${isToday ? 'text-indigo-600 dark:text-indigo-400' : isCurrentMonth ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-[#85858b]'}`}>
+                    <div className={`w-7 h-7 sm:w-auto sm:h-auto flex items-center justify-center sm:justify-start rounded-full text-sm tabular-nums sm:mb-1 ${isToday ? 'bg-gray-900 text-white dark:bg-[#ededed] dark:text-[#171717] sm:bg-transparent sm:text-brass-700 sm:dark:bg-transparent sm:dark:text-brass font-medium' : isCurrentMonth ? 'text-gray-900 dark:text-[#ededed]' : 'text-gray-400 dark:text-[#85858b]'}`}>
                       {format(day, 'd')}
                     </div>
 
                     {/* Mobile: coloured dots only */}
                     {dayExpenses.length > 0 && (
-                      <div className="flex flex-wrap gap-0.5 sm:hidden">
-                        {incomeCount > 0 && (
-                          <span className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />
-                        )}
-                        {expenseCount > 0 && (
-                          <span className="w-2 h-2 rounded-full bg-rose-500 flex-shrink-0" />
-                        )}
-                        {dayExpenses.length > 1 && (
-                          <span className="text-gray-400 dark:text-[#85858b]" style={{ fontSize: '8px', lineHeight: '8px', marginTop: '2px' }}>
-                            ×{dayExpenses.length}
-                          </span>
-                        )}
+                      <div className="mt-1 flex gap-1 sm:hidden" aria-label={`${dayExpenses.length} entries`}>
+                        {expenseCount > 0 && <span className="w-1.5 h-1.5 rounded-full bg-brass" />}
+                        {incomeCount > 0 && <span className="w-1.5 h-1.5 rounded-full bg-green-600 dark:bg-[#4cc38a]" />}
                       </div>
                     )}
 
@@ -1129,7 +1153,7 @@ const Expenses = () => {
                         recurringEndDate: e.target.checked ? formData.recurringEndDate : '',
                       })
                     }
-                    className="w-5 h-5 text-indigo-600 border-gray-300 dark:border-white/[0.15] rounded focus:ring-indigo-500"
+                    className="w-5 h-5 text-brass-600 border-gray-300 dark:border-white/[0.15] rounded focus:ring-brass-500"
                   />
                 </label>
 
@@ -1145,9 +1169,9 @@ const Expenses = () => {
                               key={p}
                               type="button"
                               onClick={() => setFormData({ ...formData, recurringPeriod: p })}
-                              className={`px-3.5 py-2 rounded-full text-sm font-medium capitalize min-h-[40px] border transition-colors
+                              className={`px-3.5 py-2 rounded-lg text-sm capitalize min-h-[40px] border transition-colors
                                 ${active
-                                  ? 'bg-indigo-600 border-indigo-600 text-white'
+                                  ? 'bg-gray-900 border-gray-900 text-white dark:bg-[#ededed] dark:border-[#ededed] dark:text-[#171717]'
                                   : 'bg-transparent border-gray-300 dark:border-white/[0.15] text-gray-700 dark:text-[#a1a1a6]'
                                 }`}
                             >
@@ -1211,7 +1235,7 @@ const Expenses = () => {
               disabled={bulkLoading}
               className="btn-primary btn-md flex-1"
             >
-              {bulkLoading ? 'Updating...' : 'Update All'}
+              {bulkLoading ? 'Updating...' : 'Save all'}
             </button>
             <button
               type="button"
@@ -1229,7 +1253,7 @@ const Expenses = () => {
       <Modal
         isOpen={showBulkDelete}
         onClose={() => setShowBulkDelete(false)}
-        title="Delete Expenses"
+        title="Delete entries"
         maxWidth="max-w-md"
       >
         <div className="flex flex-col h-full">

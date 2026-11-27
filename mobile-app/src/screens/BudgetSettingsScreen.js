@@ -41,13 +41,13 @@ function BudgetSettingsScreen({ navigation }) {
         },
         title: {
             fontSize: 28,
-            fontWeight: '300', // Sohne thin display
+            fontWeight: '400',
             color: colors.text,
             letterSpacing: -0.64,
         },
         card: {
             backgroundColor: colors.card,
-            borderRadius: 12, // Stripe rounded.lg
+            borderRadius: 12,
             padding: 20,
             borderWidth: 1,
             borderColor: colors.border,
@@ -61,27 +61,27 @@ function BudgetSettingsScreen({ navigation }) {
         },
         input: {
             borderWidth: 1,
-            borderColor: colors.inputBorder || '#a8c3de',
-            borderRadius: 6, // Stripe text-input (6px)
+            borderColor: colors.inputBorder || '#d4d4d4',
+            borderRadius: 6,
             paddingHorizontal: 14,
             paddingVertical: 12,
             fontSize: 16,
-            fontWeight: '300',
+            fontWeight: '400',
             color: colors.text,
             fontVariant: ['tabular-nums'],
             marginBottom: 16,
         },
         hint: {
             fontSize: 12,
-            fontWeight: '300',
+            fontWeight: '400',
             color: colors.subText,
             lineHeight: 18,
         },
         saveButton: {
-            backgroundColor: colors.primary || '#533afd',
+            backgroundColor: colors.primary || '#a8611c',
             paddingVertical: 12,
             paddingHorizontal: 20,
-            borderRadius: 9999, // Stripe button-primary-pill
+            borderRadius: 10,
             alignItems: 'center',
             marginTop: 10,
         },
@@ -99,7 +99,7 @@ function BudgetSettingsScreen({ navigation }) {
                 <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
                     <Ionicons name="arrow-back" size={20} color={colors.text} />
                 </TouchableOpacity>
-                <Text style={styles.title}>Budget Settings</Text>
+                <Text style={styles.title}>Budget</Text>
                 <TouchableOpacity onPress={togglePrivacy} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
                     <Ionicons name={isPrivate ? 'eye-off-outline' : 'eye-outline'} size={20} color={colors.text} />
                 </TouchableOpacity>
@@ -122,7 +122,7 @@ function BudgetSettingsScreen({ navigation }) {
                 </View>
 
                 <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-                    <Text style={styles.saveButtonText}>Save Budget Settings</Text>
+                    <Text style={styles.saveButtonText}>Save budget</Text>
                 </TouchableOpacity>
             </ScrollView>
         </View>

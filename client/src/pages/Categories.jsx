@@ -9,6 +9,10 @@ import SectionLabel from '../components/form/SectionLabel'
 import FieldCard from '../components/form/FieldCard'
 import StickyFormFooter from '../components/form/StickyFormFooter'
 import Amount from '../components/Amount'
+import CategoryIcon, { CategoryTile } from '../components/CategoryIcon'
+import Switch from '../components/Switch'
+
+const EMPTY_FORM = { name: '', color: '#3B82F6', icon: '💰', isSavings: false }
 
 const currencySymbols = {
   USD: '$',
@@ -28,11 +32,7 @@ const Categories = () => {
   const [editingCategory, setEditingCategory] = useState(null)
   const [draggedItem, setDraggedItem] = useState(null)
   const [dragOverItem, setDragOverItem] = useState(null)
-  const [formData, setFormData] = useState({
-    name: '',
-    color: '#3B82F6',
-    icon: '💰'
-  })
+  const [formData, setFormData] = useState(EMPTY_FORM)
   const [categoryStats, setCategoryStats] = useState([])
   const [statsLoading, setStatsLoading] = useState(false)
   const [formLoading, setFormLoading] = useState(false)
@@ -56,14 +56,11 @@ const Categories = () => {
       setFormData({
         name: editingCategory.name,
         color: editingCategory.color,
-        icon: editingCategory.icon
+        icon: editingCategory.icon,
+        isSavings: !!editingCategory.isSavings
       })
     } else {
-      setFormData({
-        name: '',
-        color: '#3B82F6',
-        icon: '💰'
-      })
+      setFormData(EMPTY_FORM)
     }
   }, [editingCategory])
 
@@ -78,25 +75,19 @@ const Categories = () => {
     setFormLoading(true)
     try {
       if (editingCategory) {
-        // Prevent editing default categories
-        if (editingCategory.isDefault) {
-          toast.error('Cannot edit default categories')
-          setFormLoading(false)
-          return
-        }
         const result = await updateCategory(editingCategory._id, formData)
         if (result.success) {
           toast.success('Category updated successfully')
           setEditingCategory(null)
           setShowForm(false)
-          setFormData({ name: '', color: '#3B82F6', icon: '💰' })
+          setFormData(EMPTY_FORM)
         }
       } else {
         const result = await addCategory(formData)
         if (result.success) {
           toast.success('Category created successfully')
           setShowForm(false)
-          setFormData({ name: '', color: '#3B82F6', icon: '💰' })
+          setFormData(EMPTY_FORM)
         }
       }
     } catch (error) {
@@ -108,12 +99,8 @@ const Categories = () => {
     }
   }
 
+  // Default categories open too, but only their savings flag can change
   const handleEdit = (category) => {
-    // Prevent editing default categories
-    if (category.isDefault) {
-      toast.error('Default categories cannot be edited')
-      return
-    }
     setEditingCategory(category)
     setShowForm(true)
   }
@@ -121,12 +108,12 @@ const Categories = () => {
   const handleCancel = () => {
     setShowForm(false)
     setEditingCategory(null)
-    setFormData({ name: '', color: '#3B82F6', icon: '💰' })
+    setFormData(EMPTY_FORM)
   }
 
   const handleAddNew = () => {
     setEditingCategory(null)
-    setFormData({ name: '', color: '#3B82F6', icon: '💰' })
+    setFormData(EMPTY_FORM)
     setShowForm(true)
   }
 
@@ -236,7 +223,7 @@ const Categories = () => {
   if (categoriesLoading) {
     return (
       <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brass-500"></div>
       </div>
     )
   }
@@ -246,14 +233,14 @@ const Categories = () => {
       <div className="flex flex-wrap gap-3 items-start justify-between">
         <div>
           <h1 className="text-2xl md:text-[28px] leading-tight font-medium text-gray-900 dark:text-[#ededed]">Categories</h1>
-          <p className="text-sm text-gray-600 dark:text-[#85858b]">Manage your expense categories</p>
+          <p className="mt-1 text-sm text-gray-500 dark:text-[#a1a1a6]">How your entries are grouped in lists, charts and exports</p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={handleAddNew}
             className="btn-primary btn-md"
           >
-            <Plus size={16} />
+            <Plus size={16} strokeWidth={1.5} />
             <span>Add category</span>
           </button>
         </div>
@@ -263,21 +250,24 @@ const Categories = () => {
       <Modal
         isOpen={showForm}
         onClose={handleCancel}
-        title={editingCategory ? 'Edit category' : 'Add New Category'}
+        title={editingCategory ? 'Edit category' : 'New category'}
         maxWidth="max-w-md"
       >
         <form onSubmit={handleSubmit} className="flex flex-col max-h-[80vh]">
           <div className="flex-1 overflow-y-auto p-5 space-y-5">
             {/* Preview */}
             <div className="flex justify-center">
-              <div
-                className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl"
-                style={{ backgroundColor: (formData.color || '#6366f1') + '20' }}
-              >
-                {formData.icon}
+              <div className="flex items-center gap-3 h-12 px-4 rounded-xl border border-gray-200 dark:border-white/[0.08]">
+                <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: formData.color }} />
+                <CategoryIcon icon={formData.icon} size={18} className="text-gray-600 dark:text-[#a1a1a6]" />
+                <span className="text-sm text-gray-900 dark:text-[#ededed]">{formData.name || 'Category name'}</span>
               </div>
             </div>
 
+            {editingCategory?.isDefault ? (
+              <p className="text-sm text-center text-gray-500 dark:text-[#85858b]">Default categories keep their name, icon and color</p>
+            ) : (
+            <>
             <div>
               <SectionLabel>Category name</SectionLabel>
               <FieldCard className="p-4">
@@ -286,7 +276,7 @@ const Categories = () => {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full bg-transparent border-0 outline-none text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-slate-500"
-                  placeholder="Enter category name"
+                  placeholder="Groceries"
                   maxLength={30}
                 />
               </FieldCard>
@@ -300,13 +290,15 @@ const Categories = () => {
                     key={icon}
                     type="button"
                     onClick={() => setFormData({ ...formData, icon })}
-                    className={`flex items-center justify-center text-xl rounded-xl border-2 min-h-[44px] transition-colors ${
+                    aria-label={`Icon ${icon}`}
+                    aria-pressed={formData.icon === icon}
+                    className={`flex items-center justify-center rounded-lg border min-h-[44px] transition-colors ${
                       formData.icon === icon
-                        ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10'
-                        : 'border-gray-200 dark:border-white/[0.08] hover:border-gray-300 dark:hover:border-white/[0.15]'
+                        ? 'border-gray-900 dark:border-[#ededed] bg-gray-100 dark:bg-[#232325] text-gray-900 dark:text-[#ededed]'
+                        : 'border-gray-200 dark:border-white/[0.08] text-gray-500 dark:text-[#a1a1a6] hover:bg-gray-50 dark:hover:bg-white/[0.04]'
                     }`}
                   >
-                    {icon}
+                    <CategoryIcon icon={icon} size={18} />
                   </button>
                 ))}
               </div>
@@ -322,7 +314,7 @@ const Categories = () => {
                     onClick={() => setFormData({ ...formData, color })}
                     className={`w-10 h-10 rounded-full border-2 transition-colors ${
                       formData.color === color
-                        ? 'border-gray-800 dark:border-white scale-110 shadow-md shadow-current/20'
+                        ? 'ring-2 ring-offset-2 ring-gray-900 dark:ring-[#ededed] ring-offset-white dark:ring-offset-[#19191b] border-transparent'
                         : 'border-gray-200 dark:border-white/[0.08] hover:border-gray-400 dark:hover:border-white/[0.20]'
                     }`}
                     style={{ backgroundColor: color }}
@@ -331,12 +323,25 @@ const Categories = () => {
                 ))}
               </div>
             </div>
+            </>
+            )}
+
+            <FieldCard className="p-4 flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm text-gray-900 dark:text-[#ededed]">Savings or investment</p>
+                <p className="mt-0.5 text-xs text-gray-500 dark:text-[#85858b]">Money put aside, not spent. Can be left out of spending totals on the dashboard and in analytics.</p>
+              </div>
+              <Switch
+                checked={formData.isSavings}
+                onChange={(isSavings) => setFormData({ ...formData, isSavings })}
+                aria-label="Savings or investment"
+              />
+            </FieldCard>
           </div>
 
           <StickyFormFooter
-            variant="neutral"
             loading={formLoading}
-            label={editingCategory ? 'Update Category' : 'Add category'}
+            label={editingCategory ? 'Save changes' : 'Add category'}
             loadingLabel={editingCategory ? 'Updating…' : 'Adding…'}
             onCancel={handleCancel}
           />
@@ -346,17 +351,17 @@ const Categories = () => {
       {/* All categories */}
       <div className="glass-card overflow-hidden">
         <div className="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-white/[0.05]">
-          <h3 className="text-base font-medium text-gray-900 dark:text-white">All categories</h3>
-          <p className="text-xs text-gray-500 dark:text-[#85858b] mt-0.5">
-            Drag and drop to reorder · {categories.length} total
+          <h2 className="text-base font-medium text-gray-900 dark:text-[#ededed]">All categories</h2>
+          <p className="text-xs text-gray-500 dark:text-[#85858b] mt-1">
+            {categories.length} categories · drag to reorder
           </p>
         </div>
         <div className="p-3 sm:p-6">
           {categories.length === 0 ? (
             <EmptyState
               icon={Tag}
-              title="No categories available"
-              description="Create your first custom category to get started."
+              title="No categories yet"
+              description="Add a category to start grouping your entries."
               actionLabel="Add category"
               onAction={handleAddNew}
             />
@@ -370,72 +375,49 @@ const Categories = () => {
                   onDragOver={(e) => handleDragOver(e, category)}
                   onDrop={(e) => handleDrop(e, category)}
                   onDragEnd={handleDragEnd}
-                  className={`flex items-center justify-between p-4 border rounded-xl transition-colors cursor-move ${dragOverItem?._id === category._id
-                    ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 scale-[1.02] shadow-md'
+                  className={`flex items-center justify-between h-16 pl-2 pr-3 border rounded-xl transition-colors cursor-move ${dragOverItem?._id === category._id
+                    ? 'border-brass bg-brass-50 dark:bg-brass-500/10'
                     : draggedItem?._id === category._id
-                      ? 'opacity-50 border-dashed border-gray-400 dark:border-slate-500'
-                      : 'border-gray-200 dark:border-white/[0.07] hover:bg-gray-50 dark:hover:bg-white/[0.03] hover:shadow-sm'
+                      ? 'opacity-50 border-dashed border-gray-400 dark:border-white/[0.2]'
+                      : 'border-gray-200 dark:border-white/[0.07] hover:bg-gray-50 dark:hover:bg-white/[0.03]'
                     }`}
                 >
                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <div className="text-gray-400 cursor-grab active:cursor-grabbing">
-                      <GripVertical size={20} />
+                    <div className="text-gray-300 dark:text-[#5a5a5f] cursor-grab active:cursor-grabbing">
+                      <GripVertical size={16} strokeWidth={1.5} />
                     </div>
-                    <div
-                      className="w-12 h-12 rounded-full flex items-center justify-center text-xl flex-shrink-0"
-                      style={{ backgroundColor: category.color + '20' }}
-                    >
-                      {category.icon}
-                    </div>
+                    <CategoryTile icon={category.icon} />
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-900 dark:text-white truncate">{category.name}</h4>
-                      <p className="text-sm text-gray-500 dark:text-[#a1a1a6] flex items-center gap-2">
-                        {category.isDefault ? (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-500/15 dark:text-indigo-300">
-                            Default
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300">
-                            Custom
-                          </span>
-                        )}
-                        {category.expenseCount > 0 && (
-                          <span className="text-blue-600 dark:text-blue-400 text-xs">
-                            {category.expenseCount} exp.
-                          </span>
-                        )}
+                      <h3 className="flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-[#ededed]">
+                        <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: category.color }} />
+                        <span className="truncate">{category.name}</span>
+                      </h3>
+                      <p className="mt-0.5 text-xs text-gray-500 dark:text-[#85858b]">
+                        {category.isDefault ? 'Default' : 'Custom'}
+                        {category.isSavings && ' · Savings'}
+                        {category.expenseCount > 0 && <> · <span className="tabular-nums">{category.expenseCount}</span> {category.expenseCount === 1 ? 'entry' : 'entries'}</>}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-1 ml-2">
+                    <button
+                      onClick={() => handleEdit(category)}
+                      className="p-2 text-gray-400 dark:text-[#85858b] hover:text-gray-900 dark:hover:text-[#ededed] hover:bg-gray-100 dark:hover:bg-white/[0.06] rounded-lg transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center"
+                      title="Edit category"
+                      aria-label={`Edit ${category.name}`}
+                    >
+                      <Edit size={16} strokeWidth={1.5} />
+                    </button>
                     {!category.isDefault && (
-                      <>
-                        <button
-                          onClick={() => handleEdit(category)}
-                          className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-xl transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center"
-                          title="Edit category"
-                          aria-label={`Edit ${category.name}`}
-                        >
-                          <Edit size={16} />
-                        </button>
                         <button
                           onClick={() => handleDelete(category)}
-                          className={`p-2 rounded-xl transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center ${category.expenseCount > 0
-                            ? 'text-orange-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-500/10'
-                            : 'text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10'
-                            }`}
+                          className="p-2 rounded-lg transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center text-gray-400 dark:text-[#85858b] hover:text-red-600 dark:hover:text-[#e5484d] hover:bg-red-50 dark:hover:bg-[#e5484d]/10"
                           title="Delete category"
                           aria-label={`Delete ${category.name}`}
                         >
-                          <Trash2 size={16} />
+                          <Trash2 size={16} strokeWidth={1.5} />
                         </button>
-                      </>
-                    )}
-                    {category.isDefault && (
-                      <span className="text-xs text-gray-400 italic px-2">
-                        Read-only
-                      </span>
                     )}
                   </div>
                 </div>
@@ -449,41 +431,44 @@ const Categories = () => {
       {categoryStats.length > 0 && (
       <div className="glass-card overflow-hidden">
           <div className="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-white/[0.05]">
-            <h3 className="text-base font-medium text-gray-900 dark:text-white">Category statistics</h3>
-            <p className="text-xs text-gray-500 dark:text-[#85858b]">Expense breakdown by category</p>
+            <h2 className="text-base font-medium text-gray-900 dark:text-[#ededed]">Where the money went</h2>
+            <p className="text-xs text-gray-500 dark:text-[#85858b] mt-1">Share of all expenses, by category</p>
           </div>
-          <div className="p-3 sm:p-6">
+          <div className="px-4 sm:px-6 py-2">
             {statsLoading ? (
               <div className="flex justify-center py-8">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-brass"></div>
               </div>
             ) : (
-              <div className="space-y-4">
-                {categoryStats.map((stat, index) => (
-                <div key={stat._id} className="flex items-center justify-between p-3 sm:p-4 border border-gray-200 dark:border-white/[0.07] rounded-xl hover:bg-gray-50 dark:hover:bg-white/[0.03] transition-colors">
-                    <div className="flex items-center gap-3 min-w-0 flex-1">
-                      <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
-                        style={{ backgroundColor: stat.categoryColor + '20' }}
-                      >
-                        {categories?.find(cat => cat._id === stat._id)?.icon || '💰'}
-                      </div>
+              <ol className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                {(() => {
+                  const total = categoryStats.reduce((sum, s) => sum + s.totalAmount, 0) || 1
+                  const top = Math.max(...categoryStats.map(s => s.totalAmount)) || 1
+                  return categoryStats.map((stat, index) => (
+                    <li key={stat._id} className="py-3 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3">
+                      <CategoryTile size="sm" icon={categories?.find(cat => cat._id === stat._id)?.icon} />
                       <div className="min-w-0">
-                        <h4 className="font-medium text-gray-900 dark:text-white truncate text-sm">{stat.categoryName}</h4>
-                        <p className="text-xs text-gray-500 dark:text-[#a1a1a6]">{stat.count} expense(s)</p>
+                        <div className="flex items-baseline justify-between gap-3">
+                          <span className="text-sm text-gray-900 dark:text-[#ededed] truncate">{stat.categoryName}</span>
+                          <span className="font-mono text-xs text-gray-500 dark:text-[#85858b] tabular-nums">{((stat.totalAmount / total) * 100).toFixed(1)}%</span>
+                        </div>
+                        <div className="mt-2 h-1 rounded-full bg-gray-100 dark:bg-white/[0.06]">
+                          <div
+                            className={`h-1 rounded-full ${index === 0 ? 'bg-brass' : 'bg-gray-400 dark:bg-[#5a5a5f]'}`}
+                            style={{ width: `${(stat.totalAmount / top) * 100}%` }}
+                          />
+                        </div>
                       </div>
-                    </div>
-                    <div className="text-right ml-2 flex-shrink-0">
-                      <div className="text-sm sm:text-base font-medium text-gray-900 dark:text-white">
-                        <Amount value={stat.totalAmount} currency={currency} />
+                      <div className="w-32 text-right">
+                        <div className="text-sm text-gray-900 dark:text-[#ededed] tabular-nums">
+                          <Amount value={stat.totalAmount} currency={currency} />
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-[#85858b] tabular-nums">{stat.count} {stat.count === 1 ? 'entry' : 'entries'}</div>
                       </div>
-                      <div className="text-xs text-gray-500 dark:text-[#a1a1a6]">
-                        {((stat.totalAmount / categoryStats.reduce((sum, s) => sum + s.totalAmount, 0)) * 100).toFixed(1)}%
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                    </li>
+                  ))
+                })()}
+              </ol>
             )}
           </div>
         </div>

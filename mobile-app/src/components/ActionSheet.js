@@ -9,6 +9,7 @@ import {
     Dimensions,
     TouchableWithoutFeedback,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 
 const { height } = Dimensions.get('window');
@@ -52,15 +53,15 @@ export default function ActionSheet({ visible, onClose, options = [], title, sub
     const getIconForType = (type) => {
         switch (type) {
             case 'edit':
-                return '✏️';
+                return 'create-outline';
             case 'delete':
-                return '🗑️';
+                return 'trash-outline';
             case 'view':
-                return '👁️';
+                return 'eye-outline';
             case 'share':
-                return '📤';
+                return 'share-outline';
             default:
-                return '•';
+                return 'ellipse-outline';
         }
     };
 
@@ -102,17 +103,17 @@ export default function ActionSheet({ visible, onClose, options = [], title, sub
                                 {options.map((option, index) => {
                                     let textColor = colors.text;
                                     let bgColor = 'transparent';
-                                    let iconBgColor = `${colors.border}80`;
+                                    let iconBgColor = colors.cardElevated;
 
                                     if (option.style === 'destructive') {
-                                        textColor = colors.danger || '#ea2261';
-                                        iconBgColor = isDark ? '#3d1624' : '#fce4ec';
+                                        textColor = colors.danger || '#dc2626';
+                                        iconBgColor = isDark ? 'rgba(229,72,77,0.12)' : '#fef2f2';
                                     } else if (option.style === 'primary') {
-                                        textColor = colors.primary || '#533afd';
-                                        iconBgColor = isDark ? '#1f1e4d' : '#eef0fe';
+                                        textColor = colors.primary || '#a8611c';
+                                        iconBgColor = colors.primarySubdued;
                                     } else if (option.style === 'secondary') {
                                         textColor = colors.text;
-                                        iconBgColor = isDark ? `${colors.border}80` : '#f6f9fc';
+                                        iconBgColor = colors.cardElevated;
                                     }
 
                                     return (
@@ -141,9 +142,7 @@ export default function ActionSheet({ visible, onClose, options = [], title, sub
                                                         },
                                                     ]}
                                                 >
-                                                    <Text style={styles.optionIcon}>
-                                                        {getIconForType(option.icon)}
-                                                    </Text>
+                                                    <Ionicons name={getIconForType(option.icon)} size={18} color={textColor} />
                                                 </View>
                                             )}
                                             <View style={styles.optionTextContainer}>
@@ -166,7 +165,7 @@ export default function ActionSheet({ visible, onClose, options = [], title, sub
                                 style={[
                                     styles.cancelButton,
                                     {
-                                        backgroundColor: isDark ? '#273951' : '#e3e8ee',
+                                        backgroundColor: isDark ? '#525252' : '#e5e5e5',
                                         borderColor: colors.border,
                                     },
                                 ]}
@@ -186,14 +185,14 @@ export default function ActionSheet({ visible, onClose, options = [], title, sub
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(13, 37, 61, 0.65)',
+        backgroundColor: 'rgba(10, 10, 10, 0.55)',
         justifyContent: 'flex-end',
     },
     sheetContainer: {
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
         paddingBottom: 24,
-        shadowColor: '#003770',
+        shadowColor: '#000000',
         shadowOffset: { width: 0, height: -4 },
         shadowOpacity: 0.15,
         shadowRadius: 16,
@@ -216,13 +215,13 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 18,
-        fontWeight: '300', // Sohne thin style
+        fontWeight: '400',
         letterSpacing: -0.22,
         marginBottom: 2,
     },
     subtitle: {
         fontSize: 13,
-        fontWeight: '300',
+        fontWeight: '400',
         lineHeight: 18,
     },
     optionsContainer: {
@@ -262,7 +261,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 16,
         marginTop: 12,
         paddingVertical: 12,
-        borderRadius: 9999, // Stripe pill button
+        borderRadius: 8,
         alignItems: 'center',
         borderWidth: 1,
     },

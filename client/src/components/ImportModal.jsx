@@ -276,7 +276,7 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
                                 accept=".csv,.xlsx,.xls"
                                 onChange={handleFileChange}
                             />
-                            <div className="h-16 w-16 bg-indigo-100 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-full flex items-center justify-center mb-4">
+                            <div className="h-16 w-16 bg-brass-100 dark:bg-brass-500/10 text-brass-600 dark:text-brass-400 rounded-full flex items-center justify-center mb-4">
                                 <Upload size={32} />
                             </div>
                             <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
@@ -298,9 +298,9 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
 
                     {step === 2 && (
                         <div className="space-y-6">
-                            <div className="bg-indigo-50 dark:bg-indigo-500/10 p-4 rounded-xl flex items-start gap-3 border border-indigo-100 dark:border-indigo-500/20">
-                                <AlertCircle className="text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" size={18} />
-                                <div className="text-sm text-indigo-800 dark:text-indigo-300">
+                            <div className="bg-brass-50 dark:bg-brass-500/10 p-4 rounded-xl flex items-start gap-3 border border-brass-100 dark:border-brass-500/20">
+                                <AlertCircle className="text-brass-600 dark:text-brass-400 flex-shrink-0 mt-0.5" size={18} />
+                                <div className="text-sm text-brass-800 dark:text-brass-300">
                                     <p className="font-medium mb-1">Map your columns</p>
                                     <p>Match the columns from your file to the expense fields. Required fields are marked with *.</p>
                                 </div>
@@ -317,7 +317,7 @@ const ImportModal = ({ isOpen, onClose, onImportSuccess }) => {
                                             onChange={(e) => handleMappingChange(field, e.target.value)}
                                             className={`glass-input w-full min-h-[44px] focus:outline-none focus:ring-2 ${!mapping[field] && REQUIRED_FIELDS.includes(field)
                                                 ? 'border-red-300 dark:border-red-500/30 focus:ring-red-500/30'
-                                                : 'focus:ring-indigo-500/30'
+                                                : 'focus:ring-brass-500/30'
                                                 }`}
                                         >
                                             <option value="">Select column...</option>

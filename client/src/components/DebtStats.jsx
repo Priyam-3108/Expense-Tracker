@@ -6,10 +6,10 @@ const Card = ({ label, value, meta, tone, onClick, active, currency }) => (
         type="button"
         onClick={onClick}
         aria-pressed={!!active}
-        className={`glass-card p-4 sm:p-5 text-left transition-colors hover:border-gray-300 dark:hover:border-white/[0.14] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#533afd]/50 ${active ? 'ring-1 ring-[#533afd]/50' : ''}`}
+        className={`glass-card p-4 sm:p-5 text-left transition-colors hover:border-gray-300 dark:hover:border-white/[0.14] focus:outline-none focus-visible:ring-2 focus-visible:ring-brass/50 ${active ? 'ring-1 ring-brass/50' : ''}`}
     >
         <p className="text-sm text-gray-600 dark:text-[#a1a1a6]">{label}</p>
-        <p className={`mt-2 text-xl md:text-2xl leading-none font-mono font-medium tabular-nums truncate ${tone}`}>
+        <p className={`mt-2 text-xl md:text-2xl leading-none font-medium tabular-nums truncate ${tone}`}>
             <Amount value={value} currency={currency} />
         </p>
         <p className="mt-2 text-xs text-gray-500 dark:text-[#85858b]">{meta}</p>
@@ -23,7 +23,7 @@ export default function DebtStats({ s, view, onPick }) {
     const plural = (n) => `${n} record${n === 1 ? '' : 's'}`;
     return (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            <Card currency={currency} label="Owed to you" value={s.receivable} tone="text-emerald-600 dark:text-[#4cc38a]"
+            <Card currency={currency} label="Owed to you" value={s.receivable} tone={base}
                 meta={`${s.lentActive} pending`} active={view.type === 'lent' && !view.quick} onClick={() => onPick({ type: 'lent', quick: '' })} />
             <Card currency={currency} label="You owe" value={s.payable} tone={base}
                 meta={`${s.borrowedActive} pending`} active={view.type === 'borrowed' && !view.quick} onClick={() => onPick({ type: 'borrowed', quick: '' })} />

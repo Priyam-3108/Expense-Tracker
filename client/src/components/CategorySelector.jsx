@@ -188,7 +188,7 @@ const CategorySelector = ({
           <button
             type="button"
             onClick={handleCreateClick}
-            className="w-full flex items-center justify-center md:justify-start gap-2 px-4 py-3 md:px-3 md:py-2 text-sm font-medium md:font-normal text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 focus:bg-indigo-50 dark:focus:bg-indigo-500/10 focus:outline-none min-h-[44px] rounded-xl md:rounded-none transition-colors"
+            className="w-full flex items-center justify-center md:justify-start gap-2 px-4 py-3 md:px-3 md:py-2 text-sm font-medium md:font-normal text-brass-600 dark:text-brass-400 hover:bg-brass-50 dark:hover:bg-brass-500/10 focus:bg-brass-50 dark:focus:bg-brass-500/10 focus:outline-none min-h-[44px] rounded-xl md:rounded-none transition-colors"
           >
             <Plus size={18} className="md:w-4 md:h-4" />
             Create new category

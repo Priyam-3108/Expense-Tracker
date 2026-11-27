@@ -100,7 +100,7 @@ const ResetPassword = () => {
                 </label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                    <Lock className="h-4 w-4 text-[#737373] group-focus-within:text-[#533afd] transition-colors" />
+                    <Lock className="h-4 w-4 text-[#737373] group-focus-within:text-brass-700 transition-colors" />
                   </div>
                   <input
                     id="newPassword"
@@ -112,7 +112,7 @@ const ResetPassword = () => {
                     className={cn(
                       "block w-full pl-11 pr-12 py-2.5 rounded-lg transition-colors text-sm min-h-[44px]",
                       "bg-white border text-[#171717] placeholder:text-[#737373]/50",
-                      "focus:outline-none focus:ring-2 focus:ring-offset-0 focus:border-[#533afd] focus:ring-[#533afd]/15",
+                      "focus:outline-none focus:ring-2 focus:ring-offset-0 focus:border-brass-700 focus:ring-brass-700/15",
                       errors.newPassword ? "border-red-400" : "border-[#d4d4d4]"
                     )}
                     placeholder="••••••••"
@@ -142,7 +142,7 @@ const ResetPassword = () => {
                 </label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                    <Lock className="h-4 w-4 text-[#737373] group-focus-within:text-[#533afd] transition-colors" />
+                    <Lock className="h-4 w-4 text-[#737373] group-focus-within:text-brass-700 transition-colors" />
                   </div>
                   <input
                     id="confirmPassword"
@@ -154,7 +154,7 @@ const ResetPassword = () => {
                     className={cn(
                       "block w-full pl-11 pr-12 py-2.5 rounded-lg transition-colors text-sm min-h-[44px]",
                       "bg-white border text-[#171717] placeholder:text-[#737373]/50",
-                      "focus:outline-none focus:ring-2 focus:ring-offset-0 focus:border-[#533afd] focus:ring-[#533afd]/15",
+                      "focus:outline-none focus:ring-2 focus:ring-offset-0 focus:border-brass-700 focus:ring-brass-700/15",
                       errors.confirmPassword ? "border-red-400" : "border-[#d4d4d4]"
                     )}
                     placeholder="••••••••"
@@ -214,7 +214,7 @@ const ResetPassword = () => {
           {/* Back to login link */}
           <p className="text-center text-sm text-[#737373] mt-6">
             Remember your password?{' '}
-            <Link to="/login" className="text-[#533afd] hover:underline">
+            <Link to="/login" className="font-medium text-[#171717] underline decoration-[#d4d4d4] underline-offset-4 hover:decoration-[#171717]">
               Sign in
             </Link>
           </p>

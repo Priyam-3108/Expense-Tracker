@@ -1,27 +1,19 @@
 import { Link } from 'react-router-dom'
 
-const Logo = ({ className = "", size = "default" }) => {
-    const sizes = {
-        small: { box: 24, glyph: 14, text: "text-base" },
-        default: { box: 28, glyph: 16, text: "text-base" },
-        large: { box: 32, glyph: 18, text: "text-lg" }
-    }
+// A balanced ledger closes on a double rule: the mark is that rule on a brass tile
+export const LogoMark = ({ size = 22, className = '' }) => (
+    <svg width={size} height={size} viewBox="0 0 22 22" fill="none" aria-hidden="true" className={`shrink-0 text-brass ${className}`}>
+        <rect width="22" height="22" rx="6" fill="currentColor" />
+        <path d="M6 9.5h10M6 13.5h10" stroke="#fff" strokeWidth="1.75" strokeLinecap="round" />
+    </svg>
+)
 
-    const currentSize = sizes[size] || sizes.default
-
+const Logo = ({ className = '', to = '/', tone = 'auto' }) => {
+    const text = tone === 'light' ? 'text-[#ededed]' : 'text-[#171717] dark:text-[#ededed]'
     return (
-        <Link to="/" className={`flex items-center gap-2 ${className}`}>
-            <span
-                className="shrink-0 rounded-lg bg-[#533afd] flex items-center justify-center"
-                style={{ width: currentSize.box, height: currentSize.box }}
-            >
-                <svg width={currentSize.glyph} height={currentSize.glyph} viewBox="0 0 16 16" fill="none">
-                    <path d="M3 4h10M3 8h7M3 12h5" stroke="white" strokeWidth="1.75" strokeLinecap="round" />
-                </svg>
-            </span>
-            <span className={`font-medium text-gray-900 dark:text-[#ededed] ${currentSize.text}`}>
-                Spendly
-            </span>
+        <Link to={to} className={`flex items-center gap-2 rounded-md focus-ring ${className}`}>
+            <LogoMark />
+            <span className={`text-[17px] leading-none font-semibold ${text}`}>Spendly</span>
         </Link>
     )
 }

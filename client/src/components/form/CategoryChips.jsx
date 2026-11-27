@@ -33,7 +33,7 @@ export default function CategoryChips({ categories = [], value, onChange, onCrea
         <button
           type="button"
           onClick={onCreateClick}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-full border-[1.5px] border-dashed border-gray-300 dark:border-white/[0.15] text-sm font-medium text-indigo-600 dark:text-indigo-400 whitespace-nowrap min-h-[40px]"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-full border-[1.5px] border-dashed border-gray-300 dark:border-white/[0.15] text-sm font-medium text-brass-600 dark:text-brass-400 whitespace-nowrap min-h-[40px]"
         >
           <Plus size={14} />
           New

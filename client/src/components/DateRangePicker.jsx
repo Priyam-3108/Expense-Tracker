@@ -224,11 +224,11 @@ const DateRangePicker = ({ startDate, endDate, onChange, className = '' }) => {
                     className={`p-2 text-sm rounded-lg transition-colors relative ${!isCurrentMonthDay
                       ? 'text-gray-300 dark:text-[#85858b] cursor-not-allowed'
                       : isStart || isEnd
-                        ? 'bg-indigo-600 text-white font-medium'
+                        ? 'bg-brass-600 text-white font-medium'
                         : inRange
-                          ? 'bg-indigo-100 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-300'
+                          ? 'bg-brass-100 dark:bg-brass-500/15 text-brass-700 dark:text-brass-300'
                           : isToday
-                            ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-medium'
+                            ? 'bg-brass-50 dark:bg-brass-500/10 text-brass-600 dark:text-brass-400 font-medium'
                             : 'text-gray-700 dark:text-[#a1a1a6] hover:bg-gray-100 dark:hover:bg-white/[0.06]'
                       }`}
                     disabled={!isCurrentMonthDay}
@@ -246,7 +246,7 @@ const DateRangePicker = ({ startDate, endDate, onChange, className = '' }) => {
                 onClick={() => {
                   onChange(format(new Date(), 'yyyy-MM-dd'), '');
                 }}
-                className="flex-1 px-3 py-2 text-sm text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-xl transition-colors"
+                className="flex-1 px-3 py-2 text-sm text-brass-600 dark:text-brass-400 hover:bg-brass-50 dark:hover:bg-brass-500/10 rounded-xl transition-colors"
               >
                 Today
               </button>

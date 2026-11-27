@@ -71,14 +71,14 @@ const Profile = () => {
   const tabs = [
     { id: 'profile', label: 'Profile information' },
     { id: 'password', label: 'Change password'},
-    { id: 'account', label: 'Account Info'},
+    { id: 'account', label: 'Account'},
   ];
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl md:text-[28px] leading-tight font-medium text-gray-900 dark:text-[#ededed]">Profile</h1>
-        <p className="text-gray-600 dark:text-[#85858b]">Manage your account settings and preferences</p>
+        <p className="mt-1 text-sm text-gray-500 dark:text-[#a1a1a6]">Your name, currency, password and privacy</p>
       </div>
 
       <div className="border-b border-gray-200 dark:border-white/[0.06]">
@@ -88,7 +88,7 @@ const Profile = () => {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === tab.id
-                ? 'border-indigo-500 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400'
+                ? 'border-brass-500 dark:border-brass-400 text-brass-600 dark:text-brass-400'
                 : 'border-transparent text-gray-500 dark:text-[#a1a1a6] hover:text-gray-700 dark:hover:text-white hover:border-gray-300 dark:hover:border-white/[0.15]'
                 }`}
             >
@@ -105,7 +105,7 @@ const Profile = () => {
             <form onSubmit={handleProfileSubmit} className="space-y-4">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-[#a1a1a6] mb-1">
-                  Full Name
+                  Full name
                 </label>
                 <input
                   type="text"
@@ -120,7 +120,7 @@ const Profile = () => {
 
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-[#a1a1a6] mb-1">
-                  Email Address
+                  Email address
                 </label>
                 <input
                   type="email"
@@ -135,7 +135,7 @@ const Profile = () => {
 
               <div>
                 <label htmlFor="currency" className="block text-sm font-medium text-gray-700 dark:text-[#a1a1a6] mb-1">
-                  Preferred Currency
+                  Currency
                 </label>
                 <select
                   id="currency"
@@ -162,7 +162,7 @@ const Profile = () => {
                   disabled={loading}
                   className="btn-primary btn-md"
                 >
-                  {loading ? 'Updating...' : 'Update profile'}
+                  {loading ? 'Saving…' : 'Save changes'}
                 </button>
               </div>
             </form>
@@ -171,7 +171,7 @@ const Profile = () => {
               <div>
                 <p className="text-sm font-medium text-gray-900 dark:text-white">Hide amounts by default</p>
                 <p className="text-xs text-gray-500 dark:text-[#85858b]">
-                  Masks all monetary values across the app until you reveal them.
+                  Masks all monetary values across the app until you reveal them
                 </p>
               </div>
               <button
@@ -181,7 +181,7 @@ const Profile = () => {
                 disabled={savingPrivacy}
                 onClick={() => handlePrivacyDefaultChange(!privacyDefault)}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  privacyDefault ? 'bg-indigo-600' : 'bg-gray-300 dark:bg-white/[0.15]'
+                  privacyDefault ? 'bg-brass-600' : 'bg-gray-300 dark:bg-white/[0.15]'
                 }`}
               >
                 <span
@@ -287,9 +287,9 @@ const Profile = () => {
                 </div>
               </div>
 
-              <div className="mt-6 p-4 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl border border-indigo-100 dark:border-indigo-500/20">
-                <h3 className="text-sm font-medium text-indigo-900 dark:text-indigo-300 mb-2">Account security</h3>
-                <ul className="text-sm text-indigo-800 dark:text-indigo-400 space-y-1">
+              <div className="mt-6 p-4 bg-brass-50 dark:bg-brass-500/10 rounded-xl border border-brass-100 dark:border-brass-500/20">
+                <h3 className="text-sm font-medium text-brass-900 dark:text-brass-300 mb-2">Account security</h3>
+                <ul className="text-sm text-brass-800 dark:text-brass-400 space-y-1">
                   <li>• Your password is securely hashed and stored</li>
                   <li>• All data is transmitted over encrypted connections</li>
                   <li>• Session tokens expire automatically for security</li>

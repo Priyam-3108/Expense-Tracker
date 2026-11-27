@@ -57,6 +57,9 @@ const getNextRecurringDate = (currentDateStr, period) => {
   return `${newYear}-${newMonth}-${newDay}`;
 };
 
+// Ids of the user's categories flagged as savings/investments
+const savingsCategoryIds = (userId) => Category.find({ user: userId, isSavings: true }).distinct('_id');
+
 // Get all expenses for a user with filtering and pagination
 export const getExpenses = async (req, res) => {
   try {
@@ -851,7 +854,8 @@ export const getExpenseStats = async (req, res) => {
       endDateStr
     );
 
-    // Get total expenses and income
+    // Get total expenses and income; `savings` is the part of expenses that went to savings categories
+    const savingsIds = await savingsCategoryIds(req.user._id);
     const totalStats = await Expense.aggregate([
       {
         $match: {
@@ -863,13 +867,16 @@ export const getExpenseStats = async (req, res) => {
         $group: {
           _id: '$type',
           total: { $sum: '$amount' },
+          savings: { $sum: { $cond: [{ $in: ['$category', savingsIds] }, '$amount', 0] } },
           count: { $sum: 1 }
         }
       }
     ]);
 
     // Calculate net amount
-    const expenseTotal = totalStats.find(stat => stat._id === 'expense')?.total || 0;
+    const expenseStat = totalStats.find(stat => stat._id === 'expense');
+    const expenseTotal = expenseStat?.total || 0;
+    const savingsTotal = expenseStat?.savings || 0;
     const incomeTotal = totalStats.find(stat => stat._id === 'income')?.total || 0;
     const netAmount = incomeTotal - expenseTotal;
 
@@ -880,6 +887,7 @@ export const getExpenseStats = async (req, res) => {
         categorySummary,
         totalStats: {
           expenses: expenseTotal,
+          savings: savingsTotal,
           income: incomeTotal,
           net: netAmount
         }
@@ -903,6 +911,7 @@ export const getExpenseTrends = async (req, res) => {
     // Use string date comparison for YYYY-MM-DD format
     const startDateStr = `${year}-01-01`;
     const endDateStr = `${year}-12-31`;
+    const savingsIds = await savingsCategoryIds(req.user._id);
 
     const trends = await Expense.aggregate([
       {
@@ -927,12 +936,16 @@ export const getExpenseTrends = async (req, res) => {
             type: '$type'
           },
           total: { $sum: '$amount' },
+          savings: { $sum: { $cond: [{ $in: ['$category', savingsIds] }, '$amount', 0] } },
           count: { $sum: 1 }
         }
       },
       {
         $group: {
           _id: '$_id.month',
+          savings: {
+            $sum: { $cond: [{ $eq: ['$_id.type', 'expense'] }, '$savings', 0] }
+          },
           expenses: {
             $sum: {
               $cond: [
@@ -969,6 +982,7 @@ export const getExpenseTrends = async (req, res) => {
       return {
         month,
         expenses: monthData?.expenses || 0,
+        savings: monthData?.savings || 0,
         income: monthData?.income || 0,
         net: (monthData?.income || 0) - (monthData?.expenses || 0)
       };
@@ -1025,6 +1039,18 @@ export const getDetailedAnalytics = async (req, res) => {
     // Add type filter if provided
     if (type && type !== 'all') {
       filter.type = type;
+    }
+
+    // Money moved to savings categories; with excludeSavings=true it leaves every figure below
+    const savingsIds = await savingsCategoryIds(req.user._id);
+    const [savingsRow] = await Expense.aggregate([
+      { $match: { ...filter, type: 'expense' } },
+      { $match: { category: { $in: savingsIds } } },
+      { $group: { _id: null, total: { $sum: '$amount' } } }
+    ]);
+    const savingsTotal = savingsRow?.total || 0;
+    if (req.query.excludeSavings === 'true' && !filter.category) {
+      filter.$nor = [{ type: 'expense', category: { $in: savingsIds } }];
     }
 
     // 1. Get category-wise breakdown with detailed stats
@@ -1242,7 +1268,8 @@ export const getDetailedAnalytics = async (req, res) => {
           avgDailyExpense,
           avgDailyIncome,
           savingsRate,
-          totalDays
+          totalDays,
+          savingsTotal
         },
         categoryBreakdown,
         dailyPattern,

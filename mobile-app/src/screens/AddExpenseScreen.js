@@ -4,7 +4,6 @@ import {
     ScrollView, Modal, StatusBar, Switch, Platform,
     KeyboardAvoidingView, Animated
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import ModernDatePicker from '../components/ModernDatePicker';
 import CustomAlert from '../components/CustomAlert';
@@ -94,12 +93,12 @@ export default function AddExpenseScreen({ navigation, route }) {
 
     const handleSubmit = async () => {
         if (!amount || !category) {
-            setAlertConfig({ type: 'warning', title: 'Missing Fields', message: 'Please enter an amount and select a category.', buttons: [{ text: 'OK', style: 'primary' }] });
+            setAlertConfig({ type: 'warning', title: 'Missing fields', message: 'Please enter an amount and select a category.', buttons: [{ text: 'OK', style: 'primary' }] });
             setShowAlert(true);
             return;
         }
         if (isRecurring && recurringEndDate < date) {
-            setAlertConfig({ type: 'warning', title: 'Invalid Date', message: 'End date must be after start date.', buttons: [{ text: 'OK', style: 'primary' }] });
+            setAlertConfig({ type: 'warning', title: 'Invalid date', message: 'End date must be after start date.', buttons: [{ text: 'OK', style: 'primary' }] });
             setShowAlert(true);
             return;
         }
@@ -122,7 +121,7 @@ export default function AddExpenseScreen({ navigation, route }) {
 
             hapticFeedback.success();
             setAlertConfig({
-                type: 'success', title: isEditing ? 'Updated!' : 'Saved!',
+                type: 'success', title: isEditing ? 'Changes saved' : 'Saved',
                 message: `Transaction ${isEditing ? 'updated' : 'saved'} successfully.`,
                 buttons: [{ text: 'OK', style: 'primary', onPress: () => { resetForm(); navigation.setParams({ expense: undefined }); navigation.goBack(); } }],
             });
@@ -173,23 +172,23 @@ export default function AddExpenseScreen({ navigation, route }) {
 
         // ── Amount hero ──
         heroCard: {
-            marginHorizontal: 16, marginBottom: 20, borderRadius: 20,
-            overflow: 'hidden', ...shadows.lg,
+            marginHorizontal: 16, marginBottom: 20, borderRadius: 16,
+            overflow: 'hidden', borderWidth: 1, borderColor: colors.border, backgroundColor: colors.cardElevated,
         },
-        heroGradient: { padding: 28, alignItems: 'center', justifyContent: 'center' },
-        heroCurrencyLabel: { fontSize: 16, color: 'rgba(255,255,255,0.7)', fontWeight: '300', marginBottom: 4 },
+        heroGradient: { padding: 24, alignItems: 'center', justifyContent: 'center' },
+        heroCurrencyLabel: { fontSize: 14, color: colors.textSecondary, fontWeight: '400', marginBottom: 4 },
         heroInput: {
-            fontSize: 52, fontWeight: '200', color: '#ffffff',
-            letterSpacing: -2, textAlign: 'center',
+            fontSize: 48, fontWeight: '400', color: colors.text,
+            letterSpacing: -1, textAlign: 'center',
             fontVariant: ['tabular-nums'], minWidth: 120,
         },
-        heroPlaceholder: { fontSize: 52, fontWeight: '200', color: 'rgba(255,255,255,0.35)', letterSpacing: -2 },
+        heroPlaceholder: { fontSize: 48, fontWeight: '400', color: colors.subText, letterSpacing: -1 },
         heroDate: {
             marginTop: 12, flexDirection: 'row', alignItems: 'center', gap: 6,
-            backgroundColor: 'rgba(255,255,255,0.15)', paddingHorizontal: 14, paddingVertical: 6,
-            borderRadius: 9999, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)',
+            backgroundColor: colors.card, paddingHorizontal: 12, paddingVertical: 6,
+            borderRadius: 8, borderWidth: 1, borderColor: colors.border,
         },
-        heroDateText: { color: 'rgba(255,255,255,0.9)', fontSize: 13, fontWeight: '400' },
+        heroDateText: { color: colors.text, fontSize: 13, fontWeight: '400' },
 
         // ── Type toggle ──
         typeToggle: {
@@ -201,12 +200,12 @@ export default function AddExpenseScreen({ navigation, route }) {
             flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
             gap: 7, paddingVertical: 13, borderRadius: 13,
         },
-        typeBtnText: { fontSize: 15, fontWeight: '500', letterSpacing: -0.2 },
+        typeBtnText: { fontSize: 15, fontWeight: '500' },
 
         // ── Section label ──
         sectionLabel: {
-            fontSize: 11, fontWeight: '600', color: colors.subText,
-            letterSpacing: 0.8, textTransform: 'uppercase',
+            fontSize: 11, fontWeight: '500', color: colors.subText,
+            letterSpacing: 0.8,
             marginHorizontal: 20, marginBottom: 8,
         },
 
@@ -215,7 +214,7 @@ export default function AddExpenseScreen({ navigation, route }) {
         chip: {
             flexDirection: 'row', alignItems: 'center', gap: 6,
             paddingHorizontal: 14, paddingVertical: 9,
-            borderRadius: 9999, borderWidth: 1.5, marginRight: 8, marginBottom: 8,
+            borderRadius: 8, borderWidth: 1.5, marginRight: 8, marginBottom: 8,
         },
         chipDot: { width: 8, height: 8, borderRadius: 4 },
         chipText: { fontSize: 13, fontWeight: '400' },
@@ -227,7 +226,7 @@ export default function AddExpenseScreen({ navigation, route }) {
             ...shadows.sm,
         },
         textInput: {
-            padding: 16, fontSize: 15, fontWeight: '300',
+            padding: 16, fontSize: 15, fontWeight: '400',
             color: colors.text, minHeight: 52,
         },
 
@@ -253,7 +252,7 @@ export default function AddExpenseScreen({ navigation, route }) {
         periodBtn: {
             flexDirection: 'row', alignItems: 'center', gap: 5,
             paddingHorizontal: 14, paddingVertical: 8,
-            borderRadius: 9999, borderWidth: 1,
+            borderRadius: 8, borderWidth: 1,
         },
         periodText: { fontSize: 13, fontWeight: '400' },
 
@@ -269,7 +268,7 @@ export default function AddExpenseScreen({ navigation, route }) {
             width: 36, height: 36, borderRadius: 18,
             backgroundColor: colors.primarySubdued, justifyContent: 'center', alignItems: 'center',
         },
-        dateText: { fontSize: 15, fontWeight: '300', color: colors.text },
+        dateText: { fontSize: 15, fontWeight: '400', color: colors.text },
         dateLabel: { fontSize: 11, color: colors.subText, marginBottom: 1, fontWeight: '400' },
 
         // ── Submit ──
@@ -280,13 +279,13 @@ export default function AddExpenseScreen({ navigation, route }) {
             borderTopWidth: 1, borderTopColor: colors.border,
         },
         submitBtn: {
-            borderRadius: 16, overflow: 'hidden', ...shadows.md,
+            borderRadius: 12, overflow: 'hidden', backgroundColor: colors.ink,
         },
         submitGradient: {
             flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
             gap: 8, paddingVertical: 16,
         },
-        submitText: { color: '#ffffff', fontSize: 16, fontWeight: '500', letterSpacing: -0.2 },
+        submitText: { color: colors.onInk, fontSize: 16, fontWeight: '500' },
 
         // ── Category picker modal ──
         modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
@@ -306,12 +305,9 @@ export default function AddExpenseScreen({ navigation, route }) {
         },
         catOptionLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
         catDot: { width: 14, height: 14, borderRadius: 7 },
-        catOptionText: { fontSize: 15, fontWeight: '300', color: colors.text },
+        catOptionText: { fontSize: 15, fontWeight: '400', color: colors.text },
     });
 
-    const submitGradient = isExpense
-        ? [colors.dangerDark || '#c71852', colors.danger]
-        : [colors.successDark || '#059669', colors.success];
 
     return (
         <KeyboardAvoidingView style={s.outer} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -322,36 +318,30 @@ export default function AddExpenseScreen({ navigation, route }) {
                 <TouchableOpacity style={s.backBtn} onPress={() => navigation.goBack()}>
                     <Ionicons name="arrow-back" size={18} color={colors.text} />
                 </TouchableOpacity>
-                <Text style={s.headerTitle}>{isEditing ? 'Edit Transaction' : 'Add Transaction'}</Text>
+                <Text style={s.headerTitle}>{isEditing ? 'Edit entry' : 'New entry'}</Text>
             </View>
 
             <ScrollView contentContainerStyle={s.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
 
                 {/* ── Hero Amount Card ── */}
                 <View style={s.heroCard}>
-                    <LinearGradient
-                        colors={isExpense
-                            ? ['#2e0a1a', '#c71852', '#ea2261']
-                            : ['#0a2e22', '#059669', '#10b981']}
-                        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                        style={s.heroGradient}
-                    >
+                    <View style={s.heroGradient}>
                         <Text style={s.heroCurrencyLabel}>Amount (₹)</Text>
                         <TextInput
                             style={s.heroInput}
                             placeholder="0"
-                            placeholderTextColor="rgba(255,255,255,0.3)"
+                            placeholderTextColor={colors.subText}
                             value={amount}
                             onChangeText={setAmount}
                             keyboardType="numeric"
                             returnKeyType="done"
                         />
                         <TouchableOpacity style={s.heroDate} onPress={() => setShowDatePicker(true)}>
-                            <Ionicons name="calendar-outline" size={14} color="rgba(255,255,255,0.8)" />
+                            <Ionicons name="calendar-outline" size={14} color={colors.textSecondary} />
                             <Text style={s.heroDateText}>{formattedDate}</Text>
-                            <Ionicons name="chevron-down" size={12} color="rgba(255,255,255,0.6)" />
+                            <Ionicons name="chevron-down" size={12} color={colors.subText} />
                         </TouchableOpacity>
-                    </LinearGradient>
+                    </View>
                 </View>
 
                 {/* Date Picker */}
@@ -365,7 +355,7 @@ export default function AddExpenseScreen({ navigation, route }) {
                 {/* ── Type Toggle ── */}
                 <View style={s.typeToggle}>
                     <TouchableOpacity
-                        style={[s.typeBtn, isExpense && { backgroundColor: colors.dangerBg || '#fff0f5' }]}
+                        style={[s.typeBtn, isExpense && { backgroundColor: colors.dangerBg || '#fef2f2' }]}
                         onPress={() => switchType('expense')}
                     >
                         <Ionicons name="arrow-down-circle" size={20} color={isExpense ? colors.danger : colors.subText} />
@@ -455,14 +445,14 @@ export default function AddExpenseScreen({ navigation, route }) {
                             })}
                         </View>
 
-                        <Text style={[s.sectionLabel, { marginHorizontal: 0, marginTop: 16, marginBottom: 8 }]}>End Date</Text>
+                        <Text style={[s.sectionLabel, { marginHorizontal: 0, marginTop: 16, marginBottom: 8 }]}>End date</Text>
                         <TouchableOpacity style={[s.dateTrigger, { marginHorizontal: 0, marginBottom: 0 }]} onPress={() => setShowEndDatePicker(true)}>
                             <View style={s.dateTriggerLeft}>
                                 <View style={s.dateIcon}>
                                     <Ionicons name="calendar-outline" size={16} color={colors.primary} />
                                 </View>
                                 <View>
-                                    <Text style={s.dateLabel}>End Date</Text>
+                                    <Text style={s.dateLabel}>End date</Text>
                                     <Text style={s.dateText}>{recurringEndDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</Text>
                                 </View>
                             </View>
@@ -488,10 +478,9 @@ export default function AddExpenseScreen({ navigation, route }) {
                     disabled={loading}
                     activeOpacity={0.85}
                 >
-                    <LinearGradient colors={submitGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={s.submitGradient}>
-                        <Ionicons name={loading ? 'hourglass-outline' : (isEditing ? 'pencil' : 'checkmark-circle')} size={20} color="#ffffff" />
-                        <Text style={s.submitText}>{loading ? 'Saving…' : (isEditing ? 'Update Transaction' : 'Save Transaction')}</Text>
-                    </LinearGradient>
+                    <View style={s.submitGradient}>
+                        <Text style={s.submitText}>{loading ? 'Saving…' : (isEditing ? 'Save changes' : isExpense ? 'Save expense' : 'Save income')}</Text>
+                    </View>
                 </TouchableOpacity>
             </View>
 
@@ -500,7 +489,7 @@ export default function AddExpenseScreen({ navigation, route }) {
                 <TouchableOpacity style={s.modalBg} activeOpacity={1} onPress={() => setPickerVisible(false)}>
                     <View style={s.modalSheet}>
                         <View style={s.modalHandle} />
-                        <Text style={s.modalTitle}>Select Category</Text>
+                        <Text style={s.modalTitle}>Category</Text>
                         <ScrollView showsVerticalScrollIndicator={false}>
                             {categories.map(cat => (
                                 <TouchableOpacity key={cat._id} style={s.catOption} onPress={() => { hapticFeedback.light(); setCategory(cat._id); setPickerVisible(false); }}>

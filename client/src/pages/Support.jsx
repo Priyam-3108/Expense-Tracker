@@ -22,7 +22,7 @@ const Support = () => {
                         <span className="page-badge">Help & support</span>
                         <h1 className="page-title">How can we help?</h1>
                         <p className="page-subtitle">
-                            Get the support you need to make the most of Expense Tracker
+                            Get the support you need to make the most of Spendly
                         </p>
                     </div>
 
@@ -114,7 +114,7 @@ const Support = () => {
                             <p><strong>Mobile experience:</strong></p>
                             <ul>
                                 <li>Use a modern mobile browser (not in-app browsers from social media)</li>
-                                <li>For best experience, add Expense Tracker to your home screen</li>
+                                <li>For best experience, add Spendly to your home screen</li>
                                 <li>Make sure JavaScript is enabled in your browser settings</li>
                             </ul>
                         </div>
@@ -127,7 +127,7 @@ const Support = () => {
                         </h2>
                         <div className="section-content">
                             <p>
-                                <strong>Email:</strong> <a href="mailto:support@expensetracker.com" className="text-[#533afd] hover:underline">support@expensetracker.com</a>
+                                <strong>Email:</strong> <a href="mailto:support@expensetracker.com" className="text-brass hover:underline">support@expensetracker.com</a>
                             </p>
                             <p>
                                 <strong>Response Time:</strong> We typically respond within 24-48 hours during business days.
@@ -151,13 +151,13 @@ const Support = () => {
                         </h2>
                         <div className="section-content">
                             <p>
-                                We love hearing from our users! If you have ideas for new features or improvements, we'd love to hear them.
+                                We love hearing from our users. If you have ideas for new features or improvements, we'd love to hear them.
                             </p>
                             <p>
-                                Send your suggestions to <a href="mailto:feedback@expensetracker.com" className="text-[#533afd] hover:underline">feedback@expensetracker.com</a>
+                                Send your suggestions to <a href="mailto:feedback@expensetracker.com" className="text-brass hover:underline">feedback@expensetracker.com</a>
                             </p>
                             <p>
-                                Your feedback helps us make Expense Tracker better for everyone!
+                                Your feedback helps us make Spendly better for everyone.
                             </p>
                         </div>
                     </div>
@@ -178,7 +178,7 @@ const Support = () => {
                                 <li>Can you reproduce the issue consistently?</li>
                             </ul>
                             <p>
-                                Report bugs to: <a href="mailto:bugs@expensetracker.com" className="text-[#533afd] hover:underline">bugs@expensetracker.com</a>
+                                Report bugs to: <a href="mailto:bugs@expensetracker.com" className="text-brass hover:underline">bugs@expensetracker.com</a>
                             </p>
                         </div>
                     </div>
@@ -190,7 +190,7 @@ const Support = () => {
                         </h2>
                         <div className="text-[#737373]">
                             <p className="mb-6">
-                                Explore these resources to get the most out of Expense Tracker:
+                                Explore these resources to get the most out of Spendly:
                             </p>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <Link to="/docs" className="bg-[#f5f5f5] border border-[#e5e5e5] p-4 rounded-xl flex items-center justify-between text-[#171717] hover:bg-[#eef2f6] transition-colors">
