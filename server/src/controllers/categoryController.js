@@ -126,7 +126,7 @@ export const getCategory = async (req, res) => {
 // Create new category
 export const createCategory = async (req, res) => {
   try {
-    const { name, color, icon } = req.body;
+    const { name, color, icon, isSavings } = req.body;
 
     // Check if category with same name already exists for this user
     const existingCategory = await Category.findOne({
@@ -145,6 +145,7 @@ export const createCategory = async (req, res) => {
       name: name.trim(),
       color: color || '#3B82F6',
       icon: icon || '💰',
+      isSavings: !!isSavings,
       user: req.user._id,
       isDefault: false // Ensure user-created categories are not default
     });
@@ -179,7 +180,7 @@ export const createCategory = async (req, res) => {
 // Update category
 export const updateCategory = async (req, res) => {
   try {
-    const { name, color, icon } = req.body;
+    const { name, color, icon, isSavings } = req.body;
     const categoryId = req.params.id;
 
     // Find category and ensure it belongs to the user
@@ -195,8 +196,9 @@ export const updateCategory = async (req, res) => {
       });
     }
 
-    // Prevent modification of default categories
-    if (category.isDefault) {
+    // Default categories keep their name, color and icon; only the savings flag can change
+    const renaming = name && name.trim() !== category.name;
+    if (category.isDefault && (renaming || (color && color !== category.color) || (icon && icon !== category.icon))) {
       return res.status(403).json({
         success: false,
         message: 'Cannot modify default categories'
@@ -204,7 +206,7 @@ export const updateCategory = async (req, res) => {
     }
 
     // Check if new name conflicts with existing category
-    if (name && name.trim() !== category.name) {
+    if (renaming) {
       const existingCategory = await Category.findOne({
         name: name.trim(),
         user: req.user._id,
@@ -224,6 +226,7 @@ export const updateCategory = async (req, res) => {
     if (name) updates.name = name.trim();
     if (color) updates.color = color;
     if (icon) updates.icon = icon;
+    if (typeof isSavings === 'boolean') updates.isSavings = isSavings;
 
     const updatedCategory = await Category.findByIdAndUpdate(
       categoryId,

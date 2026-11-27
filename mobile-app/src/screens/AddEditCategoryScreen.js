@@ -10,6 +10,7 @@ import {
     Alert,
     ActivityIndicator,
     KeyboardAvoidingView,
+    Switch,
     Platform
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -39,8 +40,11 @@ function AddEditCategoryScreen({ navigation, route }) {
     const [formData, setFormData] = useState({
         name: '',
         color: '#3B82F6',
-        icon: '💰'
+        icon: '💰',
+        isSavings: false
     });
+    // Default categories keep their name, icon and color; only the savings flag can change
+    const lockedLook = isEditing && !!category?.isDefault;
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
@@ -49,7 +53,8 @@ function AddEditCategoryScreen({ navigation, route }) {
             setFormData({
                 name: category.name || '',
                 color: category.color || '#3B82F6',
-                icon: category.icon || '💰'
+                icon: category.icon || '💰',
+                isSavings: !!category.isSavings
             });
         }
     }, [category, isEditing]);
@@ -69,13 +74,6 @@ function AddEditCategoryScreen({ navigation, route }) {
 
     const handleSubmit = async () => {
         if (!validateForm()) {
-            hapticFeedback.error();
-            return;
-        }
-
-        // Prevent editing default categories
-        if (isEditing && category?.isDefault) {
-            Alert.alert('Error', 'Cannot edit default categories');
             hapticFeedback.error();
             return;
         }
@@ -302,6 +300,26 @@ function AddEditCategoryScreen({ navigation, route }) {
             fontWeight: '400',
             letterSpacing: 0,
         },
+        savingsRow: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: spacing.md,
+            backgroundColor: colors.card,
+            borderWidth: 1,
+            borderColor: colors.border,
+            borderRadius: 12,
+            padding: spacing.md,
+        },
+        savingsTitle: {
+            fontSize: 15,
+            fontWeight: '400',
+            color: colors.text,
+        },
+        note: {
+            fontSize: 12,
+            color: colors.subText,
+            marginTop: 2,
+        },
         loadingContainer: {
             flexDirection: 'row',
             alignItems: 'center',
@@ -328,7 +346,7 @@ function AddEditCategoryScreen({ navigation, route }) {
                     <Ionicons name="arrow-back" size={24} color={colors.text} />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>
-                    {isEditing ? 'Edit Category' : 'Add Category'}
+                    {isEditing ? 'Edit category' : 'New category'}
                 </Text>
                 {isEditing && !category?.isDefault ? (
                     <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
@@ -344,6 +362,12 @@ function AddEditCategoryScreen({ navigation, route }) {
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
             >
+                {lockedLook ? (
+                    <Text style={[styles.note, { marginBottom: spacing.xl }]}>
+                        {formData.name} is a default category. It keeps its name, icon and color.
+                    </Text>
+                ) : (
+                <>
                 {/* Category Name */}
                 <View style={styles.section}>
                     <Text style={styles.label}>Name</Text>
@@ -406,6 +430,24 @@ function AddEditCategoryScreen({ navigation, route }) {
                         ))}
                     </View>
                 </View>
+                </>
+                )}
+
+                {/* Savings flag */}
+                <View style={[styles.section, styles.savingsRow]}>
+                    <View style={{ flex: 1 }}>
+                        <Text style={styles.savingsTitle}>Savings or investment</Text>
+                        <Text style={styles.note}>Money put aside, not spent. Can be left out of spending on Home and in Analytics.</Text>
+                    </View>
+                    <Switch
+                        value={formData.isSavings}
+                        onValueChange={(isSavings) => { hapticFeedback.light(); setFormData({ ...formData, isSavings }); }}
+                        trackColor={{ false: colors.borderStrong, true: colors.primary }}
+                        thumbColor="#ffffff"
+                        disabled={loading}
+                        accessibilityLabel="Savings or investment"
+                    />
+                </View>
 
                 {/* Save Button */}
                 <TouchableOpacity
@@ -417,12 +459,12 @@ function AddEditCategoryScreen({ navigation, route }) {
                         <View style={styles.loadingContainer}>
                             <ActivityIndicator color="#ffffff" />
                             <Text style={styles.loadingText}>
-                                {isEditing ? 'Updating...' : 'Creating...'}
+                                {isEditing ? 'Saving…' : 'Adding…'}
                             </Text>
                         </View>
                     ) : (
                         <Text style={styles.saveButtonText}>
-                            {isEditing ? 'Update Category' : 'Create Category'}
+                            {isEditing ? 'Save changes' : 'Add category'}
                         </Text>
                     )}
                 </TouchableOpacity>

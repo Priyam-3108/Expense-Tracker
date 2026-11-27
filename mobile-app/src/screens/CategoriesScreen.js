@@ -69,11 +69,8 @@ function CategoriesScreen({ navigation }) {
 
     const handleCategoryPress = (category) => {
         hapticFeedback.light();
-        if (!category.isDefault) {
-            navigation.navigate('AddEditCategory', { category });
-        } else {
-            Alert.alert('Default Category', 'Default categories cannot be edited');
-        }
+        // Default categories open too; only their savings flag can change there
+        navigation.navigate('AddEditCategory', { category });
     };
 
     const handleAddCategory = () => {
@@ -190,6 +187,11 @@ function CategoriesScreen({ navigation }) {
                             ) : (
                                 <View style={[styles.pill, { backgroundColor: colors.successBg || '#ecfdf5' }]}>
                                     <Text style={[styles.pillText, { color: colors.success }]}>Custom</Text>
+                                </View>
+                            )}
+                            {item.isSavings && (
+                                <View style={[styles.pill, { backgroundColor: colors.primarySubdued }]}>
+                                    <Text style={[styles.pillText, { color: colors.primary }]}>Savings</Text>
                                 </View>
                             )}
                             {item.expenseCount > 0 && (

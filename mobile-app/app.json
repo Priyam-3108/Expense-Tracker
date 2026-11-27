@@ -2,7 +2,7 @@
   "expo": {
     "name": "Spendly",
     "slug": "spendly",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "spendly",
@@ -21,7 +21,8 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.priyampatel2003.spendly"
+      "package": "com.priyampatel2003.spendly",
+      "versionCode": 2
     },
     "web": {
       "output": "static",
@@ -37,6 +38,7 @@
           "resizeMode": "contain",
           "backgroundColor": "#fafafa",
           "dark": {
+            "image": "./assets/images/splash-icon.png",
             "backgroundColor": "#141415"
           }
         }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, StatusBar, TouchableOpacity, RefreshControl, Platform, Dimensions } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -13,8 +13,11 @@ import InsightCard from '../components/InsightCard';
 import { SkeletonCard } from '../components/SkeletonLoader';
 import hapticFeedback from '../utils/haptics';
 import { usePrivacy } from '../context/PrivacyContext';
+import { useExcludeSavings } from '../hooks/useExcludeSavings';
+import SavingsToggle from '../components/SavingsToggle';
+import Amount from '../components/Amount';
 
-function AnalyticsScreen() {
+function AnalyticsScreen({ navigation }) {
     const { colors, isDark, spacing, borderRadius, shadows } = useTheme();
     const { isPrivate, toggle: togglePrivacy } = usePrivacy();
     const maskMoney = (msg) => isPrivate ? msg.replace(/₹[\d,.]+/g, '₹••••') : msg;
@@ -22,6 +25,8 @@ function AnalyticsScreen() {
     const [refreshing, setRefreshing] = useState(false);
     const [selectedPeriod, setSelectedPeriod] = useState('month'); // 'week', 'month', '3months', '6months', 'year', 'custom'
     const [chartType, setChartType] = useState('bar'); // 'bar', 'pie', 'line'
+    const [excludeSavings, setExcludeSavings] = useExcludeSavings();
+    const latestRequest = useRef(0);
 
     // Custom Date Range State
     const [customStartDate, setCustomStartDate] = useState(new Date());
@@ -34,6 +39,10 @@ function AnalyticsScreen() {
         categoryBreakdown: [],
         spendingTrend: [],
         insights: [],
+        categoryRows: [],
+        totalExpenses: 0,
+        savingsTotal: 0,
+        range: null,
     });
 
 
@@ -66,6 +75,8 @@ function AnalyticsScreen() {
     }, [selectedPeriod, customStartDate, customEndDate]);
 
     const fetchAnalytics = async () => {
+        // A newer request (period or savings toggle changed) wins over this one
+        const requestId = ++latestRequest.current;
         try {
             const range = getDateRange();
             const start = range.start;
@@ -88,8 +99,10 @@ function AnalyticsScreen() {
             // Fetch analytics data from backend with explicit dates
             const response = await expenseService.getDetailedAnalytics({
                 startDate: startDateStr,
-                endDate: endDateStr
+                endDate: endDateStr,
+                excludeSavings: excludeSavings ? 'true' : undefined
             });
+            if (requestId !== latestRequest.current) return;
 
             if (response.data.success) {
                 const data = response.data.data;
@@ -148,27 +161,43 @@ function AnalyticsScreen() {
                     };
                 });
 
+                // 4. Rows for the tappable category list
+                const categoryRows = rawCategories.map(item => ({
+                    id: item._id,
+                    name: item.category?.name || 'Other',
+                    color: item.category?.color || colors.subText,
+                    total: parseFloat(item.totalAmount || 0),
+                    count: item.count || 0,
+                }));
+
                 setAnalyticsData({
                     monthlyExpenses,
                     categoryBreakdown,
                     spendingTrend,
                     insights: generateInsights(data),
+                    categoryRows,
+                    totalExpenses: data.summary?.totalExpenses || 0,
+                    savingsTotal: data.summary?.savingsTotal || 0,
+                    range: { startDate: startDateStr, endDate: endDateStr },
                 });
             } else {
                 setAnalyticsData(emptyData());
             }
 
         } catch (error) {
+            if (requestId !== latestRequest.current) return;
             console.error('Error fetching analytics:', error);
             setAnalyticsData(emptyData());
         } finally {
-            setLoading(false);
-            setRefreshing(false);
+            if (requestId === latestRequest.current) {
+                setLoading(false);
+                setRefreshing(false);
+            }
         }
     };
 
     // No data or a failed request shows an empty state, never invented figures
-    const emptyData = () => ({ monthlyExpenses: [], categoryBreakdown: [], spendingTrend: [], insights: [] });
+    const emptyData = () => ({ monthlyExpenses: [], categoryBreakdown: [], spendingTrend: [], insights: [], categoryRows: [], totalExpenses: 0, savingsTotal: 0, range: null });
 
     const generateInsights = (data) => {
         const insights = [];
@@ -233,13 +262,23 @@ function AnalyticsScreen() {
     useFocusEffect(
         useCallback(() => {
             fetchAnalytics();
-        }, [selectedPeriod, customStartDate, customEndDate])
+        }, [selectedPeriod, customStartDate, customEndDate, excludeSavings])
     );
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
         fetchAnalytics();
-    }, [selectedPeriod, customStartDate, customEndDate]);
+    }, [selectedPeriod, customStartDate, customEndDate, excludeSavings]);
+
+    const openCategory = (row) => {
+        hapticFeedback.light();
+        navigation.navigate('CategoryDetail', {
+            categoryId: row.id,
+            name: row.name,
+            ...analyticsData.range,
+            totalExpenses: analyticsData.totalExpenses,
+        });
+    };
 
     const onDateChange = (event, selectedDate, type) => {
         if (type === 'start') {
@@ -390,6 +429,18 @@ function AnalyticsScreen() {
         insightsSection: {
             marginBottom: spacing.xl,
         },
+        catRow: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 10,
+            paddingVertical: 12,
+            paddingHorizontal: spacing.md,
+        },
+        catDot: { width: 8, height: 8, borderRadius: 4 },
+        catName: { fontSize: 15, color: colors.text },
+        catMeta: { fontSize: 12, color: colors.subText, marginTop: 2 },
+        catAmount: { fontSize: 15, color: colors.text, fontVariant: ['tabular-nums'] },
+        catShare: { fontSize: 12, color: colors.subText, fontVariant: ['tabular-nums'], textAlign: 'right', marginTop: 2 },
     });
 
     const renderChart = () => {
@@ -557,6 +608,10 @@ function AnalyticsScreen() {
                             )}
                         </View>
                     )}
+
+                    {analyticsData.savingsTotal > 0 && (
+                        <SavingsToggle value={excludeSavings} onChange={setExcludeSavings} leftOut={analyticsData.savingsTotal} />
+                    )}
                 </View>
 
                 <View style={styles.content}>
@@ -617,6 +672,38 @@ function AnalyticsScreen() {
                             )}
                         </View>
                     </View>
+
+                    {/* By category: tap a row to see its entries */}
+                    {analyticsData.categoryRows.length > 0 && (
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>By category</Text>
+                            <View style={[styles.chartCard, { padding: 0 }]}>
+                                {analyticsData.categoryRows.map((row, i) => (
+                                    <TouchableOpacity
+                                        key={row.id}
+                                        onPress={() => openCategory(row)}
+                                        activeOpacity={0.7}
+                                        accessibilityRole="button"
+                                        accessibilityLabel={`${row.name}, ${row.count} entries. Show entries`}
+                                        style={[styles.catRow, i > 0 && { borderTopWidth: 1, borderTopColor: colors.borderLight }]}
+                                    >
+                                        <View style={[styles.catDot, { backgroundColor: row.color }]} />
+                                        <View style={{ flex: 1 }}>
+                                            <Text style={styles.catName} numberOfLines={1}>{row.name}</Text>
+                                            <Text style={styles.catMeta}>{row.count} {row.count === 1 ? 'entry' : 'entries'}</Text>
+                                        </View>
+                                        <View>
+                                            <Amount value={row.total} style={styles.catAmount} />
+                                            <Text style={styles.catShare}>
+                                                {analyticsData.totalExpenses > 0 ? Math.round((row.total / analyticsData.totalExpenses) * 100) : 0}%
+                                            </Text>
+                                        </View>
+                                        <Ionicons name="chevron-forward" size={16} color={colors.subText} />
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+                        </View>
+                    )}
 
                     {/* Insights */}
                     <View style={styles.insightsSection}>

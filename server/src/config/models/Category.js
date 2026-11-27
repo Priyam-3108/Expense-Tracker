@@ -24,6 +24,11 @@ const categorySchema = new mongoose.Schema({
   isDefault: {
     type: Boolean,
     default: false
+  },
+  // Money moved into savings or investments: logged as an expense, but can be left out of spending totals
+  isSavings: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true

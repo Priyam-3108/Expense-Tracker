@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, StatusBar, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContext } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -361,7 +362,7 @@ function ProfileScreen({ navigation }) {
                     <Text style={styles.logoutText}>Logout</Text>
                 </TouchableOpacity>
 
-                <Text style={styles.version}>Version 1.0.0</Text>
+                <Text style={styles.version}>Version {Constants.expoConfig?.version}</Text>
             </ScrollView>
         </View>
     );

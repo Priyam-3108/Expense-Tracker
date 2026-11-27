@@ -10,6 +10,9 @@ import FieldCard from '../components/form/FieldCard'
 import StickyFormFooter from '../components/form/StickyFormFooter'
 import Amount from '../components/Amount'
 import CategoryIcon, { CategoryTile } from '../components/CategoryIcon'
+import Switch from '../components/Switch'
+
+const EMPTY_FORM = { name: '', color: '#3B82F6', icon: '💰', isSavings: false }
 
 const currencySymbols = {
   USD: '$',
@@ -29,11 +32,7 @@ const Categories = () => {
   const [editingCategory, setEditingCategory] = useState(null)
   const [draggedItem, setDraggedItem] = useState(null)
   const [dragOverItem, setDragOverItem] = useState(null)
-  const [formData, setFormData] = useState({
-    name: '',
-    color: '#3B82F6',
-    icon: '💰'
-  })
+  const [formData, setFormData] = useState(EMPTY_FORM)
   const [categoryStats, setCategoryStats] = useState([])
   const [statsLoading, setStatsLoading] = useState(false)
   const [formLoading, setFormLoading] = useState(false)
@@ -57,14 +56,11 @@ const Categories = () => {
       setFormData({
         name: editingCategory.name,
         color: editingCategory.color,
-        icon: editingCategory.icon
+        icon: editingCategory.icon,
+        isSavings: !!editingCategory.isSavings
       })
     } else {
-      setFormData({
-        name: '',
-        color: '#3B82F6',
-        icon: '💰'
-      })
+      setFormData(EMPTY_FORM)
     }
   }, [editingCategory])
 
@@ -79,25 +75,19 @@ const Categories = () => {
     setFormLoading(true)
     try {
       if (editingCategory) {
-        // Prevent editing default categories
-        if (editingCategory.isDefault) {
-          toast.error('Cannot edit default categories')
-          setFormLoading(false)
-          return
-        }
         const result = await updateCategory(editingCategory._id, formData)
         if (result.success) {
           toast.success('Category updated successfully')
           setEditingCategory(null)
           setShowForm(false)
-          setFormData({ name: '', color: '#3B82F6', icon: '💰' })
+          setFormData(EMPTY_FORM)
         }
       } else {
         const result = await addCategory(formData)
         if (result.success) {
           toast.success('Category created successfully')
           setShowForm(false)
-          setFormData({ name: '', color: '#3B82F6', icon: '💰' })
+          setFormData(EMPTY_FORM)
         }
       }
     } catch (error) {
@@ -109,12 +99,8 @@ const Categories = () => {
     }
   }
 
+  // Default categories open too, but only their savings flag can change
   const handleEdit = (category) => {
-    // Prevent editing default categories
-    if (category.isDefault) {
-      toast.error('Default categories cannot be edited')
-      return
-    }
     setEditingCategory(category)
     setShowForm(true)
   }
@@ -122,12 +108,12 @@ const Categories = () => {
   const handleCancel = () => {
     setShowForm(false)
     setEditingCategory(null)
-    setFormData({ name: '', color: '#3B82F6', icon: '💰' })
+    setFormData(EMPTY_FORM)
   }
 
   const handleAddNew = () => {
     setEditingCategory(null)
-    setFormData({ name: '', color: '#3B82F6', icon: '💰' })
+    setFormData(EMPTY_FORM)
     setShowForm(true)
   }
 
@@ -278,6 +264,10 @@ const Categories = () => {
               </div>
             </div>
 
+            {editingCategory?.isDefault ? (
+              <p className="text-sm text-center text-gray-500 dark:text-[#85858b]">Default categories keep their name, icon and color</p>
+            ) : (
+            <>
             <div>
               <SectionLabel>Category name</SectionLabel>
               <FieldCard className="p-4">
@@ -333,6 +323,20 @@ const Categories = () => {
                 ))}
               </div>
             </div>
+            </>
+            )}
+
+            <FieldCard className="p-4 flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm text-gray-900 dark:text-[#ededed]">Savings or investment</p>
+                <p className="mt-0.5 text-xs text-gray-500 dark:text-[#85858b]">Money put aside, not spent. Can be left out of spending totals on the dashboard and in analytics.</p>
+              </div>
+              <Switch
+                checked={formData.isSavings}
+                onChange={(isSavings) => setFormData({ ...formData, isSavings })}
+                aria-label="Savings or investment"
+              />
+            </FieldCard>
           </div>
 
           <StickyFormFooter
@@ -390,22 +394,22 @@ const Categories = () => {
                       </h3>
                       <p className="mt-0.5 text-xs text-gray-500 dark:text-[#85858b]">
                         {category.isDefault ? 'Default' : 'Custom'}
+                        {category.isSavings && ' · Savings'}
                         {category.expenseCount > 0 && <> · <span className="tabular-nums">{category.expenseCount}</span> {category.expenseCount === 1 ? 'entry' : 'entries'}</>}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-1 ml-2">
+                    <button
+                      onClick={() => handleEdit(category)}
+                      className="p-2 text-gray-400 dark:text-[#85858b] hover:text-gray-900 dark:hover:text-[#ededed] hover:bg-gray-100 dark:hover:bg-white/[0.06] rounded-lg transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center"
+                      title="Edit category"
+                      aria-label={`Edit ${category.name}`}
+                    >
+                      <Edit size={16} strokeWidth={1.5} />
+                    </button>
                     {!category.isDefault && (
-                      <>
-                        <button
-                          onClick={() => handleEdit(category)}
-                          className="p-2 text-gray-400 dark:text-[#85858b] hover:text-gray-900 dark:hover:text-[#ededed] hover:bg-gray-100 dark:hover:bg-white/[0.06] rounded-lg transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center"
-                          title="Edit category"
-                          aria-label={`Edit ${category.name}`}
-                        >
-                          <Edit size={16} strokeWidth={1.5} />
-                        </button>
                         <button
                           onClick={() => handleDelete(category)}
                           className="p-2 rounded-lg transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center text-gray-400 dark:text-[#85858b] hover:text-red-600 dark:hover:text-[#e5484d] hover:bg-red-50 dark:hover:bg-[#e5484d]/10"
@@ -414,7 +418,6 @@ const Categories = () => {
                         >
                           <Trash2 size={16} strokeWidth={1.5} />
                         </button>
-                      </>
                     )}
                   </div>
                 </div>

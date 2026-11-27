@@ -4,7 +4,7 @@ import { usePrivacy } from '../context/PrivacyContext'
 import Amount from './Amount'
 import DateRangePicker from './DateRangePicker'
 import CategorySelector from './CategorySelector'
-import { formatCurrency, formatDateForInput, calculatePercentage, getCurrentMonthRange, getLast30DaysRange } from '../utils/helpers'
+import { formatCurrency, formatDate, formatDateForInput, calculatePercentage, getCurrentMonthRange, getLast30DaysRange } from '../utils/helpers'
 import { analyticsService } from '../services/analyticsService'
 import {
     LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area
@@ -14,6 +14,9 @@ import {
     ArrowUpCircle, ArrowDownCircle, PieChart as PieChartIcon, Share2, SearchX
 } from 'lucide-react'
 import EmptyState from './EmptyState'
+import Modal from './Modal'
+import Switch from './Switch'
+import { useExcludeSavings } from '../hooks/useExcludeSavings'
 import { startOfYear, endOfYear, format, parseISO, eachDayOfInterval, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachMonthOfInterval } from 'date-fns'
 
 const currencySymbols = {
@@ -95,14 +98,31 @@ const AnalyticsDashboard = ({
         setDateRange({ startDate: start, endDate: end })
     }
 
+    // Savings/investment categories can be left out of spending; picking one in the category filter overrides that
+    const [excludeSavings, setExcludeSavings] = useExcludeSavings()
+    const savingsIds = useMemo(() => new Set(categories.filter(c => c.isSavings).map(c => c._id)), [categories])
+    const skipSavings = excludeSavings && savingsIds.size > 0 && !selectedCategory
+
     // Filter expenses based on current filters
-    const filteredExpenses = useMemo(() => {
-        return expenses.filter(expense => {
+    const { filteredExpenses, savingsLeftOut } = useMemo(() => {
+        let savingsLeftOut = 0
+        const filteredExpenses = expenses.filter(expense => {
             const matchesCategory = !selectedCategory || expense.category?._id === selectedCategory || expense.category === selectedCategory
             const matchesType = filterType === 'all' || expense.type === filterType
-            return matchesCategory && matchesType
+            if (!matchesCategory || !matchesType) return false
+            if (skipSavings && expense.type === 'expense' && savingsIds.has(expense.category?._id || expense.category)) {
+                savingsLeftOut += expense.amount || 0
+                return false
+            }
+            return true
         })
-    }, [expenses, selectedCategory, filterType])
+        return { filteredExpenses, savingsLeftOut }
+    }, [expenses, selectedCategory, filterType, skipSavings, savingsIds])
+
+    // Category whose entries are open in the detail sheet
+    const [inspect, setInspect] = useState({ id: null, open: false })
+    const setInspectingId = (id) => setInspect({ id, open: true })
+    const inspectingId = inspect.id
 
     // Calculate summary statistics
     const summary = useMemo(() => {
@@ -224,8 +244,9 @@ const AnalyticsDashboard = ({
                 const category = categories?.find(c => c._id === categoryId)
                 const categoryName = category?.name || 'Uncategorized'
 
-                if (!categoryMap[categoryName]) {
-                    categoryMap[categoryName] = {
+                if (!categoryMap[categoryId]) {
+                    categoryMap[categoryId] = {
+                        id: categoryId,
                         name: categoryName,
                         value: 0,
                         color: category?.color || '#3B82F6',
@@ -233,8 +254,8 @@ const AnalyticsDashboard = ({
                         count: 0
                     }
                 }
-                categoryMap[categoryName].value += expense.amount || 0
-                categoryMap[categoryName].count += 1
+                categoryMap[categoryId].value += expense.amount || 0
+                categoryMap[categoryId].count += 1
             }
         })
 
@@ -414,16 +435,28 @@ const AnalyticsDashboard = ({
                         </div>
                     </div>
 
-                    {/* Clear filters Button */}
-                    {hasActiveFilters && (
-                        <div className="mt-6 pt-4 border-t border-gray-200 dark:border-white/[0.05] flex justify-end">
-                            <button
-                                onClick={clearFilters}
-                                className="btn-ghost btn-sm"
-                            >
-                                <X size={16} strokeWidth={1.5} />
-                                Clear filters
-                            </button>
+                    {/* Savings toggle and clear filters */}
+                    {(hasActiveFilters || savingsIds.size > 0) && (
+                        <div className="mt-6 pt-4 border-t border-gray-200 dark:border-white/[0.05] flex flex-wrap items-center justify-between gap-3">
+                            {savingsIds.size > 0 ? (
+                                <Switch
+                                    checked={excludeSavings}
+                                    onChange={setExcludeSavings}
+                                    disabled={!!selectedCategory}
+                                    title={selectedCategory ? 'A single category is selected, so it is shown as is' : undefined}
+                                    className="disabled:opacity-50 disabled:pointer-events-none"
+                                    label="Exclude savings and investments"
+                                />
+                            ) : <span />}
+                            {hasActiveFilters && (
+                                <button
+                                    onClick={clearFilters}
+                                    className="btn-ghost btn-sm"
+                                >
+                                    <X size={16} strokeWidth={1.5} />
+                                    Clear filters
+                                </button>
+                            )}
                         </div>
                     )}
                 </div>
@@ -432,11 +465,14 @@ const AnalyticsDashboard = ({
             {/* Summary Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="glass-card p-5">
-                  <p className="text-sm text-gray-600 dark:text-[#a1a1a6]">Expenses</p>
+                  <p className="text-sm text-gray-600 dark:text-[#a1a1a6]">{skipSavings ? 'Spending' : 'Expenses'}</p>
                   <p className={"mt-2 text-xl md:text-2xl leading-none font-medium tabular-nums text-gray-900 dark:text-[#ededed]"}>
                     <Amount value={summary.totalExpenses} currency={currency} />
                   </p>
                   <p className="mt-2 text-xs text-gray-500 dark:text-[#85858b]">{summary.expenseCount} transaction{summary.expenseCount !== 1 ? 's' : ''}</p>
+                  {skipSavings && savingsLeftOut > 0 && (
+                    <p className="mt-1 text-xs text-gray-500 dark:text-[#85858b]"><Amount value={savingsLeftOut} currency={currency} /> to savings, left out</p>
+                  )}
                 </div>
 
                 <div className="glass-card p-5">
@@ -547,11 +583,11 @@ const AnalyticsDashboard = ({
                     <div className="flex items-center justify-between mb-3 sm:mb-4">
                         <div>
                             <h3 className="text-base font-medium text-gray-900 dark:text-[#ededed]">By category</h3>
-                            <p className="text-xs text-gray-500 dark:text-[#a1a1a6] mt-1">Share of expenses in this range</p>
+                            <p className="text-xs text-gray-500 dark:text-[#a1a1a6] mt-1">Share of expenses in this range. Select one to see its entries</p>
                         </div>
                     </div>
                     {categoryChartData.length > 0 ? (
-                        <ShareBar data={categoryChartData} currency={currency} isPrivate={isPrivate} />
+                        <ShareBar data={categoryChartData} currency={currency} isPrivate={isPrivate} onSelect={setInspectingId} />
                     ) : (
                         <div className="flex items-center justify-center h-[200px] sm:h-[300px] text-gray-400 dark:text-[#85858b]">
                             <p>No category data available</p>
@@ -625,11 +661,16 @@ const AnalyticsDashboard = ({
                 <div className="glass-card p-4 sm:p-6">
                     <h3 className="text-base font-medium text-gray-900 dark:text-[#ededed] mb-3 sm:mb-4">Top categories</h3>
                     {topCategories.length > 0 ? (
-                        <div className="space-y-4">
+                        <div className="-mx-2 space-y-1">
                             {topCategories.map((category, index) => {
                                 const percentage = calculatePercentage(category.value, summary.totalExpenses)
                                 return (
-                                    <div key={index} className="space-y-2">
+                                    <button
+                                        key={category.id}
+                                        type="button"
+                                        onClick={() => setInspectingId(category.id)}
+                                        className="block w-full text-left space-y-2 px-2 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-white/[0.04] transition-colors"
+                                    >
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-3">
                                                 <span
@@ -652,7 +693,7 @@ const AnalyticsDashboard = ({
                                                 style={{ width: `${percentage}%` }}
                                             />
                                         </div>
-                                    </div>
+                                    </button>
                                 )
                             })}
                         </div>
@@ -747,32 +788,167 @@ const AnalyticsDashboard = ({
                     </div>
                 </div>
             </div>
+
+            <CategoryDetail
+                open={inspect.open}
+                category={categoryChartData.find(c => c.id === inspectingId)}
+                entries={filteredExpenses.filter(e => e.type === 'expense' && (e.category?._id || e.category) === inspectingId)}
+                totalExpenses={summary.totalExpenses}
+                dateRange={dateRange}
+                currency={currency}
+                isPrivate={isPrivate}
+                chartStyle={{ bar: chart.expense, grid: chart.grid, tick, tooltip: tooltipStyle, tooltipItem }}
+                onClose={() => setInspect((s) => ({ ...s, open: false }))}
+            />
         </div>
     )
 }
 
 // One stacked bar for the share of each category, with its legend below
-const ShareBar = ({ data, currency, isPrivate }) => {
+const ShareBar = ({ data, currency, isPrivate, onSelect }) => {
     const total = data.reduce((sum, d) => sum + d.value, 0) || 1
     const sorted = [...data].sort((a, b) => b.value - a.value)
     return (
         <div className="pt-2">
             <div className="flex h-3 w-full gap-0.5 overflow-hidden rounded-full" role="img" aria-label="Share of expenses by category">
                 {sorted.map((d) => (
-                    <span key={d.name} className="h-full first:rounded-l-full last:rounded-r-full" style={{ width: `${(d.value / total) * 100}%`, backgroundColor: d.color || '#a3a3a3' }} />
+                    <span key={d.id} className="h-full first:rounded-l-full last:rounded-r-full" style={{ width: `${(d.value / total) * 100}%`, backgroundColor: d.color || '#a3a3a3' }} />
                 ))}
             </div>
             <ul className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-x-6">
                 {sorted.map((d) => (
-                    <li key={d.name} className="h-9 flex items-center gap-2 text-sm border-b border-gray-100 dark:border-white/[0.05]">
-                        <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: d.color || '#a3a3a3' }} />
-                        <span className="flex-1 min-w-0 truncate text-gray-700 dark:text-[#a1a1a6]">{d.name}</span>
-                        <span className="tabular-nums text-gray-900 dark:text-[#ededed]">{isPrivate ? '••••' : formatCurrency(d.value, currency)}</span>
-                        <span className="w-12 text-right font-mono text-xs tabular-nums text-gray-500 dark:text-[#85858b]">{((d.value / total) * 100).toFixed(0)}%</span>
+                    <li key={d.id} className="border-b border-gray-100 dark:border-white/[0.05]">
+                        <button
+                            type="button"
+                            onClick={() => onSelect(d.id)}
+                            className="w-full h-9 px-1 flex items-center gap-2 text-sm text-left rounded-md hover:bg-gray-50 dark:hover:bg-white/[0.04] transition-colors"
+                        >
+                            <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: d.color || '#a3a3a3' }} />
+                            <span className="flex-1 min-w-0 truncate text-gray-700 dark:text-[#a1a1a6]">{d.name}</span>
+                            <span className="tabular-nums text-gray-900 dark:text-[#ededed]">{isPrivate ? '••••' : formatCurrency(d.value, currency)}</span>
+                            <span className="w-12 text-right font-mono text-xs tabular-nums text-gray-500 dark:text-[#85858b]">{((d.value / total) * 100).toFixed(0)}%</span>
+                        </button>
                     </li>
                 ))}
             </ul>
         </div>
+    )
+}
+
+// Sheet with one category's entries in the current range: totals, its spending over time, and every entry
+const CategoryDetail = ({ open, category, entries, totalExpenses, dateRange, currency, isPrivate, chartStyle, onClose }) => {
+    const [sortBy, setSortBy] = useState('date') // 'date' | 'amount'
+
+    const stats = useMemo(() => {
+        const total = entries.reduce((s, e) => s + (e.amount || 0), 0)
+        const largest = entries.reduce((max, e) => (e.amount > (max?.amount || 0) ? e : max), null)
+        return { total, count: entries.length, average: entries.length ? total / entries.length : 0, largest }
+    }, [entries])
+
+    // Daily bars for ranges up to two months, monthly bars beyond that
+    const series = useMemo(() => {
+        if (!entries.length) return []
+        const dates = entries.map(e => e.date.slice(0, 10)).sort()
+        const start = parseISO(dateRange.startDate || dates[0])
+        const end = parseISO(dateRange.endDate || dates[dates.length - 1])
+        if (isNaN(start) || isNaN(end) || start > end) return []
+        const daily = eachDayOfInterval({ start, end }).length <= 62
+        const keyOf = daily ? (d) => format(d, 'yyyy-MM-dd') : (d) => format(d, 'yyyy-MM')
+        const buckets = new Map((daily ? eachDayOfInterval({ start, end }) : eachMonthOfInterval({ start, end }))
+            .map(d => [keyOf(d), { label: format(d, daily ? 'MMM d' : 'MMM yy'), amount: 0 }]))
+        entries.forEach(e => {
+            const b = buckets.get(keyOf(parseISO(e.date.slice(0, 10))))
+            if (b) b.amount += e.amount || 0
+        })
+        return [...buckets.values()]
+    }, [entries, dateRange])
+
+    const sorted = useMemo(() => [...entries].sort((a, b) =>
+        sortBy === 'amount' ? b.amount - a.amount : b.date.localeCompare(a.date)
+    ), [entries, sortBy])
+
+    const figure = (label, value, sub) => (
+        <div className="p-3 rounded-lg border border-gray-100 dark:border-white/[0.06]">
+            <p className="text-xs text-gray-500 dark:text-[#85858b]">{label}</p>
+            <p className="mt-1 text-base font-medium tabular-nums text-gray-900 dark:text-[#ededed] truncate">{value}</p>
+            {sub && <p className="mt-0.5 text-xs text-gray-500 dark:text-[#85858b] truncate">{sub}</p>}
+        </div>
+    )
+    const share = totalExpenses > 0 ? Math.round((stats.total / totalExpenses) * 100) : 0
+
+    return (
+        <Modal isOpen={open && !!category} onClose={onClose} title={category?.name} maxWidth="max-w-2xl">
+            {category && (
+                <div className="p-5 space-y-5">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        {figure('Total', <Amount value={stats.total} currency={currency} />, `${share}% of expenses`)}
+                        {figure('Entries', stats.count)}
+                        {figure('Average', <Amount value={stats.average} currency={currency} />, 'per entry')}
+                        {figure('Largest', <Amount value={stats.largest?.amount} currency={currency} />, stats.largest && formatDate(stats.largest.date, 'MMM d'))}
+                    </div>
+
+                    {series.length > 1 && (
+                        <div className="h-[140px]" aria-hidden="true">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={series} margin={{ top: 4, right: 12, left: 12, bottom: 0 }}>
+                                    <CartesianGrid vertical={false} stroke={chartStyle.grid} />
+                                    <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ ...chartStyle.tick, fontSize: 11 }} interval="preserveStartEnd" minTickGap={24} />
+                                    <YAxis hide />
+                                    <Tooltip
+                                        contentStyle={chartStyle.tooltip}
+                                        itemStyle={chartStyle.tooltipItem}
+                                        cursor={{ fill: chartStyle.grid }}
+                                        formatter={(value) => [isPrivate ? '••••' : formatCurrency(value, currency), 'Spent']}
+                                    />
+                                    <Bar dataKey="amount" fill={chartStyle.bar} radius={[3, 3, 0, 0]} maxBarSize={24} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    )}
+
+                    <div>
+                        <div className="flex items-center justify-between mb-2">
+                            <h4 className="text-sm font-medium text-gray-900 dark:text-[#ededed]">Entries</h4>
+                            <div role="group" aria-label="Sort entries" className="inline-flex gap-1 p-0.5 rounded-lg border border-gray-200 dark:border-white/[0.06] bg-gray-100 dark:bg-white/[0.04]">
+                                {[['date', 'Newest'], ['amount', 'Largest']].map(([value, label]) => (
+                                    <button
+                                        key={value}
+                                        type="button"
+                                        aria-pressed={sortBy === value}
+                                        onClick={() => setSortBy(value)}
+                                        className={`px-2.5 h-7 text-xs rounded-md transition-colors ${sortBy === value
+                                            ? 'bg-white dark:bg-[#2a2a2c] text-gray-900 dark:text-[#ededed] shadow-[0_1px_2px_rgba(0,0,0,0.06)]'
+                                            : 'text-gray-600 dark:text-[#a1a1a6] hover:text-gray-900 dark:hover:text-white'}`}
+                                    >
+                                        {label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        <ul className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                            {sorted.map((e) => (
+                                <li key={e._id} className="py-3 flex items-start gap-3">
+                                    <span className="w-14 shrink-0 pt-0.5 font-mono text-xs tabular-nums text-gray-500 dark:text-[#85858b]">{formatDate(e.date, 'MMM d')}</span>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm text-gray-900 dark:text-[#ededed] truncate">{e.description || <span className="text-gray-400 dark:text-[#5a5a5f]">No description</span>}</p>
+                                        {e.notes && <p className="mt-0.5 text-xs text-gray-500 dark:text-[#a1a1a6] line-clamp-2">{e.notes}</p>}
+                                        {(e.tags?.length > 0 || e.isRecurring) && (
+                                            <div className="mt-1.5 flex flex-wrap gap-1">
+                                                {e.isRecurring && <span className="px-1.5 py-0.5 rounded text-[11px] bg-gray-100 dark:bg-white/[0.06] text-gray-600 dark:text-[#a1a1a6]">Recurring{e.recurringPeriod ? `, ${e.recurringPeriod}` : ''}</span>}
+                                                {e.tags?.map(tag => (
+                                                    <span key={tag} className="px-1.5 py-0.5 rounded text-[11px] bg-gray-100 dark:bg-white/[0.06] text-gray-600 dark:text-[#a1a1a6]">#{tag}</span>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <Amount value={e.amount} currency={currency} className="shrink-0 text-sm tabular-nums text-gray-900 dark:text-[#ededed]" />
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+            )}
+        </Modal>
     )
 }
 

@@ -20,6 +20,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { buildHeatmapGrid } from '../utils/heatmapGrid';
 import ActivityHeatmap from '../components/ActivityHeatmap';
 import { usePrivacy } from '../context/PrivacyContext';
+import { useExcludeSavings } from '../hooks/useExcludeSavings';
+import SavingsToggle from '../components/SavingsToggle';
 
 export default function DashboardScreen({ navigation }) {
   const { signOut, user } = useContext(AuthContext);
@@ -28,7 +30,8 @@ export default function DashboardScreen({ navigation }) {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [summary, setSummary] = useState({ income: 0, expense: 0, balance: 0 });
+  const [summary, setSummary] = useState({ income: 0, expense: 0, balance: 0, savings: 0 });
+  const [excludeSavings, setExcludeSavings] = useExcludeSavings();
   const [heatmap, setHeatmap] = useState(null);
 
   // Action Sheet & Alert States
@@ -86,7 +89,7 @@ export default function DashboardScreen({ navigation }) {
       });
 
       let fetchedExpenses = [];
-      let backendStats = { income: 0, expense: 0 };
+      let backendStats = { income: 0, expense: 0, savings: 0 };
       let isOfflineMode = false;
 
       try {
@@ -105,6 +108,7 @@ export default function DashboardScreen({ navigation }) {
           if (statsData?.totalStats) {
             backendStats.income = parseFloat(statsData.totalStats.income) || 0;
             backendStats.expense = parseFloat(statsData.totalStats.expenses || statsData.totalStats.expense) || 0;
+            backendStats.savings = parseFloat(statsData.totalStats.savings) || 0;
           } else if (Array.isArray(statsData)) {
             statsData.forEach(s => {
               if (s._id === 'income') backendStats.income += parseFloat(s.total) || 0;
@@ -161,7 +165,8 @@ export default function DashboardScreen({ navigation }) {
       setSummary({
         income: totalIncome,
         expense: totalExpense,
-        balance: totalIncome - totalExpense
+        balance: totalIncome - totalExpense,
+        savings: isOfflineMode ? 0 : backendStats.savings
       });
 
       // Cache the server part for offline use
@@ -239,6 +244,9 @@ export default function DashboardScreen({ navigation }) {
   const monthTitle = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   const todayLabel = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
+  // Savings and investments are expenses on paper; with the toggle on they leave spending (and so raise the balance)
+  const savingsOut = excludeSavings ? summary.savings : 0;
+
   const renderHeader = () => (
     <View>
       {/* Top Header */}
@@ -273,14 +281,18 @@ export default function DashboardScreen({ navigation }) {
       </View>
 
       {/* Balance Card */}
-      <BalanceCard balance={summary.balance} onPress={() => hapticFeedback.light()} />
+      <BalanceCard balance={summary.balance + savingsOut} onPress={() => hapticFeedback.light()} />
 
       {/* Summary Cards Row */}
       <View style={styles.summaryRow}>
         <SummaryCard title="Income" amount={summary.income} />
         <View style={{ width: 12 }} />
-        <SummaryCard title="Expenses" amount={summary.expense} />
+        <SummaryCard title={savingsOut > 0 ? 'Spending' : 'Expenses'} amount={summary.expense - savingsOut} />
       </View>
+
+      {summary.savings > 0 && (
+        <SavingsToggle value={excludeSavings} onChange={setExcludeSavings} leftOut={summary.savings} />
+      )}
 
       {heatmap?.grid?.length > 0 && heatmap.grid.some((w) => w.some((c) => c.count > 0)) && (
         <View style={[styles.activityCard, { backgroundColor: colors.card, borderColor: colors.border }]}>

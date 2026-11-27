@@ -5,6 +5,8 @@ import { useExpense } from '../context/ExpenseContext'
 import { useDebt } from '../context/DebtContext'
 import { useDailyActivity } from '../hooks/useDailyActivity'
 import { usePeriodStats } from '../hooks/usePeriodStats'
+import { useExcludeSavings } from '../hooks/useExcludeSavings'
+import Switch from '../components/Switch'
 import { PERIODS, periodTitle, comparisonLabel } from '../utils/periods'
 import ActivityHeatmap from '../components/ActivityHeatmap'
 import { expenseService } from '../services/expenseService'
@@ -30,7 +32,7 @@ import {
 
 const Dashboard = () => {
   const { currency } = useAuth()
-  const { trends, loadTrends, getCategoryById } = useExpense()
+  const { trends, loadTrends, getCategoryById, categories } = useExpense()
   const { debts, loadDebts } = useDebt()
   const [recentTransactions, setRecentTransactions] = useState([])
   const [loadingRecent, setLoadingRecent] = useState(true)
@@ -39,7 +41,16 @@ const Dashboard = () => {
     const stored = localStorage.getItem('dashPeriod')
     return PERIODS.some(p => p.value === stored) ? stored : 'month'
   })
-  const { current, previous, loading } = usePeriodStats(period)
+  const { current: rawCurrent, previous: rawPrevious, loading } = usePeriodStats(period)
+  const [excludeSavings, setExcludeSavings] = useExcludeSavings()
+  const hasSavings = categories.some(c => c.isSavings)
+  const skipSavings = excludeSavings && hasSavings
+  // Savings and investments are expenses on paper; with the toggle on they leave spending (and so raise net)
+  const withoutSavings = (s) => s && skipSavings
+    ? { ...s, expenses: s.expenses - (s.savings || 0), net: s.net + (s.savings || 0), categories: s.categories.filter(c => !c.isSavings) }
+    : s
+  const current = withoutSavings(rawCurrent)
+  const previous = withoutSavings(rawPrevious)
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())
   const navigate = useNavigate()
   const activity = useDailyActivity(52)
@@ -86,7 +97,7 @@ const Dashboard = () => {
     return {
       name: item.month,
       Income: future ? null : item.income,
-      Expense: future ? null : item.expenses
+      Expense: future ? null : item.expenses - (skipSavings ? item.savings || 0 : 0)
     }
   }) || []
   const totalExpense = chartData.reduce((s, d) => s + (d.Expense || 0), 0)
@@ -167,6 +178,9 @@ const Dashboard = () => {
           <p className="mt-1 text-sm text-gray-500 dark:text-[#a1a1a6]">{format(new Date(), 'EEEE, MMMM d, yyyy')}</p>
         </div>
         <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+          {hasSavings && (
+            <Switch checked={excludeSavings} onChange={setExcludeSavings} label="Exclude savings" className="h-9 self-start sm:self-auto" />
+          )}
           <div role="group" aria-label="Period" className="inline-flex gap-1 p-1 rounded-[10px] border border-gray-200 dark:border-white/[0.06] bg-gray-100 dark:bg-white/[0.04]">
             {PERIODS.map(({ value, label }) => (
               <button
@@ -219,7 +233,10 @@ const Dashboard = () => {
           {figure('Income', current?.income, !loading && compare(current?.income, previous?.income, ['more', 'less']))}
         </div>
         <div className={`p-5 md:p-6 border-gray-200 dark:border-white/[0.07] ${hasDebts ? 'lg:border-r' : ''}`}>
-          {figure('Expenses', current?.expenses, !loading && compare(current?.expenses, previous?.expenses, ['more', 'less']))}
+          {figure(skipSavings ? 'Spending' : 'Expenses', current?.expenses, !loading && compare(current?.expenses, previous?.expenses, ['more', 'less']))}
+          {skipSavings && !loading && rawCurrent?.savings > 0 && (
+            <p className={`mt-1 ${meta}`}><Amount whole value={rawCurrent.savings} currency={currency} /> to savings, left out</p>
+          )}
         </div>
         {hasDebts && (
           <div className="col-span-2 lg:col-span-1 p-5 md:p-6 bg-gray-50 dark:bg-white/[0.02] border-t lg:border-t-0 border-gray-200 dark:border-white/[0.07] rounded-b-xl lg:rounded-bl-none lg:rounded-r-xl">
