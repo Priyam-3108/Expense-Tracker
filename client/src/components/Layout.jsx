@@ -111,7 +111,10 @@ const Layout = () => {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-3 py-4 space-y-0.5">
+          <div className="px-4 pt-5 pb-2">
+            <p className="text-xs text-gray-400 dark:text-[#71717A] px-2">Navigation</p>
+          </div>
+          <nav className="flex-1 px-3 pb-4 space-y-1">
             {navigation.map((item) => {
               const Icon = item.icon
               return (
@@ -121,19 +124,19 @@ const Layout = () => {
                   onClick={() => setSidebarOpen(false)}
                   className={({ isActive }) =>
                     cn(
-                      "flex items-center gap-2.5 px-3 text-sm rounded-lg transition-colors min-h-[44px] lg:min-h-0 lg:h-9",
+                      "flex items-center gap-2.5 px-3 text-sm rounded-[10px] transition-colors min-h-[44px] lg:min-h-0 lg:h-9",
                       isActive
-                        ? "bg-gray-100 dark:bg-[#232325] text-gray-900 dark:text-[#ededed] font-medium dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
-                        : "text-gray-600 dark:text-[#a1a1a6] hover:bg-gray-50 dark:hover:bg-white/[0.04] hover:text-gray-900 dark:hover:text-[#ededed]"
+                        ? "bg-gray-100 dark:bg-gradient-to-b dark:from-[#27272a] dark:to-[#1f1f22] text-gray-900 dark:text-[#ededed] font-medium border border-gray-200/80 dark:border-white/[0.08] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+                        : "text-gray-600 dark:text-[#a1a1a6] hover:bg-gray-50 dark:hover:bg-white/[0.04] hover:text-gray-900 dark:hover:text-[#ededed] border border-transparent"
                     )
                   }
                 >
                   {({ isActive }) => (
                     <>
                       <Icon
-                        size={18}
+                        size={17}
                         strokeWidth={1.5}
-                        className={cn("shrink-0", isActive ? "text-brass dark:text-brass" : "text-gray-400 dark:text-[#85858b]")}
+                        className={cn("shrink-0", isActive ? "text-gray-900 dark:text-[#ededed]" : "text-gray-400 dark:text-[#71717A]")}
                       />
                       {item.name}
                     </>

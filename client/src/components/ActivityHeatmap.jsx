@@ -32,7 +32,8 @@ export default function ActivityHeatmap({
     (theme === 'system' && typeof window !== 'undefined' &&
       window.matchMedia('(prefers-color-scheme: dark)').matches)
   const palette = isDark ? DARK : LIGHT
-  const [hover, setHover] = useState(null) // { x, y, cell }
+  const [hover, setHover] = useState(null) // { x, y, flipLeft, cell }
+  const outerRef = useRef(null)
   const scrollRef = useRef(null)
 
   // Newest weeks are on the right; start scrolled there when the grid overflows.
@@ -56,8 +57,8 @@ export default function ActivityHeatmap({
   const template = `${LABEL_COL_WIDTH}px repeat(${numCols}, minmax(${MIN_CELL}px, 1fr))`
 
   return (
-    <div className="relative">
-      <div ref={scrollRef} className="overflow-x-auto pb-1 [scrollbar-width:thin]">
+    <div ref={outerRef} className="relative">
+      <div ref={scrollRef} className="overflow-x-auto pb-1 bulk-expenses-scroll">
         <div className="relative" style={{ minWidth: LABEL_COL_WIDTH + numCols * (MIN_CELL + GAP) }}>
           {/* Month labels: same column template as the grid so they line up at any width */}
           <div className="grid mb-1" style={{ gridTemplateColumns: template, columnGap: GAP, height: monthLabelHeight }}>
@@ -89,11 +90,19 @@ export default function ActivityHeatmap({
                   type="button"
                   disabled={!cell.inWindow}
                   onClick={() => cell.date && cell.count > 0 && onCellClick?.(cell.date)}
-                  onMouseEnter={(e) => cell.inWindow && setHover({
-                    x: e.currentTarget.offsetLeft,
-                    y: e.currentTarget.offsetTop,
-                    cell,
-                  })}
+                  onMouseEnter={(e) => {
+                    if (!cell.inWindow || !outerRef.current) return
+                    const cellRect = e.currentTarget.getBoundingClientRect()
+                    const outerRect = outerRef.current.getBoundingClientRect()
+                    const relX = cellRect.left - outerRect.left + cellRect.width / 2
+                    const relY = cellRect.top - outerRect.top
+                    setHover({
+                      x: relX,
+                      y: relY,
+                      flipLeft: relX > outerRect.width * 0.65,
+                      cell,
+                    })
+                  }}
                   onMouseLeave={() => setHover(null)}
                   className="w-full aspect-square rounded-[3px] transition-opacity hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brass disabled:cursor-default disabled:hover:opacity-100"
                   style={{
@@ -107,18 +116,23 @@ export default function ActivityHeatmap({
             )}
           </div>
 
-          {/* Tooltip (inside the scroll content so offsets stay correct when scrolled) */}
-          {hover && hover.cell.date && (
-            <div
-              className="pointer-events-none absolute z-10 rounded-md bg-gray-900 dark:bg-[#232325] dark:border dark:border-white/[0.08] text-white text-[11px] px-2 py-1 whitespace-nowrap"
-              style={{ left: hover.x + 20, top: hover.y - 40 }}
-            >
-              <div className="font-medium">{format(parseISO(hover.cell.date), 'EEE, MMM d, yyyy')}</div>
-              <div className="font-mono tabular-nums">{hover.cell.count} {hover.cell.count === 1 ? 'entry' : 'entries'} · {isPrivate ? '••••' : formatCurrency(hover.cell.expenseTotal, currency)}</div>
-            </div>
-          )}
         </div>
       </div>
+
+      {/* Tooltip rendered outside overflow-x-auto so hovering right-edge cells never triggers horizontal scroll */}
+      {hover && hover.cell.date && (
+        <div
+          className="pointer-events-none absolute z-20 rounded-lg bg-gray-900 dark:bg-[#232325] border border-black/10 dark:border-white/[0.1] shadow-lg text-white text-[11px] px-2.5 py-1.5 whitespace-nowrap"
+          style={{
+            left: hover.x,
+            top: Math.max(0, hover.y - 46),
+            transform: hover.flipLeft ? 'translateX(calc(-100% + 6px))' : 'translateX(-6px)',
+          }}
+        >
+          <div className="font-medium text-white">{format(parseISO(hover.cell.date), 'EEE, MMM d, yyyy')}</div>
+          <div className="font-mono tabular-nums text-white/75">{hover.cell.count} {hover.cell.count === 1 ? 'entry' : 'entries'} · {isPrivate ? '••••' : formatCurrency(hover.cell.expenseTotal, currency)}</div>
+        </div>
+      )}
 
       {/* Legend */}
       <div className="flex items-center gap-1.5 mt-3 text-[11px] text-gray-400 dark:text-[#85858b]" style={{ paddingLeft: LABEL_COL_WIDTH }}>
