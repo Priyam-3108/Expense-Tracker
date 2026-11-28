@@ -120,7 +120,8 @@ const Analytics = () => {
 
       const response = await analyticsService.enableSharing()
       if (response.data.success) {
-        setShareLink(response.data.data.link)
+        const { token, link } = response.data.data
+        setShareLink(token ? `${window.location.origin}/analytics/shared/${token}` : link)
         setShareEnabled(true)
         setShowShareModal(true)
         toast.success('Analytics sharing enabled')

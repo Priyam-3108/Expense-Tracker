@@ -15,11 +15,13 @@ export const getShareToken = async (req, res) => {
             await user.save();
         }
 
+        const clientOrigin = process.env.CLIENT_URL || process.env.FRONTEND_URL || req.get('origin') || 'http://localhost:5173';
+
         res.json({
             success: true,
             data: {
                 token: user.analyticsShareToken,
-                link: `${process.env.CLIENT_URL || 'http://localhost:5173'}/analytics/shared/${user.analyticsShareToken}`
+                link: `${clientOrigin}/analytics/shared/${user.analyticsShareToken}`
             }
         });
     } catch (error) {
